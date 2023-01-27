@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Service;
 
-import ar.edu.um.haberes.rest.exception.NovedadNotFoundException;
+import ar.edu.um.haberes.rest.exception.NovedadException;
 import ar.edu.um.haberes.rest.exception.common.ImportNewsException;
 import ar.edu.um.haberes.rest.exception.common.TituloNotFoundException;
 import ar.edu.um.haberes.rest.model.Codigo;
@@ -184,7 +184,7 @@ public class NovedadFileService {
 			} catch (IncorrectResultSizeDataAccessException e) {
 				throw new ImportNewsException(novedadUpload.getLegajoId(), anho, mes, novedadUpload.getCodigoId(),
 						novedadUpload.getDependenciaId());
-			} catch (NovedadNotFoundException e) {
+			} catch (NovedadException e) {
 				novedadId = null;
 			}
 			novedades.add(new Novedad(novedadId, novedadUpload.getLegajoId(), anho, mes, novedadUpload.getCodigoId(),
@@ -207,7 +207,7 @@ public class NovedadFileService {
 					Novedad novedad = novedadService.findByUnique(old.getLegajoId(), anho, mes, old.getCodigoId(),
 							old.getDependenciaId());
 					novedadId = novedad.getNovedadId();
-				} catch (NovedadNotFoundException e) {
+				} catch (NovedadException e) {
 					novedadId = null;
 				}
 				novedades.add(

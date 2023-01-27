@@ -22,7 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import ar.edu.um.haberes.rest.exception.ContactoNotFoundException;
-import ar.edu.um.haberes.rest.exception.PersonaNotFoundException;
+import ar.edu.um.haberes.rest.exception.PersonaException;
 import ar.edu.um.haberes.rest.model.Contacto;
 import ar.edu.um.haberes.rest.model.Persona;
 import ar.edu.um.haberes.rest.model.view.PersonaSearch;
@@ -126,11 +126,11 @@ public class PersonaService {
 	}
 
 	public Persona findByLegajoId(Long legajoId) {
-		return repository.findByLegajoId(legajoId).orElseThrow(() -> new PersonaNotFoundException(legajoId));
+		return repository.findByLegajoId(legajoId).orElseThrow(() -> new PersonaException(legajoId));
 	}
 
 	public Persona findByDocumento(BigDecimal documento) {
-		return repository.findByDocumento(documento).orElseThrow(() -> new PersonaNotFoundException(documento));
+		return repository.findByDocumento(documento).orElseThrow(() -> new PersonaException(documento));
 	}
 
 	public Persona add(Persona persona) {
@@ -153,7 +153,7 @@ public class PersonaService {
 			repository.save(persona);
 			log.debug(persona.toString());
 			return persona;
-		}).orElseThrow(() -> new PersonaNotFoundException(legajoId));
+		}).orElseThrow(() -> new PersonaException(legajoId));
 	}
 
 	public List<Persona> saveall(List<Persona> personas) {

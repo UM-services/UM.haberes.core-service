@@ -14,7 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import ar.edu.um.haberes.rest.exception.LiquidacionNotFoundException;
+import ar.edu.um.haberes.rest.exception.LiquidacionException;
 import ar.edu.um.haberes.rest.model.Liquidacion;
 import ar.edu.um.haberes.rest.model.LiquidacionVersion;
 import ar.edu.um.haberes.rest.model.view.LiquidacionPeriodo;
@@ -98,18 +98,18 @@ public class LiquidacionService {
 
 	public Liquidacion findByLiquidacionId(Long liquidacionId) {
 		return repository.findByLiquidacionId(liquidacionId)
-				.orElseThrow(() -> new LiquidacionNotFoundException(liquidacionId));
+				.orElseThrow(() -> new LiquidacionException(liquidacionId));
 	}
 
 	public Liquidacion findByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes) {
 		return repository.findByLegajoIdAndAnhoAndMes(legajoId, anho, mes)
-				.orElseThrow(() -> new LiquidacionNotFoundException(legajoId, anho, mes));
+				.orElseThrow(() -> new LiquidacionException(legajoId, anho, mes));
 	}
 
 	public Liquidacion findByPeriodoAnterior(Long legajoId, Integer anho, Integer mes) {
 		Periodo periodo = Periodo.prevMonth(anho, mes);
 		return repository.findByLegajoIdAndAnhoAndMes(legajoId, periodo.getAnho(), periodo.getMes())
-				.orElseThrow(() -> new LiquidacionNotFoundException(legajoId, periodo.getAnho(), periodo.getMes()));
+				.orElseThrow(() -> new LiquidacionException(legajoId, periodo.getAnho(), periodo.getMes()));
 	}
 
 	public Liquidacion add(Liquidacion liquidacion) {
@@ -139,7 +139,7 @@ public class LiquidacionService {
 					newLiquidacion.getLiquida(), newLiquidacion.getPersona(), newLiquidacion.getDependencia());
 			liquidacion = repository.save(liquidacion);
 			return liquidacion;
-		}).orElseThrow(() -> new LiquidacionNotFoundException(liquidacionId));
+		}).orElseThrow(() -> new LiquidacionException(liquidacionId));
 	}
 
 	@Transactional

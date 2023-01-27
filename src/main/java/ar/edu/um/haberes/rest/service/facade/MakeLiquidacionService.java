@@ -22,7 +22,7 @@ import ar.edu.um.haberes.rest.exception.AdicionalCursoTablaNotFoundException;
 import ar.edu.um.haberes.rest.exception.CategoriaPeriodoNotFoundException;
 import ar.edu.um.haberes.rest.exception.LegajoControlNotFoundException;
 import ar.edu.um.haberes.rest.exception.LetraNotFoundException;
-import ar.edu.um.haberes.rest.exception.LiquidacionNotFoundException;
+import ar.edu.um.haberes.rest.exception.LiquidacionException;
 import ar.edu.um.haberes.rest.model.CargoLiquidacion;
 import ar.edu.um.haberes.rest.model.Actividad;
 import ar.edu.um.haberes.rest.model.AdicionalCursoRango;
@@ -196,13 +196,25 @@ public class MakeLiquidacionService {
 				if (liquidacion.getBloqueado() == (byte) 1) {
 					return;
 				}
-			} catch (LiquidacionNotFoundException e) {
+			} catch (LiquidacionException e) {
 
 			}
 		}
 
-		// Verifica si el estado anterior era 9/S para pasarlo a 9/N
 		persona = personaService.findByLegajoId(legajoId);
+		// Verifica si el estado es 9/N no liquida
+		if (persona.getEstado() == 9 && persona.getLiquida().equals("N")) {
+			try {
+				Liquidacion liquidacion = liquidacionService.findByPeriodoAnterior(legajoId, anho, mes);
+				if (liquidacion.getEstado() == 1 && liquidacion.getLiquida().equals("S")) {
+					log.debug("SIN Liquidacion {}/{}/{}", legajoId, anho, mes);
+					return;
+				}
+			} catch (LiquidacionException e) {
+
+			}
+		}
+		// Verifica si el estado anterior era 9/S para pasarlo a 9/N
 		if (!(persona.getEstado() == 1 && persona.getLiquida().equals("S"))) {
 			try {
 				Liquidacion liquidacion = liquidacionService.findByPeriodoAnterior(legajoId, anho, mes);
@@ -211,7 +223,7 @@ public class MakeLiquidacionService {
 					persona = personaService.update(persona, legajoId);
 					return;
 				}
-			} catch (LiquidacionNotFoundException e) {
+			} catch (LiquidacionException e) {
 
 			}
 		}
@@ -689,7 +701,7 @@ public class MakeLiquidacionService {
 				if (liquidacion.getBloqueado() == (byte) 1) {
 					return;
 				}
-			} catch (LiquidacionNotFoundException e) {
+			} catch (LiquidacionException e) {
 
 			}
 		}

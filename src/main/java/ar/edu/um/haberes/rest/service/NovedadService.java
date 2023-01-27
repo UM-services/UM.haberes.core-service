@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import ar.edu.um.haberes.rest.exception.NovedadNotFoundException;
+import ar.edu.um.haberes.rest.exception.NovedadException;
 import ar.edu.um.haberes.rest.model.Novedad;
 import ar.edu.um.haberes.rest.repository.INovedadRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -44,13 +44,13 @@ public class NovedadService {
 	}
 
 	public Novedad findByNovedadId(Long novedadId) {
-		return repository.findByNovedadId(novedadId).orElseThrow(() -> new NovedadNotFoundException(novedadId));
+		return repository.findByNovedadId(novedadId).orElseThrow(() -> new NovedadException(novedadId));
 	}
 
 	public Novedad findByUnique(Long legajoId, Integer anho, Integer mes, Integer codigoId, Integer dependenciaId) {
 		return repository
 				.findByLegajoIdAndAnhoAndMesAndCodigoIdAndDependenciaId(legajoId, anho, mes, codigoId, dependenciaId)
-				.orElseThrow(() -> new NovedadNotFoundException(legajoId, anho, mes, codigoId, dependenciaId));
+				.orElseThrow(() -> new NovedadException(legajoId, anho, mes, codigoId, dependenciaId));
 	}
 
 	public Novedad add(Novedad novedad) {
@@ -69,7 +69,7 @@ public class NovedadService {
 			repository.save(novedad);
 			log.debug(novedad.toString());
 			return novedad;
-		}).orElseThrow(() -> new NovedadNotFoundException(novedadId));
+		}).orElseThrow(() -> new NovedadException(novedadId));
 	}
 
 	@Transactional

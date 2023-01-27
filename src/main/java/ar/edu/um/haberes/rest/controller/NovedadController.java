@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import ar.edu.um.haberes.rest.exception.NovedadNotFoundException;
+import ar.edu.um.haberes.rest.exception.NovedadException;
 import ar.edu.um.haberes.rest.model.Novedad;
 import ar.edu.um.haberes.rest.service.NovedadService;
 
@@ -55,7 +55,7 @@ public class NovedadController {
 	public ResponseEntity<Novedad> findByNovedadId(@PathVariable Long novedadId) {
 		try {
 			return new ResponseEntity<Novedad>(service.findByNovedadId(novedadId), HttpStatus.OK);
-		} catch (NovedadNotFoundException e) {
+		} catch (NovedadException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
@@ -69,7 +69,7 @@ public class NovedadController {
 		try {
 			return new ResponseEntity<Novedad>(service.findByUnique(legajoId, anho, mes, codigoId, dependenciaIdLocal),
 					HttpStatus.OK);
-		} catch (NovedadNotFoundException e) {
+		} catch (NovedadException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}

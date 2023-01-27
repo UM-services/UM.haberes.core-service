@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import ar.edu.um.haberes.rest.exception.LiquidacionNotFoundException;
+import ar.edu.um.haberes.rest.exception.LiquidacionException;
 import ar.edu.um.haberes.rest.model.Liquidacion;
 import ar.edu.um.haberes.rest.model.view.LiquidacionPeriodo;
 import ar.edu.um.haberes.rest.service.LiquidacionService;
@@ -92,7 +92,7 @@ public class LiquidacionController {
 	public ResponseEntity<Liquidacion> findByLiquidacionId(@PathVariable Long liquidacionId) {
 		try {
 			return new ResponseEntity<Liquidacion>(service.findByLiquidacionId(liquidacionId), HttpStatus.OK);
-		} catch (LiquidacionNotFoundException e) {
+		} catch (LiquidacionException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
@@ -103,7 +103,7 @@ public class LiquidacionController {
 		try {
 			return new ResponseEntity<Liquidacion>(service.findByLegajoIdAndAnhoAndMes(legajoId, anho, mes),
 					HttpStatus.OK);
-		} catch (LiquidacionNotFoundException e) {
+		} catch (LiquidacionException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}

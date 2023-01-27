@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 import ar.edu.um.haberes.rest.exception.ItemNotFoundException;
 import ar.edu.um.haberes.rest.exception.LegajoContabilidadNotFoundException;
-import ar.edu.um.haberes.rest.exception.LiquidacionNotFoundException;
+import ar.edu.um.haberes.rest.exception.LiquidacionException;
 import ar.edu.um.haberes.rest.model.Actividad;
 import ar.edu.um.haberes.rest.model.CargoLiquidacion;
 import ar.edu.um.haberes.rest.model.CargoClaseDetalle;
@@ -104,7 +104,7 @@ public class ContableService {
 		Liquidacion liquidacion = null;
 		try {
 			liquidacion = liquidacionService.findByLegajoIdAndAnhoAndMes(legajoId, anho, mes);
-		} catch (LiquidacionNotFoundException e) {
+		} catch (LiquidacionException e) {
 			liquidacion = new Liquidacion();
 		}
 		log.debug("Liquidacion -> {}", liquidacion);

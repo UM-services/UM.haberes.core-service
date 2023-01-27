@@ -30,7 +30,7 @@ import org.springframework.stereotype.Service;
 
 import ar.edu.um.haberes.rest.exception.AcreditacionNotFoundException;
 import ar.edu.um.haberes.rest.exception.LegajoBancoNotFoundException;
-import ar.edu.um.haberes.rest.exception.NovedadNotFoundException;
+import ar.edu.um.haberes.rest.exception.NovedadException;
 import ar.edu.um.haberes.rest.model.Acreditacion;
 import ar.edu.um.haberes.rest.model.CargoClaseDetalle;
 import ar.edu.um.haberes.rest.model.CargoLiquidacion;
@@ -921,7 +921,7 @@ public class SheetService {
 					Novedad novedad = novedadService.findByUnique(persona.getLegajoId(), anho, semestre * 6, codigoId,
 							null);
 					novedadId = novedad.getNovedadId();
-				} catch (NovedadNotFoundException e) {
+				} catch (NovedadException e) {
 					novedadId = null;
 				}
 				importe = aguinaldo;

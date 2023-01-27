@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import ar.edu.um.haberes.rest.exception.PersonaNotFoundException;
+import ar.edu.um.haberes.rest.exception.PersonaException;
 import ar.edu.um.haberes.rest.model.Persona;
 import ar.edu.um.haberes.rest.model.view.PersonaSearch;
 import ar.edu.um.haberes.rest.service.PersonaService;
@@ -82,7 +82,7 @@ public class PersonaController {
 	public ResponseEntity<Persona> findByLegajoId(@PathVariable Long legajoId) {
 		try {
 			return new ResponseEntity<Persona>(service.findByLegajoId(legajoId), HttpStatus.OK);
-		} catch (PersonaNotFoundException e) {
+		} catch (PersonaException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
@@ -91,7 +91,7 @@ public class PersonaController {
 	public ResponseEntity<Persona> findByDocumento(@PathVariable BigDecimal documento) {
 		try {
 			return new ResponseEntity<Persona>(service.findByDocumento(documento), HttpStatus.OK);
-		} catch (PersonaNotFoundException e) {
+		} catch (PersonaException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}

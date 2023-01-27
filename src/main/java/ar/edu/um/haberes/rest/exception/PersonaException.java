@@ -10,22 +10,22 @@ import java.text.MessageFormat;
  * @author daniel
  *
  */
-public class PersonaNotFoundException extends RuntimeException {
+public class PersonaException extends RuntimeException {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -8813165673257060305L;
 
-	public PersonaNotFoundException() {
+	public PersonaException() {
 		super("Cannot find Persona");
 	}
 
-	public PersonaNotFoundException(Long legajoId) {
+	public PersonaException(Long legajoId) {
 		super(MessageFormat.format("Cannot find Persona {0}", legajoId));
 	}
 
-	public PersonaNotFoundException(BigDecimal documento) {
+	public PersonaException(BigDecimal documento) {
 		super(MessageFormat.format("Cannot find Persona {0}", documento));
 	}
 
