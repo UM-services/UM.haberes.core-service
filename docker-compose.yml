@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+
+    haberes:
+        build: .
+        ports:
+            - 8091:8091
+        environment:
+            APP_SERVER: 10.147.20.25:3306
+            APP_DATABASE: haberes
+            APP_USER: root
+            APP_PASSWORD: root
+            APP_PORT: 8091
+            APP_ADD-PROPERTIES: "false"
+            APP_LOGGING: "debug"
+            APP_LIVERELOAD_ENABLED: "true"
+            APP_LIVERELOAD_PORT: 35791
+            APP_OPEN-IN-VIEW: "false"
+            APP_MAIL_USERNAME: sueldos@um.edu.ar
+            APP_MAIL_PASSWORD: Daniel22

@@ -53,10 +53,10 @@ public class Liquidacion extends Auditable implements Serializable {
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ", timezone = "UTC")
 	private OffsetDateTime fechaLiquidacion;
-	
+
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ", timezone = "UTC")
 	private OffsetDateTime fechaAcreditacion;
-	
+
 	private Integer dependenciaId;
 	private String salida;
 	private BigDecimal totalRemunerativo = BigDecimal.ZERO;
@@ -74,5 +74,9 @@ public class Liquidacion extends Auditable implements Serializable {
 	@OneToOne
 	@JoinColumn(name = "dependenciaId", insertable = false, updatable = false)
 	private Dependencia dependencia;
+
+	public String key() {
+		return this.legajoId + "." + this.anho + "." + this.mes;
+	}
 
 }

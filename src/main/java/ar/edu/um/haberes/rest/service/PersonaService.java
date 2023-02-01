@@ -125,6 +125,11 @@ public class PersonaService {
 		return repository.findAllByLiquida("S", Sort.by("apellido").and(Sort.by("nombre")));
 	}
 
+	public List<Persona> findAllOrderByDependencia() {
+		return repository.findAll(Sort.by("dependencia.dependenciaId")
+				.and(Sort.by("apellido").and(Sort.by("nombre").and(Sort.by("legajoId")))));
+	}
+
 	public Persona findByLegajoId(Long legajoId) {
 		return repository.findByLegajoId(legajoId).orElseThrow(() -> new PersonaException(legajoId));
 	}

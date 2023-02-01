@@ -69,6 +69,7 @@ import ar.edu.um.haberes.rest.service.NovedadService;
 import ar.edu.um.haberes.rest.service.PersonaService;
 import ar.edu.um.haberes.rest.service.view.LegajoCursoCantidadService;
 import ar.edu.um.haberes.rest.service.view.NovedadAcumuladoService;
+import ar.edu.um.haberes.rest.util.Periodo;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -1077,6 +1078,134 @@ public class SheetService {
 				this.setCellString(row, 4, codigo.getNombre(), style_normal);
 				this.setCellBigDecimal(row, 5, liquidacionAdicional.getAdicional(), style_normal);
 				this.setCellInteger(row, 7, 1, style_normal);
+			}
+		}
+
+		for (Integer column = 0; column < sheet.getRow(1).getPhysicalNumberOfCells(); column++)
+			sheet.autoSizeColumn(column);
+
+		try {
+			File file = new File(filename);
+			FileOutputStream output = new FileOutputStream(file);
+			book.write(output);
+			output.flush();
+			output.close();
+			log.debug(file.getAbsolutePath());
+			book.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return filename;
+	}
+
+	public String comparaConsecutivos(Integer anho, Integer mes) {
+		String path = env.getProperty("path.files");
+
+		String filename = path + "consecutivos." + anho + "." + mes + ".xlsx";
+
+		Workbook book = new XSSFWorkbook();
+		CellStyle style_normal = book.createCellStyle();
+		Font font_normal = book.createFont();
+		font_normal.setBold(false);
+		style_normal.setFont(font_normal);
+		CellStyle style_bold = book.createCellStyle();
+		Font font_bold = book.createFont();
+		font_bold.setBold(true);
+		style_bold.setFont(font_bold);
+
+		Sheet sheet = book.createSheet("Comparativo");
+		Row row = null;
+		Integer fila = -1;
+		row = sheet.createRow(++fila);
+		this.setCellString(row, 0, MessageFormat.format("Periodo Actual: {0}/{1}", mes, anho), style_bold);
+		row = sheet.createRow(++fila);
+		this.setCellString(row, 0, "Dependencia", style_bold);
+		this.setCellString(row, 1, "Legajo", style_bold);
+		this.setCellString(row, 2, "Apellido, Nombre", style_bold);
+		this.setCellString(row, 3, "Bruto Anterior", style_bold);
+		this.setCellString(row, 4, "1/2 SAC Anterior", style_bold);
+		this.setCellString(row, 5, "Bruto Actual", style_bold);
+		this.setCellString(row, 6, "1/2 SAC Actual", style_bold);
+		this.setCellString(row, 7, "Bruto Diferencia", style_bold);
+		this.setCellString(row, 8, "Porcentaje", style_bold);
+		this.setCellString(row, 9, "Neto Anterior", style_bold);
+		this.setCellString(row, 10, "1/2 SAC Anterior (Est)", style_bold);
+		this.setCellString(row, 11, "Neto Actual", style_bold);
+		this.setCellString(row, 12, "1/2 SAC Actual (Est)", style_bold);
+		this.setCellString(row, 13, "Neto Diferencia", style_bold);
+		Map<String, Liquidacion> liquidacionMap = liquidacionService.findAllByPeriodo(anho, mes, 0).stream()
+				.collect(Collectors.toMap(Liquidacion::key, liquidacion -> liquidacion));
+		Map<String, Item> aguinaldoMap = itemService.findAllByCodigo(3, anho, mes).stream()
+				.collect(Collectors.toMap(Item::legajoKey, item -> item));
+		Periodo periodo = Periodo.prevMonth(anho, mes);
+		Map<String, Liquidacion> liquidacionAnteriorMap = liquidacionService
+				.findAllByPeriodo(periodo.getAnho(), periodo.getMes(), 0).stream()
+				.collect(Collectors.toMap(Liquidacion::key, liquidacion -> liquidacion));
+		Map<String, Item> aguinaldoAnteriorMap = itemService.findAllByCodigo(3, periodo.getAnho(), periodo.getMes())
+				.stream().collect(Collectors.toMap(Item::legajoKey, item -> item));
+
+		for (Persona persona : personaService.findAllOrderByDependencia()) {
+			Boolean liquidado = false;
+			Liquidacion liquidacion = null;
+			Liquidacion liquidacionAnterior = null;
+			BigDecimal brutoAnterior = BigDecimal.ZERO;
+			BigDecimal brutoActual = BigDecimal.ZERO;
+			BigDecimal netoAnterior = BigDecimal.ZERO;
+			BigDecimal netoActual = BigDecimal.ZERO;
+			BigDecimal aguinaldoActual = BigDecimal.ZERO;
+			BigDecimal aguinaldoAnterior = BigDecimal.ZERO;
+			String key = persona.getLegajoId() + "." + anho + "." + mes;
+			if (liquidacionMap.containsKey(key)) {
+				liquidado = true;
+				liquidacion = liquidacionMap.get(key);
+				brutoActual = liquidacion.getTotalRemunerativo();
+				netoActual = liquidacion.getTotalNeto();
+			}
+			key = persona.getLegajoId() + "." + periodo.getAnho() + "." + periodo.getMes();
+			if (liquidacionAnteriorMap.containsKey(key)) {
+				liquidado = true;
+				liquidacionAnterior = liquidacionAnteriorMap.get(key);
+				brutoAnterior = liquidacionAnterior.getTotalRemunerativo();
+				netoAnterior = liquidacionAnterior.getTotalNeto();
+			}
+			key = persona.getLegajoId() + "." + anho + "." + mes + ".3";
+			if (aguinaldoMap.containsKey(key)) {
+				aguinaldoActual = aguinaldoMap.get(key).getImporte();
+			}
+			key = persona.getLegajoId() + "." + periodo.getAnho() + "." + periodo.getMes() + ".3";
+			if (aguinaldoAnteriorMap.containsKey(key)) {
+				aguinaldoAnterior = aguinaldoAnteriorMap.get(key).getImporte();
+			}
+			if (liquidado) {
+				row = sheet.createRow(++fila);
+				this.setCellString(row, 0, persona.getDependencia().getAcronimo(), style_normal);
+				this.setCellLong(row, 1, persona.getLegajoId(), style_normal);
+				this.setCellString(row, 2, persona.getApellidoNombre(), style_normal);
+				this.setCellBigDecimal(row, 3, brutoAnterior, style_normal);
+				this.setCellBigDecimal(row, 4, aguinaldoAnterior, style_normal);
+				this.setCellBigDecimal(row, 5, brutoActual, style_normal);
+				this.setCellBigDecimal(row, 6, aguinaldoActual, style_normal);
+				this.setCellBigDecimal(row, 7, brutoActual.add(aguinaldoAnterior).subtract(brutoAnterior)
+						.subtract(aguinaldoActual).setScale(2, RoundingMode.HALF_UP), style_normal);
+				BigDecimal porcentaje = BigDecimal.ZERO;
+				if (brutoAnterior.subtract(aguinaldoAnterior).compareTo(BigDecimal.ZERO) != 0) {
+					BigDecimal numerador = brutoActual.subtract(aguinaldoActual).setScale(2, RoundingMode.HALF_UP);
+					BigDecimal denominador = brutoAnterior.subtract(aguinaldoAnterior).setScale(2,
+							RoundingMode.HALF_UP);
+					porcentaje = numerador.divide(denominador, 4, RoundingMode.HALF_UP);
+					porcentaje = porcentaje.multiply(new BigDecimal(100.0)).setScale(4, RoundingMode.HALF_UP);
+					porcentaje = porcentaje.subtract(new BigDecimal(100.0));
+				}
+				this.setCellBigDecimal(row, 8, porcentaje, style_normal);
+
+				aguinaldoActual = aguinaldoActual.multiply(new BigDecimal(0.83)).setScale(2, RoundingMode.HALF_UP);
+				aguinaldoAnterior = aguinaldoAnterior.multiply(new BigDecimal(0.83)).setScale(2, RoundingMode.HALF_UP);
+				this.setCellBigDecimal(row, 9, netoAnterior, style_normal);
+				this.setCellBigDecimal(row, 10, aguinaldoAnterior, style_normal);
+				this.setCellBigDecimal(row, 11, netoActual, style_normal);
+				this.setCellBigDecimal(row, 12, aguinaldoActual, style_normal);
+				this.setCellBigDecimal(row, 13, netoActual.add(aguinaldoAnterior).subtract(netoAnterior)
+						.subtract(aguinaldoActual).setScale(2, RoundingMode.HALF_UP), style_normal);
 			}
 		}
 
