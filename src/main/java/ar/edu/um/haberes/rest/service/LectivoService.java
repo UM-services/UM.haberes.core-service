@@ -5,12 +5,12 @@ package ar.edu.um.haberes.rest.service;
 
 import java.util.List;
 
+import ar.edu.um.haberes.rest.kotlin.model.Lectivo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import ar.edu.um.haberes.rest.exception.LectivoNotFoundException;
-import ar.edu.um.haberes.rest.model.Lectivo;
 import ar.edu.um.haberes.rest.repository.ILectivoRepository;
 
 /**

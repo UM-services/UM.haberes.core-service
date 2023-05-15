@@ -3,11 +3,11 @@
  */
 package ar.edu.um.haberes.rest.service;
 
+import ar.edu.um.haberes.rest.kotlin.model.Build;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ar.edu.um.haberes.rest.exception.BuildNotFoundException;
-import ar.edu.um.haberes.rest.model.Build;
 import ar.edu.um.haberes.rest.repository.IBuildRepository;
 
 /**
