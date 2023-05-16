@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import ar.edu.um.haberes.rest.kotlin.model.Contacto;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -21,9 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import ar.edu.um.haberes.rest.exception.ContactoNotFoundException;
+import ar.edu.um.haberes.rest.exception.ContactoException;
 import ar.edu.um.haberes.rest.exception.PersonaException;
-import ar.edu.um.haberes.rest.model.Contacto;
 import ar.edu.um.haberes.rest.model.Persona;
 import ar.edu.um.haberes.rest.model.view.PersonaSearch;
 import ar.edu.um.haberes.rest.repository.IPersonaRepository;
@@ -200,7 +200,7 @@ public class PersonaService {
 							Contacto contacto = null;
 							try {
 								contacto = contactoService.findByLegajoId(legajoId);
-							} catch (ContactoNotFoundException e) {
+							} catch (ContactoException e) {
 								contacto = new Contacto();
 							}
 							contacto.setLegajoId(legajoId);

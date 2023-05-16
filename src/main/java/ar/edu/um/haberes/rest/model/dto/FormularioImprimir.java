@@ -6,7 +6,7 @@ package ar.edu.um.haberes.rest.model.dto;
 import java.io.Serializable;
 import java.util.List;
 
-import ar.edu.um.haberes.rest.model.Contacto;
+import ar.edu.um.haberes.rest.kotlin.model.Contacto;
 import ar.edu.um.haberes.rest.model.LegajoControl;
 import lombok.AllArgsConstructor;
 import lombok.Data;

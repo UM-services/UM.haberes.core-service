@@ -5,13 +5,13 @@ package ar.edu.um.haberes.rest.service;
 
 import java.util.List;
 
+import ar.edu.um.haberes.rest.kotlin.model.Contacto;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import ar.edu.um.haberes.rest.exception.ContactoNotFoundException;
-import ar.edu.um.haberes.rest.model.Contacto;
+import ar.edu.um.haberes.rest.exception.ContactoException;
 import ar.edu.um.haberes.rest.repository.IContactoRepository;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,7 +35,7 @@ public class ContactoService {
 	}
 
 	public Contacto findByLegajoId(Long legajoId) {
-		return repository.findByLegajoId(legajoId).orElseThrow(() -> new ContactoNotFoundException(legajoId));
+		return repository.findByLegajoId(legajoId).orElseThrow(() -> new ContactoException(legajoId));
 	}
 
 	public Contacto add(Contacto contacto) {
@@ -53,7 +53,7 @@ public class ContactoService {
 			repository.save(contacto);
 			log.debug("Contacto -> " + contacto);
 			return contacto;
-		}).orElseThrow(() -> new ContactoNotFoundException(legajoId));
+		}).orElseThrow(() -> new ContactoException(legajoId));
 	}
 
 	@Transactional

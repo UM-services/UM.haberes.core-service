@@ -17,6 +17,9 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import ar.edu.um.haberes.rest.exception.ContactoException;
+import ar.edu.um.haberes.rest.kotlin.model.Contacto;
+import ar.edu.um.haberes.rest.service.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
@@ -29,7 +32,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import ar.edu.um.haberes.rest.exception.AcreditacionNotFoundException;
-import ar.edu.um.haberes.rest.exception.LegajoBancoNotFoundException;
+import ar.edu.um.haberes.rest.exception.LegajoBancoException;
 import ar.edu.um.haberes.rest.exception.NovedadException;
 import ar.edu.um.haberes.rest.model.Acreditacion;
 import ar.edu.um.haberes.rest.model.CargoClaseDetalle;
@@ -50,23 +53,6 @@ import ar.edu.um.haberes.rest.model.Novedad;
 import ar.edu.um.haberes.rest.model.Persona;
 import ar.edu.um.haberes.rest.model.view.LegajoCursoCantidad;
 import ar.edu.um.haberes.rest.model.view.NovedadAcumulado;
-import ar.edu.um.haberes.rest.service.AcreditacionService;
-import ar.edu.um.haberes.rest.service.CargoClaseDetalleService;
-import ar.edu.um.haberes.rest.service.CargoLiquidacionService;
-import ar.edu.um.haberes.rest.service.CargoTipoService;
-import ar.edu.um.haberes.rest.service.CategoriaService;
-import ar.edu.um.haberes.rest.service.CodigoService;
-import ar.edu.um.haberes.rest.service.CursoCargoService;
-import ar.edu.um.haberes.rest.service.CursoService;
-import ar.edu.um.haberes.rest.service.DependenciaService;
-import ar.edu.um.haberes.rest.service.FacultadService;
-import ar.edu.um.haberes.rest.service.GeograficaService;
-import ar.edu.um.haberes.rest.service.ItemService;
-import ar.edu.um.haberes.rest.service.LegajoBancoService;
-import ar.edu.um.haberes.rest.service.LiquidacionAdicionalService;
-import ar.edu.um.haberes.rest.service.LiquidacionService;
-import ar.edu.um.haberes.rest.service.NovedadService;
-import ar.edu.um.haberes.rest.service.PersonaService;
 import ar.edu.um.haberes.rest.service.view.LegajoCursoCantidadService;
 import ar.edu.um.haberes.rest.service.view.NovedadAcumuladoService;
 import ar.edu.um.haberes.rest.util.Periodo;
@@ -139,6 +125,9 @@ public class SheetService {
 
 	@Autowired
 	private LegajoBancoService legajoBancoService;
+
+	@Autowired
+	private ContactoService contactoService;
 
 	@Autowired
 	private Environment env;
@@ -1231,7 +1220,7 @@ public class SheetService {
 
 		String path = env.getProperty("path.files");
 
-		String filename = path + "personaes.xlsx";
+		String filename = path + "personales.xlsx";
 
 		Workbook book = new XSSFWorkbook();
 		CellStyle style_normal = book.createCellStyle();
@@ -1274,8 +1263,16 @@ public class SheetService {
 		this.setCellString(row, 24, "Fijo", style_bold);
 		this.setCellString(row, 25, "Porcentaje", style_bold);
 		this.setCellString(row, 26, "Resto", style_bold);
+		this.setCellString(row, 27, "e-mail Personal", style_bold);
+		this.setCellString(row, 28, "e-mail Institucional", style_bold);
 
 		for (Persona persona : personaService.findAll()) {
+			Contacto contacto = null;
+			try {
+				contacto = contactoService.findByLegajoId(persona.getLegajoId());
+			} catch (ContactoException e) {
+				contacto = new Contacto();
+			}
 			row = sheet.createRow(++fila);
 			this.setCellLong(row, 0, persona.getLegajoId(), style_normal);
 			this.setCellBigDecimal(row, 1, persona.getDocumento(), style_normal);
@@ -1335,9 +1332,11 @@ public class SheetService {
 					this.setCellBigDecimal(row, 25, banco.getPorcentaje(), style_normal);
 					this.setCellString(row, 26, banco.getResto() == 1 ? "*" : "", style_normal);
 				}
-			} catch (LegajoBancoNotFoundException e) {
+			} catch (LegajoBancoException e) {
 
 			}
+			this.setCellString(row, 27, contacto.getMailPersonal(), style_normal);
+			this.setCellString(row, 28, contacto.getMailInstitucional(), style_normal);
 		}
 
 		for (Integer column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import ar.edu.um.haberes.rest.exception.LegajoBancoNotFoundException;
+import ar.edu.um.haberes.rest.exception.LegajoBancoException;
 import ar.edu.um.haberes.rest.model.LegajoBanco;
 import ar.edu.um.haberes.rest.service.LegajoBancoService;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +39,7 @@ public class LegajoBancoController {
 	public ResponseEntity<LegajoBanco> findByLegajoBancoId(@PathVariable Long legajoBancoId) {
 		try {
 			return new ResponseEntity<LegajoBanco>(service.findByLegajoBancoId(legajoBancoId), HttpStatus.OK);
-		} catch (LegajoBancoNotFoundException e) {
+		} catch (LegajoBancoException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
@@ -49,7 +49,7 @@ public class LegajoBancoController {
 			@PathVariable Integer mes, @PathVariable String cbu) {
 		try {
 			return new ResponseEntity<LegajoBanco>(service.findByUnique(legajoId, anho, mes, cbu), HttpStatus.OK);
-		} catch (LegajoBancoNotFoundException e) {
+		} catch (LegajoBancoException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
@@ -58,7 +58,7 @@ public class LegajoBancoController {
 	public ResponseEntity<LegajoBanco> findLastByLegajoId(@PathVariable Long legajoId) {
 		try {
 			return new ResponseEntity<LegajoBanco>(service.findLastByLegajoId(legajoId), HttpStatus.OK);
-		} catch (LegajoBancoNotFoundException e) {
+		} catch (LegajoBancoException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}

@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import ar.edu.um.haberes.rest.kotlin.model.Contacto;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
@@ -50,8 +51,8 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfWriter;
 
-import ar.edu.um.haberes.rest.exception.ContactoNotFoundException;
-import ar.edu.um.haberes.rest.exception.LegajoBancoNotFoundException;
+import ar.edu.um.haberes.rest.exception.ContactoException;
+import ar.edu.um.haberes.rest.exception.LegajoBancoException;
 import ar.edu.um.haberes.rest.exception.LegajoControlNotFoundException;
 import ar.edu.um.haberes.rest.exception.LetraNotFoundException;
 import ar.edu.um.haberes.rest.model.Antiguedad;
@@ -60,7 +61,6 @@ import ar.edu.um.haberes.rest.model.CargoClaseDetalle;
 import ar.edu.um.haberes.rest.model.CargoLiquidacion;
 import ar.edu.um.haberes.rest.model.Codigo;
 import ar.edu.um.haberes.rest.model.CodigoGrupo;
-import ar.edu.um.haberes.rest.model.Contacto;
 import ar.edu.um.haberes.rest.model.Control;
 import ar.edu.um.haberes.rest.model.CursoCargo;
 import ar.edu.um.haberes.rest.model.Dependencia;
@@ -216,7 +216,7 @@ public class BonoService {
 		LegajoBanco legajoBanco = null;
 		try {
 			legajoBanco = legajoBancoService.findLegajoCbuPrincipal(legajoId, anho, mes);
-		} catch (LegajoBancoNotFoundException e) {
+		} catch (LegajoBancoException e) {
 			legajoBanco = new LegajoBanco();
 		}
 		log.debug("LegajoBanco -> {}", legajoBanco);
@@ -941,7 +941,7 @@ public class BonoService {
 		Contacto contacto = null;
 		try {
 			contacto = contactoService.findByLegajoId(legajoId);
-		} catch (ContactoNotFoundException e) {
+		} catch (ContactoException e) {
 			return "ERROR: Sin correos para ENVIAR";
 		}
 

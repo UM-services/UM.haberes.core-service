@@ -5,6 +5,7 @@ package ar.edu.um.haberes.rest.controller;
 
 import java.util.List;
 
+import ar.edu.um.haberes.rest.kotlin.model.Contacto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import ar.edu.um.haberes.rest.exception.ContactoNotFoundException;
-import ar.edu.um.haberes.rest.model.Contacto;
+import ar.edu.um.haberes.rest.exception.ContactoException;
 import ar.edu.um.haberes.rest.service.ContactoService;
 
 /**
@@ -47,7 +47,7 @@ public class ContactoController {
 	public ResponseEntity<Contacto> findByLegajoId(@PathVariable Long legajoId) {
 		try {
 			return new ResponseEntity<Contacto>(service.findByLegajoId(legajoId), HttpStatus.OK);
-		} catch (ContactoNotFoundException e) {
+		} catch (ContactoException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}

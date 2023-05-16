@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import ar.edu.um.haberes.rest.exception.LegajoBancoNotFoundException;
+import ar.edu.um.haberes.rest.exception.LegajoBancoException;
 import ar.edu.um.haberes.rest.model.LegajoBanco;
 import ar.edu.um.haberes.rest.repository.ILegajoBancoRepository;
 
@@ -105,22 +105,22 @@ public class LegajoBancoService {
 
 	public LegajoBanco findLegajoCbuPrincipal(Long legajoId, Integer anho, Integer mes) {
 		return repository.findByLegajoIdAndAnhoAndMesAndResto(legajoId, anho, mes, (byte) 1)
-				.orElseThrow(() -> new LegajoBancoNotFoundException(legajoId, anho, mes));
+				.orElseThrow(() -> new LegajoBancoException(legajoId, anho, mes));
 	}
 
 	public LegajoBanco findByLegajoBancoId(Long legajoBancoId) {
 		return repository.findByLegajoBancoId(legajoBancoId)
-				.orElseThrow(() -> new LegajoBancoNotFoundException(legajoBancoId));
+				.orElseThrow(() -> new LegajoBancoException(legajoBancoId));
 	}
 
 	public LegajoBanco findByUnique(Long legajoId, Integer anho, Integer mes, String cbu) {
 		return repository.findByLegajoIdAndAnhoAndMesAndCbu(legajoId, anho, mes, cbu)
-				.orElseThrow(() -> new LegajoBancoNotFoundException(legajoId, anho, mes, cbu));
+				.orElseThrow(() -> new LegajoBancoException(legajoId, anho, mes, cbu));
 	}
 
 	public LegajoBanco findLastByLegajoId(Long legajoId) {
 		return repository.findTopByLegajoIdOrderByAnhoDescMesDesc(legajoId)
-				.orElseThrow(() -> new LegajoBancoNotFoundException(legajoId));
+				.orElseThrow(() -> new LegajoBancoException(legajoId));
 	}
 
 	@Transactional
@@ -141,7 +141,7 @@ public class LegajoBancoService {
 					newLegajoBanco.getAcreditado(), newLegajoBanco.getPersona(), newLegajoBanco.getLiquidacion());
 			repository.save(legajoBanco);
 			return legajoBanco;
-		}).orElseThrow(() -> new LegajoBancoNotFoundException(legajoBancoId));
+		}).orElseThrow(() -> new LegajoBancoException(legajoBancoId));
 	}
 
 	@Transactional
