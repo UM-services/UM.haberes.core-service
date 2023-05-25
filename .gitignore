@@ -2,6 +2,7 @@
 spring-boot-migrator.log
 *.xlsx
 logs/
+data/
 /target/
 !.mvn/wrapper/maven-wrapper.jar
 

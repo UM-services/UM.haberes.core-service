@@ -5,6 +5,7 @@ package ar.edu.um.haberes.rest.controller.facade;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -224,6 +225,20 @@ public class SheetController {
 		InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=consecutivos.xlsx");
+		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		headers.add("Pragma", "no-cache");
+		headers.add("Expires", "0");
+		return ResponseEntity.ok().headers(headers).contentLength(file.length())
+				.contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
+	}
+
+	@GetMapping("/comparaImputacionSueldos/{anhoDesde}/{mesDesde}/{anhoHasta}/{mesHasta}")
+	public ResponseEntity<Resource> comparaImputacionSueldos(@PathVariable Integer anhoDesde, @PathVariable Integer mesDesde, @PathVariable Integer anhoHasta, @PathVariable Integer mesHasta) throws FileNotFoundException {
+		String filename = service.comparaImputaciones(anhoDesde, mesDesde, anhoHasta, mesHasta);
+		File file = new File(filename);
+		InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=imputaciones.xlsx");
 		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
 		headers.add("Pragma", "no-cache");
 		headers.add("Expires", "0");

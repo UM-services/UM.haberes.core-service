@@ -5,11 +5,16 @@ package ar.edu.um.haberes.rest.service.facade;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import ar.edu.um.haberes.rest.kotlin.model.extern.Cuenta;
+import ar.edu.um.haberes.rest.kotlin.model.extern.CuentaMovimiento;
+import ar.edu.um.haberes.rest.service.extern.CuentaMovimientoService;
+import ar.edu.um.haberes.rest.service.extern.CuentaService;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,6 +103,12 @@ public class ContableService {
 
 	@Autowired
 	private LegajoContabilidadService legajoContabilidadService;
+
+	@Autowired
+	private CuentaMovimientoService cuentaMovimientoService;
+
+	@Autowired
+	private CuentaService cuentaService;
 
 	@Transactional
 	public void generateByLegajo(Long legajoId, Integer anho, Integer mes) {
@@ -496,6 +507,14 @@ public class ContableService {
 		legajoCargoClaseImputacionService.deleteAllByPeriodo(anho, mes);
 		legajoCategoriaImputacionService.deleteAllByPeriodo(anho, mes);
 		legajoCodigoImputacionService.deleteAllByPeriodo(anho, mes);
+	}
+
+    public List<CuentaMovimiento> findAllByAsiento(OffsetDateTime fechaContable, Integer ordenContable) {
+		return cuentaMovimientoService.findAllByAsiento(fechaContable, ordenContable);
+    }
+
+	public List<Cuenta> findAllCuentas() {
+		return cuentaService.findAll();
 	}
 
 }

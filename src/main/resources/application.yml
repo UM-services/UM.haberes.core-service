@@ -1,5 +1,5 @@
 app:
-  server: 10.147.20.20:3306
+  server: 127.0.0.1:3306
   database: haberes
   user: root
   password: root
@@ -13,6 +13,9 @@ app:
   mail:
     username: sueldos@um.edu.ar
     password: Daniel22
+  tesium:
+    server: 127.0.0.1
+    port: 8092
     
 server:
   port: ${app.port}
