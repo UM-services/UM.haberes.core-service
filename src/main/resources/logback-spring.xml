@@ -40,7 +40,7 @@
 	</root>
 
 	<!-- LOG at TRACE level -->
-	<logger name="ar.edu.um.haberes.rest" level="trace" additivity="false">
+	<logger name="um.haberes.rest" level="trace" additivity="false">
 		<appender-ref ref="RollingFile" />
 		<appender-ref ref="Console" />
 	</logger>

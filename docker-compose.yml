@@ -3,8 +3,8 @@ version: "3.9"
 services:
     mysql:
         image: dqmdz/mysql:5.7
-        ports:
-            - "3306:3306"
+#        ports:
+#            - "3306:3306"
         volumes:
             - ./data:/var/lib/mysql
             - /etc/localtime:/etc/localtime:ro
@@ -14,23 +14,25 @@ services:
             - MYSQL_ROOT_PASSWORD=root
             - TZ=America/Argentina/Mendoza
 
-#    haberes:
-#        build: .
-#        ports:
-#            - "8091:8091"
-#        depends_on:
-#            - mysql
-#        environment:
-#            APP_SERVER: mysql:3306
-#            APP_DATABASE: haberes
-#            APP_USER: root
-#            APP_PASSWORD: root
-#            APP_PORT: 8091
-#            APP_ADD-PROPERTIES: "false"
-#            APP_LOGGING: "debug"
-#            APP_LIVERELOAD_ENABLED: "true"
-#            APP_LIVERELOAD_PORT: 35791
-#            APP_OPEN-IN-VIEW: "false"
-#            APP_MAIL_USERNAME: sueldos@um.edu.ar
-#            APP_MAIL_PASSWORD: Daniel22
+    haberes:
+        build: .
+        ports:
+            - "8091:8091"
+        depends_on:
+            - mysql
+        environment:
+            APP_SERVER: mysql:3306
+            APP_DATABASE: haberes
+            APP_USER: root
+            APP_PASSWORD: root
+            APP_PORT: 8091
+            APP_ADD-PROPERTIES: "false"
+            APP_LOGGING: "debug"
+            APP_LIVERELOAD_ENABLED: "true"
+            APP_LIVERELOAD_PORT: 35791
+            APP_OPEN-IN-VIEW: "false"
+            APP_MAIL_USERNAME: sueldos@um.edu.ar
+            APP_MAIL_PASSWORD: Daniel22
+            APP_TESIUM_SERVER: 10.147.20.25
+            APP_TESIUM_PORT: 8092
 

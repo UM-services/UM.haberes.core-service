@@ -54,7 +54,7 @@ spring:
 
 logging:
   level:
-    ar.edu.um.haberes.rest: DEBUG
+    um.haberes.rest: DEBUG
     web: ${app.logging}
     org:
       hibernate:
