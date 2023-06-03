@@ -6,8 +6,8 @@ package um.haberes.rest.model.dto;
 import java.io.Serializable;
 import java.util.List;
 
+import um.haberes.rest.kotlin.model.Dependencia;
 import um.haberes.rest.model.Categoria;
-import um.haberes.rest.model.Dependencia;
 import um.haberes.rest.model.Facultad;
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import um.haberes.rest.model.LegajoCategoriaImputacion;
+import um.haberes.rest.kotlin.model.LegajoCategoriaImputacion;
 import um.haberes.rest.service.LegajoCategoriaImputacionService;
 
 /**
@@ -29,7 +29,7 @@ public class LegajoCategoriaImputacionController {
 
 	@GetMapping("/legajo/{legajoId}/{anho}/{mes}")
 	public ResponseEntity<List<LegajoCategoriaImputacion>> findAllByLegajo(@PathVariable Long legajoId,
-			@PathVariable Integer anho, @PathVariable Integer mes) {
+																		   @PathVariable Integer anho, @PathVariable Integer mes) {
 		return new ResponseEntity<List<LegajoCategoriaImputacion>>(service.findAllByLegajo(legajoId, anho, mes),
 				HttpStatus.OK);
 	}

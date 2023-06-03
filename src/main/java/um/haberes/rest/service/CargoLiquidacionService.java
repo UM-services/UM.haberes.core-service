@@ -15,7 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.CargoLiquidacionNotFoundException;
-import um.haberes.rest.model.CargoLiquidacion;
+import um.haberes.rest.kotlin.model.CargoLiquidacion;
 import um.haberes.rest.model.CargoLiquidacionVersion;
 import um.haberes.rest.repository.ICargoLiquidacionRepository;
 

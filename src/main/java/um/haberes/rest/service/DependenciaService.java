@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.DependenciaNotFoundException;
-import um.haberes.rest.model.Dependencia;
+import um.haberes.rest.kotlin.model.Dependencia;
 import um.haberes.rest.repository.IDependenciaRepository;
 
 /**

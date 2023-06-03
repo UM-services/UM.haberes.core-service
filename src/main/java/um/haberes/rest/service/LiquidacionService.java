@@ -15,7 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.LiquidacionException;
-import um.haberes.rest.model.Liquidacion;
+import um.haberes.rest.kotlin.model.Liquidacion;
 import um.haberes.rest.model.LiquidacionVersion;
 import um.haberes.rest.model.view.LiquidacionPeriodo;
 import um.haberes.rest.repository.ILiquidacionRepository;

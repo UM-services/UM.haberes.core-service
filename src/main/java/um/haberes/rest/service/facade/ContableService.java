@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import um.haberes.rest.kotlin.model.*;
 import um.haberes.rest.kotlin.model.extern.Cuenta;
 import um.haberes.rest.kotlin.model.extern.CuentaMovimiento;
 import um.haberes.rest.service.extern.CuentaMovimientoService;
@@ -24,19 +27,14 @@ import um.haberes.rest.exception.ItemNotFoundException;
 import um.haberes.rest.exception.LegajoContabilidadNotFoundException;
 import um.haberes.rest.exception.LiquidacionException;
 import um.haberes.rest.model.Actividad;
-import um.haberes.rest.model.CargoLiquidacion;
 import um.haberes.rest.model.CargoClaseDetalle;
 import um.haberes.rest.model.CargoClaseImputacion;
-import um.haberes.rest.model.CategoriaImputacion;
 import um.haberes.rest.model.Codigo;
 import um.haberes.rest.model.CodigoImputacion;
-import um.haberes.rest.model.Dependencia;
 import um.haberes.rest.model.Item;
 import um.haberes.rest.model.LegajoCargoClaseImputacion;
-import um.haberes.rest.model.LegajoCategoriaImputacion;
 import um.haberes.rest.model.LegajoCodigoImputacion;
 import um.haberes.rest.model.LegajoContabilidad;
-import um.haberes.rest.model.Liquidacion;
 import um.haberes.rest.service.ActividadService;
 import um.haberes.rest.service.CargoClaseDetalleService;
 import um.haberes.rest.service.CargoClaseImputacionService;
@@ -118,7 +116,11 @@ public class ContableService {
 		} catch (LiquidacionException e) {
 			liquidacion = new Liquidacion();
 		}
-		log.debug("Liquidacion -> {}", liquidacion);
+		try {
+			log.debug("Liquidacion -> {}", JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(liquidacion));
+		} catch (JsonProcessingException e) {
+			log.debug("Sin Liquidacion");
+		}
 		Map<String, CategoriaImputacion> categoriaImputaciones = categoriaImputacionService.findAll().stream()
 				.collect(Collectors.toMap(CategoriaImputacion::key, imputacion -> imputacion));
 		Map<String, CargoClaseImputacion> cargoClaseImputaciones = cargoClaseImputacionService.findAll().stream()
@@ -159,7 +161,11 @@ public class ContableService {
 			return;
 
 		for (CargoLiquidacion cargoLiquidacion : cargoLiquidacionService.findAllByLegajo(legajoId, anho, mes)) {
-			log.debug("CargoLiquidacion -> {}", cargoLiquidacion);
+			try {
+				log.debug("CargoLiquidacion -> {}", JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(cargoLiquidacion));
+			} catch (JsonProcessingException e) {
+				log.debug("Sin CargoLiquidacion");
+			}
 			Dependencia dependencia = cargoLiquidacion.getDependencia();
 			Byte docente = cargoLiquidacion.getCategoria().getDocente();
 			String key = dependencia.getDependenciaId() + "." + dependencia.getFacultadId() + "."
@@ -178,7 +184,11 @@ public class ContableService {
 								imputacion.getCategoriaImputacionId()));
 			}
 			CategoriaImputacion categoriaImputacion = categoriaImputaciones.get(key);
-			log.debug("CategoriaImputacion -> {}", categoriaImputacion);
+			try {
+				log.debug("CategoriaImputacion -> {}", JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(categoriaImputacion));
+			} catch (JsonProcessingException e) {
+				log.debug("Sin CategoriaImputacion");
+			}
 
 			Proporcion proporcion = null;
 			Proporcion proporcionDocente = null;
@@ -212,11 +222,17 @@ public class ContableService {
 				proporcionAdministrativo = proporcionesAdministrativo.get(key);
 			}
 
+			BigDecimal multiplicador = new BigDecimal(cargoLiquidacion.getJornada());
+			if (cargoLiquidacion.getHorasJornada().compareTo(BigDecimal.ZERO) != 0) {
+				multiplicador = cargoLiquidacion.getHorasJornada();
+			}
+			log.debug("Multiplicador={}", multiplicador);
+
 			LegajoCategoriaImputacion imputacion = new LegajoCategoriaImputacion(null, cargoLiquidacion.getLegajoId(),
 					cargoLiquidacion.getAnho(), cargoLiquidacion.getMes(), dependencia.getDependenciaId(),
 					dependencia.getFacultadId(), dependencia.getGeograficaId(), cargoLiquidacion.getCategoriaId(),
 					categoriaImputacion.getCuentaSueldos(),
-					cargoLiquidacion.getCategoriaBasico().multiply(new BigDecimal(cargoLiquidacion.getJornada()))
+					cargoLiquidacion.getCategoriaBasico().multiply(multiplicador)
 							.setScale(2, RoundingMode.HALF_UP),
 					BigDecimal.ZERO, categoriaImputacion.getCuentaAportes(), null, null, null, null, null);
 			if (cargoLiquidacion.getCategoria().getDocente() == 1) {
@@ -228,7 +244,11 @@ public class ContableService {
 			}
 			if (imputacion.getBasico().compareTo(BigDecimal.ZERO) != 0) {
 				imputacion = legajoCategoriaImputacionService.add(imputacion);
-				log.debug("LegajoCategoriaImputacion -> {}", imputacion);
+				try {
+					log.debug("LegajoCategoriaImputacion -> {}", JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(imputacion));
+				} catch (JsonProcessingException e) {
+					log.debug("Sin LegajoCategoriaImputacion");
+				}
 			}
 
 			proporcion.setTotal(proporcion.getTotal().add(imputacion.getBasico()));

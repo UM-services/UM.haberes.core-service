@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.rest.exception.LiquidacionException;
-import um.haberes.rest.model.Liquidacion;
+import um.haberes.rest.kotlin.model.Liquidacion;
 import um.haberes.rest.model.view.LiquidacionPeriodo;
 import um.haberes.rest.service.LiquidacionService;
 
@@ -39,7 +39,7 @@ public class LiquidacionController {
 
 	@GetMapping("/periodo/{anho}/{mes}/{limit}")
 	public ResponseEntity<List<Liquidacion>> findAllByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes,
-                                                              @PathVariable Integer limit) {
+															  @PathVariable Integer limit) {
 		return new ResponseEntity<List<Liquidacion>>(service.findAllByPeriodo(anho, mes, limit), HttpStatus.OK);
 	}
 

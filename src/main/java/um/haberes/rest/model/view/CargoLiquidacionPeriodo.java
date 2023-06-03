@@ -17,9 +17,9 @@ import org.hibernate.annotations.Immutable;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import um.haberes.rest.kotlin.model.Dependencia;
 import um.haberes.rest.model.Auditable;
 import um.haberes.rest.model.Categoria;
-import um.haberes.rest.model.Dependencia;
 import um.haberes.rest.model.Persona;
 import lombok.AllArgsConstructor;
 import lombok.Data;
