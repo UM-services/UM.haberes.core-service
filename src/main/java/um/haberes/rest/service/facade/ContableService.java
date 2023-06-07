@@ -533,8 +533,4 @@ public class ContableService {
 		return cuentaMovimientoService.findAllByAsiento(fechaContable, ordenContable);
     }
 
-	public List<Cuenta> findAllCuentas() {
-		return cuentaService.findAll();
-	}
-
 }

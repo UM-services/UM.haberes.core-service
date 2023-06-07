@@ -56,9 +56,4 @@ public class ContableController {
 		return new ResponseEntity<>(service.findAllByAsiento(fechaContable, ordenContable), HttpStatus.OK);
 	}
 
-	@GetMapping("/cuentas")
-	public ResponseEntity<List<Cuenta>> findAllCuentas() {
-		return new ResponseEntity<>(service.findAllCuentas(), HttpStatus.OK);
-	}
-
 }
