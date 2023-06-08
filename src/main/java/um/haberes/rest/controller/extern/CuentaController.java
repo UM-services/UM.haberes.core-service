@@ -36,4 +36,13 @@ public class CuentaController {
         }
     }
 
+    @GetMapping("/id/{cuentaContableId}")
+    public ResponseEntity<Cuenta> findByCuentaContableId(@PathVariable Long cuentaContableId) {
+        try {
+            return new ResponseEntity<>(service.findByCuentaContableId(cuentaContableId), HttpStatus.OK);
+        } catch (CuentaException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
 }

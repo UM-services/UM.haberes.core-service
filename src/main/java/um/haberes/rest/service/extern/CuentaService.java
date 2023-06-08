@@ -22,4 +22,7 @@ public class CuentaService {
         return consumer.findByNumeroCuenta(numeroCuenta);
     }
 
+    public Cuenta findByCuentaContableId(Long cuentaContableId) {
+        return consumer.findByCuentaContableId(cuentaContableId);
+    }
 }

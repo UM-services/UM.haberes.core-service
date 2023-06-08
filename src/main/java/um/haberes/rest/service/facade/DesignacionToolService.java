@@ -541,6 +541,10 @@ public class DesignacionToolService {
 		}
 
 		Designacion designacion = null;
+		log.debug("DesignacionTipoId={}", designacionTipoId);
+		log.debug("CargoTipoId={}", cargoTipoId);
+		log.debug("AnualLocal={}", anualLocal);
+		log.debug("SemestralLocal={}", semestralLocal);
 		try {
 			designacion = designacionService.findByDesignacionTipoIdAndCargoTipoIdAndAnualAndSemestral(
 					designacionTipoId, cargoTipoId, anualLocal, semestralLocal);

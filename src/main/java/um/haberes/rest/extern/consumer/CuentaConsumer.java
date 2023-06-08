@@ -20,13 +20,13 @@ public class CuentaConsumer {
     @Autowired
     private HaberesConfiguration haberesConfiguration;
 
+    private String getUrl() {
+        return "http://" + haberesConfiguration.getTesiumServer() + ":" + haberesConfiguration.getTesiumPort() + "/cuenta";
+    }
+
     public List<Cuenta> findAll() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(haberesConfiguration.getTesiumServer());
-        stringBuilder.append(":");
-        stringBuilder.append(haberesConfiguration.getTesiumPort());
         WebClient webClient = WebClient.create();
-        String url = "http://" + stringBuilder.toString() + "/cuenta/";
+        String url = this.getUrl() + "/";
         Mono<List<Cuenta>> cuentas = webClient.get()
                 .uri(url)
                 .retrieve()
@@ -36,12 +36,8 @@ public class CuentaConsumer {
     }
 
     public Cuenta findByNumeroCuenta(BigDecimal numeroCuenta) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(haberesConfiguration.getTesiumServer());
-        stringBuilder.append(":");
-        stringBuilder.append(haberesConfiguration.getTesiumPort());
         WebClient webClient = WebClient.create();
-        String url = "http://" + stringBuilder.toString() + "/cuenta/" + numeroCuenta;
+        String url = this.getUrl() + "/" + numeroCuenta;
         log.info("url={}", url);
         return webClient.get()
                 .uri(url)
@@ -52,4 +48,16 @@ public class CuentaConsumer {
                 .block();
     }
 
+    public Cuenta findByCuentaContableId(Long cuentaContableId) {
+        WebClient webClient = WebClient.create();
+        String url = this.getUrl() + "/id/" + cuentaContableId;
+        log.info("url={}", url);
+        return webClient.get()
+                .uri(url)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, response -> response.bodyToMono(Cuenta.class)
+                        .flatMap(error -> Mono.error(new CuentaException(cuentaContableId))))
+                .bodyToMono(Cuenta.class)
+                .block();
+    }
 }

@@ -1,0 +1,22 @@
+package um.haberes.rest.kotlin.model.extern
+
+import java.math.BigDecimal
+
+data class CursoCargoContratado(
+
+    var cursoCargoContratadoId: Long? = null,
+    var cursoId: Long? = null,
+    var anho: Int = 0,
+    var mes: Int = 0,
+    var contratadoId: Long? = null,
+    var contratoId: Long? = null,
+    var cargoTipoId: Int? = null,
+    var horasSemanales: BigDecimal = BigDecimal.ZERO,
+    var horasTotales: BigDecimal = BigDecimal.ZERO,
+    var designacionTipoId: Int? = null,
+    var categoriaId: Int? = null,
+    var cursoCargoNovedadId: Long? = null,
+    var acreditado: Byte = 0,
+    var contratadoPersona: ContratadoPersona? = null
+
+)

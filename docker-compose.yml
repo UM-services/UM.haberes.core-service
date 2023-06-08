@@ -4,7 +4,7 @@ services:
     mysql:
         image: dqmdz/mysql:5.7
         ports:
-            - "3306:3306"
+            - "3307:3306"
         volumes:
             - ./data:/var/lib/mysql
             - /etc/localtime:/etc/localtime:ro
@@ -13,6 +13,8 @@ services:
         environment:
             - MYSQL_ROOT_PASSWORD=root
             - TZ=America/Argentina/Mendoza
+        networks:
+            - haberes
 
 #    haberes:
 #        build: .
@@ -35,4 +37,11 @@ services:
 #            APP_MAIL_PASSWORD: Daniel22
 #            APP_TESIUM_SERVER: 10.147.20.25
 #            APP_TESIUM_PORT: 8092
+#        networks:
+#            - haberes
+#
+networks:
+    haberes:
 
+volumes:
+    mysql:

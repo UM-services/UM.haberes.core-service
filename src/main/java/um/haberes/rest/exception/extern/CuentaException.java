@@ -8,4 +8,7 @@ public class CuentaException extends RuntimeException {
         super("Cannot find Cuenta " + numeroCuenta);
     }
 
+    public CuentaException(Long cuentaContableId) {
+        super("Cannot find Cuenta (id) " + cuentaContableId);
+    }
 }
