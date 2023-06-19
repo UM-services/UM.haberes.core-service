@@ -27,8 +27,12 @@ public class LegajoCodigoImputacionService {
 		return repository.findAllByLegajoIdAndAnhoAndMes(legajoId, anho, mes);
 	}
 
+	public List<LegajoCodigoImputacion> findAllByLegajoAndCodigos(Long legajoId, Integer anho, Integer mes, List<Integer> codigoIds) {
+		return repository.findAllByLegajoIdAndAnhoAndMesAndCodigoIdIn(legajoId, anho, mes, codigoIds);
+	}
+
 	public LegajoCodigoImputacion add(LegajoCodigoImputacion legajocodigoimputacion) {
-		repository.save(legajocodigoimputacion);
+		legajocodigoimputacion = repository.save(legajocodigoimputacion);
 		return legajocodigoimputacion;
 	}
 

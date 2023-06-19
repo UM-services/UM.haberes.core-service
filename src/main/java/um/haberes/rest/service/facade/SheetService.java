@@ -18,12 +18,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import um.haberes.rest.exception.ContactoException;
-import um.haberes.rest.kotlin.model.CargoLiquidacion;
-import um.haberes.rest.kotlin.model.Contacto;
-import um.haberes.rest.kotlin.model.Dependencia;
-import um.haberes.rest.kotlin.model.Liquidacion;
+import um.haberes.rest.kotlin.model.*;
 import um.haberes.rest.kotlin.model.extern.Cuenta;
 import um.haberes.rest.kotlin.model.extern.CuentaMovimiento;
+import um.haberes.rest.model.*;
 import um.haberes.rest.service.extern.CuentaMovimientoService;
 import um.haberes.rest.service.extern.CuentaService;
 import org.apache.poi.ss.usermodel.Cell;
@@ -40,20 +38,6 @@ import org.springframework.stereotype.Service;
 import um.haberes.rest.exception.AcreditacionNotFoundException;
 import um.haberes.rest.exception.LegajoBancoException;
 import um.haberes.rest.exception.NovedadException;
-import um.haberes.rest.model.Acreditacion;
-import um.haberes.rest.model.CargoClaseDetalle;
-import um.haberes.rest.model.CargoTipo;
-import um.haberes.rest.model.Categoria;
-import um.haberes.rest.model.Codigo;
-import um.haberes.rest.model.Curso;
-import um.haberes.rest.model.CursoCargo;
-import um.haberes.rest.model.Facultad;
-import um.haberes.rest.model.Geografica;
-import um.haberes.rest.model.Item;
-import um.haberes.rest.model.LegajoBanco;
-import um.haberes.rest.model.LiquidacionAdicional;
-import um.haberes.rest.model.Novedad;
-import um.haberes.rest.model.Persona;
 import um.haberes.rest.model.view.LegajoCursoCantidad;
 import um.haberes.rest.model.view.NovedadAcumulado;
 import um.haberes.rest.service.view.LegajoCursoCantidadService;
@@ -140,6 +124,18 @@ public class SheetService {
 
     @Autowired
     private CuentaMovimientoService cuentaMovimientoService;
+
+    @Autowired
+    private LegajoCategoriaImputacionService legajoCategoriaImputacionService;
+
+    @Autowired
+    private LegajoCargoClaseImputacionService legajoCargoClaseImputacionService;
+
+    @Autowired
+    private CodigoGrupoService codigoGrupoService;
+
+    @Autowired
+    private LegajoCodigoImputacionService legajoCodigoImputacionService;
 
     public String generateLiquidables() {
         String path = env.getProperty("path.files");
@@ -1441,6 +1437,117 @@ public class SheetService {
                 anho = next.getAnho();
                 mes = next.getMes();
             }
+        }
+
+        for (Integer column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
+            sheet.autoSizeColumn(column);
+
+        try {
+            File file = new File(filename);
+            FileOutputStream output = new FileOutputStream(file);
+            book.write(output);
+            output.flush();
+            output.close();
+            log.debug(file.getAbsolutePath());
+            book.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return filename;
+    }
+
+    public String cruceImputaciones(Integer anho, Integer mes) {
+
+        String path = env.getProperty("path.files");
+
+        String filename = path + "cruce.xlsx";
+
+        Workbook book = new XSSFWorkbook();
+        CellStyle style_normal = book.createCellStyle();
+        Font font_normal = book.createFont();
+        font_normal.setBold(false);
+        style_normal.setFont(font_normal);
+        CellStyle style_bold = book.createCellStyle();
+        Font font_bold = book.createFont();
+        font_bold.setBold(true);
+        style_bold.setFont(font_bold);
+
+        // Codigos Remunerativos
+        List<Integer> codigoIdRemunerativos = codigoGrupoService.findAllByRemunerativo((byte) 1).stream().map(codigoGrupo -> codigoGrupo.getCodigoId()).collect(Collectors.toList());
+        List<Integer> codigoIdNoRemunerativos = codigoGrupoService.findAllByNoRemunerativo((byte) 1).stream().map(codigoGrupo -> codigoGrupo.getCodigoId()).collect(Collectors.toList());
+
+        Sheet sheet = book.createSheet("Acreditados");
+        Row row = null;
+        Integer fila = -1;
+        row = sheet.createRow(++fila);
+        this.setCellString(row, 0, "Legajo", style_bold);
+        this.setCellString(row, 1, "Apellido, Nombre", style_bold);
+        this.setCellString(row, 2, "Cargos", style_bold);
+        this.setCellString(row, 3, "Cargos Imputacion Basico", style_bold);
+        this.setCellString(row, 4, "Cargos Imputacion Antigüedad", style_bold);
+        this.setCellString(row, 5, "Cargos Clase", style_bold);
+        this.setCellString(row, 6, "Cargos Clase Imputacion Basico", style_bold);
+        this.setCellString(row, 7, "Cargos Clase Imputacion Antigüedad", style_bold);
+        this.setCellString(row, 8, "Basico Liquidacion", style_bold);
+        this.setCellString(row, 9, "Antigüedad Liquidacion", style_bold);
+        this.setCellString(row, 10, "Codigos Imputacion Remunerativos", style_bold);
+        this.setCellString(row, 11, "Codigos Imputacion No Remunerativos", style_bold);
+
+        for (Liquidacion liquidacion : liquidacionService.findAllByAcreditado(anho, mes)) {
+            Map<Integer, Item> itemMap = itemService.findAllByLegajo(liquidacion.getLegajoId(), anho, mes).stream().collect(Collectors.toMap(Item::getCodigoId, item -> item));
+            BigDecimal totalCargos = BigDecimal.ZERO;
+            for (CargoLiquidacion cargoLiquidacion : cargoLiquidacionService.findAllByLegajo(liquidacion.getLegajoId(), anho, mes)) {
+                BigDecimal multiplicador = new BigDecimal(cargoLiquidacion.getJornada());
+                if (cargoLiquidacion.getHorasJornada().compareTo(BigDecimal.ZERO) > 0) {
+                    multiplicador = cargoLiquidacion.getHorasJornada();
+                }
+                totalCargos = totalCargos.add(cargoLiquidacion.getCategoriaBasico().multiply(multiplicador)).setScale(2, RoundingMode.HALF_UP);
+            }
+            BigDecimal totalCargosBasicoImputacion = BigDecimal.ZERO;
+            BigDecimal totalCargosAntiguedadImputacion = BigDecimal.ZERO;
+            for (LegajoCategoriaImputacion legajoCategoriaImputacion : legajoCategoriaImputacionService.findAllByLegajo(liquidacion.getLegajoId(), anho, mes)) {
+                totalCargosBasicoImputacion = totalCargosBasicoImputacion.add(legajoCategoriaImputacion.getBasico()).setScale(2, RoundingMode.HALF_UP);
+                totalCargosAntiguedadImputacion = totalCargosAntiguedadImputacion.add(legajoCategoriaImputacion.getAntiguedad()).setScale(2, RoundingMode.HALF_UP);
+            }
+            BigDecimal totalCargosClase = BigDecimal.ZERO;
+            for (CargoClaseDetalle cargoClaseDetalle : cargoClaseDetalleService.findAllByLegajo(liquidacion.getLegajoId(), anho, mes)) {
+                totalCargosClase = totalCargosClase.add(cargoClaseDetalle.getValorHora().multiply(new BigDecimal(cargoClaseDetalle.getHoras()))).setScale(2, RoundingMode.HALF_UP);
+            }
+            BigDecimal totalCargosClaseBasicoImputacion = BigDecimal.ZERO;
+            BigDecimal totalCargosClaseAntiguedadImputacion = BigDecimal.ZERO;
+            for (LegajoCargoClaseImputacion legajoCargoClaseImputacion : legajoCargoClaseImputacionService.findAllByLegajo(liquidacion.getLegajoId(), anho, mes)) {
+                totalCargosClaseBasicoImputacion = totalCargosClaseBasicoImputacion.add(legajoCargoClaseImputacion.getBasico()).setScale(2, RoundingMode.HALF_UP);
+                totalCargosClaseAntiguedadImputacion = totalCargosClaseAntiguedadImputacion.add(legajoCargoClaseImputacion.getAntiguedad()).setScale(2, RoundingMode.HALF_UP);
+            }
+            BigDecimal basicoLiquidacion = BigDecimal.ZERO;
+            BigDecimal antiguedadLiquidacion = BigDecimal.ZERO;
+            if (itemMap.containsKey(1)) {
+                basicoLiquidacion = itemMap.get(1).getImporte();
+            }
+            if (itemMap.containsKey(2)) {
+                antiguedadLiquidacion = itemMap.get(2).getImporte();
+            }
+            BigDecimal totalCodigosRemunerativosImputacion = BigDecimal.ZERO;
+            for (LegajoCodigoImputacion legajoCodigoImputacion : legajoCodigoImputacionService.findAllByLegajoAndCodigos(liquidacion.getLegajoId(), anho, mes, codigoIdRemunerativos)) {
+                totalCodigosRemunerativosImputacion = totalCodigosRemunerativosImputacion.add(legajoCodigoImputacion.getImporte()).setScale(2, RoundingMode.HALF_UP);
+            }
+            BigDecimal totalCodigosNoRemunerativosImputacion = BigDecimal.ZERO;
+            for (LegajoCodigoImputacion legajoCodigoImputacion : legajoCodigoImputacionService.findAllByLegajoAndCodigos(liquidacion.getLegajoId(), anho, mes, codigoIdNoRemunerativos)) {
+                totalCodigosNoRemunerativosImputacion = totalCodigosNoRemunerativosImputacion.add(legajoCodigoImputacion.getImporte()).setScale(2, RoundingMode.HALF_UP);
+            }
+            row = sheet.createRow(++fila);
+            this.setCellLong(row, 0, liquidacion.getLegajoId(), style_normal);
+            this.setCellString(row, 1, liquidacion.getPersona().getApellidoNombre(), style_normal);
+            this.setCellBigDecimal(row, 2, totalCargos, style_normal);
+            this.setCellBigDecimal(row, 3, totalCargosBasicoImputacion, style_normal);
+            this.setCellBigDecimal(row, 4, totalCargosAntiguedadImputacion, style_normal);
+            this.setCellBigDecimal(row, 5, totalCargosClase, style_normal);
+            this.setCellBigDecimal(row, 6, totalCargosClaseBasicoImputacion, style_normal);
+            this.setCellBigDecimal(row, 7, totalCargosClaseAntiguedadImputacion, style_normal);
+            this.setCellBigDecimal(row, 8, basicoLiquidacion, style_normal);
+            this.setCellBigDecimal(row, 9, antiguedadLiquidacion, style_normal);
+            this.setCellBigDecimal(row, 10, totalCodigosRemunerativosImputacion, style_normal);
+            this.setCellBigDecimal(row, 11, totalCodigosNoRemunerativosImputacion, style_normal);
         }
 
         for (Integer column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)

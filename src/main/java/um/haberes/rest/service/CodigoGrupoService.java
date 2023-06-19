@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.CodigoGrupoNotFoundException;
-import um.haberes.rest.model.CodigoGrupo;
+import um.haberes.rest.kotlin.model.CodigoGrupo;
 import um.haberes.rest.repository.ICodigoGrupoRepository;
 
 /**

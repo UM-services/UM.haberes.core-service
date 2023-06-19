@@ -15,7 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.CodigoNotFoundException;
-import um.haberes.rest.model.Codigo;
+import um.haberes.rest.kotlin.model.Codigo;
 import um.haberes.rest.model.view.CodigoPeriodo;
 import um.haberes.rest.model.view.CodigoSearch;
 import um.haberes.rest.repository.ICodigoRepository;

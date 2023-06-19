@@ -20,6 +20,8 @@ public interface ILegajoCodigoImputacionRepository extends JpaRepository<LegajoC
 
 	public List<LegajoCodigoImputacion> findAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
 
+	public List<LegajoCodigoImputacion> findAllByLegajoIdAndAnhoAndMesAndCodigoIdIn(Long legajoId, Integer anho, Integer mes, List<Integer> codigoIds);
+
 	@Modifying
 	public void deleteAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
 

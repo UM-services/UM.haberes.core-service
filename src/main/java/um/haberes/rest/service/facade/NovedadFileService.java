@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
 import um.haberes.rest.exception.NovedadException;
 import um.haberes.rest.exception.common.ImportNewsException;
 import um.haberes.rest.exception.common.TituloNotFoundException;
-import um.haberes.rest.model.Codigo;
+import um.haberes.rest.kotlin.model.Codigo;
 import um.haberes.rest.model.Novedad;
 import um.haberes.rest.model.NovedadUpload;
 import um.haberes.rest.service.CodigoService;

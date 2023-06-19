@@ -18,4 +18,8 @@ public class EjercicioService {
         OffsetDateTime lastDate = Periodo.lastDay(anho, mes);
         return consumer.findByFecha(lastDate);
     }
+
+    public Ejercicio findByFecha(OffsetDateTime fecha) {
+        return consumer.findByFecha(fecha);
+    }
 }

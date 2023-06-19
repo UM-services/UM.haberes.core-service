@@ -4,7 +4,7 @@ services:
     mysql:
         image: dqmdz/mysql:5.7
         ports:
-            - "3307:3306"
+            - "3306:3306"
         volumes:
             - ./data:/var/lib/mysql
             - /etc/localtime:/etc/localtime:ro
@@ -22,6 +22,7 @@ services:
 #            - "8091:8091"
 #        depends_on:
 #            - mysql
+#        restart: always
 #        environment:
 #            APP_SERVER: mysql:3306
 #            APP_DATABASE: haberes
@@ -39,9 +40,19 @@ services:
 #            APP_TESIUM_PORT: 8092
 #        networks:
 #            - haberes
-#
+
+    cloudbeaver:
+        image: dbeaver/cloudbeaver:latest
+        restart: always
+        ports:
+            - '8978:8978'
+        volumes:
+            - ./cloudbeaver:/opt/cloudbeaver/workspace
+        networks:
+            - haberes
 networks:
     haberes:
 
 volumes:
     mysql:
+    cloudbeaver:

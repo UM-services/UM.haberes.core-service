@@ -1,8 +1,11 @@
 /.rewrite-cache/
 spring-boot-migrator.log
 *.xlsx
+appmap.yml
 logs/
+tmp/
 data/
+cloudbeaver/
 /target/
 !.mvn/wrapper/maven-wrapper.jar
 

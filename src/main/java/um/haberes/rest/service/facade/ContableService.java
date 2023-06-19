@@ -29,7 +29,6 @@ import um.haberes.rest.exception.LiquidacionException;
 import um.haberes.rest.model.Actividad;
 import um.haberes.rest.model.CargoClaseDetalle;
 import um.haberes.rest.model.CargoClaseImputacion;
-import um.haberes.rest.model.Codigo;
 import um.haberes.rest.model.CodigoImputacion;
 import um.haberes.rest.model.Item;
 import um.haberes.rest.model.LegajoCargoClaseImputacion;
