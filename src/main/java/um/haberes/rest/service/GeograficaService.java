@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.GeograficaNotFoundException;
+import um.haberes.rest.exception.GeograficaException;
 import um.haberes.rest.model.Geografica;
 import um.haberes.rest.repository.IGeograficaRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,7 @@ public class GeograficaService {
 
 	public Geografica findByGeograficaId(Integer geograficaId) {
 		return repository.findByGeograficaId(geograficaId)
-				.orElseThrow(() -> new GeograficaNotFoundException(geograficaId));
+				.orElseThrow(() -> new GeograficaException(geograficaId));
 	}
 
 	public Geografica update(Geografica newgeografica, Integer geograficaId) {
@@ -44,7 +44,7 @@ public class GeograficaService {
 			repository.save(geografica);
 			log.debug("Geografica -> " + geografica);
 			return geografica;
-		}).orElseThrow(() -> new GeograficaNotFoundException(geograficaId));
+		}).orElseThrow(() -> new GeograficaException(geograficaId));
 	}
 
 }

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import um.haberes.rest.exception.CategoriaNotFoundException;
+import um.haberes.rest.exception.CategoriaException;
 import um.haberes.rest.exception.common.TituloNotFoundException;
 import um.haberes.rest.model.Categoria;
 import um.haberes.rest.model.view.CategoriaSearch;
@@ -70,7 +70,7 @@ public class CategoriaController {
 	public ResponseEntity<Categoria> findByCategoriaId(@PathVariable Integer categoriaId) {
 		try {
 			return new ResponseEntity<Categoria>(service.findByCategoriaId(categoriaId), HttpStatus.OK);
-		} catch (CategoriaNotFoundException e) {
+		} catch (CategoriaException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
@@ -79,7 +79,7 @@ public class CategoriaController {
 	public @ResponseBody ResponseEntity<Categoria> findLast() {
 		try {
 			return new ResponseEntity<Categoria>(service.findLast(), HttpStatus.OK);
-		} catch (CategoriaNotFoundException e) {
+		} catch (CategoriaException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}

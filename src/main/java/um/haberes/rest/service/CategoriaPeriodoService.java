@@ -10,7 +10,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.CategoriaPeriodoNotFoundException;
+import um.haberes.rest.exception.CategoriaPeriodoException;
 import um.haberes.rest.model.CategoriaPeriodo;
 import um.haberes.rest.repository.ICategoriaPeriodoRepository;
 
@@ -30,7 +30,7 @@ public class CategoriaPeriodoService {
 
 	public CategoriaPeriodo findByUnique(Integer categoriaId, Integer anho, Integer mes) {
 		return repository.findByCategoriaIdAndAnhoAndMes(categoriaId, anho, mes)
-				.orElseThrow(() -> new CategoriaPeriodoNotFoundException(categoriaId, anho, mes));
+				.orElseThrow(() -> new CategoriaPeriodoException(categoriaId, anho, mes));
 	}
 
 	public CategoriaPeriodo add(CategoriaPeriodo categoriaPeriodo) {
@@ -46,7 +46,7 @@ public class CategoriaPeriodoService {
 					newCategoriaPeriodo.getNoDocente(), newCategoriaPeriodo.getLiquidaPorHora());
 			categoriaPeriodo = repository.save(categoriaPeriodo);
 			return categoriaPeriodo;
-		}).orElseThrow(() -> new CategoriaPeriodoNotFoundException(categoriaPeriodoId));
+		}).orElseThrow(() -> new CategoriaPeriodoException(categoriaPeriodoId));
 	}
 
 	@Transactional

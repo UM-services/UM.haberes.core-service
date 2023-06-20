@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import um.haberes.rest.exception.SeguridadSocialNotFoundException;
+import um.haberes.rest.exception.SeguridadSocialException;
 import um.haberes.rest.model.SeguridadSocial;
 import um.haberes.rest.service.SeguridadSocialService;
 
@@ -34,7 +34,7 @@ public class SeguridadSocialController {
 	public ResponseEntity<SeguridadSocial> findByUnique(@PathVariable Integer anho, @PathVariable Integer mes) {
 		try {
 			return new ResponseEntity<SeguridadSocial>(service.findByUnique(anho, mes), HttpStatus.OK);
-		} catch (SeguridadSocialNotFoundException e) {
+		} catch (SeguridadSocialException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}

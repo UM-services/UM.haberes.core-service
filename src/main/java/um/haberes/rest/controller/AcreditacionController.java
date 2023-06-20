@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import um.haberes.rest.exception.AcreditacionNotFoundException;
+import um.haberes.rest.exception.AcreditacionException;
 import um.haberes.rest.model.Acreditacion;
 import um.haberes.rest.service.AcreditacionService;
 
@@ -42,7 +42,7 @@ public class AcreditacionController {
 	public @ResponseBody ResponseEntity<Acreditacion> findByAcreditacionId(@PathVariable Long acreditacionId) {
 		try {
 			return new ResponseEntity<Acreditacion>(service.findByAcreditacionId(acreditacionId), HttpStatus.OK);
-		} catch (AcreditacionNotFoundException e) {
+		} catch (AcreditacionException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
@@ -52,7 +52,7 @@ public class AcreditacionController {
 			@PathVariable Integer mes) {
 		try {
 			return new ResponseEntity<Acreditacion>(service.findByPeriodo(anho, mes), HttpStatus.OK);
-		} catch (AcreditacionNotFoundException e) {
+		} catch (AcreditacionException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
@@ -67,7 +67,7 @@ public class AcreditacionController {
 	public ResponseEntity<Acreditacion> add(@RequestBody Acreditacion Acreditacion) {
 		try {
 			return new ResponseEntity<Acreditacion>(service.add(Acreditacion), HttpStatus.OK);
-		} catch (AcreditacionNotFoundException e) {
+		} catch (AcreditacionException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 
@@ -78,7 +78,7 @@ public class AcreditacionController {
 			@PathVariable Long acreditacionId) {
 		try {
 			return new ResponseEntity<Acreditacion>(service.update(acreditacion, acreditacionId), HttpStatus.OK);
-		} catch (AcreditacionNotFoundException e) {
+		} catch (AcreditacionException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import um.haberes.rest.exception.ActividadNotFoundException;
+import um.haberes.rest.exception.ActividadException;
 import um.haberes.rest.model.Actividad;
 import um.haberes.rest.model.view.ActividadPeriodo;
 import um.haberes.rest.service.ActividadService;
@@ -42,7 +42,7 @@ public class ActividadController {
 			@PathVariable Integer mes) {
 		try {
 			return new ResponseEntity<Actividad>(service.findByUnique(legajoId, anho, mes), HttpStatus.OK);
-		} catch (ActividadNotFoundException e) {
+		} catch (ActividadException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}

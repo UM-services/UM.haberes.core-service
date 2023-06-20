@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import um.haberes.rest.exception.CursoCargoNovedadNotFoundException;
+import um.haberes.rest.exception.CursoCargoNovedadException;
 import um.haberes.rest.model.CursoCargoNovedad;
 import um.haberes.rest.service.CursoCargoNovedadService;
 
@@ -115,7 +115,7 @@ public class CursoCargoNovedadController {
 		try {
 			return new ResponseEntity<CursoCargoNovedad>(service.findByCursoCargoNovedadId(cursoCargoNovedadId),
 					HttpStatus.OK);
-		} catch (CursoCargoNovedadNotFoundException e) {
+		} catch (CursoCargoNovedadException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
@@ -126,7 +126,7 @@ public class CursoCargoNovedadController {
 		try {
 			return new ResponseEntity<CursoCargoNovedad>(service.findByLegajo(legajoId, cursoId, anho, mes),
 					HttpStatus.OK);
-		} catch (CursoCargoNovedadNotFoundException e) {
+		} catch (CursoCargoNovedadException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
@@ -137,7 +137,7 @@ public class CursoCargoNovedadController {
 		try {
 			return new ResponseEntity<CursoCargoNovedad>(
 					service.findByUnique(cursoId, anho, mes, cargoTipoId, legajoId), HttpStatus.OK);
-		} catch (CursoCargoNovedadNotFoundException e) {
+		} catch (CursoCargoNovedadException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}

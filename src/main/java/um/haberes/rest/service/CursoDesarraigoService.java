@@ -10,8 +10,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.AcreditacionNotFoundException;
-import um.haberes.rest.exception.CursoDesarraigoNotFoundException;
+import um.haberes.rest.exception.AcreditacionException;
+import um.haberes.rest.exception.CursoDesarraigoException;
 import um.haberes.rest.model.CursoDesarraigo;
 import um.haberes.rest.repository.ICursoDesarraigoRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -40,12 +40,12 @@ public class CursoDesarraigoService {
 
 	public CursoDesarraigo findByCursoDesarraigoId(Long cursoDesarraigoId) {
 		return repository.findByCursoDesarraigoId(cursoDesarraigoId)
-				.orElseThrow(() -> new CursoDesarraigoNotFoundException(cursoDesarraigoId));
+				.orElseThrow(() -> new CursoDesarraigoException(cursoDesarraigoId));
 	}
 
 	public CursoDesarraigo findByUnique(Long legajoId, Integer anho, Integer mes, Long cursoId) {
 		return repository.findByLegajoIdAndAnhoAndMesAndCursoId(legajoId, anho, mes, cursoId)
-				.orElseThrow(() -> new CursoDesarraigoNotFoundException(legajoId, anho, mes, cursoId));
+				.orElseThrow(() -> new CursoDesarraigoException(legajoId, anho, mes, cursoId));
 	}
 
 	@Transactional
@@ -69,7 +69,7 @@ public class CursoDesarraigoService {
 			cursoDesarraigo = repository.save(cursoDesarraigo);
 			log.debug("CursoDesarraigo -> " + cursoDesarraigo);
 			return cursoDesarraigo;
-		}).orElseThrow(() -> new AcreditacionNotFoundException(cursoDesarraigoId));
+		}).orElseThrow(() -> new AcreditacionException(cursoDesarraigoId));
 	}
 
 	public List<CursoDesarraigo> saveAll(List<CursoDesarraigo> cursos) {

@@ -26,8 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.CategoriaNotFoundException;
-import um.haberes.rest.exception.CategoriaPeriodoNotFoundException;
+import um.haberes.rest.exception.CategoriaException;
+import um.haberes.rest.exception.CategoriaPeriodoException;
 import um.haberes.rest.exception.common.TituloNotFoundException;
 import um.haberes.rest.model.Categoria;
 import um.haberes.rest.model.CategoriaPeriodo;
@@ -104,11 +104,11 @@ public class CategoriaService {
 	}
 
 	public Categoria findByCategoriaId(Integer categoriaId) {
-		return repository.findByCategoriaId(categoriaId).orElseThrow(() -> new CategoriaNotFoundException(categoriaId));
+		return repository.findByCategoriaId(categoriaId).orElseThrow(() -> new CategoriaException(categoriaId));
 	}
 
 	public Categoria findLast() {
-		return repository.findTopByOrderByCategoriaIdDesc().orElseThrow(() -> new CategoriaNotFoundException());
+		return repository.findTopByOrderByCategoriaIdDesc().orElseThrow(() -> new CategoriaException());
 	}
 
 	public void delete(Integer categoriaId) {
@@ -125,7 +125,7 @@ public class CategoriaService {
 			try {
 				categoriaPeriodo = categoriaPeriodoService.findByUnique(categoria.getCategoriaId(), anho, mes);
 				old = true;
-			} catch (CategoriaPeriodoNotFoundException e) {
+			} catch (CategoriaPeriodoException e) {
 				categoriaPeriodo = new CategoriaPeriodo(null, categoria.getCategoriaId(), anho, mes, "",
 						BigDecimal.ZERO, (byte) 0, (byte) 0, (byte) 0);
 			}
@@ -157,7 +157,7 @@ public class CategoriaService {
 				try {
 					categoriaPeriodo = categoriaPeriodoService.findByUnique(categoria.getCategoriaId(), anho, mes);
 					old = true;
-				} catch (CategoriaPeriodoNotFoundException e) {
+				} catch (CategoriaPeriodoException e) {
 					categoriaPeriodo = new CategoriaPeriodo(null, categoria.getCategoriaId(), anho, mes, "",
 							BigDecimal.ZERO, (byte) 0, (byte) 0, (byte) 0);
 				}
@@ -177,7 +177,7 @@ public class CategoriaService {
 			categoria = repository.save(categoria);
 			log.debug("Categoria -> {}", categoria);
 			return categoria;
-		}).orElseThrow(() -> new CategoriaNotFoundException(categoriaId));
+		}).orElseThrow(() -> new CategoriaException(categoriaId));
 	}
 
 	@Transactional

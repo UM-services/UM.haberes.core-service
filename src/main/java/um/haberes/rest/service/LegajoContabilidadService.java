@@ -8,7 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.LegajoContabilidadNotFoundException;
+import um.haberes.rest.exception.LegajoContabilidadException;
 import um.haberes.rest.model.LegajoContabilidad;
 import um.haberes.rest.repository.ILegajoContabilidadRepository;
 
@@ -27,7 +27,7 @@ public class LegajoContabilidadService {
 
 	public LegajoContabilidad findByUnique(Long legajoId, Integer anho, Integer mes) {
 		return repository.findByLegajoIdAndAnhoAndMes(legajoId, anho, mes)
-				.orElseThrow(() -> new LegajoContabilidadNotFoundException(legajoId, anho, mes));
+				.orElseThrow(() -> new LegajoContabilidadException(legajoId, anho, mes));
 	}
 
 	public void delete(Long legajocontabilidadID) {
@@ -48,7 +48,7 @@ public class LegajoContabilidadService {
 			legajocontabilidad.setRemunerativo(newLegajoContabilidad.getRemunerativo());
 			legajocontabilidad.setNoRemunerativo(newLegajoContabilidad.getNoRemunerativo());
 			return repository.save(legajocontabilidad);
-		}).orElseThrow(() -> new LegajoContabilidadNotFoundException(legajoContabilidadId));
+		}).orElseThrow(() -> new LegajoContabilidadException(legajoContabilidadId));
 	}
 
 	public LegajoContabilidad save(LegajoContabilidad legajoContabilidad) {

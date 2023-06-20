@@ -6,7 +6,7 @@ package um.haberes.rest.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.ControlNotFoundException;
+import um.haberes.rest.exception.ControlException;
 import um.haberes.rest.model.Control;
 import um.haberes.rest.repository.IControlRepository;
 
@@ -21,7 +21,7 @@ public class ControlService {
 	private IControlRepository repository;
 
 	public Control findByPeriodo(Integer anho, Integer mes) {
-		return repository.findByAnhoAndMes(anho, mes).orElseThrow(() -> new ControlNotFoundException(anho, mes));
+		return repository.findByAnhoAndMes(anho, mes).orElseThrow(() -> new ControlException(anho, mes));
 	}
 
 	public Control add(Control control) {
@@ -50,7 +50,7 @@ public class ControlService {
 					newControl.getEstadoDocenteAuxiliar());
 			repository.save(control);
 			return control;
-		}).orElseThrow(() -> new ControlNotFoundException(controlId));
+		}).orElseThrow(() -> new ControlException(controlId));
 	}
 
 }

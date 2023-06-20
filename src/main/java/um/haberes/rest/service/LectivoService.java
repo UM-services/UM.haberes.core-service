@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.LectivoNotFoundException;
+import um.haberes.rest.exception.LectivoException;
 import um.haberes.rest.repository.ILectivoRepository;
 
 /**
@@ -32,7 +32,7 @@ public class LectivoService {
 	}
 
 	public Lectivo findByLectivoId(Integer lectivoId) {
-		return repository.findByLectivoId(lectivoId).orElseThrow(() -> new LectivoNotFoundException(lectivoId));
+		return repository.findByLectivoId(lectivoId).orElseThrow(() -> new LectivoException(lectivoId));
 	}
 
 	public List<Lectivo> saveAll(List<Lectivo> lectivos) {

@@ -10,7 +10,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.ExcluidoNotFoundException;
+import um.haberes.rest.exception.ExcluidoException;
 import um.haberes.rest.model.Excluido;
 import um.haberes.rest.repository.IExcluidoRepository;
 
@@ -30,7 +30,7 @@ public class ExcluidoService {
 
 	public Excluido findByUnique(Long legajoId, Integer anho, Integer mes) {
 		return repository.findByLegajoIdAndAnhoAndMes(legajoId, anho, mes)
-				.orElseThrow(() -> new ExcluidoNotFoundException(legajoId, anho, mes));
+				.orElseThrow(() -> new ExcluidoException(legajoId, anho, mes));
 	}
 
 	public Excluido add(Excluido excluido) {
@@ -44,7 +44,7 @@ public class ExcluidoService {
 					newexcluido.getFecha(), newexcluido.getObservaciones());
 			repository.save(excluido);
 			return excluido;
-		}).orElseThrow(() -> new ExcluidoNotFoundException(excluidoId));
+		}).orElseThrow(() -> new ExcluidoException(excluidoId));
 	}
 
 	@Transactional

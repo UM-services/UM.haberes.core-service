@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.ItemNotFoundException;
+import um.haberes.rest.exception.ItemException;
 import um.haberes.rest.model.Item;
 import um.haberes.rest.model.ItemVersion;
 import um.haberes.rest.repository.IItemRepository;
@@ -44,12 +44,6 @@ public class ItemService {
 		return repository.findAllByLegajoIdAndAnhoAndMes(legajoId, anho, mes);
 	}
 
-	public List<Item> findAllByLegajo(Long legajoId, Integer anho, Integer mes, Integer codigoIdDesde,
-			Integer codigoIdHasta) {
-		return repository.findAllByLegajoIdAndAnhoAndMesAndCodigoIdBetween(legajoId, anho, mes, codigoIdDesde,
-				codigoIdHasta);
-	}
-
 	public List<Item> findAllByPeriodo(Integer anho, Integer mes, Integer limit) {
 		return repository.findAllByAnhoAndMes(anho, mes, PageRequest.of(0, limit));
 	}
@@ -66,9 +60,13 @@ public class ItemService {
 		return repository.findAllByAnhoAndMesAndCodigoIdAndImporteGreaterThan(anho, mes, 99, BigDecimal.ZERO);
 	}
 
+	public List<Item> findAllCodigosByLegajo(Long legajoId, Integer anho, Integer mes, List<Integer> codigoIds) {
+		return repository.findAllByLegajoIdAndAnhoAndMesAndCodigoIdIn(legajoId, anho, mes, codigoIds);
+	}
+
 	public Item findByUnique(Long legajoId, Integer anho, Integer mes, Integer codigoId) {
 		return repository.findByLegajoIdAndAnhoAndMesAndCodigoId(legajoId, anho, mes, codigoId)
-				.orElseThrow(() -> new ItemNotFoundException(legajoId, anho, mes, codigoId));
+				.orElseThrow(() -> new ItemException(legajoId, anho, mes, codigoId));
 	}
 
 	@Transactional
@@ -90,7 +88,7 @@ public class ItemService {
 			itemVersionRepository.save(itemVersion);
 			repository.save(item);
 			return item;
-		}).orElseThrow(() -> new ItemNotFoundException(itemId));
+		}).orElseThrow(() -> new ItemException(itemId));
 	}
 
 	@Transactional

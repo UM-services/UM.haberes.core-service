@@ -8,7 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.CodigoImputacionNotFoundException;
+import um.haberes.rest.exception.CodigoImputacionException;
 import um.haberes.rest.model.CodigoImputacion;
 import um.haberes.rest.repository.ICodigoImputacionRepository;
 
@@ -28,7 +28,7 @@ public class CodigoImputacionService {
 
 	public CodigoImputacion findByCodigoimputacionId(Long codigoImputacionId) {
 		return repository.findByCodigoImputacionId(codigoImputacionId)
-				.orElseThrow(() -> new CodigoImputacionNotFoundException(codigoImputacionId));
+				.orElseThrow(() -> new CodigoImputacionException(codigoImputacionId));
 	}
 
 	public CodigoImputacion findByUnique(Integer dependenciaId, Integer facultadId, Integer geograficaId,
@@ -37,7 +37,7 @@ public class CodigoImputacionService {
 				.findByDependenciaIdAndFacultadIdAndGeograficaIdAndCodigoId(dependenciaId, facultadId, geograficaId,
 						codigoId)
 				.orElseThrow(
-						() -> new CodigoImputacionNotFoundException(dependenciaId, facultadId, geograficaId, codigoId));
+						() -> new CodigoImputacionException(dependenciaId, facultadId, geograficaId, codigoId));
 	}
 
 	public CodigoImputacion add(CodigoImputacion codigoimputacion) {
@@ -54,7 +54,7 @@ public class CodigoImputacionService {
 					newCodigoImputacion.getCuentaAportesNoDocente());
 			repository.save(codigoimputacion);
 			return codigoimputacion;
-		}).orElseThrow(() -> new CodigoImputacionNotFoundException(codigoImputacionId));
+		}).orElseThrow(() -> new CodigoImputacionException(codigoImputacionId));
 	}
 
 }

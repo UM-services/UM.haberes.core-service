@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.CursoCargoNovedadNotFoundException;
+import um.haberes.rest.exception.CursoCargoNovedadException;
 import um.haberes.rest.model.CursoCargoNovedad;
 import um.haberes.rest.repository.ICursoCargoNovedadRepository;
 
@@ -106,17 +106,17 @@ public class CursoCargoNovedadService {
 
 	public CursoCargoNovedad findByCursoCargoNovedadId(Long cursoCargoNovedadId) {
 		return repository.findByCursoCargoNovedadId(cursoCargoNovedadId)
-				.orElseThrow(() -> new CursoCargoNovedadNotFoundException(cursoCargoNovedadId));
+				.orElseThrow(() -> new CursoCargoNovedadException(cursoCargoNovedadId));
 	}
 
 	public CursoCargoNovedad findByLegajo(Long legajoId, Long cursoId, Integer anho, Integer mes) {
 		return repository.findByLegajoIdAndCursoIdAndAnhoAndMes(legajoId, cursoId, anho, mes)
-				.orElseThrow(() -> new CursoCargoNovedadNotFoundException(legajoId, cursoId, anho, mes));
+				.orElseThrow(() -> new CursoCargoNovedadException(legajoId, cursoId, anho, mes));
 	}
 
 	public CursoCargoNovedad findByUnique(Long cursoId, Integer anho, Integer mes, Integer cargoTipoId, Long legajoId) {
 		return repository.findByCursoIdAndAnhoAndMesAndCargoTipoIdAndLegajoId(cursoId, anho, mes, cargoTipoId, legajoId)
-				.orElseThrow(() -> new CursoCargoNovedadNotFoundException(cursoId, anho, mes, cargoTipoId, legajoId));
+				.orElseThrow(() -> new CursoCargoNovedadException(cursoId, anho, mes, cargoTipoId, legajoId));
 	}
 
 	public CursoCargoNovedad add(CursoCargoNovedad cursoCargoNovedad) {
@@ -138,7 +138,7 @@ public class CursoCargoNovedadService {
 					newCursoCargoNovedad.getCargoTipo(), newCursoCargoNovedad.getPersona());
 			repository.save(cursoCargoNovedad);
 			return cursoCargoNovedad;
-		}).orElseThrow(() -> new CursoCargoNovedadNotFoundException(cursoCargoNovedadId));
+		}).orElseThrow(() -> new CursoCargoNovedadException(cursoCargoNovedadId));
 	}
 
 	@Transactional

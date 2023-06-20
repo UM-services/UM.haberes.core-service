@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import um.haberes.rest.exception.UsuarioNotFoundException;
+import um.haberes.rest.exception.UsuarioException;
 import um.haberes.rest.model.Usuario;
 import um.haberes.rest.service.UsuarioService;
 
@@ -33,7 +33,7 @@ public class UsuarioController {
 	public ResponseEntity<Usuario> findByLegajoId(@PathVariable Long legajoId) {
 		try {
 			return new ResponseEntity<Usuario>(service.findByLegajoId(legajoId), HttpStatus.OK);
-		} catch (UsuarioNotFoundException e) {
+		} catch (UsuarioException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
@@ -42,7 +42,7 @@ public class UsuarioController {
 	public ResponseEntity<Usuario> updateLastLog(@PathVariable Long legajoId) {
 		try {
 			return new ResponseEntity<Usuario>(service.updateLastLog(legajoId), HttpStatus.OK);
-		} catch (UsuarioNotFoundException e) {
+		} catch (UsuarioException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}

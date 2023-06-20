@@ -8,7 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.DesignacionNotFoundException;
+import um.haberes.rest.exception.DesignacionException;
 import um.haberes.rest.model.Designacion;
 import um.haberes.rest.repository.IDesignacionRepository;
 
@@ -31,7 +31,7 @@ public class DesignacionService {
 		return repository
 				.findByDesignacionTipoIdAndCargoTipoIdAndAnualAndSemestral(designacionTipoId, cargoTipoId, anual,
 						semestral)
-				.orElseThrow(() -> new DesignacionNotFoundException(designacionTipoId, cargoTipoId, anual, semestral));
+				.orElseThrow(() -> new DesignacionException(designacionTipoId, cargoTipoId, anual, semestral));
 	}
 
 }

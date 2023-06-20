@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import um.haberes.rest.exception.ExcluidoNotFoundException;
+import um.haberes.rest.exception.ExcluidoException;
 import um.haberes.rest.model.Excluido;
 import um.haberes.rest.service.ExcluidoService;
 
@@ -43,7 +43,7 @@ public class ExcluidoController {
 			@PathVariable Integer mes) {
 		try {
 			return new ResponseEntity<Excluido>(service.findByUnique(legajoId, anho, mes), HttpStatus.OK);
-		} catch (ExcluidoNotFoundException e) {
+		} catch (ExcluidoException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}

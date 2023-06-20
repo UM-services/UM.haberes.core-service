@@ -8,7 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.AcreditacionNotFoundException;
+import um.haberes.rest.exception.AcreditacionException;
 import um.haberes.rest.model.Acreditacion;
 import um.haberes.rest.repository.IAcreditacionRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -28,11 +28,11 @@ public class AcreditacionService {
 	}
 
 	public Acreditacion findByAcreditacionId(Long acreditacionId) {
-		return repository.findByAcreditacionId(acreditacionId).orElseThrow(() -> new AcreditacionNotFoundException(acreditacionId));
+		return repository.findByAcreditacionId(acreditacionId).orElseThrow(() -> new AcreditacionException(acreditacionId));
 	}
 	
 	public Acreditacion findByPeriodo(Integer anho, Integer mes) {
-		return repository.findByAnhoAndMes(anho, mes).orElseThrow(() -> new AcreditacionNotFoundException(anho, mes));
+		return repository.findByAnhoAndMes(anho, mes).orElseThrow(() -> new AcreditacionException(anho, mes));
 	}
 
 	public void delete(Long acreditacionId) {
@@ -59,6 +59,6 @@ public class AcreditacionService {
 			repository.save(acreditacion);
 			log.debug(String.format("Acreditacion -> ", acreditacion));
 			return acreditacion;
-		}).orElseThrow(() -> new AcreditacionNotFoundException(acreditacionId));
+		}).orElseThrow(() -> new AcreditacionException(acreditacionId));
 	}
 }

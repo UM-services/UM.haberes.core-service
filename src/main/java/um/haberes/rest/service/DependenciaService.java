@@ -8,7 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.DependenciaNotFoundException;
+import um.haberes.rest.exception.DependenciaException;
 import um.haberes.rest.kotlin.model.Dependencia;
 import um.haberes.rest.repository.IDependenciaRepository;
 
@@ -30,10 +30,10 @@ public class DependenciaService {
 	}
 
 	public Dependencia findByDependenciaId(Integer dependenciaId) {
-		return repository.findByDependenciaId(dependenciaId).orElseThrow(() -> new DependenciaNotFoundException(dependenciaId));
+		return repository.findByDependenciaId(dependenciaId).orElseThrow(() -> new DependenciaException(dependenciaId));
 	}
 
 	public Dependencia findFirstByFacultadIdAndGeograficaId(Integer facultadId, Integer geograficaId) {
-		return repository.findFirstByFacultadIdAndGeograficaId(facultadId, geograficaId).orElseThrow(() -> new DependenciaNotFoundException(facultadId, geograficaId));
+		return repository.findFirstByFacultadIdAndGeograficaId(facultadId, geograficaId).orElseThrow(() -> new DependenciaException(facultadId, geograficaId));
 	}
 }

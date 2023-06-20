@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import um.haberes.rest.exception.ItemNotFoundException;
+import um.haberes.rest.exception.ItemException;
 import um.haberes.rest.model.Item;
 import um.haberes.rest.service.ItemService;
 
@@ -37,13 +37,6 @@ public class ItemController {
 	public ResponseEntity<List<Item>> findAllByCodigoId(@PathVariable Integer codigoId, @PathVariable Integer anho,
 			@PathVariable Integer mes) {
 		return new ResponseEntity<List<Item>>(service.findAllByCodigo(codigoId, anho, mes), HttpStatus.OK);
-	}
-
-	@GetMapping("/legajo/{legajoId}/{anho}/{mes}/{codigoIdDesde}/{codigoIdHasta}")
-	public ResponseEntity<List<Item>> findAllByLegajoId(@PathVariable Long legajoId, @PathVariable Integer anho,
-			@PathVariable Integer mes, @PathVariable Integer codigoIdDesde, @PathVariable Integer codigoIdHasta) {
-		return new ResponseEntity<List<Item>>(
-				service.findAllByLegajo(legajoId, anho, mes, codigoIdDesde, codigoIdHasta), HttpStatus.OK);
 	}
 
 	@GetMapping("/periodo/{anho}/{mes}/{limit}")
@@ -68,7 +61,7 @@ public class ItemController {
 			@PathVariable Integer mes, @PathVariable Integer codigoId) {
 		try {
 			return new ResponseEntity<Item>(service.findByUnique(legajoId, anho, mes, codigoId), HttpStatus.OK);
-		} catch (ItemNotFoundException e) {
+		} catch (ItemException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}

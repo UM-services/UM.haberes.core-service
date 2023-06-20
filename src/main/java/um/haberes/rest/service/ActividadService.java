@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.ActividadNotFoundException;
+import um.haberes.rest.exception.ActividadException;
 import um.haberes.rest.model.Actividad;
 import um.haberes.rest.model.view.ActividadPeriodo;
 import um.haberes.rest.repository.IActividadRepository;
@@ -41,7 +41,7 @@ public class ActividadService {
 
 	public Actividad findByUnique(Long legajoId, Integer anho, Integer mes) {
 		return repository.findByLegajoIdAndAnhoAndMes(legajoId, anho, mes)
-				.orElseThrow(() -> new ActividadNotFoundException(legajoId, anho, mes));
+				.orElseThrow(() -> new ActividadException(legajoId, anho, mes));
 	}
 
 	public Actividad add(Actividad actividad) {
@@ -59,6 +59,6 @@ public class ActividadService {
 			actividad = repository.save(actividad);
 			log.debug("Actividad -> {}", actividad);
 			return actividad;
-		}).orElseThrow(() -> new ActividadNotFoundException(actividadId));
+		}).orElseThrow(() -> new ActividadException(actividadId));
 	}
 }

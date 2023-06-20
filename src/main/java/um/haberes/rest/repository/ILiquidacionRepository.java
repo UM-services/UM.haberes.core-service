@@ -42,6 +42,8 @@ public interface ILiquidacionRepository extends JpaRepository<Liquidacion, Long>
 
 	public List<Liquidacion> findAllByAnhoAndMesAndFechaAcreditacionNotNull(Integer anho, Integer mes, Sort sort);
 
+	public List<Liquidacion> findAllByAnhoAndMesAndFechaAcreditacionNotNullAndLegajoIdIn(Integer anho, Integer mes, List<Long> legajoIds, Sort and);
+
 	public Optional<Liquidacion> findByLiquidacionId(Long liquidacionId);
 
 	public Optional<Liquidacion> findByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);

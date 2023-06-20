@@ -8,7 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.SituacionNotFoundException;
+import um.haberes.rest.exception.SituacionException;
 import um.haberes.rest.model.Situacion;
 import um.haberes.rest.repository.ISituacionRepository;
 
@@ -26,6 +26,6 @@ public class SituacionService {
 	}
 
 	public Situacion findBySituacionID(Integer situacionID) {
-		return repository.findById(situacionID).orElseThrow(() -> new SituacionNotFoundException(situacionID));
+		return repository.findById(situacionID).orElseThrow(() -> new SituacionException(situacionID));
 	}
 }

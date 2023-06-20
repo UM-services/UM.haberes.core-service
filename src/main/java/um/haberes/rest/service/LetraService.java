@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.LetraNotFoundException;
+import um.haberes.rest.exception.LetraException;
 import um.haberes.rest.model.Letra;
 import um.haberes.rest.repository.ILetraRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,7 @@ public class LetraService {
 
 	public Letra findByUnique(Long legajoId, Integer anho, Integer mes) {
 		return repository.findByLegajoIdAndAnhoAndMes(legajoId, anho, mes)
-				.orElseThrow(() -> new LetraNotFoundException(legajoId, anho, mes));
+				.orElseThrow(() -> new LetraException(legajoId, anho, mes));
 	}
 
 	public Letra add(Letra letra) {
@@ -44,7 +44,7 @@ public class LetraService {
 			repository.save(letra);
 			log.debug(letra.toString());
 			return letra;
-		}).orElseThrow(() -> new LetraNotFoundException(letraId));
+		}).orElseThrow(() -> new LetraException(letraId));
 	}
 
 	@Transactional

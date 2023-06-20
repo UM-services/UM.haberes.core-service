@@ -53,8 +53,8 @@ import com.lowagie.text.pdf.PdfWriter;
 
 import um.haberes.rest.exception.ContactoException;
 import um.haberes.rest.exception.LegajoBancoException;
-import um.haberes.rest.exception.LegajoControlNotFoundException;
-import um.haberes.rest.exception.LetraNotFoundException;
+import um.haberes.rest.exception.LegajoControlException;
+import um.haberes.rest.exception.LetraException;
 import um.haberes.rest.model.Antiguedad;
 import um.haberes.rest.model.BonoImpresion;
 import um.haberes.rest.model.CargoClaseDetalle;
@@ -64,7 +64,6 @@ import um.haberes.rest.model.Item;
 import um.haberes.rest.model.LegajoBanco;
 import um.haberes.rest.model.LegajoControl;
 import um.haberes.rest.model.Letra;
-import um.haberes.rest.model.LiquidacionAdicional;
 import um.haberes.rest.model.Persona;
 import um.haberes.rest.service.AntiguedadService;
 import um.haberes.rest.service.BonoImpresionService;
@@ -883,7 +882,7 @@ public class BonoService {
 				letra = letraService.update(
 						new Letra(letra.getLetraId(), legajoId, anho, mes, neto, Tool.number_2_text(neto)),
 						letra.getLetraId());
-			} catch (LetraNotFoundException e) {
+			} catch (LetraException e) {
 				letra = letraService.add(new Letra(null, legajoId, anho, mes, neto, Tool.number_2_text(neto)));
 			}
 			PdfPTable tableFirma = new PdfPTable(columnHeader);
@@ -979,7 +978,7 @@ public class BonoService {
 			legajoControl = legajoControlService.findByUnique(legajoIdSolicitud, anho, mes);
 			legajoControl.setBonoEnviado((byte) 1);
 			legajoControl = legajoControlService.update(legajoControl, legajoControl.getLegajoControlId());
-		} catch (LegajoControlNotFoundException e) {
+		} catch (LegajoControlException e) {
 			legajoControl = new LegajoControl(null, legajoId, anho, mes, (byte) 0, (byte) 0, (byte) 1, persona);
 			legajoControl = legajoControlService.add(legajoControl);
 		}

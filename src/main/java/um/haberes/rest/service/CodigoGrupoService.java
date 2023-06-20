@@ -8,7 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.CodigoGrupoNotFoundException;
+import um.haberes.rest.exception.CodigoGrupoException;
 import um.haberes.rest.kotlin.model.CodigoGrupo;
 import um.haberes.rest.repository.ICodigoGrupoRepository;
 
@@ -39,7 +39,7 @@ public class CodigoGrupoService {
 	}
 
 	public CodigoGrupo findByCodigoId(Integer codigoId) {
-		return repository.findByCodigoId(codigoId).orElseThrow(() -> new CodigoGrupoNotFoundException(codigoId));
+		return repository.findByCodigoId(codigoId).orElseThrow(() -> new CodigoGrupoException(codigoId));
 	}
 
 	public CodigoGrupo add(CodigoGrupo codigoGrupo) {
@@ -54,7 +54,7 @@ public class CodigoGrupoService {
 					newCodigoGrupo.getCodigo());
 			repository.save(codigoGrupo);
 			return codigoGrupo;
-		}).orElseThrow(() -> new CodigoGrupoNotFoundException(codigoId));
+		}).orElseThrow(() -> new CodigoGrupoException(codigoId));
 	}
 
 }

@@ -8,7 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.ClaseNotFoundException;
+import um.haberes.rest.exception.ClaseException;
 import um.haberes.rest.model.Clase;
 import um.haberes.rest.repository.IClaseRepository;
 
@@ -27,11 +27,11 @@ public class ClaseService {
 	}
 
 	public Clase findLast() {
-		return repository.findTopByOrderByClaseIdDesc().orElseThrow(() -> new ClaseNotFoundException());
+		return repository.findTopByOrderByClaseIdDesc().orElseThrow(() -> new ClaseException());
 	}
 
 	public Clase findByClaseId(Integer claseId) {
-		return repository.findByClaseId(claseId).orElseThrow(() -> new ClaseNotFoundException(claseId));
+		return repository.findByClaseId(claseId).orElseThrow(() -> new ClaseException(claseId));
 	}
 
 	public void delete(Integer claseId) {
@@ -48,6 +48,6 @@ public class ClaseService {
 			clase = new Clase(claseId, newClase.getNombre(), newClase.getValorHora());
 			repository.save(clase);
 			return clase;
-		}).orElseThrow(() -> new ClaseNotFoundException(claseId));
+		}).orElseThrow(() -> new ClaseException(claseId));
 	}
 }

@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.CursoNotFoundException;
+import um.haberes.rest.exception.CursoException;
 import um.haberes.rest.model.Curso;
 import um.haberes.rest.repository.ICursoRepository;
 
@@ -43,7 +43,7 @@ public class CursoService {
 	}
 
 	public Curso findByCursoId(Long cursoId) {
-		return repository.findByCursoId(cursoId).orElseThrow(() -> new CursoNotFoundException(cursoId));
+		return repository.findByCursoId(cursoId).orElseThrow(() -> new CursoException(cursoId));
 	}
 
 	public Curso add(Curso curso) {
@@ -58,7 +58,7 @@ public class CursoService {
 					newCurso.getNivel());
 			repository.save(curso);
 			return curso;
-		}).orElseThrow(() -> new CursoNotFoundException(cursoId));
+		}).orElseThrow(() -> new CursoException(cursoId));
 	}
 
 	@Transactional

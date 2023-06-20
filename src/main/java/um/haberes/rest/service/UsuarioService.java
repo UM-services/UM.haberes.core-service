@@ -9,7 +9,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.UsuarioNotFoundException;
+import um.haberes.rest.exception.UsuarioException;
 import um.haberes.rest.model.Usuario;
 import um.haberes.rest.repository.IUsuarioRepository;
 import um.haberes.rest.util.Tool;
@@ -25,7 +25,7 @@ public class UsuarioService {
 	private IUsuarioRepository repository;
 
 	public Usuario findByLegajoId(Long legajoId) {
-		return repository.findByLegajoId(legajoId).orElseThrow(() -> new UsuarioNotFoundException(legajoId));
+		return repository.findByLegajoId(legajoId).orElseThrow(() -> new UsuarioException(legajoId));
 	}
 
 	public Usuario updateLastLog(Long legajoId) {
@@ -34,7 +34,7 @@ public class UsuarioService {
 					usuario.getUsuarioId());
 			repository.save(usuario);
 			return usuario;
-		}).orElseThrow(() -> new UsuarioNotFoundException(legajoId));
+		}).orElseThrow(() -> new UsuarioException(legajoId));
 	}
 
 	public Boolean isUserValid(Usuario usuario) {

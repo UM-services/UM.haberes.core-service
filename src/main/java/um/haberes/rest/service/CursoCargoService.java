@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.CursoCargoNotFoundException;
+import um.haberes.rest.exception.CursoCargoException;
 import um.haberes.rest.model.CursoCargo;
 import um.haberes.rest.repository.ICursoCargoRepository;
 
@@ -92,17 +92,17 @@ public class CursoCargoService {
 
 	public CursoCargo findByCursoCargoId(Long cursoCargoId) {
 		return repository.findByCursoCargoId(cursoCargoId)
-				.orElseThrow(() -> new CursoCargoNotFoundException(cursoCargoId));
+				.orElseThrow(() -> new CursoCargoException(cursoCargoId));
 	}
 
 	public CursoCargo findByUnique(Long cursoId, Integer anho, Integer mes, Integer cargoTipoId, Long legajoId) {
 		return repository.findByCursoIdAndAnhoAndMesAndCargoTipoIdAndLegajoId(cursoId, anho, mes, cargoTipoId, legajoId)
-				.orElseThrow(() -> new CursoCargoNotFoundException(cursoId, anho, mes, cargoTipoId, legajoId));
+				.orElseThrow(() -> new CursoCargoException(cursoId, anho, mes, cargoTipoId, legajoId));
 	}
 
 	public CursoCargo findByLegajo(Long cursoId, Integer anho, Integer mes, Long legajoId) {
 		return repository.findByCursoIdAndAnhoAndMesAndLegajoId(cursoId, anho, mes, legajoId)
-				.orElseThrow(() -> new CursoCargoNotFoundException(cursoId, anho, mes, legajoId));
+				.orElseThrow(() -> new CursoCargoException(cursoId, anho, mes, legajoId));
 	}
 
 	public CursoCargo add(CursoCargo cursoCargo) {
@@ -120,7 +120,7 @@ public class CursoCargoService {
 					newCursoCargo.getPersona(), newCursoCargo.getDesignacionTipo(), newCursoCargo.getCategoria());
 			repository.save(cursoCargo);
 			return cursoCargo;
-		}).orElseThrow(() -> new CursoCargoNotFoundException(cursoCargoId));
+		}).orElseThrow(() -> new CursoCargoException(cursoCargoId));
 	}
 
 	@Transactional

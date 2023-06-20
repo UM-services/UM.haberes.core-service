@@ -9,7 +9,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.DesignacionTipoNotFoundException;
+import um.haberes.rest.exception.DesignacionTipoException;
 import um.haberes.rest.model.DesignacionTipo;
 import um.haberes.rest.repository.IDesignacionTipoRepository;
 
@@ -29,12 +29,12 @@ public class DesignacionTipoService {
 
 	public DesignacionTipo findByHorasSemanales(BigDecimal horasSemanales) {
 		return repository.findFirstByHorasSemanalesGreaterThanEqual(horasSemanales)
-				.orElseThrow(() -> new DesignacionTipoNotFoundException(horasSemanales));
+				.orElseThrow(() -> new DesignacionTipoException(horasSemanales));
 	}
 
 	public DesignacionTipo findByDesignacionTipoId(Integer designacionTipoId) {
 		return repository.findByDesignacionTipoId(designacionTipoId)
-				.orElseThrow(() -> new DesignacionTipoNotFoundException(designacionTipoId));
+				.orElseThrow(() -> new DesignacionTipoException(designacionTipoId));
 	}
 
 }

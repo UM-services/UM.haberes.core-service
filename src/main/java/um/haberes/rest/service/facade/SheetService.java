@@ -10,10 +10,7 @@ import java.math.RoundingMode;
 import java.text.MessageFormat;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -35,7 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.AcreditacionNotFoundException;
+import um.haberes.rest.exception.AcreditacionException;
 import um.haberes.rest.exception.LegajoBancoException;
 import um.haberes.rest.exception.NovedadException;
 import um.haberes.rest.model.view.LegajoCursoCantidad;
@@ -809,7 +806,7 @@ public class SheetService {
             // Si el periodo final del semestre está acreditado termina
             if (acreditacion.getAcreditado() == 1)
                 return;
-        } catch (AcreditacionNotFoundException e) {
+        } catch (AcreditacionException e) {
             log.debug("Sin Registro ACREDITACION");
         }
 
@@ -1489,11 +1486,15 @@ public class SheetService {
         this.setCellString(row, 6, "Cargos Clase Imputacion Basico", style_bold);
         this.setCellString(row, 7, "Cargos Clase Imputacion Antigüedad", style_bold);
         this.setCellString(row, 8, "Basico Liquidacion", style_bold);
-        this.setCellString(row, 9, "Antigüedad Liquidacion", style_bold);
-        this.setCellString(row, 10, "Codigos Imputacion Remunerativos", style_bold);
-        this.setCellString(row, 11, "Codigos Imputacion No Remunerativos", style_bold);
+        this.setCellString(row, 9, "Diferencia Basico", style_bold);
+        this.setCellString(row, 10, "Antigüedad Liquidacion", style_bold);
+        this.setCellString(row, 11, "Diferencia Antigüedad", style_bold);
+        this.setCellString(row, 12, "Codigos Imputacion Remunerativos", style_bold);
+        this.setCellString(row, 13, "Codigos Imputacion No Remunerativos", style_bold);
 
         for (Liquidacion liquidacion : liquidacionService.findAllByAcreditado(anho, mes)) {
+//        Long[] valores = {54L, 57L, 725L, 1515L};
+//        for (Liquidacion liquidacion : liquidacionService.findAllAcreditadoByLegajoIdIn(anho, mes, Arrays.asList(valores))) {
             Map<Integer, Item> itemMap = itemService.findAllByLegajo(liquidacion.getLegajoId(), anho, mes).stream().collect(Collectors.toMap(Item::getCodigoId, item -> item));
             BigDecimal totalCargos = BigDecimal.ZERO;
             for (CargoLiquidacion cargoLiquidacion : cargoLiquidacionService.findAllByLegajo(liquidacion.getLegajoId(), anho, mes)) {
@@ -1535,6 +1536,8 @@ public class SheetService {
             for (LegajoCodigoImputacion legajoCodigoImputacion : legajoCodigoImputacionService.findAllByLegajoAndCodigos(liquidacion.getLegajoId(), anho, mes, codigoIdNoRemunerativos)) {
                 totalCodigosNoRemunerativosImputacion = totalCodigosNoRemunerativosImputacion.add(legajoCodigoImputacion.getImporte()).setScale(2, RoundingMode.HALF_UP);
             }
+            BigDecimal diferenciaBasico = basicoLiquidacion.subtract(totalCargosBasicoImputacion).subtract(totalCargosClaseBasicoImputacion).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal diferenciaAntiguedad = antiguedadLiquidacion.subtract(totalCargosAntiguedadImputacion).subtract(totalCargosClaseAntiguedadImputacion).setScale(2, RoundingMode.HALF_UP);
             row = sheet.createRow(++fila);
             this.setCellLong(row, 0, liquidacion.getLegajoId(), style_normal);
             this.setCellString(row, 1, liquidacion.getPersona().getApellidoNombre(), style_normal);
@@ -1545,9 +1548,11 @@ public class SheetService {
             this.setCellBigDecimal(row, 6, totalCargosClaseBasicoImputacion, style_normal);
             this.setCellBigDecimal(row, 7, totalCargosClaseAntiguedadImputacion, style_normal);
             this.setCellBigDecimal(row, 8, basicoLiquidacion, style_normal);
-            this.setCellBigDecimal(row, 9, antiguedadLiquidacion, style_normal);
-            this.setCellBigDecimal(row, 10, totalCodigosRemunerativosImputacion, style_normal);
-            this.setCellBigDecimal(row, 11, totalCodigosNoRemunerativosImputacion, style_normal);
+            this.setCellBigDecimal(row, 9, diferenciaBasico, style_normal);
+            this.setCellBigDecimal(row, 10, antiguedadLiquidacion, style_normal);
+            this.setCellBigDecimal(row, 11, diferenciaAntiguedad, style_normal);
+            this.setCellBigDecimal(row, 12, totalCodigosRemunerativosImputacion, style_normal);
+            this.setCellBigDecimal(row, 13, totalCodigosNoRemunerativosImputacion, style_normal);
         }
 
         for (Integer column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)

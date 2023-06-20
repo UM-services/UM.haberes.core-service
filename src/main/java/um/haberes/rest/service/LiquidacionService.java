@@ -96,6 +96,10 @@ public class LiquidacionService {
 				Sort.by("persona.apellido").ascending().and(Sort.by("persona.nombre").ascending()));
 	}
 
+	public List<Liquidacion> findAllAcreditadoByLegajoIdIn(Integer anho, Integer mes, List<Long> legajoIds) {
+		return repository.findAllByAnhoAndMesAndFechaAcreditacionNotNullAndLegajoIdIn(anho, mes, legajoIds, Sort.by("persona.apellido").ascending().and(Sort.by("persona.nombre").ascending()));
+	}
+
 	public Liquidacion findByLiquidacionId(Long liquidacionId) {
 		return repository.findByLiquidacionId(liquidacionId)
 				.orElseThrow(() -> new LiquidacionException(liquidacionId));

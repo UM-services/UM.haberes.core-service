@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import um.haberes.rest.exception.ControlNotFoundException;
+import um.haberes.rest.exception.ControlException;
 import um.haberes.rest.model.Control;
 import um.haberes.rest.service.ControlService;
 
@@ -34,7 +34,7 @@ public class ControlController {
 	public ResponseEntity<Control> findByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes) {
 		try {
 			return new ResponseEntity<Control>(service.findByPeriodo(anho, mes), HttpStatus.OK);
-		} catch (ControlNotFoundException e) {
+		} catch (ControlException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}

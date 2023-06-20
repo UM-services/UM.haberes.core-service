@@ -6,7 +6,7 @@ package um.haberes.rest.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.SeguridadSocialNotFoundException;
+import um.haberes.rest.exception.SeguridadSocialException;
 import um.haberes.rest.model.SeguridadSocial;
 import um.haberes.rest.repository.ISeguridadSocialRepository;
 
@@ -22,7 +22,7 @@ public class SeguridadSocialService {
 
 	public SeguridadSocial findByUnique(Integer anho, Integer mes) {
 		return repository.findByAnhoAndMes(anho, mes)
-				.orElseThrow(() -> new SeguridadSocialNotFoundException(anho, mes));
+				.orElseThrow(() -> new SeguridadSocialException(anho, mes));
 	}
 
 	public SeguridadSocial add(SeguridadSocial seguridadSocial) {
@@ -38,7 +38,7 @@ public class SeguridadSocialService {
 					newSeguridadSocial.getCc028());
 			seguridadSocial = repository.save(seguridadSocial);
 			return seguridadSocial;
-		}).orElseThrow(() -> new SeguridadSocialNotFoundException(seguridadSocialId));
+		}).orElseThrow(() -> new SeguridadSocialException(seguridadSocialId));
 	}
 
 }

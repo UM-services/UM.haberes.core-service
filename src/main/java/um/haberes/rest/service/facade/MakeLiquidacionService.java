@@ -17,11 +17,11 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.ActividadNotFoundException;
+import um.haberes.rest.exception.ActividadException;
 import um.haberes.rest.exception.AdicionalCursoTablaNotFoundException;
-import um.haberes.rest.exception.CategoriaPeriodoNotFoundException;
-import um.haberes.rest.exception.LegajoControlNotFoundException;
-import um.haberes.rest.exception.LetraNotFoundException;
+import um.haberes.rest.exception.CategoriaPeriodoException;
+import um.haberes.rest.exception.LegajoControlException;
+import um.haberes.rest.exception.LetraException;
 import um.haberes.rest.exception.LiquidacionException;
 import um.haberes.rest.kotlin.model.*;
 import um.haberes.rest.model.Actividad;
@@ -38,7 +38,6 @@ import um.haberes.rest.model.CursoFusion;
 import um.haberes.rest.model.Item;
 import um.haberes.rest.model.LegajoControl;
 import um.haberes.rest.model.Letra;
-import um.haberes.rest.model.LiquidacionAdicional;
 import um.haberes.rest.model.Novedad;
 import um.haberes.rest.model.Persona;
 import um.haberes.rest.model.view.NovedadDuplicada;
@@ -165,7 +164,7 @@ public class MakeLiquidacionService {
 		legajoControl = null;
 		try {
 			legajoControl = legajoControlService.findByUnique(legajoId, anho, mes);
-		} catch (LegajoControlNotFoundException e) {
+		} catch (LegajoControlException e) {
 			legajoControl = new LegajoControl(null, legajoId, anho, mes, (byte) 0, (byte) 0, (byte) 0, null);
 			legajoControl = legajoControlService.add(legajoControl);
 		}
@@ -671,14 +670,14 @@ public class MakeLiquidacionService {
 
 		try {
 			actividadService.findByUnique(legajoId, anho, mes);
-		} catch (ActividadNotFoundException e) {
+		} catch (ActividadException e) {
 			actividadService
 					.add(new Actividad(null, legajoId, anho, mes, (byte) 1, (byte) 1, (byte) 1, 10, null, null));
 		}
 
 		try {
 			letraService.findByUnique(legajoId, anho, mes);
-		} catch (LetraNotFoundException e) {
+		} catch (LetraException e) {
 			letraService.add(new Letra(null, legajoId, anho, mes, BigDecimal.ZERO, ""));
 		}
 
@@ -741,7 +740,7 @@ public class MakeLiquidacionService {
 				totalDependencia.put(dependencia.getDependenciaId(),
 						totalDependencia.get(dependencia.getDependenciaId()).add(categoriaPeriodo.getBasico())
 								.setScale(2, RoundingMode.HALF_UP));
-			} catch (CategoriaPeriodoNotFoundException e) {
+			} catch (CategoriaPeriodoException e) {
 				Categoria categoria = categoriaService.findByCategoriaId(cursoFusion.getCategoriaId());
 				totalDependencia.put(dependencia.getDependenciaId(),
 						totalDependencia.get(dependencia.getDependenciaId()).add(categoria.getBasico()).setScale(2,

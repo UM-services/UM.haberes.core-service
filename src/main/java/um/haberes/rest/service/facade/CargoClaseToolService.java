@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import um.haberes.rest.exception.AcreditacionNotFoundException;
+import um.haberes.rest.exception.AcreditacionException;
 import um.haberes.rest.exception.view.CargoClasePeriodoNotFoundException;
 import um.haberes.rest.model.Acreditacion;
 import um.haberes.rest.model.CargoClase;
@@ -81,7 +81,7 @@ public class CargoClaseToolService {
 				if (acreditacion.getAcreditado() == 1) {
 					return "ERROR: Hay un Período ACREDITADO entre los LIMITES Indicados . . .";
 				}
-			} catch (AcreditacionNotFoundException e) {
+			} catch (AcreditacionException e) {
 			}
 		}
 		cargoClaseDetalleService.deleteAllByCargoClasePeriodoId(cargoClasePeriodoId);
@@ -100,7 +100,7 @@ public class CargoClaseToolService {
 				if (acreditacion.getAcreditado() == 1) {
 					return "ERROR: Hay un Período ACREDITADO entre los LIMITES Indicados . . .";
 				}
-			} catch (AcreditacionNotFoundException e) {
+			} catch (AcreditacionException e) {
 			}
 		}
 		// Agrega el cargo con clase
@@ -145,7 +145,7 @@ public class CargoClaseToolService {
 					if (acreditacion.getAcreditado() == 1) {
 						return "ERROR: Hay un Período ACREDITADO entre los LIMITES Indicados . . .";
 					}
-				} catch (AcreditacionNotFoundException e) {
+				} catch (AcreditacionException e) {
 				}
 			}
 		}
@@ -156,7 +156,7 @@ public class CargoClaseToolService {
 				if (acreditacion.getAcreditado() == 1) {
 					return "ERROR: Hay un Período ACREDITADO entre los LIMITES Indicados . . .";
 				}
-			} catch (AcreditacionNotFoundException e) {
+			} catch (AcreditacionException e) {
 			}
 		}
 		// Pongo el nuevo periodo hasta

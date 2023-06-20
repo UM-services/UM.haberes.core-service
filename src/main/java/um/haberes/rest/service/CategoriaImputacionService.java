@@ -8,7 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.CategoriaImputacionNotFoundException;
+import um.haberes.rest.exception.CategoriaImputacionException;
 import um.haberes.rest.kotlin.model.CategoriaImputacion;
 import um.haberes.rest.repository.ICategoriaImputacionRepository;
 
@@ -28,7 +28,7 @@ public class CategoriaImputacionService {
 
 	public CategoriaImputacion findByCategoriaimputacionId(Long categoriaImputacionId) {
 		return repository.findByCategoriaImputacionId(categoriaImputacionId)
-				.orElseThrow(() -> new CategoriaImputacionNotFoundException(categoriaImputacionId));
+				.orElseThrow(() -> new CategoriaImputacionException(categoriaImputacionId));
 	}
 
 	public CategoriaImputacion findByUnique(Integer dependenciaId, Integer facultadId, Integer geograficaId,
@@ -36,7 +36,7 @@ public class CategoriaImputacionService {
 		return repository
 				.findByDependenciaIdAndFacultadIdAndGeograficaIdAndCategoriaId(dependenciaId, facultadId, geograficaId,
 						categoriaId)
-				.orElseThrow(() -> new CategoriaImputacionNotFoundException(dependenciaId, facultadId, geograficaId,
+				.orElseThrow(() -> new CategoriaImputacionException(dependenciaId, facultadId, geograficaId,
 						categoriaId));
 	}
 
@@ -53,7 +53,7 @@ public class CategoriaImputacionService {
 					newCategoriaImputacion.getCuentaSueldos(), newCategoriaImputacion.getCuentaAportes());
 			repository.save(categoriaImputacion);
 			return categoriaImputacion;
-		}).orElseThrow(() -> new CategoriaImputacionNotFoundException(categoriaImputacionId));
+		}).orElseThrow(() -> new CategoriaImputacionException(categoriaImputacionId));
 	}
 
 }

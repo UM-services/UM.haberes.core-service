@@ -8,7 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.FacultadNotFoundException;
+import um.haberes.rest.exception.FacultadException;
 import um.haberes.rest.model.Facultad;
 import um.haberes.rest.repository.IFacultadRepository;
 
@@ -35,7 +35,7 @@ public class FacultadService {
 	}
 
 	public Facultad findByFacultadId(Integer facultadId) {
-		return repository.findByFacultadId(facultadId).orElseThrow(() -> new FacultadNotFoundException(facultadId));
+		return repository.findByFacultadId(facultadId).orElseThrow(() -> new FacultadException(facultadId));
 	}
 
 }

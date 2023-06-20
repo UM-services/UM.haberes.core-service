@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.CodigoNotFoundException;
+import um.haberes.rest.exception.CodigoException;
 import um.haberes.rest.kotlin.model.Codigo;
 import um.haberes.rest.model.view.CodigoPeriodo;
 import um.haberes.rest.model.view.CodigoSearch;
@@ -69,11 +69,11 @@ public class CodigoService {
 	}
 
 	public Codigo findByCodigoId(Integer codigoId) {
-		return repository.findById(codigoId).orElseThrow(() -> new CodigoNotFoundException(codigoId));
+		return repository.findById(codigoId).orElseThrow(() -> new CodigoException(codigoId));
 	}
 
 	public Codigo findLast() {
-		return repository.findTopByOrderByCodigoId().orElseThrow(() -> new CodigoNotFoundException());
+		return repository.findTopByOrderByCodigoId().orElseThrow(() -> new CodigoException());
 	}
 
 	public void delete(Integer codigoId) {
@@ -93,7 +93,7 @@ public class CodigoService {
 			codigo = repository.save(codigo);
 			log.debug(codigo.toString());
 			return codigo;
-		}).orElseThrow(() -> new CodigoNotFoundException(codigoId));
+		}).orElseThrow(() -> new CodigoException(codigoId));
 	}
 
 	@Transactional

@@ -18,9 +18,9 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.AntiguedadLimiteNotFoundException;
 import um.haberes.rest.exception.AntiguedadNotFoundException;
-import um.haberes.rest.exception.CursoDesarraigoNotFoundException;
-import um.haberes.rest.exception.DesignacionNotFoundException;
-import um.haberes.rest.exception.LegajoControlNotFoundException;
+import um.haberes.rest.exception.CursoDesarraigoException;
+import um.haberes.rest.exception.DesignacionException;
+import um.haberes.rest.exception.LegajoControlException;
 import um.haberes.rest.model.Antiguedad;
 import um.haberes.rest.model.AntiguedadLimite;
 import um.haberes.rest.model.CargoTipo;
@@ -147,7 +147,7 @@ public class DesignacionToolService {
 		LegajoControl legajoControl = null;
 		try {
 			legajoControl = legajoControlService.findByUnique(legajoId, anho, mes);
-		} catch (LegajoControlNotFoundException e) {
+		} catch (LegajoControlException e) {
 			legajoControl = new LegajoControl();
 		}
 		if (legajoControl.getFusionado() == 1)
@@ -202,7 +202,7 @@ public class DesignacionToolService {
 		try {
 			legajoControl = legajoControlService.findByUnique(legajoId, anho, mes);
 			legajoControlId = legajoControl.getLegajoControlId();
-		} catch (LegajoControlNotFoundException e) {
+		} catch (LegajoControlException e) {
 			legajoControlId = null;
 		}
 		legajoControl = new LegajoControl(legajoControlId, legajoId, anho, mes, legajoControl.getLiquidado(), (byte) 1,
@@ -450,7 +450,7 @@ public class DesignacionToolService {
 			try {
 				cursoDesarraigoId = cursoDesarraigoService.findByUnique(legajoId, anho, mes, curso.getCursoId())
 						.getCursoDesarraigoId();
-			} catch (CursoDesarraigoNotFoundException e) {
+			} catch (CursoDesarraigoException e) {
 				log.debug("Sin Desarraigo");
 			}
 			BigDecimal factor = porcentajeDocente.add(BigDecimal.ONE);
@@ -548,7 +548,7 @@ public class DesignacionToolService {
 		try {
 			designacion = designacionService.findByDesignacionTipoIdAndCargoTipoIdAndAnualAndSemestral(
 					designacionTipoId, cargoTipoId, anualLocal, semestralLocal);
-		} catch (DesignacionNotFoundException e) {
+		} catch (DesignacionException e) {
 			return null;
 		}
 		return designacion.getCategoriaId();

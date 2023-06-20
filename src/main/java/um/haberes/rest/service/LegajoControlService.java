@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.LegajoControlNotFoundException;
+import um.haberes.rest.exception.LegajoControlException;
 import um.haberes.rest.model.LegajoControl;
 import um.haberes.rest.repository.ILegajoControlRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +46,7 @@ public class LegajoControlService {
 
 	public LegajoControl findByUnique(Long legajoId, Integer anho, Integer mes) {
 		return repository.findByLegajoIdAndAnhoAndMes(legajoId, anho, mes)
-				.orElseThrow(() -> new LegajoControlNotFoundException(legajoId, anho, mes));
+				.orElseThrow(() -> new LegajoControlException(legajoId, anho, mes));
 	}
 
 	public LegajoControl add(LegajoControl legajoControl) {
@@ -63,7 +63,7 @@ public class LegajoControlService {
 			repository.save(legajoControl);
 			log.debug(String.format("LegajoControl -> %s", legajoControl));
 			return legajoControl;
-		}).orElseThrow(() -> new LegajoControlNotFoundException(legajoControlId));
+		}).orElseThrow(() -> new LegajoControlException(legajoControlId));
 	}
 
 	public LegajoControl save(LegajoControl control) {

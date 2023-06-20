@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import um.haberes.rest.exception.ClaseNotFoundException;
+import um.haberes.rest.exception.ClaseException;
 import um.haberes.rest.model.Clase;
 import um.haberes.rest.service.ClaseService;
 
@@ -46,7 +46,7 @@ public class ClaseController {
 	public @ResponseBody ResponseEntity<Clase> findByClaseId(@PathVariable Integer claseId) {
 		try {
 			return new ResponseEntity<Clase>(service.findByClaseId(claseId), HttpStatus.OK);
-		} catch (ClaseNotFoundException e) {
+		} catch (ClaseException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
@@ -55,7 +55,7 @@ public class ClaseController {
 	public @ResponseBody ResponseEntity<Clase> findLast() {
 		try {
 			return new ResponseEntity<Clase>(service.findLast(), HttpStatus.OK);
-		} catch (ClaseNotFoundException e) {
+		} catch (ClaseException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
