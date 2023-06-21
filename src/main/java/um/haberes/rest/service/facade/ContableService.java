@@ -227,6 +227,9 @@ public class ContableService {
                     liquidacionAdicionalMap.put(keyAdicional, liquidacionAdicional);
                     basico = basico.add(liquidacionAdicional.getAdicional()).setScale(2, RoundingMode.HALF_UP);
                     imputacion.setBasico(basico);
+                    BigDecimal antiguedadAdicional = BigDecimal.ZERO;
+                    antiguedadAdicional = liquidacionAdicional.getAdicional().multiply(indices.get(0)).setScale(2, RoundingMode.HALF_UP);
+                    imputacion.setAntiguedad(imputacion.getAntiguedad().add(antiguedadAdicional).setScale(2, RoundingMode.HALF_UP));
                 }
             } catch (LiquidacionAdicionalException e) {
             }
