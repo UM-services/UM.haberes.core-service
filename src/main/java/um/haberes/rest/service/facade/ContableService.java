@@ -339,7 +339,7 @@ public class ContableService {
             }
         }
         for (Proporcion proporcionDocente : proporcionesDocente.values()) {
-            if (total.compareTo(BigDecimal.ZERO) == 0) {
+            if (totalDocente.compareTo(BigDecimal.ZERO) == 0) {
                 proporcionDocente.setPorcentaje(BigDecimal.ONE);
             } else {
                 proporcionDocente
@@ -347,7 +347,7 @@ public class ContableService {
             }
         }
         for (Proporcion proporcionAdministrativo : proporcionesAdministrativo.values()) {
-            if (total.compareTo(BigDecimal.ZERO) == 0) {
+            if (totalAdministrativo.compareTo(BigDecimal.ZERO) == 0) {
                 proporcionAdministrativo.setPorcentaje(BigDecimal.ONE);
             } else {
                 proporcionAdministrativo.setPorcentaje(
