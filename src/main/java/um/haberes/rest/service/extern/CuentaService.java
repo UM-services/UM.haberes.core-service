@@ -18,6 +18,10 @@ public class CuentaService {
         return consumer.findAll();
     }
 
+    public List<Cuenta> findByStrings(List<String> conditions, Boolean visible) {
+        return consumer.findByStrings(conditions, visible);
+    }
+
     public Cuenta findByNumeroCuenta(BigDecimal numeroCuenta) {
         return consumer.findByNumeroCuenta(numeroCuenta);
     }
@@ -25,4 +29,5 @@ public class CuentaService {
     public Cuenta findByCuentaContableId(Long cuentaContableId) {
         return consumer.findByCuentaContableId(cuentaContableId);
     }
+
 }
