@@ -1,0 +1,25 @@
+package um.haberes.rest.controller.facade;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import um.haberes.rest.kotlin.internal.OrdenPagoRequest;
+import um.haberes.rest.service.facade.OrdenPagoService;
+
+@RestController
+@RequestMapping("/ordenPago")
+public class OrdenPagoController {
+
+    @Autowired
+    private OrdenPagoService service;
+
+    @PostMapping("/generate")
+    public ResponseEntity<Boolean> generateOrdenPago(@RequestBody OrdenPagoRequest ordenPagoRequest) {
+        return new ResponseEntity<>(service.generateOrdenPago(ordenPagoRequest), HttpStatus.OK);
+    }
+
+}

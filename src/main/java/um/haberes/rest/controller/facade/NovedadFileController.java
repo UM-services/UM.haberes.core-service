@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package um.haberes.rest.controller.facade;
 
@@ -27,34 +27,33 @@ import um.haberes.rest.util.transfer.FileInfo;
 @RequestMapping("/novedadfile")
 public class NovedadFileController {
 
-	@Autowired
-	private NovedadFileService service;
+    @Autowired
+    private NovedadFileService service;
 
-	@PostMapping("/upload/{anho}/{mes}")
-	public ResponseEntity<Void> upload(@RequestBody FileInfo fileInfo, @PathVariable Integer anho,
-			@PathVariable Integer mes) {
-		try {
-			service.upload(fileInfo, anho, mes);
-			return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
-		} catch (TituloNotFoundException e) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-		}
-	}
+    @PostMapping("/upload/{anho}/{mes}")
+    public ResponseEntity<String> upload(@RequestBody FileInfo fileInfo, @PathVariable Integer anho,
+                                         @PathVariable Integer mes) {
+        try {
+            return new ResponseEntity<>(service.upload(fileInfo, anho, mes), HttpStatus.OK);
+        } catch (TituloNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
 
-	@GetMapping("/import/{anho}/{mes}")
-	public ResponseEntity<Void> importNews(@PathVariable Integer anho, @PathVariable Integer mes) {
-		service.importNews(anho, mes);
-		try {
-			return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
-		} catch (ImportNewsException e) {
-			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
-		}
-	}
+    @GetMapping("/import/{anho}/{mes}")
+    public ResponseEntity<Void> importNews(@PathVariable Integer anho, @PathVariable Integer mes) {
+        service.importNews(anho, mes);
+        try {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (ImportNewsException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        }
+    }
 
-	@GetMapping("/transfer/{anho}/{mes}")
-	public ResponseEntity<Void> transfer(@PathVariable Integer anho, @PathVariable Integer mes) {
-		service.transfer(anho, mes);
-		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
-	}
+    @GetMapping("/transfer/{anho}/{mes}")
+    public ResponseEntity<Void> transfer(@PathVariable Integer anho, @PathVariable Integer mes) {
+        service.transfer(anho, mes);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 
 }
