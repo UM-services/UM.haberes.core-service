@@ -504,7 +504,7 @@ public class SheetService {
             this.setCellLong(row, 0, persona.getLegajoId(), style_normal);
             this.setCellString(row, 1, persona.getApellido() + ", " + persona.getNombre(), style_normal);
             Map<Integer, BigDecimal> items = itemService
-                    .findAllByLegajoIdAndAnhoAndMes(persona.getLegajoId(), anho, mes).stream()
+                    .findAllByLegajo(persona.getLegajoId(), anho, mes).stream()
                     .collect(Collectors.toMap(Item::getCodigoId, item -> item.getImporte()));
             columna = 1;
             for (Codigo codigo : codigos) {

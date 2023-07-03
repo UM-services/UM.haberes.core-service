@@ -33,10 +33,15 @@ public class ItemController {
 	@Autowired
 	private ItemService service;
 
+	@GetMapping("/legajo/{legajoId}/{anho}/{mes}")
+	public ResponseEntity<List<Item>> findAllByLegajo(@PathVariable Long legajoId, @PathVariable Integer anho, @PathVariable Integer mes) {
+		return new ResponseEntity<>(service.findAllByLegajo(legajoId, anho, mes), HttpStatus.OK);
+	}
+
 	@GetMapping("/codigo/{codigoId}/{anho}/{mes}")
 	public ResponseEntity<List<Item>> findAllByCodigoId(@PathVariable Integer codigoId, @PathVariable Integer anho,
 			@PathVariable Integer mes) {
-		return new ResponseEntity<List<Item>>(service.findAllByCodigo(codigoId, anho, mes), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllByCodigo(codigoId, anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/periodo/{anho}/{mes}/{limit}")
@@ -44,7 +49,7 @@ public class ItemController {
 			@PathVariable Integer limit) {
 		if (limit == 0)
 			limit = 99999;
-		return new ResponseEntity<List<Item>>(service.findAllByPeriodo(anho, mes, limit), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllByPeriodo(anho, mes, limit), HttpStatus.OK);
 	}
 
 	@GetMapping("/periodolegajo/{anho}/{mes}/{legajoId}/{limit}")
@@ -52,7 +57,7 @@ public class ItemController {
 			@PathVariable Long legajoId, @PathVariable Integer limit) {
 		if (limit == 0)
 			limit = 99999;
-		return new ResponseEntity<List<Item>>(service.findAllByPeriodoAndLegajo(anho, mes, legajoId, limit),
+		return new ResponseEntity<>(service.findAllByPeriodoAndLegajo(anho, mes, legajoId, limit),
 				HttpStatus.OK);
 	}
 
@@ -60,7 +65,7 @@ public class ItemController {
 	public ResponseEntity<Item> findByUnique(@PathVariable Long legajoId, @PathVariable Integer anho,
 			@PathVariable Integer mes, @PathVariable Integer codigoId) {
 		try {
-			return new ResponseEntity<Item>(service.findByUnique(legajoId, anho, mes, codigoId), HttpStatus.OK);
+			return new ResponseEntity<>(service.findByUnique(legajoId, anho, mes, codigoId), HttpStatus.OK);
 		} catch (ItemException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
@@ -68,29 +73,29 @@ public class ItemController {
 
 	@PostMapping("/")
 	public ResponseEntity<Item> add(@RequestBody Item item) {
-		return new ResponseEntity<Item>(service.add(item), HttpStatus.OK);
+		return new ResponseEntity<>(service.add(item), HttpStatus.OK);
 	}
 
 	@PutMapping("/{itemId}")
 	public ResponseEntity<Item> update(@RequestBody Item item, @PathVariable Long itemId) {
-		return new ResponseEntity<Item>(service.update(item, itemId), HttpStatus.OK);
+		return new ResponseEntity<>(service.update(item, itemId), HttpStatus.OK);
 	}
 
 	@PutMapping("/")
 	public ResponseEntity<List<Item>> saveAll(@RequestBody List<Item> items) {
-		return new ResponseEntity<List<Item>>(service.saveAll(items), HttpStatus.OK);
+		return new ResponseEntity<>(service.saveAll(items), HttpStatus.OK);
 	}
 
 	@DeleteMapping("/periodo/{anho}/{mes}")
 	public ResponseEntity<Void> deleteByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes) {
 		service.deleteByPeriodo(anho, mes);
-		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 	@GetMapping("/onlyETEC/{legajoId}/{anho}/{mes}")
 	public ResponseEntity<Boolean> onlyETEC(@PathVariable Long legajoId, @PathVariable Integer anho,
 			@PathVariable Integer mes) {
-		return new ResponseEntity<Boolean>(service.onlyETEC(legajoId, anho, mes), HttpStatus.OK);
+		return new ResponseEntity<>(service.onlyETEC(legajoId, anho, mes), HttpStatus.OK);
 	}
 
 }

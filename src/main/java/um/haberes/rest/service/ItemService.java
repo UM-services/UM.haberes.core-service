@@ -48,10 +48,6 @@ public class ItemService {
 		return repository.findAllByAnhoAndMes(anho, mes, PageRequest.of(0, limit));
 	}
 
-	public List<Item> findAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes) {
-		return repository.findAllByLegajoIdAndAnhoAndMes(legajoId, anho, mes);
-	}
-
 	public List<Item> findAllByPeriodoAndLegajo(Integer anho, Integer mes, Long legajoId, Integer limit) {
 		return repository.findAllByAnhoAndMesAndLegajoId(anho, mes, legajoId, PageRequest.of(0, limit));
 	}
