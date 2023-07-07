@@ -14,6 +14,7 @@ data class Codigo(
     var nombre: String = "",
     var docente: Byte = 0,
     var noDocente: Byte = 0,
-    var transferible: Byte = 0
+    var transferible: Byte = 0,
+    var incluidoEtec: Byte = 0
 
 ) : Auditable()

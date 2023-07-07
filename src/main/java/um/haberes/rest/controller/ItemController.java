@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.rest.exception.ItemException;
-import um.haberes.rest.model.Item;
+import um.haberes.rest.kotlin.model.Item;
 import um.haberes.rest.service.ItemService;
 
 /**

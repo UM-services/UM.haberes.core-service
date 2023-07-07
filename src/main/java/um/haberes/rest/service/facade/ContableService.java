@@ -12,8 +12,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import um.haberes.rest.exception.LiquidacionAdicionalException;
 import um.haberes.rest.kotlin.model.*;
 import um.haberes.rest.kotlin.model.extern.CuentaMovimiento;
@@ -31,7 +29,6 @@ import um.haberes.rest.model.Actividad;
 import um.haberes.rest.model.CargoClaseDetalle;
 import um.haberes.rest.model.CargoClaseImputacion;
 import um.haberes.rest.model.CodigoImputacion;
-import um.haberes.rest.model.Item;
 import um.haberes.rest.model.LegajoCargoClaseImputacion;
 import um.haberes.rest.model.LegajoCodigoImputacion;
 import um.haberes.rest.model.LegajoContabilidad;

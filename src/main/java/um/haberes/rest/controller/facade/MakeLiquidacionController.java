@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import um.haberes.rest.model.Item;
+import um.haberes.rest.kotlin.model.Item;
 import um.haberes.rest.service.facade.MakeLiquidacionService;
 
 /**
@@ -51,8 +51,8 @@ public class MakeLiquidacionController {
 
 	@GetMapping("/basicoAndAntiguedad/{legajoId}/{anho}/{mes}")
 	public ResponseEntity<List<Item>> basicoAndAntiguedad(@PathVariable Long legajoId, @PathVariable Integer anho,
-			@PathVariable Integer mes) {
-		return new ResponseEntity<List<Item>>(service.basicoAndAntiguedad(legajoId, anho, mes), HttpStatus.OK);
+														  @PathVariable Integer mes) {
+		return new ResponseEntity<>(service.basicoAndAntiguedad(legajoId, anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/generateCargosDocentes/{legajoId}/{anho}/{mes}")

@@ -89,7 +89,7 @@ public class CodigoService {
 	public Codigo update(Codigo newCodigo, Integer codigoId) {
 		return repository.findById(codigoId).map(codigo -> {
 			codigo = new Codigo(codigoId, newCodigo.getNombre(), newCodigo.getDocente(), newCodigo.getNoDocente(),
-					newCodigo.getTransferible());
+					newCodigo.getTransferible(), newCodigo.getIncluidoEtec());
 			codigo = repository.save(codigo);
 			log.debug(codigo.toString());
 			return codigo;

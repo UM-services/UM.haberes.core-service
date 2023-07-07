@@ -27,12 +27,12 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      run: mvn clean install
+      run: mvn clean verify install
       
     - uses: mr-smithers-excellent/docker-build-push@v5
       name: Build & push Docker image
       env:
-        VERSION: 3.15.23
+        VERSION: 3.16.24
       with:
         image: dqmdz/um.haberes
         tags: ${VERSION}, latest, "${GITHUB_REF#refs/heads/}.$(git rev-parse --short ${GITHUB_SHA})"

@@ -11,8 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
-
-import um.haberes.rest.model.Item;
+import um.haberes.rest.kotlin.model.Item;
 
 /**
  * @author daniel

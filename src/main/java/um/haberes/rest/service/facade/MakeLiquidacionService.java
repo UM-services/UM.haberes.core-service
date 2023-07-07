@@ -35,7 +35,6 @@ import um.haberes.rest.model.Control;
 import um.haberes.rest.model.CursoCargo;
 import um.haberes.rest.model.CursoDesarraigo;
 import um.haberes.rest.model.CursoFusion;
-import um.haberes.rest.model.Item;
 import um.haberes.rest.model.LegajoControl;
 import um.haberes.rest.model.Letra;
 import um.haberes.rest.model.Novedad;

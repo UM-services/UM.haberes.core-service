@@ -59,5 +59,3 @@ logging:
     org:
       hibernate:
         SQL: ${app.logging}
-
-

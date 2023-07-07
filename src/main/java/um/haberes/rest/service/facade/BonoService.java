@@ -60,7 +60,6 @@ import um.haberes.rest.model.BonoImpresion;
 import um.haberes.rest.model.CargoClaseDetalle;
 import um.haberes.rest.model.Control;
 import um.haberes.rest.model.CursoCargo;
-import um.haberes.rest.model.Item;
 import um.haberes.rest.model.LegajoBanco;
 import um.haberes.rest.model.LegajoControl;
 import um.haberes.rest.model.Letra;
