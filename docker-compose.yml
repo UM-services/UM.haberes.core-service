@@ -50,6 +50,7 @@ services:
             - ./cloudbeaver:/opt/cloudbeaver/workspace
         networks:
             - haberes
+
 networks:
     haberes:
 
