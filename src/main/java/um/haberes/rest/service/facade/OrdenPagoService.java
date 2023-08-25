@@ -47,9 +47,33 @@ public class OrdenPagoService {
 
             }
             proveedorMovimiento = new ProveedorMovimiento(null, null, "Personal Administrativo y Docente", 6, ordenPagoRequest.getFechaPago(), ordenPagoRequest.getFechaPago(), ejercicio.getEjercicioId(), 1 + ordenPago, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, null, 0, "Sueldos mes " + ordenPagoRequest.getMes() + "/" + ordenPagoRequest.getAnho(), null, (byte) 0, (byte) 0, null, null);
-//            proveedorMovimiento = proveedorMovimientoService.add(proveedorMovimiento);
+            proveedorMovimiento = proveedorMovimientoService.add(proveedorMovimiento);
+            acreditacionPago = new AcreditacionPago();
         }
-        return false;
+
+        acreditacionPago.setMes(ordenPagoRequest.getMes());
+        acreditacionPago.setAnho(ordenPagoRequest.getAnho());
+        acreditacionPago.setFechaPago(ordenPagoRequest.getFechaPago());
+        acreditacionPago.setComprobanteIdPago(proveedorMovimiento.getComprobanteId());
+        acreditacionPago.setPuntoVentaPago(proveedorMovimiento.getPrefijo());
+        acreditacionPago.setNumeroComprobantePago(proveedorMovimiento.getNumeroComprobante());
+        if (ordenPagoRequest.getTotalSantander().compareTo(BigDecimal.ZERO) > 0) {
+            acreditacionPago.setTotalSantander(ordenPagoRequest.getTotalSantander());
+        }
+        if (ordenPagoRequest.getTotalOtrosBancos().compareTo(BigDecimal.ZERO) > 0) {
+            acreditacionPago.setTotalOtrosBancos(ordenPagoRequest.getTotalOtrosBancos());
+        }
+        try {
+            if (acreditacionPago.getAcreditacionPagoId() == null) {
+                acreditacionPago = acreditacionPagoService.add(acreditacionPago);
+            } else {
+                acreditacionPago = acreditacionPagoService.update(acreditacionPago, acreditacionPago.getAcreditacionPagoId());
+            }
+        } catch (AcreditacionPagoException e) {
+            return false;
+        }
+
+        return true;
     }
 
 }

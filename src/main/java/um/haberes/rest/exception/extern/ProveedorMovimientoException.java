@@ -4,6 +4,10 @@ import java.text.MessageFormat;
 
 public class ProveedorMovimientoException extends RuntimeException {
 
+    public ProveedorMovimientoException() {
+        super("Cannot find ProveedorMovimiento");
+    }
+
     public ProveedorMovimientoException(Integer prefijo, Long numeroComprobante) {
         super(MessageFormat.format("Cannot find ProveedorMovimiento -> {0}/{1}", prefijo, numeroComprobante));
     }

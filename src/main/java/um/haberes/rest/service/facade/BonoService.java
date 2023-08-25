@@ -149,6 +149,9 @@ public class BonoService {
 	@Autowired
 	private CodigoService codigoService;
 
+	@Autowired
+	private DesignacionToolService designacionToolService;
+
 	public String generatePdfDependencia(Integer anho, Integer mes, Integer dependenciaId, String salida,
 			Long legajoIdSolicitud, String ipAddress) {
 		String path = env.getProperty("path.files");
@@ -206,6 +209,7 @@ public class BonoService {
 		Integer mesesAntiguedad = antiguedad.getMesesDocentes() > antiguedad.getMesesAdministrativos()
 				? antiguedad.getMesesDocentes()
 				: antiguedad.getMesesAdministrativos();
+		List<BigDecimal> indices = designacionToolService.indiceAntiguedad(legajoId, anho, mes);
 		LegajoBanco legajoBanco = null;
 		try {
 			legajoBanco = legajoBancoService.findLegajoCbuPrincipal(legajoId, anho, mes);
@@ -270,6 +274,17 @@ public class BonoService {
 			// Legajo, dependencia y básico
 			Dependencia dependencia = dependencias.get(persona.getDependenciaId());
 			Item item = null;
+			BigDecimal basicoETEC = BigDecimal.ZERO;
+			BigDecimal antiguedadETEC = BigDecimal.ZERO;
+			if (items.containsKey(29)) {
+				item = items.get(29);
+				BigDecimal importe = item.getImporte();
+				BigDecimal auxiliar = importe.divide(BigDecimal.ONE.add(indices.get(0)), 2, RoundingMode.HALF_UP);
+				antiguedadETEC = importe.subtract(auxiliar).setScale(2, RoundingMode.HALF_UP);
+				basicoETEC = importe.subtract(antiguedadETEC).setScale(2, RoundingMode.HALF_UP);
+			}
+			// Pongo debajo el control del básico porque más abajo lo toma para la impresión
+			item = null;
 			if (!items.containsKey(1)) {
 				item = new Item();
 			} else {
@@ -280,7 +295,7 @@ public class BonoService {
 			paragraph.add(new Phrase("         Dependencia: ", new Font(Font.HELVETICA, 8)));
 			paragraph.add(new Phrase(dependencia.getAcronimo(), new Font(Font.HELVETICA, 9, Font.BOLD)));
 			paragraph.add(new Phrase("         Sueldo Básico: ", new Font(Font.HELVETICA, 8)));
-			paragraph.add(new Phrase(new DecimalFormat("#,##0.00").format(item.getImporte()),
+			paragraph.add(new Phrase(new DecimalFormat("#,##0.00").format(item.getImporte().add(basicoETEC).setScale(2, RoundingMode.HALF_UP)),
 					new Font(Font.HELVETICA, 9, Font.BOLD)));
 			paragraph.add(new Phrase("         Ingreso: ", new Font(Font.HELVETICA, 8)));
 			paragraph.add(new Phrase(
@@ -689,6 +704,10 @@ public class BonoService {
 			for (CodigoGrupo codigoGrupo : codigoGrupoService.findAllByRemunerativo((byte) 1)) {
 				if (items.containsKey(codigoGrupo.getCodigoId())) {
 					item = items.get(codigoGrupo.getCodigoId());
+					BigDecimal importe = item.getImporte();
+					if (item.getCodigoId() == 29) {
+						importe = importe.subtract(antiguedadETEC).setScale(2, RoundingMode.HALF_UP);
+					}
 					cell = new PdfPCell(
 							new Paragraph(codigoGrupo.getCodigoId().toString(), new Font(Font.HELVETICA, 8)));
 					cell.setBorder(Rectangle.NO_BORDER);
@@ -699,13 +718,32 @@ public class BonoService {
 					cell.setBorder(Rectangle.NO_BORDER);
 					cell.setHorizontalAlignment(Element.ALIGN_LEFT);
 					tableCodigoRemun.addCell(cell);
-					cell = new PdfPCell(new Paragraph(new DecimalFormat("#,##0.00").format(item.getImporte()),
+					cell = new PdfPCell(new Paragraph(new DecimalFormat("#,##0.00").format(importe),
 							new Font(Font.HELVETICA, 8)));
 					cell.setBorder(Rectangle.NO_BORDER);
 					cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
 					tableCodigoRemun.addCell(cell);
-					totalRemunerativo = totalRemunerativo.add(item.getImporte()).setScale(2, RoundingMode.HALF_UP);
+					totalRemunerativo = totalRemunerativo.add(importe).setScale(2, RoundingMode.HALF_UP);
 					count++;
+					if (item.getCodigoId() == 29) {
+						cell = new PdfPCell(
+								new Paragraph(codigoGrupo.getCodigoId().toString(), new Font(Font.HELVETICA, 8)));
+						cell.setBorder(Rectangle.NO_BORDER);
+						cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+						tableCodigoRemun.addCell(cell);
+						cell = new PdfPCell(
+								new Paragraph("ANTIGÜEDAD ETEC", new Font(Font.HELVETICA, 8)));
+						cell.setBorder(Rectangle.NO_BORDER);
+						cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+						tableCodigoRemun.addCell(cell);
+						cell = new PdfPCell(new Paragraph(new DecimalFormat("#,##0.00").format(antiguedadETEC),
+								new Font(Font.HELVETICA, 8)));
+						cell.setBorder(Rectangle.NO_BORDER);
+						cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+						tableCodigoRemun.addCell(cell);
+						totalRemunerativo = totalRemunerativo.add(antiguedadETEC).setScale(2, RoundingMode.HALF_UP);
+						count++;
+					}
 				}
 			}
 			// Si no hay códigos remun

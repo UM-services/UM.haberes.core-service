@@ -3,6 +3,7 @@ package um.haberes.rest.extern.consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -45,6 +46,22 @@ public class ProveedorMovimientoConsumer {
                         .flatMap(error -> Mono.error(new ProveedorMovimientoException(prefijo))))
                 .bodyToMono(ProveedorMovimiento.class)
                 .block();
+    }
+
+    public ProveedorMovimiento add(ProveedorMovimiento proveedorMovimiento) {
+        WebClient webClient = WebClient.create();
+        String url = this.getUrl() + "/";
+        log.info("url={}", url);
+        return webClient.post()
+                .uri(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Mono.just(proveedorMovimiento), ProveedorMovimiento.class)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, response -> response.bodyToMono(ProveedorMovimiento.class)
+                        .flatMap(error -> Mono.error(new ProveedorMovimientoException())))
+                .bodyToMono(ProveedorMovimiento.class)
+                .block();
+
     }
 
 }

@@ -17,7 +17,9 @@ services:
             - haberes
 
 #    haberes:
-#        build: .
+#        build:
+#            context: .
+#            dockerfile: Dockerfile.local
 #        ports:
 #            - "8091:8091"
 #        depends_on:
@@ -55,5 +57,5 @@ networks:
     haberes:
 
 volumes:
-    mysql:
+    data:
     cloudbeaver:

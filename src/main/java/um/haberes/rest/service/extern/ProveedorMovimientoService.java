@@ -19,4 +19,7 @@ public class ProveedorMovimientoService {
         return consumer.findLastOrdenPago(prefijo);
     }
 
+    public ProveedorMovimiento add(ProveedorMovimiento proveedorMovimiento) {
+        return consumer.add(proveedorMovimiento);
+    }
 }
