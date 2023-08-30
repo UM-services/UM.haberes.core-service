@@ -6,6 +6,7 @@ package um.haberes.rest.service.facade;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -111,8 +112,8 @@ public class DesignacionToolService {
 	@Transactional
 	public List<CursoCargo> redesignarGradoByLegajo(Long legajoId, Integer anho, Integer mes, Boolean aplicaExcepcion) {
 		log.debug("Redesignar Grado By Legajo");
-		List<CursoCargo> cursoCargos = cursoCargoService.findAllByLegajoAndNivel(legajoId, anho, mes,
-				const_Nivel_Grado);
+		Integer[] nivelIds = {const_Nivel_Grado, const_Nivel_Tecnicatura};
+		List<CursoCargo> cursoCargos = cursoCargoService.findAllByLegajoAndNivelIds(legajoId, anho, mes, Arrays.asList(nivelIds));
 		log.debug("Start CursoCargos -> {}", cursoCargos);
 		for (CursoCargo cursoCargo : cursoCargos) {
 			DesignacionTipo designacionTipo = designacionTipoService
@@ -143,6 +144,7 @@ public class DesignacionToolService {
 	@Transactional
 	public void fusionarGradoByLegajo(Long legajoId, Integer anho, Integer mes, List<CursoCargo> cursoCargos,
 			Boolean aplicaExcepcion) {
+		Integer[] nivelIds = {const_Nivel_Grado, const_Nivel_Tecnicatura};
 		log.debug("Fusionar Grado By Legajo");
 		LegajoControl legajoControl = null;
 		try {
@@ -155,7 +157,7 @@ public class DesignacionToolService {
 		log.debug("{}", legajoControl);
 
 		if (cursoCargos == null) {
-			cursoCargos = cursoCargoService.findAllByLegajoAndNivel(legajoId, anho, mes, const_Nivel_Grado);
+			cursoCargos = cursoCargoService.findAllByLegajoAndNivelIds(legajoId, anho, mes, Arrays.asList(nivelIds));
 		}
 		log.debug("CursoCargos -> {}", cursoCargos);
 

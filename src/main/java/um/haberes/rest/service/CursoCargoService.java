@@ -31,6 +31,11 @@ public class CursoCargoService {
 		return cursoCargos.stream().filter(c -> c.getCurso().getNivelId() == nivelId).collect(Collectors.toList());
 	}
 
+	public List<CursoCargo> findAllByLegajoAndNivelIds(Long legajoId, Integer anho, Integer mes, List<Integer> nivelIds) {
+		List<CursoCargo> cursoCargos = this.findAllByLegajo(legajoId, anho, mes);
+		return cursoCargos.stream().filter(c -> nivelIds.contains(c.getCurso().getNivelId())).collect(Collectors.toList());
+	}
+
 	public List<CursoCargo> findAllByLegajo(Long legajoId, Integer anho, Integer mes) {
 		return repository.findAllByLegajoIdAndAnhoAndMes(legajoId, anho, mes,
 				Sort.by("curso.facultadId").ascending().and(Sort.by("curso.geograficaId").ascending())
