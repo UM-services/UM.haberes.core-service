@@ -1,8 +1,6 @@
 package um.haberes.rest.kotlin.model
 
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import um.haberes.rest.model.Auditable
 
 @Entity
@@ -15,6 +13,16 @@ data class Codigo(
     var docente: Byte = 0,
     var noDocente: Byte = 0,
     var transferible: Byte = 0,
-    var incluidoEtec: Byte = 0
+    var incluidoEtec: Byte = 0,
+    var afipConceptoSueldoIdPrimerSemestre: Long? = null,
+    var afipConceptoSueldoIdSegundoSemestre: Long? = null,
+
+    @OneToOne
+    @JoinColumn(name = "afipConceptoSueldoIdPrimerSemestre", insertable = false, updatable = false)
+    var afipConceptoSueldoPrimerSemestre: AfipConceptoSueldo? = null,
+
+    @OneToOne
+    @JoinColumn(name = "afipConceptoSueldoIdSegundoSemestre", insertable = false, updatable = false)
+    var afipConceptoSueldoSegundoSemestre: AfipConceptoSueldo? = null
 
 ) : Auditable()

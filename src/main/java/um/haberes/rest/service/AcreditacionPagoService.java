@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.AcreditacionPagoException;
-import um.haberes.rest.model.AcreditacionPago;
+import um.haberes.rest.kotlin.model.AcreditacionPago;
 import um.haberes.rest.repository.IAcreditacionPagoRepository;
 
 /**
@@ -18,6 +18,7 @@ import um.haberes.rest.repository.IAcreditacionPagoRepository;
  */
 @Service
 public class AcreditacionPagoService {
+
 	@Autowired
 	private IAcreditacionPagoRepository repository;
 

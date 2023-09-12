@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import um.haberes.rest.model.AcreditacionPago;
+import um.haberes.rest.kotlin.model.AcreditacionPago;
 import um.haberes.rest.service.AcreditacionPagoService;
 
 /**
@@ -33,7 +33,7 @@ public class AcreditacionPagoController {
 
 	@GetMapping("/unique/{anho}/{mes}/{fechapago}")
 	public ResponseEntity<AcreditacionPago> findByUnique(@PathVariable Integer anho, @PathVariable Integer mes,
-			@PathVariable @DateTimeFormat(iso = ISO.DATE_TIME) OffsetDateTime fechapago) {
+														 @PathVariable @DateTimeFormat(iso = ISO.DATE_TIME) OffsetDateTime fechapago) {
 		return new ResponseEntity<AcreditacionPago>(service.findByUnique(anho, mes, fechapago), HttpStatus.OK);
 	}
 

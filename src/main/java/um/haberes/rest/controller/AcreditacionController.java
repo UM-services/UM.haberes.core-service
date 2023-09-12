@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.rest.exception.AcreditacionException;
-import um.haberes.rest.model.Acreditacion;
+import um.haberes.rest.kotlin.model.Acreditacion;
 import um.haberes.rest.service.AcreditacionService;
 
 /**

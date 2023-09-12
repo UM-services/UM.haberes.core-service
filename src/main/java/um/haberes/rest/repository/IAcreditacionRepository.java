@@ -6,8 +6,7 @@ package um.haberes.rest.repository;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import um.haberes.rest.model.Acreditacion;
+import um.haberes.rest.kotlin.model.Acreditacion;
 
 /**
  * @author daniel

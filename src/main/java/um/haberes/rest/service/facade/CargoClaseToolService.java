@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import um.haberes.rest.exception.AcreditacionException;
 import um.haberes.rest.exception.view.CargoClasePeriodoNotFoundException;
-import um.haberes.rest.model.Acreditacion;
+import um.haberes.rest.kotlin.model.Acreditacion;
 import um.haberes.rest.model.CargoClase;
 import um.haberes.rest.model.CargoClaseDetalle;
 import um.haberes.rest.model.CargoClasePeriodo;

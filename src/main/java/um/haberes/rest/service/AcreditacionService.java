@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.AcreditacionException;
-import um.haberes.rest.model.Acreditacion;
+import um.haberes.rest.kotlin.model.Acreditacion;
 import um.haberes.rest.repository.IAcreditacionRepository;
 import lombok.extern.slf4j.Slf4j;
 
