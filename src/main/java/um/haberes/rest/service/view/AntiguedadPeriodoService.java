@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.view.AntiguedadPeriodoNotFoundException;
-import um.haberes.rest.model.view.AntiguedadPeriodo;
+import um.haberes.rest.kotlin.view.AntiguedadPeriodo;
 import um.haberes.rest.repository.view.IAntiguedadPeriodoRepository;
 
 /**

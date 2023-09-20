@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.model.view.AsignadoCategoria;
+import um.haberes.rest.kotlin.view.AsignadoCategoria;
 import um.haberes.rest.repository.view.IAsignadoCategoriaRepository;
 
 /**

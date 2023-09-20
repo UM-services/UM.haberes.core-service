@@ -3,9 +3,9 @@
  */
 package um.haberes.rest.repository.view;
 
-import java.util.List;
+import um.haberes.rest.kotlin.view.PersonaSearch;
 
-import um.haberes.rest.model.view.PersonaSearch;
+import java.util.List;
 
 /**
  * @author daniel

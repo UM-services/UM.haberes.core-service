@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.rest.exception.PersonaException;
+import um.haberes.rest.kotlin.view.PersonaSearch;
 import um.haberes.rest.model.Persona;
-import um.haberes.rest.model.view.PersonaSearch;
 import um.haberes.rest.service.PersonaService;
 import um.haberes.rest.util.transfer.FileInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -39,49 +39,49 @@ public class PersonaController {
 
 	@GetMapping("/")
 	public ResponseEntity<List<Persona>> findAll() {
-		return new ResponseEntity<List<Persona>>(service.findAll(), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAll(), HttpStatus.OK);
 	}
 
 	@PostMapping("/legajos")
 	public ResponseEntity<List<Persona>> findAllLegajos(@RequestBody List<Long> legajos) {
-		return new ResponseEntity<List<Persona>>(service.findAllLegajos(legajos), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllLegajos(legajos), HttpStatus.OK);
 	}
 
 	// Legajos que tienen cargo en cursos para el período solicitado
 	@GetMapping("/docente/{anho}/{mes}")
 	public ResponseEntity<List<Persona>> findAllDocente(@PathVariable Integer anho, @PathVariable Integer mes) {
-		return new ResponseEntity<List<Persona>>(service.findAllDocente(anho, mes), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllDocente(anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/nodocente/{anho}/{mes}")
 	public ResponseEntity<List<Persona>> findAllNoDocente(@PathVariable Integer anho, @PathVariable Integer mes) {
-		return new ResponseEntity<List<Persona>>(service.findAllNoDocente(anho, mes), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllNoDocente(anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/semestre/{anho}/{semestre}")
 	public ResponseEntity<List<Persona>> findAllBySemestre(@PathVariable Integer anho, @PathVariable Integer semestre) {
-		return new ResponseEntity<List<Persona>>(service.findAllBySemestre(anho, semestre), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllBySemestre(anho, semestre), HttpStatus.OK);
 	}
 
 	@GetMapping("/desarraigo/{anho}/{mes}")
 	public ResponseEntity<List<Persona>> findAllByDesarraigo(@PathVariable Integer anho, @PathVariable Integer mes) {
-		return new ResponseEntity<List<Persona>>(service.findAllByDesarraigo(anho, mes), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllByDesarraigo(anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/liquidables")
 	public ResponseEntity<List<Persona>> findAllLiquidables() {
-		return new ResponseEntity<List<Persona>>(service.findAllLiquidables(), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllLiquidables(), HttpStatus.OK);
 	}
 
 	@PostMapping("/search")
 	public ResponseEntity<List<PersonaSearch>> findByStrings(@RequestBody List<String> conditions) {
-		return new ResponseEntity<List<PersonaSearch>>(service.findByStrings(conditions), HttpStatus.OK);
+		return new ResponseEntity<>(service.findByStrings(conditions), HttpStatus.OK);
 	}
 
 	@GetMapping("/{legajoId}")
 	public ResponseEntity<Persona> findByLegajoId(@PathVariable Long legajoId) {
 		try {
-			return new ResponseEntity<Persona>(service.findByLegajoId(legajoId), HttpStatus.OK);
+			return new ResponseEntity<>(service.findByLegajoId(legajoId), HttpStatus.OK);
 		} catch (PersonaException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
@@ -90,7 +90,7 @@ public class PersonaController {
 	@GetMapping("/documento/{documento}")
 	public ResponseEntity<Persona> findByDocumento(@PathVariable BigDecimal documento) {
 		try {
-			return new ResponseEntity<Persona>(service.findByDocumento(documento), HttpStatus.OK);
+			return new ResponseEntity<>(service.findByDocumento(documento), HttpStatus.OK);
 		} catch (PersonaException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
@@ -98,23 +98,23 @@ public class PersonaController {
 
 	@PostMapping("/")
 	public ResponseEntity<Persona> add(@RequestBody Persona persona) {
-		return new ResponseEntity<Persona>(service.add(persona), HttpStatus.OK);
+		return new ResponseEntity<>(service.add(persona), HttpStatus.OK);
 	}
 
 	@PutMapping("/{legajoId}")
 	public ResponseEntity<Persona> update(@RequestBody Persona persona, @PathVariable Long legajoId) {
-		return new ResponseEntity<Persona>(service.update(persona, legajoId), HttpStatus.OK);
+		return new ResponseEntity<>(service.update(persona, legajoId), HttpStatus.OK);
 	}
 
 	@PutMapping("/")
 	public ResponseEntity<List<Persona>> saveall(@RequestBody List<Persona> personas) {
-		return new ResponseEntity<List<Persona>>(service.saveall(personas), HttpStatus.OK);
+		return new ResponseEntity<>(service.saveall(personas), HttpStatus.OK);
 	}
 
 	@PostMapping("/upload")
 	public ResponseEntity<List<Persona>> upload(@RequestBody FileInfo fileinfo) {
 		log.debug("Upload - Controller");
-		return new ResponseEntity<List<Persona>>(service.upload(fileinfo), HttpStatus.OK);
+		return new ResponseEntity<>(service.upload(fileinfo), HttpStatus.OK);
 	}
 
 }

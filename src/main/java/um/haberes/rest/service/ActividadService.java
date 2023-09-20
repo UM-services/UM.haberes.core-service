@@ -10,8 +10,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.ActividadException;
+import um.haberes.rest.kotlin.view.ActividadPeriodo;
 import um.haberes.rest.model.Actividad;
-import um.haberes.rest.model.view.ActividadPeriodo;
 import um.haberes.rest.repository.IActividadRepository;
 import um.haberes.rest.repository.view.IActividadPeriodoRepository;
 import lombok.extern.slf4j.Slf4j;

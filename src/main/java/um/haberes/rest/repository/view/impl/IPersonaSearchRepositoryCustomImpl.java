@@ -14,7 +14,7 @@ import jakarta.persistence.criteria.Root;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import um.haberes.rest.model.view.PersonaSearch;
+import um.haberes.rest.kotlin.view.PersonaSearch;
 import um.haberes.rest.repository.view.IPersonaSearchRepositoryCustom;
 
 /**

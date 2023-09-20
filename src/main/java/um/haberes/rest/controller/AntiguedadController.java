@@ -19,8 +19,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.rest.exception.AntiguedadNotFoundException;
 import um.haberes.rest.exception.view.AntiguedadPeriodoNotFoundException;
+import um.haberes.rest.kotlin.view.AntiguedadPeriodo;
 import um.haberes.rest.model.Antiguedad;
-import um.haberes.rest.model.view.AntiguedadPeriodo;
 import um.haberes.rest.service.AntiguedadService;
 
 /**
@@ -38,7 +38,7 @@ public class AntiguedadController {
 	public ResponseEntity<Antiguedad> findByUnique(@PathVariable Long legajoId, @PathVariable Integer anho,
 			@PathVariable Integer mes) {
 		try {
-			return new ResponseEntity<Antiguedad>(service.findByUnique(legajoId, anho, mes), HttpStatus.OK);
+			return new ResponseEntity<>(service.findByUnique(legajoId, anho, mes), HttpStatus.OK);
 		} catch (AntiguedadNotFoundException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
@@ -46,7 +46,7 @@ public class AntiguedadController {
 
 	@GetMapping("/last/{legajoId}/{anho}/{mes}")
 	public ResponseEntity<AntiguedadPeriodo> findLastByUnique(@PathVariable Long legajoId, @PathVariable Integer anho,
-			@PathVariable Integer mes) {
+															  @PathVariable Integer mes) {
 		try {
 			return new ResponseEntity<AntiguedadPeriodo>(service.findLastByUnique(legajoId, anho, mes), HttpStatus.OK);
 		} catch (AntiguedadPeriodoNotFoundException e) {
@@ -59,29 +59,29 @@ public class AntiguedadController {
 			@PathVariable Integer limit) {
 		if (limit == 0)
 			limit = 30000;
-		return new ResponseEntity<List<Antiguedad>>(service.findAllByPeriodo(anho, mes, limit), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllByPeriodo(anho, mes, limit), HttpStatus.OK);
 	}
 
 	@PostMapping("/")
 	public ResponseEntity<Antiguedad> add(@RequestBody Antiguedad antiguedad) {
-		return new ResponseEntity<Antiguedad>(service.add(antiguedad), HttpStatus.OK);
+		return new ResponseEntity<>(service.add(antiguedad), HttpStatus.OK);
 	}
 
 	@PutMapping("/{antiguedadId}")
 	public ResponseEntity<Antiguedad> update(@RequestBody Antiguedad antiguedad, @PathVariable Long antiguedadId) {
-		return new ResponseEntity<Antiguedad>(service.update(antiguedad, antiguedadId), HttpStatus.OK);
+		return new ResponseEntity<>(service.update(antiguedad, antiguedadId), HttpStatus.OK);
 	}
 
 	@PutMapping("/")
 	public ResponseEntity<List<Antiguedad>> saveAll(@RequestBody List<Antiguedad> antiguedades) {
-		return new ResponseEntity<List<Antiguedad>>(service.saveAll(antiguedades), HttpStatus.OK);
+		return new ResponseEntity<>(service.saveAll(antiguedades), HttpStatus.OK);
 	}
 
 	@GetMapping("/calculate/{legajoId}/{anho}/{mes}")
 	public ResponseEntity<Void> calculate(@PathVariable Long legajoId, @PathVariable Integer anho,
 			@PathVariable Integer mes) {
 		service.calculate(legajoId, anho, mes);
-		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 }

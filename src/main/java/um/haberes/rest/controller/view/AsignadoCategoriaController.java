@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import um.haberes.rest.model.view.AsignadoCategoria;
+import um.haberes.rest.kotlin.view.AsignadoCategoria;
 import um.haberes.rest.service.view.AsignadoCategoriaService;
 
 /**
@@ -29,8 +29,8 @@ public class AsignadoCategoriaController {
 
 	@GetMapping("/asignado/{dependenciaId}/{categoriaId}")
 	public ResponseEntity<List<AsignadoCategoria>> findAllAsignados(@PathVariable Integer dependenciaId,
-			@PathVariable Integer categoriaId) {
-		return new ResponseEntity<List<AsignadoCategoria>>(service.findAllAsignados(dependenciaId, categoriaId),
+																	@PathVariable Integer categoriaId) {
+		return new ResponseEntity<>(service.findAllAsignados(dependenciaId, categoriaId),
 				HttpStatus.OK);
 	}
 

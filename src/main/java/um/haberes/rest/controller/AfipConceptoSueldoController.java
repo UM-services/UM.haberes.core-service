@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import um.haberes.rest.kotlin.model.AfipConceptoSueldo;
+import um.haberes.rest.kotlin.view.AfipConceptoSueldoSearch;
 import um.haberes.rest.service.AfipConceptoSueldoService;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public class AfipConceptoSueldoController {
     }
 
     @PostMapping("/search")
-    public ResponseEntity<List<AfipConceptoSueldo>> findAllByAsignadoAndConditions(@RequestBody List<String> conditions) {
+    public ResponseEntity<List<AfipConceptoSueldoSearch>> findAllByAsignadoAndConditions(@RequestBody List<String> conditions) {
         return new ResponseEntity<>(service.findAllByAsignadoAndConditions(conditions), HttpStatus.OK);
     }
 

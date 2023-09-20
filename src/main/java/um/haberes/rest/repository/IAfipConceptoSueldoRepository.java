@@ -7,7 +7,7 @@ import um.haberes.rest.kotlin.model.AfipConceptoSueldo;
 import java.util.Optional;
 
 @Repository
-public interface IAfipConceptoSueldoRepository extends JpaRepository<AfipConceptoSueldo, Long>, IAfipConceptoSueldoRepositoryCustom {
+public interface IAfipConceptoSueldoRepository extends JpaRepository<AfipConceptoSueldo, Long> {
 
     public Optional<AfipConceptoSueldo> findByAfipConceptoSueldoId(Long afipConceptoSueldoId);
 
