@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package um.haberes.rest.controller.facade;
 
@@ -25,12 +25,18 @@ import um.haberes.rest.util.transfer.MailInfo;
 @RestController
 @RequestMapping("/mailing")
 public class MailingController {
-	@Autowired
-	private MailingService service;
-	
-	@PostMapping("/")
-	public ResponseEntity<Void> mailing(@RequestBody List<MailInfo> mails) throws MessagingException {
-		service.mailing(mails);
-		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
-	}
+
+    private final MailingService service;
+
+    @Autowired
+    public MailingController(MailingService service) {
+        this.service = service;
+    }
+
+    @PostMapping("/")
+    public ResponseEntity<Void> mailing(@RequestBody List<MailInfo> mails) throws MessagingException {
+        service.mailing(mails);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
 }

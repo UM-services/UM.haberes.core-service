@@ -30,8 +30,12 @@ import um.haberes.rest.service.facade.BonoService;
 @RequestMapping("/bono")
 public class BonoController {
 
+	private final BonoService service;
+
 	@Autowired
-	private BonoService service;
+	public BonoController(BonoService service) {
+		this.service = service;
+	}
 
 	@GetMapping("/generatePdf/{legajoId}/{anho}/{mes}/{legajoIdSolicitud}/{ipAddress}")
 	public ResponseEntity<Resource> generatePdf(@PathVariable Long legajoId, @PathVariable Integer anho,

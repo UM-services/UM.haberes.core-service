@@ -14,8 +14,12 @@ import um.haberes.rest.service.facade.OrdenPagoService;
 @RequestMapping("/ordenPago")
 public class OrdenPagoController {
 
+    private final OrdenPagoService service;
+
     @Autowired
-    private OrdenPagoService service;
+    public OrdenPagoController(OrdenPagoService service) {
+        this.service = service;
+    }
 
     @PostMapping("/generate")
     public ResponseEntity<Boolean> generateOrdenPago(@RequestBody OrdenPagoRequest ordenPagoRequest) {

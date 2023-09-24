@@ -26,29 +26,33 @@ import um.haberes.rest.service.facade.CargoClaseToolService;
 @RequestMapping("/cargoclasetool")
 public class CargoClaseToolController {
 
+	private final CargoClaseToolService service;
+
 	@Autowired
-	private CargoClaseToolService service;
+	public CargoClaseToolController(CargoClaseToolService service) {
+		this.service = service;
+	}
 
 	@PostMapping("/")
 	public ResponseEntity<String> addCargo(@RequestBody CargoClasePeriodo cargoclaseperiodo) {
-		return new ResponseEntity<String>(service.addCargo(cargoclaseperiodo), HttpStatus.OK);
+		return new ResponseEntity<>(service.addCargo(cargoclaseperiodo), HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{cargoClasePeriodoId}")
 	public ResponseEntity<String> deleteCargo(@PathVariable Long cargoClasePeriodoId) {
-		return new ResponseEntity<String>(service.deleteCargo(cargoClasePeriodoId), HttpStatus.OK);
+		return new ResponseEntity<>(service.deleteCargo(cargoClasePeriodoId), HttpStatus.OK);
 	}
 
 	@PutMapping("/{cargoClasePeriodoId}/{anhoHasta}/{mesHasta}")
 	public ResponseEntity<String> changeHasta(@PathVariable Long cargoClasePeriodoId, @PathVariable Integer anhoHasta,
 			@PathVariable Integer mesHasta) {
-		return new ResponseEntity<String>(service.changeHasta(cargoClasePeriodoId, anhoHasta, mesHasta), HttpStatus.OK);
+		return new ResponseEntity<>(service.changeHasta(cargoClasePeriodoId, anhoHasta, mesHasta), HttpStatus.OK);
 	}
 
 	@GetMapping("/update/periodo/{anho}/{mes}")
 	public ResponseEntity<Void> updateValorHora(@PathVariable Integer anho, @PathVariable Integer mes) {
 		service.updateValorHora(anho, mes);
-		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 }

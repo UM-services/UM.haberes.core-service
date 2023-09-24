@@ -20,8 +20,12 @@ import java.io.IOException;
 @RequestMapping("/libroSueldo")
 public class LibroSueldoController {
 
+    private final LibroSueldoService service;
+
     @Autowired
-    private LibroSueldoService service;
+    public LibroSueldoController(LibroSueldoService service) {
+        this.service = service;
+    }
 
     @GetMapping("/generate/{anho}/{mes}")
     public ResponseEntity<Resource> generate(

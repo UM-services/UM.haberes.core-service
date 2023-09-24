@@ -27,8 +27,12 @@ import um.haberes.rest.util.transfer.FileInfo;
 @RequestMapping("/novedadfile")
 public class NovedadFileController {
 
+    private final NovedadFileService service;
+
     @Autowired
-    private NovedadFileService service;
+    public NovedadFileController(NovedadFileService service) {
+        this.service = service;
+    }
 
     @PostMapping("/upload/{anho}/{mes}")
     public ResponseEntity<String> upload(@RequestBody FileInfo fileInfo, @PathVariable Integer anho,

@@ -3,7 +3,6 @@
  */
 package um.haberes.rest.controller.facade;
 
-import um.haberes.rest.kotlin.model.extern.Cuenta;
 import um.haberes.rest.kotlin.model.extern.CuentaMovimiento;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -28,8 +27,12 @@ import java.util.List;
 @RequestMapping("/contable")
 public class ContableController {
 
+	private final ContableService service;
+
 	@Autowired
-	private ContableService service;
+	public ContableController(ContableService service) {
+		this.service = service;
+	}
 
 	@GetMapping("/generatelegajo/{legajoId}/{anho}/{mes}")
 	public ResponseEntity<Void> generateByLegajo(@PathVariable Long legajoId, @PathVariable Integer anho,
@@ -42,13 +45,13 @@ public class ContableController {
 	public ResponseEntity<Void> deleteAllByLegajo(@PathVariable Long legajoId, @PathVariable Integer anho,
 			@PathVariable Integer mes) {
 		service.deleteAllByLegajo(legajoId, anho, mes);
-		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 	@DeleteMapping("/deleteperiodo/{anho}/{mes}")
 	public ResponseEntity<Void> deleteAllByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes) {
 		service.deleteAllByPeriodo(anho, mes);
-		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 	@GetMapping("/asiento/{fechaContable}/{ordenContable}")

@@ -30,6 +30,7 @@ import um.haberes.rest.service.AcreditacionService;
 @RestController
 @RequestMapping(value = "/acreditacion")
 public class AcreditacionController {
+
 	@Autowired
 	private AcreditacionService service;
 
@@ -82,4 +83,5 @@ public class AcreditacionController {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
+
 }

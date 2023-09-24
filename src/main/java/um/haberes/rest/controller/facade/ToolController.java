@@ -25,8 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 public class ToolController {
 
 	@PostMapping("/mailvalidate")
-	public ResponseEntity<Boolean> mailvalidate(@RequestBody List<String> mailes) {
-		log.debug(mailes.toString());
-		return new ResponseEntity<Boolean>(ToolService.mailvalidate(mailes.get(0)), HttpStatus.OK);
+	public ResponseEntity<Boolean> mailvalidate(@RequestBody List<String> mails) {
+		log.debug(mails.toString());
+		return new ResponseEntity<>(ToolService.mailvalidate(mails.get(0)), HttpStatus.OK);
 	}
+
 }

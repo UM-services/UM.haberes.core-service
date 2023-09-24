@@ -58,7 +58,6 @@ import um.haberes.rest.exception.LetraException;
 import um.haberes.rest.model.Antiguedad;
 import um.haberes.rest.model.BonoImpresion;
 import um.haberes.rest.model.CargoClaseDetalle;
-import um.haberes.rest.model.Control;
 import um.haberes.rest.model.CursoCargo;
 import um.haberes.rest.model.LegajoBanco;
 import um.haberes.rest.model.LegajoControl;

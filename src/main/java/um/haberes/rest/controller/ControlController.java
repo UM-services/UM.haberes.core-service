@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.rest.exception.ControlException;
-import um.haberes.rest.model.Control;
+import um.haberes.rest.kotlin.model.Control;
 import um.haberes.rest.service.ControlService;
 
 /**
@@ -27,13 +27,17 @@ import um.haberes.rest.service.ControlService;
 @RequestMapping("/control")
 public class ControlController {
 
+	private final ControlService service;
+
 	@Autowired
-	private ControlService service;
+	public ControlController(ControlService service) {
+		this.service = service;
+	}
 
 	@GetMapping("/periodo/{anho}/{mes}")
 	public ResponseEntity<Control> findByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes) {
 		try {
-			return new ResponseEntity<Control>(service.findByPeriodo(anho, mes), HttpStatus.OK);
+			return new ResponseEntity<>(service.findByPeriodo(anho, mes), HttpStatus.OK);
 		} catch (ControlException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
@@ -41,12 +45,12 @@ public class ControlController {
 
 	@PostMapping("/")
 	public ResponseEntity<Control> add(@RequestBody Control control) {
-		return new ResponseEntity<Control>(service.add(control), HttpStatus.OK);
+		return new ResponseEntity<>(service.add(control), HttpStatus.OK);
 	}
 
 	@PutMapping("/{controlId}")
 	public ResponseEntity<Control> update(@RequestBody Control control, @PathVariable Long controlId) {
-		return new ResponseEntity<Control>(service.update(control, controlId), HttpStatus.OK);
+		return new ResponseEntity<>(service.update(control, controlId), HttpStatus.OK);
 	}
 
 }
