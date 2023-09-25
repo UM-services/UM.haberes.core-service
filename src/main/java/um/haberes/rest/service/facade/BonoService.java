@@ -294,7 +294,7 @@ public class BonoService {
                 }
                 basicoETEC = basicoETEC.add(horasETEC.multiply(control.getHoraReferenciaEtec())).setScale(2, RoundingMode.HALF_UP);
                 antiguedadETEC = basicoETEC.multiply(indices.get(0)).setScale(2, RoundingMode.HALF_UP);
-                presentismoETEC = basicoETEC.multiply(new BigDecimal(0.1)).setScale(2, RoundingMode.HALF_UP);
+                presentismoETEC = basicoETEC.multiply(new BigDecimal(0.2)).setScale(2, RoundingMode.HALF_UP);
                 adicionalETEC = totalETEC.subtract(basicoETEC).subtract(antiguedadETEC).subtract(presentismoETEC).setScale(2, RoundingMode.HALF_UP);
 
             }
