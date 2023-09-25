@@ -199,9 +199,7 @@ public class BonoService {
 			String ipAddress, Control control) {
 		Persona persona = personaService.findByLegajoId(legajoId);
 		Antiguedad antiguedad = antiguedadService.findByUnique(legajoId, anho, mes);
-		Integer mesesAntiguedad = antiguedad.getMesesDocentes() > antiguedad.getMesesAdministrativos()
-				? antiguedad.getMesesDocentes()
-				: antiguedad.getMesesAdministrativos();
+		Integer mesesAntiguedad = Math.max(antiguedad.getMesesDocentes(), antiguedad.getMesesAdministrativos());
 		LegajoBanco legajoBanco = null;
 		try {
 			legajoBanco = legajoBancoService.findLegajoCbuPrincipal(legajoId, anho, mes);

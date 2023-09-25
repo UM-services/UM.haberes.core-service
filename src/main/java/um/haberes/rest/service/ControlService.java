@@ -12,7 +12,6 @@ import um.haberes.rest.repository.IControlRepository;
 
 /**
  * @author daniel
- *
  */
 @Service
 public class ControlService {
@@ -51,7 +50,7 @@ public class ControlService {
                     newControl.getMincontr(), newControl.getMaximo1sijp(), newControl.getMaximo2sijp(),
                     newControl.getMaximo3sijp(), newControl.getMaximo4sijp(), newControl.getMaximo5sijp(),
                     newControl.getEstadoDocenteTitular(), newControl.getEstadoDocenteAdjunto(),
-                    newControl.getEstadoDocenteAuxiliar(), newControl.getModoLiquidacionId(), null);
+                    newControl.getEstadoDocenteAuxiliar(), newControl.getHoraReferenciaEtec(), newControl.getModoLiquidacionId(), null);
             repository.save(control);
             return control;
         }).orElseThrow(() -> new ControlException(controlId));
