@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.ClaseException;
-import um.haberes.rest.model.Clase;
+import um.haberes.rest.kotlin.model.Clase;
 import um.haberes.rest.repository.IClaseRepository;
 
 /**
@@ -19,8 +19,12 @@ import um.haberes.rest.repository.IClaseRepository;
 @Service
 public class ClaseService {
 
+	private final IClaseRepository repository;
+
 	@Autowired
-	private IClaseRepository repository;
+	public ClaseService(IClaseRepository repository) {
+		this.repository = repository;
+	}
 
 	public List<Clase> findAll() {
 		return repository.findAll();

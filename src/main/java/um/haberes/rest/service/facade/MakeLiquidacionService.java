@@ -32,6 +32,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MakeLiquidacionService {
 
+    private final int constLiquidarConFusion = 1;
+    private final int constLiquidarSinFusion = 2;
+
     private final CargoLiquidacionService cargoLiquidacionService;
 
     private final DesignacionToolService designacionToolService;
@@ -551,10 +554,19 @@ public class MakeLiquidacionService {
             horasDependencia.replace(dependencia.getDependenciaId(), horasDependencia.get(dependencia.getDependenciaId()) + cursoCargo.getHorasSemanales().intValue());
         }
         log.debug("Horas Dependencia -> {}", horasDependencia);
-        // sumatoria de cursoFusion para cada dependencia
-        Map<Integer, BigDecimal> totalDependencia = this.calculateTotalDependenciaFusionado(legajoId, anho, mes);
+
+        // calcula con fusión o sin fusión, depende la configuración del mes
+        Map<Integer, BigDecimal> totalDependencia = null;
+        if (control.getModoLiquidacionId() == constLiquidarConFusion) {
+            // sumatoria de cursoFusion para cada dependencia
+            totalDependencia = this.calculateTotalDependenciaFusionado(legajoId, anho, mes);
+        }
+        if (control.getModoLiquidacionId() == constLiquidarSinFusion) {
+            // sumatoria de cursoCargo para cada dependencia
+            totalDependencia = this.calculateTotalDependenciaSinFusion(legajoId, anho, mes);
+        }
         log.debug("Total Dependencia -> {}", totalDependencia);
-        
+
         // Calcula basico y antiguedad para cada dependencia
         for (Integer dependenciaId : totalDependencia.keySet()) {
             try {
@@ -689,10 +701,22 @@ public class MakeLiquidacionService {
                 cargoLiquidacions.add(new CargoLiquidacion(null, legajoId, anho, mes, cargo.getDependenciaId(), Periodo.firstDay(anho, mes), Periodo.lastDay(anho, mes), categoria.getCategoriaId(), categoria.getNombre(), categoria.getBasico(), cargo.getHorasJornada(), cargo.getJornada(), cargo.getPresentismo(), "A", null, null, categoria));
             }
         }
-        for (CursoFusion cursoFusion : cursoFusionService.findAllByLegajoId(legajoId, anho, mes)) {
-            Dependencia dependencia = dependencias.get(cursoFusion.getFacultadId() + "." + cursoFusion.getGeograficaId());
-            Categoria categoria = cursoFusion.getCategoria();
-            cargoLiquidacions.add(new CargoLiquidacion(null, legajoId, anho, mes, dependencia.getDependenciaId(), Periodo.firstDay(anho, mes), Periodo.lastDay(anho, mes), categoria.getCategoriaId(), categoria.getNombre(), categoria.getBasico(), BigDecimal.ZERO, 1, 0, "A", null, dependencia, categoria));
+        control = controlService.findByPeriodo(anho, mes);
+        if (control.getModoLiquidacionId() == constLiquidarConFusion) {
+            for (CursoFusion cursoFusion : cursoFusionService.findAllByLegajoId(legajoId, anho, mes)) {
+                Dependencia dependencia = dependencias.get(cursoFusion.getFacultadId() + "." + cursoFusion.getGeograficaId());
+                Categoria categoria = cursoFusion.getCategoria();
+                cargoLiquidacions.add(new CargoLiquidacion(null, legajoId, anho, mes, dependencia.getDependenciaId(), Periodo.firstDay(anho, mes), Periodo.lastDay(anho, mes), categoria.getCategoriaId(), categoria.getNombre(), categoria.getBasico(), BigDecimal.ZERO, 1, 0, "A", null, dependencia, categoria));
+            }
+        }
+        if (control.getModoLiquidacionId() == constLiquidarSinFusion) {
+            for (CursoCargo cursoCargo : cursoCargoService.findAllByLegajo(legajoId, anho, mes)) {
+                if (cursoCargo.getCategoriaId() != null) {
+                    Dependencia dependencia = dependencias.get(cursoCargo.getCurso().getFacultadId() + "." + cursoCargo.getCurso().getGeograficaId());
+                    Categoria categoria = cursoCargo.getCategoria();
+                    cargoLiquidacions.add(new CargoLiquidacion(null, legajoId, anho, mes, dependencia.getDependenciaId(), Periodo.firstDay(anho, mes), Periodo.lastDay(anho, mes), categoria.getCategoriaId(), categoria.getNombre(), categoria.getBasico(), BigDecimal.ZERO, 1, 0, "A", null, dependencia, categoria));
+                }
+            }
         }
         Categoria categoria = categoriaService.findByCategoriaId(980);
         for (Novedad novedad : novedadService.findAllByLegajoAndCodigo(legajoId, anho, mes, 980)) {
@@ -782,19 +806,33 @@ public class MakeLiquidacionService {
     private Map<Integer, BigDecimal> calculateTotalDependenciaFusionado(Long legajoId, Integer anho, Integer mes) {
         Map<Integer, BigDecimal> totalDependencia = new HashMap<>();
         for (CursoFusion cursoFusion : cursoFusionService.findAllByLegajoId(legajoId, anho, mes)) {
-            Dependencia dependencia = dependenciaService.findFirstByFacultadIdAndGeograficaId(cursoFusion.getFacultadId(), cursoFusion.getGeograficaId());
-            if (!totalDependencia.containsKey(dependencia.getDependenciaId())) {
-                totalDependencia.put(dependencia.getDependenciaId(), BigDecimal.ZERO);
-            }
-            try {
-                CategoriaPeriodo categoriaPeriodo = categoriaPeriodoService.findByUnique(cursoFusion.getCategoriaId(), anho, mes);
-                totalDependencia.put(dependencia.getDependenciaId(), totalDependencia.get(dependencia.getDependenciaId()).add(categoriaPeriodo.getBasico()).setScale(2, RoundingMode.HALF_UP));
-            } catch (CategoriaPeriodoException e) {
-                Categoria categoria = categoriaService.findByCategoriaId(cursoFusion.getCategoriaId());
-                totalDependencia.put(dependencia.getDependenciaId(), totalDependencia.get(dependencia.getDependenciaId()).add(categoria.getBasico()).setScale(2, RoundingMode.HALF_UP));
+            this.processCategoria(totalDependencia, cursoFusion.getFacultadId(), cursoFusion.getGeograficaId(), cursoFusion.getCategoriaId(), anho, mes);
+        }
+        return totalDependencia;
+    }
+
+    private Map<Integer, BigDecimal> calculateTotalDependenciaSinFusion(Long legajoId, Integer anho, Integer mes) {
+        Map<Integer, BigDecimal> totalDependencia = new HashMap<>();
+        for (CursoCargo cursoCargo : cursoCargoService.findAllByLegajo(legajoId, anho, mes)) {
+            if (cursoCargo.getCategoriaId() != null) {
+                this.processCategoria(totalDependencia, cursoCargo.getCurso().getFacultadId(), cursoCargo.getCurso().getGeograficaId(), cursoCargo.getCategoriaId(), anho, mes);
             }
         }
         return totalDependencia;
+    }
+
+    private void processCategoria(Map<Integer, BigDecimal> totalDependencia, Integer facultadId, Integer geograficaId, Integer categoriaId, Integer anho, Integer mes) {
+        Dependencia dependencia = dependenciaService.findFirstByFacultadIdAndGeograficaId(facultadId, geograficaId);
+        if (!totalDependencia.containsKey(dependencia.getDependenciaId())) {
+            totalDependencia.put(dependencia.getDependenciaId(), BigDecimal.ZERO);
+        }
+        try {
+            CategoriaPeriodo categoriaPeriodo = categoriaPeriodoService.findByUnique(categoriaId, anho, mes);
+            totalDependencia.put(dependencia.getDependenciaId(), totalDependencia.get(dependencia.getDependenciaId()).add(categoriaPeriodo.getBasico()).setScale(2, RoundingMode.HALF_UP));
+        } catch (CategoriaPeriodoException e) {
+            Categoria categoria = categoriaService.findByCategoriaId(categoriaId);
+            totalDependencia.put(dependencia.getDependenciaId(), totalDependencia.get(dependencia.getDependenciaId()).add(categoria.getBasico()).setScale(2, RoundingMode.HALF_UP));
+        }
     }
 
 }

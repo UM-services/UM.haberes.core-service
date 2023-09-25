@@ -10,7 +10,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.model.CursoFusion;
+import um.haberes.rest.kotlin.model.CursoFusion;
 import um.haberes.rest.repository.ICursoFusionRepository;
 
 /**

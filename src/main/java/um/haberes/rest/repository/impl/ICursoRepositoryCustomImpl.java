@@ -14,7 +14,7 @@ import jakarta.persistence.criteria.Root;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import um.haberes.rest.model.Curso;
+import um.haberes.rest.kotlin.model.Curso;
 import um.haberes.rest.repository.ICursoRepositoryCustom;
 
 /**
@@ -23,12 +23,16 @@ import um.haberes.rest.repository.ICursoRepositoryCustom;
  */
 public class ICursoRepositoryCustomImpl implements ICursoRepositoryCustom {
 
+	private final EntityManager entityManager;
+
 	@Autowired
-	private EntityManager entityManager;
+	public ICursoRepositoryCustomImpl(EntityManager entityManager) {
+		this.entityManager = entityManager;
+	}
 
 	@Override
 	public List<Curso> findAllByFacultadIdAndGeograficaIdAndConditions(Integer facultadId, Integer geograficaId,
-			List<String> conditions) {
+																	   List<String> conditions) {
 		CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Curso> query = criteriaBuilder.createQuery(Curso.class);
 		Root<Curso> root = query.from(Curso.class);

@@ -10,8 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
-
-import um.haberes.rest.model.CursoCargo;
+import um.haberes.rest.kotlin.model.CursoCargo;
 
 /**
  * @author daniel

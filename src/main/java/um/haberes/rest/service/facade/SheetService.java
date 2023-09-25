@@ -20,7 +20,6 @@ import um.haberes.rest.kotlin.model.extern.Cuenta;
 import um.haberes.rest.kotlin.model.extern.CuentaMovimiento;
 import um.haberes.rest.model.*;
 import um.haberes.rest.service.extern.CuentaMovimientoService;
-import um.haberes.rest.service.extern.CuentaService;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
@@ -50,92 +49,95 @@ import um.haberes.rest.service.*;
 @Slf4j
 public class SheetService {
 
-    @Autowired
-    private CargoLiquidacionService cargoService;
+    private final CargoLiquidacionService cargoLiquidacionService;
+
+    private final CursoService cursoService;
+
+    private final PersonaService personaService;
+
+    private final FacultadService facultadService;
+
+    private final CategoriaService categoriaService;
+
+    private final CargoTipoService cargoTipoService;
+
+    private final GeograficaService geograficaService;
+
+    private final CursoCargoService cursoCargoService;
+
+    private final DependenciaService dependenciaService;
+
+    private final LiquidacionService liquidacionService;
+
+    private final CodigoService codigoService;
+
+    private final ItemService itemService;
+
+    private final NovedadAcumuladoService novedadAcumuladoService;
+
+    private final NovedadService novedadService;
+
+    private final AcreditacionService acreditacionService;
+
+    private final LegajoCursoCantidadService legajoCursoCantidadService;
+
+    private final CargoClaseDetalleService cargoClaseDetalleService;
+
+    private final LiquidacionAdicionalService liquidacionAdicionalService;
+
+    private final LegajoBancoService legajoBancoService;
+
+    private final ContactoService contactoService;
+
+    private final Environment environment;
+
+    private final CuentaMovimientoService cuentaMovimientoService;
+
+    private final LegajoCategoriaImputacionService legajoCategoriaImputacionService;
+
+    private final LegajoCargoClaseImputacionService legajoCargoClaseImputacionService;
+
+    private final CodigoGrupoService codigoGrupoService;
+
+    private final LegajoCodigoImputacionService legajoCodigoImputacionService;
 
     @Autowired
-    private CursoService cursoService;
-
-    @Autowired
-    private PersonaService personaService;
-
-    @Autowired
-    private FacultadService facultadService;
-
-    @Autowired
-    private CategoriaService categoriaService;
-
-    @Autowired
-    private CargoTipoService cargoTipoService;
-
-    @Autowired
-    private GeograficaService geograficaService;
-
-    @Autowired
-    private CursoCargoService cursoCargoService;
-
-    @Autowired
-    private DependenciaService dependenciaService;
-
-    @Autowired
-    private LiquidacionService liquidacionService;
-
-    @Autowired
-    private CodigoService codigoService;
-
-    @Autowired
-    private ItemService itemService;
-
-    @Autowired
-    private NovedadAcumuladoService novedadAcumuladoService;
-
-    @Autowired
-    private NovedadService novedadService;
-
-    @Autowired
-    private AcreditacionService acreditacionService;
-
-    @Autowired
-    private LegajoCursoCantidadService legajoCursoCantidadService;
-
-    @Autowired
-    private CargoLiquidacionService cargoLiquidacionService;
-
-    @Autowired
-    private CargoClaseDetalleService cargoClaseDetalleService;
-
-    @Autowired
-    private LiquidacionAdicionalService liquidacionAdicionalService;
-
-    @Autowired
-    private LegajoBancoService legajoBancoService;
-
-    @Autowired
-    private ContactoService contactoService;
-
-    @Autowired
-    private Environment env;
-
-    @Autowired
-    private CuentaService cuentaService;
-
-    @Autowired
-    private CuentaMovimientoService cuentaMovimientoService;
-
-    @Autowired
-    private LegajoCategoriaImputacionService legajoCategoriaImputacionService;
-
-    @Autowired
-    private LegajoCargoClaseImputacionService legajoCargoClaseImputacionService;
-
-    @Autowired
-    private CodigoGrupoService codigoGrupoService;
-
-    @Autowired
-    private LegajoCodigoImputacionService legajoCodigoImputacionService;
+    public SheetService(CursoService cursoService, PersonaService personaService, FacultadService facultadService, CategoriaService categoriaService, CargoTipoService cargoTipoService, GeograficaService geograficaService,
+                        CursoCargoService cursoCargoService, DependenciaService dependenciaService, LiquidacionService liquidacionService, CodigoService codigoService, ItemService itemService,
+                        NovedadAcumuladoService novedadAcumuladoService, NovedadService novedadService, AcreditacionService acreditacionService, LegajoCursoCantidadService legajoCursoCantidadService,
+                        CargoLiquidacionService cargoLiquidacionService, CargoClaseDetalleService cargoClaseDetalleService, LiquidacionAdicionalService liquidacionAdicionalService, LegajoBancoService legajoBancoService,
+                        ContactoService contactoService, Environment environment, CuentaMovimientoService cuentaMovimientoService, LegajoCategoriaImputacionService legajoCategoriaImputacionService,
+                        LegajoCargoClaseImputacionService legajoCargoClaseImputacionService, CodigoGrupoService codigoGrupoService, LegajoCodigoImputacionService legajoCodigoImputacionService) {
+        this.cursoService = cursoService;
+        this.personaService = personaService;
+        this.facultadService = facultadService;
+        this.categoriaService = categoriaService;
+        this.cargoTipoService = cargoTipoService;
+        this.geograficaService = geograficaService;
+        this.cursoCargoService = cursoCargoService;
+        this.dependenciaService = dependenciaService;
+        this.liquidacionService = liquidacionService;
+        this.codigoService = codigoService;
+        this.itemService = itemService;
+        this.novedadAcumuladoService = novedadAcumuladoService;
+        this.novedadService = novedadService;
+        this.acreditacionService = acreditacionService;
+        this.legajoCursoCantidadService = legajoCursoCantidadService;
+        this.cargoLiquidacionService = cargoLiquidacionService;
+        this.cargoClaseDetalleService = cargoClaseDetalleService;
+        this.liquidacionAdicionalService = liquidacionAdicionalService;
+        this.legajoBancoService = legajoBancoService;
+        this.contactoService = contactoService;
+        this.environment = environment;
+        this.cuentaMovimientoService = cuentaMovimientoService;
+        this.legajoCategoriaImputacionService = legajoCategoriaImputacionService;
+        this.legajoCargoClaseImputacionService = legajoCargoClaseImputacionService;
+        this.codigoGrupoService = codigoGrupoService;
+        this.legajoCodigoImputacionService = legajoCodigoImputacionService;
+    }
 
     public String generateLiquidables() {
-        String path = env.getProperty("path.files");
+        String path = environment.getProperty("path.files");
 
         String filename = path + "liquidables.xlsx";
 
@@ -151,7 +153,7 @@ public class SheetService {
 
         Sheet sheet = book.createSheet("Liquidables");
         Row row = null;
-        Integer fila = 0;
+        int fila = 0;
         row = sheet.createRow(fila);
         this.setCellString(row, 0, "Legajo", style_bold);
         this.setCellString(row, 1, "Apellido, Nombre", style_bold);
@@ -172,7 +174,7 @@ public class SheetService {
             this.setCellString(row, 4, dependencia.getNombre(), style_normal);
         }
 
-        for (Integer column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
+        for (int column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
             sheet.autoSizeColumn(column);
 
         try {
@@ -190,7 +192,7 @@ public class SheetService {
     }
 
     public String generateCategorias() {
-        String path = env.getProperty("path.files");
+        String path = environment.getProperty("path.files");
 
         String filename = path + "categorias.xlsx";
 
@@ -206,7 +208,7 @@ public class SheetService {
 
         Sheet sheet = book.createSheet("Categorias");
         Row row = null;
-        Integer fila = 0;
+        int fila = 0;
         row = sheet.createRow(fila);
         this.setCellString(row, 0, "categoria_id", style_bold);
         this.setCellString(row, 1, "nombre", style_bold);
@@ -225,7 +227,7 @@ public class SheetService {
             this.setCellByte(row, 5, categoria.getLiquidaPorHora(), style_normal);
         }
 
-        for (Integer column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
+        for (int column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
             sheet.autoSizeColumn(column);
 
         try {
@@ -245,11 +247,11 @@ public class SheetService {
     public String generateCargos(Integer anho, Integer mes) {
         // Depurar los cargos de legajos no liquidados
         List<Long> legajos = liquidacionService.findAllByPeriodo(anho, mes, 0).stream()
-                .map(liquidacion -> liquidacion.getLegajoId()).collect(Collectors.toList());
+                .map(Liquidacion::getLegajoId).collect(Collectors.toList());
         log.debug("Legajos" + legajos);
-        cargoService.deleteAllNotInByPeriodo(legajos, anho, mes);
+        cargoLiquidacionService.deleteAllNotInByPeriodo(legajos, anho, mes);
 
-        String path = env.getProperty("path.files");
+        String path = environment.getProperty("path.files");
 
         String filename = path + "cargos" + anho + String.format("%02d", mes) + ".xlsx";
 
@@ -265,7 +267,7 @@ public class SheetService {
 
         Sheet sheet = book.createSheet("Cargos");
         Row row = null;
-        Integer fila = 0;
+        int fila = 0;
         row = sheet.createRow(fila);
         this.setCellString(row, 0, "Legajo", style_bold);
         this.setCellString(row, 1, "Apellido, Nombre", style_bold);
@@ -284,7 +286,7 @@ public class SheetService {
         Map<Integer, Categoria> categorias = categoriaService.findAll().stream()
                 .collect(Collectors.toMap(Categoria::getCategoriaId, categoria -> categoria));
 
-        for (CargoLiquidacion cargo : cargoService.findAllActivosByPeriodo(anho, mes)) {
+        for (CargoLiquidacion cargo : cargoLiquidacionService.findAllActivosByPeriodo(anho, mes)) {
             Persona persona = personas.get(cargo.getLegajoId());
             Dependencia dependencia = dependencias.get(cargo.getDependenciaId());
             Categoria categoria = categorias.get(cargo.getCategoriaId());
@@ -300,7 +302,7 @@ public class SheetService {
             this.setCellString(row, 6, categoria.getNombre(), style_normal);
         }
 
-        for (Integer column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
+        for (int column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
             sheet.autoSizeColumn(column);
 
         try {
@@ -319,13 +321,13 @@ public class SheetService {
 
     public String generateItems(Integer anho, Integer mes) {
         List<Item> items = itemService.findAllByPeriodo(anho, mes, 1000000);
-        List<Long> legajos = items.stream().map(item -> item.getLegajoId()).collect(Collectors.toList());
+        List<Long> legajos = items.stream().map(Item::getLegajoId).collect(Collectors.toList());
         List<Codigo> codigos = codigoService
-                .findAllByCodigoIds(items.stream().map(item -> item.getCodigoId()).collect(Collectors.toList()));
+                .findAllByCodigoIds(items.stream().map(Item::getCodigoId).collect(Collectors.toList()));
         Map<String, Item> mapItems = items.stream()
                 .collect(Collectors.toMap(Item::legajoKey, Function.identity(), (item, replacement) -> item));
 
-        String path = env.getProperty("path.files");
+        String path = environment.getProperty("path.files");
 
         String filename = path + "items" + anho + String.format("%02d", mes) + ".xlsx";
 
@@ -341,13 +343,13 @@ public class SheetService {
 
         Sheet sheet = book.createSheet("Items");
         Row row = null;
-        Integer fila = 0;
+        int fila = 0;
         row = sheet.createRow(fila);
         this.setCellString(row, 0, "Legajo", style_bold);
         this.setCellString(row, 1, "CUIL", style_bold);
         this.setCellString(row, 2, "Apellido, Nombre", style_bold);
-        Integer columnaDatos = 3;
-        Integer columna = columnaDatos;
+        int columnaDatos = 3;
+        int columna = columnaDatos;
         for (Codigo codigo : codigos) {
             this.setCellString(row, columna++, codigo.getNombre() + " (" + codigo.getCodigoId() + ")", style_bold);
         }
@@ -368,7 +370,7 @@ public class SheetService {
             }
         }
 
-        for (Integer column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
+        for (int column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
             sheet.autoSizeColumn(column);
 
         try {
@@ -386,7 +388,7 @@ public class SheetService {
     }
 
     public String generateCursos(Integer anho, Integer mes) {
-        String path = env.getProperty("path.files");
+        String path = environment.getProperty("path.files");
 
         String filename = path + "cursos" + anho + String.format("%02d", mes) + ".xlsx";
 
@@ -398,7 +400,7 @@ public class SheetService {
 
         Sheet sheet = book.createSheet("Cursos");
         Row row = null;
-        Integer fila = 0;
+        int fila = 0;
         row = sheet.createRow(fila);
         this.setCellString(row, 0, "Legajo", style_normal);
         this.setCellString(row, 1, "Apellido, Nombre", style_normal);
@@ -427,7 +429,7 @@ public class SheetService {
                 .collect(Collectors.toMap(CargoTipo::getCargoTipoId, cargoTipo -> cargoTipo));
 
         List<Long> legajoIds = cursoCargoService.findAllByAnhoAndMes(anho, mes).stream()
-                .map(cursoCargo -> cursoCargo.getLegajoId()).collect(Collectors.toList());
+                .map(CursoCargo::getLegajoId).collect(Collectors.toList());
 
         for (Persona persona : personaService.findAllLegajos(legajoIds)) {
             for (CursoCargo cursoCargo : cursoCargoService.findAllByLegajo(persona.getLegajoId(), anho, mes)) {
@@ -459,7 +461,7 @@ public class SheetService {
             }
         }
 
-        for (Integer column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
+        for (int column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
             sheet.autoSizeColumn(column);
 
         try {
@@ -477,7 +479,7 @@ public class SheetService {
     }
 
     public String generateCodigosNoDoc(Integer anho, Integer mes) {
-        String path = env.getProperty("path.files");
+        String path = environment.getProperty("path.files");
 
         String filename = path + "codigosnodoc" + anho + String.format("%02d", mes) + ".xlsx";
 
@@ -489,8 +491,8 @@ public class SheetService {
 
         Sheet sheet = book.createSheet("Códigos");
         Row row = null;
-        Integer fila = 0;
-        Integer columna = 1;
+        int fila = 0;
+        int columna = 1;
         row = sheet.createRow(fila);
         this.setCellString(row, 0, "Legajo", style_normal);
         this.setCellString(row, 1, "Apellido, Nombre", style_normal);
@@ -505,7 +507,7 @@ public class SheetService {
             this.setCellString(row, 1, persona.getApellido() + ", " + persona.getNombre(), style_normal);
             Map<Integer, BigDecimal> items = itemService
                     .findAllByLegajo(persona.getLegajoId(), anho, mes).stream()
-                    .collect(Collectors.toMap(Item::getCodigoId, item -> item.getImporte()));
+                    .collect(Collectors.toMap(Item::getCodigoId, Item::getImporte));
             columna = 1;
             for (Codigo codigo : codigos) {
                 ++columna;
@@ -514,7 +516,7 @@ public class SheetService {
             }
         }
 
-        for (Integer column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
+        for (int column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
             sheet.autoSizeColumn(column);
 
         try {
@@ -532,7 +534,7 @@ public class SheetService {
     }
 
     public String generateCategoriasNoDoc(Integer anho, Integer mes) {
-        String path = env.getProperty("path.files");
+        String path = environment.getProperty("path.files");
 
         String filename = path + "categoriasnodoc" + anho + String.format("%02d", mes) + ".xlsx";
 
@@ -544,8 +546,8 @@ public class SheetService {
 
         Sheet sheet = book.createSheet("Categorías");
         Row row = null;
-        Integer fila = 0;
-        Integer columna = 1;
+        int fila = 0;
+        int columna = 1;
         row = sheet.createRow(fila);
         this.setCellString(row, 0, "Legajo", style_normal);
         this.setCellString(row, 1, "Apellido, Nombre", style_normal);
@@ -569,7 +571,7 @@ public class SheetService {
             }
         }
 
-        for (Integer column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
+        for (int column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
             sheet.autoSizeColumn(column);
 
         try {
@@ -587,7 +589,7 @@ public class SheetService {
     }
 
     public String comparativoCodigo(Integer codigoId, Integer anho, Integer mes) {
-        String path = env.getProperty("path.files");
+        String path = environment.getProperty("path.files");
 
         String filename = path + "codigo" + codigoId + "-" + anho + String.format("%02d", mes) + ".xlsx";
 
@@ -599,7 +601,7 @@ public class SheetService {
 
         Sheet sheet = book.createSheet("Código " + codigoId);
         Row row = null;
-        Integer fila = -1;
+        int fila = -1;
         row = sheet.createRow(++fila);
         this.setCellString(row, 0, "Código " + codigoId, style_normal);
         row = sheet.createRow(++fila);
@@ -610,12 +612,12 @@ public class SheetService {
         this.setCellString(row, 4, "#Cantidad", style_normal);
 
         Map<Long, BigDecimal> items = itemService.findAllByCodigo(codigoId, anho, mes).stream()
-                .collect(Collectors.toMap(Item::getLegajoId, item -> item.getImporte()));
+                .collect(Collectors.toMap(Item::getLegajoId, Item::getImporte));
         List<NovedadAcumulado> novedades = novedadAcumuladoService.findAllByCodigo(codigoId, anho, mes);
         Map<Long, BigDecimal> importes = novedades.stream()
-                .collect(Collectors.toMap(NovedadAcumulado::getLegajoId, novedad -> novedad.getImporte()));
+                .collect(Collectors.toMap(NovedadAcumulado::getLegajoId, NovedadAcumulado::getImporte));
         Map<Long, Integer> cantidades = novedades.stream()
-                .collect(Collectors.toMap(NovedadAcumulado::getLegajoId, novedad -> novedad.getCantidad()));
+                .collect(Collectors.toMap(NovedadAcumulado::getLegajoId, NovedadAcumulado::getCantidad));
 
         for (Persona persona : personaService.findAllByLiquidado(anho, mes)) {
             row = sheet.createRow(++fila);
@@ -630,7 +632,7 @@ public class SheetService {
             }
         }
 
-        for (Integer column = 0; column < sheet.getRow(1).getPhysicalNumberOfCells(); column++)
+        for (int column = 0; column < sheet.getRow(1).getPhysicalNumberOfCells(); column++)
             sheet.autoSizeColumn(column);
 
         try {
@@ -648,14 +650,14 @@ public class SheetService {
     }
 
     public String simulasac(Integer anho, Integer semestre) {
-        String path = env.getProperty("path.files");
+        String path = environment.getProperty("path.files");
 
         String filename = path + "simulasac" + anho + String.format("%02d", semestre) + ".xlsx";
 
-        Integer mesDesde = (semestre - 1) * 6 + 1;
-        Integer mesHasta = semestre * 6;
-        Boolean simulaUltimo = false;
-        if (liquidacionService.findAllByPeriodo(anho, mesHasta, 1).size() == 0) {
+        int mesDesde = (semestre - 1) * 6 + 1;
+        int mesHasta = semestre * 6;
+        boolean simulaUltimo = false;
+        if (liquidacionService.findAllByPeriodo(anho, mesHasta, 1).isEmpty()) {
             simulaUltimo = true;
             mesHasta--;
         }
@@ -668,7 +670,7 @@ public class SheetService {
 
         Sheet sheet = book.createSheet("SAC");
         Row row = null;
-        Integer fila = -1;
+        int fila = -1;
         row = sheet.createRow(++fila);
         this.setCellString(row, 0, "Legajo", style_normal);
         this.setCellString(row, 1, "Apellido, Nombre", style_normal);
@@ -677,7 +679,7 @@ public class SheetService {
             meses = List.of("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio");
         if (semestre == 2)
             meses = List.of("Julio", "Agosto", "Setiembre", "Octubre", "Noviembre", "Diciembre");
-        Integer columna = 1;
+        int columna = 1;
         for (String mes : meses) {
             this.setCellString(row, ++columna, mes, style_normal);
             if (columna == 7 && simulaUltimo) {
@@ -692,7 +694,7 @@ public class SheetService {
             Map<Integer, Liquidacion> liquidaciones = liquidacionService
                     .findAllBySemestreLegajo(anho, semestre, persona.getLegajoId(), 0).stream()
                     .collect(Collectors.toMap(Liquidacion::getMes, liquidacion -> liquidacion));
-            Integer cantidadMeses = 0;
+            int cantidadMeses = 0;
             row = sheet.createRow(++fila);
             this.setCellLong(row, 0, persona.getLegajoId(), style_normal);
             this.setCellString(row, 1, persona.getApellido() + ", " + persona.getNombre(), style_normal);
@@ -703,8 +705,8 @@ public class SheetService {
             BigDecimal asignacionPosgradoTotal = BigDecimal.ZERO;
             BigDecimal asignacionPosgradoProrrata = BigDecimal.ZERO;
             BigDecimal bruto = BigDecimal.ZERO;
-            for (Integer mes = mesDesde; mes <= mesHasta; mes++) {
-                Map<Integer, Item> items = new HashMap<Integer, Item>();
+            for (int mes = mesDesde; mes <= mesHasta; mes++) {
+                Map<Integer, Item> items = new HashMap<>();
                 if (liquidaciones.containsKey(mes)) {
                     items = itemService.findAllByLegajo(persona.getLegajoId(), anho, mes).stream()
                             .collect(Collectors.toMap(Item::getCodigoId, item -> item));
@@ -781,7 +783,7 @@ public class SheetService {
             this.setCellBigDecimal(row, ++columna, value, style_normal);
         }
 
-        for (Integer column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
+        for (int column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
             sheet.autoSizeColumn(column);
 
         try {
@@ -812,31 +814,29 @@ public class SheetService {
 
         List<Long> exceptos = List.of(2084L, 2458L, 2017L, 1638L, 2023L, 1948L, 2022L, 1382L, 2604L, 2500L, 878L);
 
-        Integer mesDesde = (semestre - 1) * 6 + 1;
-        Integer mesHasta = semestre * 6;
-        Boolean simulaUltimo = false;
-        if (liquidacionService.findAllByPeriodo(anho, mesHasta, 1).size() == 0) {
+        int mesDesde = (semestre - 1) * 6 + 1;
+        int mesHasta = semestre * 6;
+        boolean simulaUltimo = false;
+        if (liquidacionService.findAllByPeriodo(anho, mesHasta, 1).isEmpty()) {
             simulaUltimo = true;
             mesHasta--;
         }
 
-        List<Novedad> novedades = new ArrayList<Novedad>();
+        List<Novedad> novedades = new ArrayList<>();
         for (Persona persona : personaService.findAllBySemestre(anho, semestre)) {
             Map<Integer, Liquidacion> liquidaciones = liquidacionService
                     .findAllBySemestreLegajo(anho, semestre, persona.getLegajoId(), 0).stream()
                     .collect(Collectors.toMap(Liquidacion::getMes, liquidacion -> liquidacion));
-            Integer cantidadMeses = 0;
+            int cantidadMeses = 0;
             BigDecimal mejorBruto = BigDecimal.ZERO;
             BigDecimal brutoSimulado = BigDecimal.ZERO;
             BigDecimal asignacionPosgrado = BigDecimal.ZERO;
             BigDecimal asignacionPosgradoTotal = BigDecimal.ZERO;
             BigDecimal asignacionPosgradoProrrata = BigDecimal.ZERO;
             BigDecimal bruto = BigDecimal.ZERO;
-            Boolean descontar23 = true;
-            if (exceptos.contains(persona.getLegajoId()))
-                descontar23 = false;
-            for (Integer mes = mesDesde; mes <= mesHasta; mes++) {
-                Map<Integer, Item> items = new HashMap<Integer, Item>();
+            boolean descontar23 = !exceptos.contains(persona.getLegajoId());
+            for (int mes = mesDesde; mes <= mesHasta; mes++) {
+                Map<Integer, Item> items = new HashMap<>();
                 if (liquidaciones.containsKey(mes)) {
                     items = itemService.findAllByLegajo(persona.getLegajoId(), anho, mes).stream()
                             .collect(Collectors.toMap(Item::getCodigoId, item -> item));
@@ -928,7 +928,7 @@ public class SheetService {
     }
 
     public String generateLegajoCursoCantidad(Integer anho, Integer mes) {
-        String path = env.getProperty("path.files");
+        String path = environment.getProperty("path.files");
 
         String filename = path + "docentes." + anho + "." + mes + ".xlsx";
 
@@ -944,7 +944,7 @@ public class SheetService {
 
         Sheet sheet = book.createSheet("Docentes");
         Row row = null;
-        Integer fila = -1;
+        int fila = -1;
         row = sheet.createRow(++fila);
         this.setCellString(row, 0, "Facultad", style_bold);
         this.setCellString(row, 1, "Sede", style_bold);
@@ -960,7 +960,7 @@ public class SheetService {
         Map<Integer, Geografica> geograficas = geograficaService.findAll().stream()
                 .collect(Collectors.toMap(Geografica::getGeograficaId, geografica -> geografica));
         List<LegajoCursoCantidad> legajoCursos = legajoCursoCantidadService.findAllByPeriodo(anho, mes);
-        List<Long> legajoIds = legajoCursos.stream().map(cantidad -> cantidad.getLegajoId())
+        List<Long> legajoIds = legajoCursos.stream().map(LegajoCursoCantidad::getLegajoId)
                 .collect(Collectors.toList());
         Map<Long, Persona> legajos = personaService.findAllLegajos(legajoIds).stream()
                 .collect(Collectors.toMap(Persona::getLegajoId, persona -> persona));
@@ -981,7 +981,7 @@ public class SheetService {
             }
         }
 
-        for (Integer column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
+        for (int column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
             sheet.autoSizeColumn(column);
 
         try {
@@ -999,7 +999,7 @@ public class SheetService {
     }
 
     public String generateBasicos(Integer anho, Integer mes) {
-        String path = env.getProperty("path.files");
+        String path = environment.getProperty("path.files");
 
         String filename = path + "basicos." + anho + "." + mes + ".xlsx";
 
@@ -1015,7 +1015,7 @@ public class SheetService {
 
         Sheet sheet = book.createSheet("Básicos");
         Row row = null;
-        Integer fila = -1;
+        int fila = -1;
         row = sheet.createRow(++fila);
         this.setCellString(row, 0, MessageFormat.format("Periodo: {0}/{1}", mes, anho), style_bold);
         row = sheet.createRow(++fila);
@@ -1072,7 +1072,7 @@ public class SheetService {
             }
         }
 
-        for (Integer column = 0; column < sheet.getRow(1).getPhysicalNumberOfCells(); column++)
+        for (int column = 0; column < sheet.getRow(1).getPhysicalNumberOfCells(); column++)
             sheet.autoSizeColumn(column);
 
         try {
@@ -1090,7 +1090,7 @@ public class SheetService {
     }
 
     public String comparaConsecutivos(Integer anho, Integer mes) {
-        String path = env.getProperty("path.files");
+        String path = environment.getProperty("path.files");
 
         String filename = path + "consecutivos." + anho + "." + mes + ".xlsx";
 
@@ -1106,7 +1106,7 @@ public class SheetService {
 
         Sheet sheet = book.createSheet("Comparativo");
         Row row = null;
-        Integer fila = -1;
+        int fila = -1;
         row = sheet.createRow(++fila);
         this.setCellString(row, 0, MessageFormat.format("Periodo Actual: {0}/{1}", mes, anho), style_bold);
         row = sheet.createRow(++fila);
@@ -1136,7 +1136,7 @@ public class SheetService {
                 .stream().collect(Collectors.toMap(Item::legajoKey, item -> item));
 
         for (Persona persona : personaService.findAllOrderByDependencia()) {
-            Boolean liquidado = false;
+            boolean liquidado = false;
             Liquidacion liquidacion = null;
             Liquidacion liquidacionAnterior = null;
             BigDecimal brutoAnterior = BigDecimal.ZERO;
@@ -1200,7 +1200,7 @@ public class SheetService {
             }
         }
 
-        for (Integer column = 0; column < sheet.getRow(1).getPhysicalNumberOfCells(); column++)
+        for (int column = 0; column < sheet.getRow(1).getPhysicalNumberOfCells(); column++)
             sheet.autoSizeColumn(column);
 
         try {
@@ -1220,7 +1220,7 @@ public class SheetService {
     public String generatePersonales() {
         String[] posgrados = {"Sin Posgrado", "Doctorado", "Maestría", "Especialización"};
 
-        String path = env.getProperty("path.files");
+        String path = environment.getProperty("path.files");
 
         String filename = path + "personales.xlsx";
 
@@ -1236,7 +1236,7 @@ public class SheetService {
 
         Sheet sheet = book.createSheet("Personales");
         Row row = null;
-        Integer fila = -1;
+        int fila = -1;
         row = sheet.createRow(++fila);
         this.setCellString(row, 0, "Legajo", style_bold);
         this.setCellString(row, 1, "Documento", style_bold);
@@ -1318,7 +1318,7 @@ public class SheetService {
                 this.setCellInteger(row, 22, persona.getModeloContratacionAfip(), style_normal);
             }
             try {
-                Boolean first = true;
+                boolean first = true;
                 LegajoBanco legajoBanco = legajoBancoService.findLastByLegajoId(persona.getLegajoId());
                 for (LegajoBanco banco : legajoBancoService.findAllByLegajoPeriodo(persona.getLegajoId(),
                         legajoBanco.getAnho(), legajoBanco.getMes())) {
@@ -1335,13 +1335,13 @@ public class SheetService {
                     this.setCellString(row, 26, banco.getResto() == 1 ? "*" : "", style_normal);
                 }
             } catch (LegajoBancoException e) {
-
+                log.debug("Nothing to do");
             }
             this.setCellString(row, 27, contacto.getMailPersonal(), style_normal);
             this.setCellString(row, 28, contacto.getMailInstitucional(), style_normal);
         }
 
-        for (Integer column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
+        for (int column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
             sheet.autoSizeColumn(column);
 
         try {
@@ -1360,7 +1360,7 @@ public class SheetService {
 
     public String comparaImputaciones(Integer anhoDesde, Integer mesDesde, Integer anhoHasta, Integer mesHasta) {
 
-        String path = env.getProperty("path.files");
+        String path = environment.getProperty("path.files");
 
         String filename = path + "personales.xlsx";
 
@@ -1378,12 +1378,12 @@ public class SheetService {
 
         Sheet sheet = book.createSheet("Personales");
         Row row = null;
-        Integer fila = -1;
+        int fila = -1;
         row = sheet.createRow(++fila);
         this.setCellString(row, 0, "Cuenta", style_bold);
 
         Map<String, Map> saldos = new HashMap<>();
-        for (Integer anho = anhoDesde, mes = mesDesde, column = 1; Periodo.toLong(anho, mes) <= Periodo.toLong(anhoHasta, mesHasta); column++) {
+        for (int anho = anhoDesde, mes = mesDesde, column = 1; Periodo.toLong(anho, mes) <= Periodo.toLong(anhoHasta, mesHasta); column++) {
             Acreditacion acreditacion = acreditacionService.findByPeriodo(anho, mes);
             StringBuilder builder = new StringBuilder();
             builder.append(mes);
@@ -1412,7 +1412,7 @@ public class SheetService {
             builder.append(" - ");
             builder.append(cuenta.getNombre());
             this.setCellString(row, 0, builder.toString(), style_normal);
-            for (Integer anho = anhoDesde, mes = mesDesde, column = 1; Periodo.toLong(anho, mes) <= Periodo.toLong(anhoHasta, mesHasta); column++) {
+            for (int anho = anhoDesde, mes = mesDesde, column = 1; Periodo.toLong(anho, mes) <= Periodo.toLong(anhoHasta, mesHasta); column++) {
                 builder = new StringBuilder();
                 builder.append(mes);
                 builder.append(".");
@@ -1436,7 +1436,7 @@ public class SheetService {
             }
         }
 
-        for (Integer column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
+        for (int column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
             sheet.autoSizeColumn(column);
 
         try {
@@ -1455,7 +1455,7 @@ public class SheetService {
 
     public String cruceImputaciones(Integer anho, Integer mes) {
 
-        String path = env.getProperty("path.files");
+        String path = environment.getProperty("path.files");
 
         String filename = path + "cruce.xlsx";
 
@@ -1470,12 +1470,12 @@ public class SheetService {
         style_bold.setFont(font_bold);
 
         // Codigos Remunerativos
-        List<Integer> codigoIdRemunerativos = codigoGrupoService.findAllByRemunerativo((byte) 1).stream().map(codigoGrupo -> codigoGrupo.getCodigoId()).collect(Collectors.toList());
-        List<Integer> codigoIdNoRemunerativos = codigoGrupoService.findAllByNoRemunerativo((byte) 1).stream().map(codigoGrupo -> codigoGrupo.getCodigoId()).collect(Collectors.toList());
+        List<Integer> codigoIdRemunerativos = codigoGrupoService.findAllByRemunerativo((byte) 1).stream().map(CodigoGrupo::getCodigoId).collect(Collectors.toList());
+        List<Integer> codigoIdNoRemunerativos = codigoGrupoService.findAllByNoRemunerativo((byte) 1).stream().map(CodigoGrupo::getCodigoId).collect(Collectors.toList());
 
         Sheet sheet = book.createSheet("Acreditados");
         Row row = null;
-        Integer fila = -1;
+        int fila = -1;
         row = sheet.createRow(++fila);
         this.setCellString(row, 0, "Legajo", style_bold);
         this.setCellString(row, 1, "Apellido, Nombre", style_bold);
@@ -1581,7 +1581,7 @@ public class SheetService {
             this.setCellBigDecimal(row, 17, diferenciaNoRemunerativos, style_normal);
         }
 
-        for (Integer column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
+        for (int column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
             sheet.autoSizeColumn(column);
 
         try {

@@ -8,8 +8,7 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import um.haberes.rest.model.Antiguedad;
+import um.haberes.rest.kotlin.model.Antiguedad;
 
 /**
  * @author daniel

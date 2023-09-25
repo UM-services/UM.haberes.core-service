@@ -12,7 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.CursoException;
-import um.haberes.rest.model.Curso;
+import um.haberes.rest.kotlin.model.Curso;
 import um.haberes.rest.repository.ICursoRepository;
 
 /**

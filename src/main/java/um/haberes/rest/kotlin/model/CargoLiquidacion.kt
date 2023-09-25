@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import jakarta.persistence.*
 import um.haberes.rest.model.Auditable
 import um.haberes.rest.model.Categoria
-import um.haberes.rest.model.Persona
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 

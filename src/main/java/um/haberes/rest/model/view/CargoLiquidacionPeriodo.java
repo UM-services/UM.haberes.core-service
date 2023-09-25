@@ -18,9 +18,9 @@ import org.hibernate.annotations.Immutable;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import um.haberes.rest.kotlin.model.Dependencia;
+import um.haberes.rest.kotlin.model.Persona;
 import um.haberes.rest.model.Auditable;
 import um.haberes.rest.model.Categoria;
-import um.haberes.rest.model.Persona;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -66,15 +66,15 @@ public class CargoLiquidacionPeriodo extends Auditable implements Serializable {
 	private String situacion;
 	private Long periodo;
 
-	@OneToOne
+	@OneToOne(optional = true)
 	@JoinColumn(name = "legajoId", insertable = false, updatable = false)
 	private Persona persona;
 
-	@OneToOne
+	@OneToOne(optional = true)
 	@JoinColumn(name = "dependenciaId", insertable = false, updatable = false)
 	private Dependencia dependencia;
 
-	@OneToOne
+	@OneToOne(optional = true)
 	@JoinColumn(name = "categoriaId", insertable = false, updatable = false)
 	private Categoria categoria;
 

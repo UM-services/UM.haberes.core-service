@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.rest.exception.CursoCargoException;
-import um.haberes.rest.model.CursoCargo;
+import um.haberes.rest.kotlin.model.CursoCargo;
 import um.haberes.rest.service.CursoCargoService;
 
 /**
@@ -30,12 +30,16 @@ import um.haberes.rest.service.CursoCargoService;
 @RequestMapping("/cursoCargo")
 public class CursoCargoController {
 
+	private final CursoCargoService service;
+
 	@Autowired
-	private CursoCargoService service;
+	public CursoCargoController(CursoCargoService service) {
+		this.service = service;
+	}
 
 	@GetMapping("/legajo/{legajoId}/{anho}/{mes}")
 	public ResponseEntity<List<CursoCargo>> findAllByLegajo(@PathVariable Long legajoId, @PathVariable Integer anho,
-			@PathVariable Integer mes) {
+															@PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findAllByLegajo(legajoId, anho, mes), HttpStatus.OK);
 	}
 

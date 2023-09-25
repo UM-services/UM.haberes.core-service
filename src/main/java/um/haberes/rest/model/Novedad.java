@@ -22,6 +22,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import um.haberes.rest.kotlin.model.Codigo;
 import um.haberes.rest.kotlin.model.Dependencia;
+import um.haberes.rest.kotlin.model.Persona;
 
 /**
  * @author daniel

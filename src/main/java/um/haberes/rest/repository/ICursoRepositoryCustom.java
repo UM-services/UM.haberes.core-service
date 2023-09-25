@@ -3,9 +3,9 @@
  */
 package um.haberes.rest.repository;
 
-import java.util.List;
+import um.haberes.rest.kotlin.model.Curso;
 
-import um.haberes.rest.model.Curso;
+import java.util.List;
 
 /**
  * @author daniel
@@ -14,6 +14,6 @@ import um.haberes.rest.model.Curso;
 public interface ICursoRepositoryCustom {
 
 	public List<Curso> findAllByFacultadIdAndGeograficaIdAndConditions(Integer facultadId, Integer geograficaId,
-			List<String> conditions);
+																	   List<String> conditions);
 
 }

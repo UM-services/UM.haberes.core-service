@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.rest.exception.ClaseException;
-import um.haberes.rest.model.Clase;
+import um.haberes.rest.kotlin.model.Clase;
 import um.haberes.rest.service.ClaseService;
 
 /**
@@ -30,13 +30,13 @@ import um.haberes.rest.service.ClaseService;
 @RequestMapping(value = "/clase")
 public class ClaseController {
 
-	@Autowired
-	private ClaseService service;
+	private final ClaseService service;
 
-	/*
-	 * find
-	 *
-	 */
+	@Autowired
+	public ClaseController(ClaseService service) {
+		this.service = service;
+	}
+
 	@GetMapping("/")
 	public @ResponseBody ResponseEntity<List<Clase>> findAll() {
 		return new ResponseEntity<List<Clase>>(service.findAll(), HttpStatus.OK);
