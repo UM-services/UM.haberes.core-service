@@ -5,7 +5,6 @@ package um.haberes.rest.service;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -13,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import um.haberes.rest.kotlin.model.Contacto;
+import um.haberes.rest.kotlin.model.*;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -24,8 +23,8 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.ContactoException;
 import um.haberes.rest.exception.PersonaException;
-import um.haberes.rest.kotlin.model.Persona;
 import um.haberes.rest.kotlin.view.PersonaSearch;
+import um.haberes.rest.model.Categoria;
 import um.haberes.rest.repository.IPersonaRepository;
 import um.haberes.rest.service.facade.ToolService;
 import um.haberes.rest.service.view.PersonaSearchService;
@@ -41,33 +40,39 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PersonaService {
 
-	@Autowired
-	private IPersonaRepository repository;
+	private final IPersonaRepository repository;
+
+	private final PersonaSearchService personaSearchService;
+
+	private final LiquidacionService liquidacionService;
+
+	private final CategoriaService categoriaService;
+
+	private final CargoLiquidacionService cargoLiquidacionService;
+
+	private final CursoCargoService cursoCargoService;
+
+	private final ContactoService contactoService;
 
 	@Autowired
-	private PersonaSearchService personaSearchService;
-
-	@Autowired
-	private LiquidacionService liquidacionService;
-
-	@Autowired
-	private CategoriaService categoriaService;
-
-	@Autowired
-	private CargoLiquidacionService cargoLiquidacionService;
-
-	@Autowired
-	private CursoCargoService cursoCargoService;
-
-	@Autowired
-	private ContactoService contactoService;
+	public PersonaService(IPersonaRepository repository, PersonaSearchService personaSearchService, LiquidacionService liquidacionService,
+						  CategoriaService categoriaService, CargoLiquidacionService cargoLiquidacionService, CursoCargoService cursoCargoService,
+						  ContactoService contactoService) {
+		this.repository = repository;
+		this.personaSearchService = personaSearchService;
+		this.liquidacionService = liquidacionService;
+		this.categoriaService = categoriaService;
+		this.cargoLiquidacionService = cargoLiquidacionService;
+		this.cursoCargoService = cursoCargoService;
+		this.contactoService = contactoService;
+	}
 
 	public List<Persona> findAll() {
 		return repository.findAll();
 	}
 
 	public List<Persona> findAllDocente(Integer anho, Integer mes) {
-		List<Long> legajos = cursoCargoService.findAllByAnhoAndMes(anho, mes).stream().map(curso -> curso.getLegajoId())
+		List<Long> legajos = cursoCargoService.findAllByAnhoAndMes(anho, mes).stream().map(CursoCargo::getLegajoId)
 				.collect(Collectors.toList());
 		return repository.findAllByLegajoIdIn(legajos,
 				Sort.by("apellido").ascending().and(Sort.by("nombre").ascending()));
@@ -76,21 +81,21 @@ public class PersonaService {
 	public List<Persona> findAllNoDocente(Integer anho, Integer mes) {
 		// Categorias No Docentes
 		List<Integer> categoriaIds = categoriaService.findAllNoDocentes().stream()
-				.map(categoria -> categoria.getCategoriaId()).collect(Collectors.toList());
+				.map(Categoria::getCategoriaId).collect(Collectors.toList());
 		// Legajos Liquidados en el período
 		List<Long> ids = liquidacionService.findAllByPeriodo(anho, mes, 0).stream()
-				.map(liquidacion -> liquidacion.getLegajoId()).collect(Collectors.toList());
+				.map(Liquidacion::getLegajoId).collect(Collectors.toList());
 		// Legajos liquidados y acreditados con categorias no docentes
 		List<Long> legajoIds = cargoLiquidacionService
 				.findAllByLegajoIdInAndCategoriaIdInAndAnhoAndMes(ids, categoriaIds, anho, mes).stream()
-				.map(cargo -> cargo.getLegajoId()).collect(Collectors.toList());
+				.map(CargoLiquidacion::getLegajoId).collect(Collectors.toList());
 		// Personas con los legajos filtrados
 		return repository.findAllByLegajoIdIn(legajoIds, Sort.by("legajoId").ascending());
 	}
 
 	public List<Persona> findAllBySemestre(Integer anho, Integer semestre) {
 		List<Long> legajos = liquidacionService.findAllByAnhoAndMesBetween(anho, (semestre - 1) * 6 + 1, semestre * 6)
-				.stream().map(liquidacion -> liquidacion.getLegajoId()).collect(Collectors.toList());
+				.stream().map(Liquidacion::getLegajoId).collect(Collectors.toList());
 		return repository.findAllByLegajoIdIn(legajos, Sort.by("legajoId").ascending());
 	}
 
@@ -105,14 +110,14 @@ public class PersonaService {
 
 	public List<Persona> findAllByDesarraigo(Integer anho, Integer mes) {
 		List<Long> legajos = cursoCargoService.findAllByAnhoAndMesAndDesarraigo(anho, mes, (byte) 1).stream()
-				.map(curso -> curso.getLegajoId()).collect(Collectors.toList());
+				.map(CursoCargo::getLegajoId).collect(Collectors.toList());
 		return repository.findAllByLegajoIdIn(legajos,
 				Sort.by("apellido").ascending().and(Sort.by("nombre").ascending()));
 	}
 
 	public List<Persona> findAllByLiquidado(Integer anho, Integer mes) {
 		List<Long> legajos = liquidacionService.findAllByPeriodo(anho, mes, 0).stream()
-				.map(liquidacion -> liquidacion.getLegajoId()).collect(Collectors.toList());
+				.map(Liquidacion::getLegajoId).collect(Collectors.toList());
 		return repository.findAllByLegajoIdIn(legajos,
 				Sort.by("apellido").ascending().and(Sort.by("nombre").ascending()));
 	}
@@ -154,7 +159,7 @@ public class PersonaService {
 					newPersona.getEstado(), newPersona.getLiquida(), newPersona.getEstadoAfip(),
 					newPersona.getDependenciaId(), newPersona.getSalida(), newPersona.getObraSocial(),
 					newPersona.getActividadAfip(), newPersona.getLocalidadAfip(), newPersona.getSituacionAfip(),
-					newPersona.getModeloContratacionAfip(), newPersona.getDependencia());
+					newPersona.getModeloContratacionAfip(), newPersona.getDirectivoEtec(), newPersona.getDependencia());
 			repository.save(persona);
 			log.debug(persona.toString());
 			return persona;
@@ -169,19 +174,19 @@ public class PersonaService {
 	public List<Persona> upload(FileInfo fileinfo) {
 		File file = Tool.writeFile(fileinfo);
 		InputStream input;
-		List<Long> legajos = new ArrayList<Long>();
+		List<Long> legajos = new ArrayList<>();
 		try {
 			input = new FileInputStream(file);
 			Workbook workbook = new XSSFWorkbook(input);
 			Sheet sheet = workbook.getSheetAt(0);
-			Integer cols = sheet.getRow(0).getPhysicalNumberOfCells();
-			Integer rows = sheet.getLastRowNum() + 1;
+			int cols = sheet.getRow(0).getPhysicalNumberOfCells();
+			int rows = sheet.getLastRowNum() + 1;
 			log.debug("rows -> " + rows);
 			Row row = sheet.getRow(0);
 			Integer col_legajo_id = null;
 			Integer col_mail_personal = null;
 			Integer col_mail_institucional = null;
-			for (Integer col = 0; col < cols; col++) {
+			for (int col = 0; col < cols; col++) {
 				if (row.getCell(col).getStringCellValue().equals("legajo_id"))
 					col_legajo_id = col;
 				if (row.getCell(col).getStringCellValue().equals("mail_personal"))
@@ -189,12 +194,12 @@ public class PersonaService {
 				if (row.getCell(col).getStringCellValue().equals("mail_institucional"))
 					col_mail_institucional = col;
 			}
-			List<Contacto> contactos = new ArrayList<Contacto>();
-			for (Integer row_number = 1; row_number < rows; row_number++) {
+			List<Contacto> contactos = new ArrayList<>();
+			for (int row_number = 1; row_number < rows; row_number++) {
 				row = sheet.getRow(row_number);
 				if (col_legajo_id != null) {
 					if (row.getCell(col_legajo_id) != null) {
-						Boolean news = false;
+						boolean news = false;
 						Long legajoId = Double.valueOf(row.getCell(col_legajo_id).getNumericCellValue()).longValue();
 						if (legajoId > 0) {
 							Contacto contacto = null;
@@ -222,7 +227,7 @@ public class PersonaService {
 								}
 							if (news) {
 								contactos.add(contacto);
-								log.debug("Contacto -> " + contacto.toString());
+								log.debug("Contacto -> " + contacto);
 								legajos.add(legajoId);
 							}
 						}
@@ -233,8 +238,6 @@ public class PersonaService {
 			workbook.close();
 			input.close();
 			file.delete();
-		} catch (FileNotFoundException e) {
-			log.debug(e.getMessage());
 		} catch (IOException e) {
 			log.debug(e.getMessage());
 		}

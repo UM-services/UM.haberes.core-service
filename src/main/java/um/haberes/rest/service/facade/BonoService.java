@@ -3,7 +3,6 @@
  */
 package um.haberes.rest.service.facade;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -183,13 +182,13 @@ public class BonoService {
     }
 
     private void mergePdf(String filename, List<String> filenames) throws IOException {
-        OutputStream outputStream = new FileOutputStream(new File(filename));
+        OutputStream outputStream = new FileOutputStream(filename);
         Document document = new Document();
         PdfWriter pdfWriter = PdfWriter.getInstance(document, outputStream);
         document.open();
         PdfContentByte pdfContentByte = pdfWriter.getDirectContent();
         for (String name : filenames) {
-            PdfReader pdfReader = new PdfReader(new FileInputStream(new File(name)));
+            PdfReader pdfReader = new PdfReader(new FileInputStream(name));
             for (int pagina = 0; pagina < pdfReader.getNumberOfPages(); ) {
                 document.newPage();
                 PdfImportedPage page = pdfWriter.getImportedPage(pdfReader, ++pagina);
@@ -286,7 +285,7 @@ public class BonoService {
             BigDecimal presentismoETEC = BigDecimal.ZERO;
             BigDecimal antiguedadETEC = BigDecimal.ZERO;
             BigDecimal adicionalETEC = BigDecimal.ZERO;
-            if (items.containsKey(29)) {
+            if (items.containsKey(29) && persona.getDirectivoEtec() == 0) {
                 item = items.get(29);
                 BigDecimal totalETEC = item.getImporte();
                 for (CursoCargo cursoCargo : cursoCargoService.findAllByLegajoAndNivel(legajoId, anho, mes, const_Nivel_Secundario)) {
@@ -355,7 +354,7 @@ public class BonoService {
             document.add(paragraph);
             // Cursos
             List<CursoCargo> cursos = cursoCargoService.findAllByLegajo(legajoId, anho, mes);
-            if (cursos.size() > 0) {
+            if (!cursos.isEmpty()) {
                 float[] columnCurso = {4, 24, 1.5f, 1.5f, 1.5f, 1.5f, 1.5f};
                 PdfPTable tableCurso = new PdfPTable(columnCurso);
                 tableCurso.setWidthPercentage(90);
@@ -612,7 +611,7 @@ public class BonoService {
             }
             // Cargos con Clase
             List<CargoClaseDetalle> clases = cargoClaseDetalleService.findAllByLegajo(legajoId, anho, mes);
-            if (clases.size() > 0) {
+            if (!clases.isEmpty()) {
                 paragraph = new Paragraph("Actividad Académica", new Font(Font.HELVETICA, 8, Font.BOLD));
                 paragraph.setAlignment(Element.ALIGN_CENTER);
                 paragraph.setMultipliedLeading(2f);
@@ -719,7 +718,7 @@ public class BonoService {
             for (CodigoGrupo codigoGrupo : codigoGrupoService.findAllByRemunerativo((byte) 1)) {
                 if (items.containsKey(codigoGrupo.getCodigoId())) {
                     item = items.get(codigoGrupo.getCodigoId());
-                    if (item.getCodigoId() == 29) {
+                    if (item.getCodigoId() == 29 && persona.getDirectivoEtec() == 0) {
                         // basico ETEC
                         cell = new PdfPCell(
                                 new Paragraph(codigoGrupo.getCodigoId().toString(), new Font(Font.HELVETICA, 8)));

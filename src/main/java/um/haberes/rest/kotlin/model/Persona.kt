@@ -45,6 +45,7 @@ data class Persona(
     var localidadAfip: Int? = null,
     var situacionAfip: Int? = null,
     var modeloContratacionAfip: Int? = null,
+    var directivoEtec: Byte = 0,
 
     @OneToOne(optional = true)
     @JoinColumn(name = "dependenciaId", insertable = false, updatable = false)
