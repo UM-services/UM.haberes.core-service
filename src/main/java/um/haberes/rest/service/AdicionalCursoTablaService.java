@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.AdicionalCursoTablaNotFoundException;
-import um.haberes.rest.model.AdicionalCursoTabla;
+import um.haberes.rest.kotlin.model.AdicionalCursoTabla;
 import um.haberes.rest.repository.IAdicionalCursoTablaRepository;
 import um.haberes.rest.util.Periodo;
 

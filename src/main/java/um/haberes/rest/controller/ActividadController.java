@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.rest.exception.ActividadException;
+import um.haberes.rest.kotlin.model.Actividad;
 import um.haberes.rest.kotlin.view.ActividadPeriodo;
-import um.haberes.rest.model.Actividad;
 import um.haberes.rest.service.ActividadService;
 
 /**

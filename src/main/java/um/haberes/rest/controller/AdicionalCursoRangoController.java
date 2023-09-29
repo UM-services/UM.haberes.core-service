@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.rest.exception.AdicionalCursoRangoNotFoundException;
-import um.haberes.rest.model.AdicionalCursoRango;
+import um.haberes.rest.kotlin.model.AdicionalCursoRango;
 import um.haberes.rest.service.AdicionalCursoRangoService;
 
 /**
@@ -35,14 +35,14 @@ public class AdicionalCursoRangoController {
 	@GetMapping("/tabla/{adicionalCursoTablaId}")
 	public ResponseEntity<List<AdicionalCursoRango>> findAllByAdicionalCursoTabla(
 			@PathVariable Long adicionalCursoTablaId) {
-		return new ResponseEntity<List<AdicionalCursoRango>>(
+		return new ResponseEntity<>(
 				service.findAllByAdicionalCursoTabla(adicionalCursoTablaId), HttpStatus.OK);
 	}
 
 	@GetMapping("/{adicionalCursoRangoId}")
 	public ResponseEntity<AdicionalCursoRango> findByAdicionalCursoRangoId(@PathVariable Long adicionalCursoRangoId) {
 		try {
-			return new ResponseEntity<AdicionalCursoRango>(service.findByAdicionalCursoRangoId(adicionalCursoRangoId),
+			return new ResponseEntity<>(service.findByAdicionalCursoRangoId(adicionalCursoRangoId),
 					HttpStatus.OK);
 		} catch (AdicionalCursoRangoNotFoundException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -51,7 +51,7 @@ public class AdicionalCursoRangoController {
 
 	@PostMapping("/")
 	public ResponseEntity<AdicionalCursoRango> add(@RequestBody AdicionalCursoRango adicionalCursoRango) {
-		return new ResponseEntity<AdicionalCursoRango>(service.add(adicionalCursoRango), HttpStatus.OK);
+		return new ResponseEntity<>(service.add(adicionalCursoRango), HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{adicionalCursoRangoId}")

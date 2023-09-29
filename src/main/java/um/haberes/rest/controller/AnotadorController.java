@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.rest.exception.AnotadorNotFoundException;
-import um.haberes.rest.model.Anotador;
+import um.haberes.rest.kotlin.model.Anotador;
 import um.haberes.rest.service.AnotadorService;
 
 /**
@@ -34,7 +34,7 @@ public class AnotadorController {
 
 	@GetMapping("/legajo/{legajoId}")
 	public ResponseEntity<List<Anotador>> findAllByLegajo(@PathVariable Long legajoId) {
-		return new ResponseEntity<List<Anotador>>(service.findAllByLegajo(legajoId), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllByLegajo(legajoId), HttpStatus.OK);
 	}
 
 	@GetMapping("/pendiente/{anho}/{mes}")

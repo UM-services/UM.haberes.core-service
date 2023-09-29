@@ -800,7 +800,7 @@ public class MakeLiquidacionService {
             }
         }
         Item item = items.get(codigoId);
-        item.setImporte(item.getImporte().add(value).setScale(2, RoundingMode.HALF_UP));
+        item.setImporte(value.setScale(2, RoundingMode.HALF_UP));
     }
 
     private Map<Integer, BigDecimal> calculateTotalDependenciaFusionado(Long legajoId, Integer anho, Integer mes) {

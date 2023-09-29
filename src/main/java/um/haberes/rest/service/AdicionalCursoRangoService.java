@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.AdicionalCursoRangoNotFoundException;
-import um.haberes.rest.model.AdicionalCursoRango;
+import um.haberes.rest.kotlin.model.AdicionalCursoRango;
 import um.haberes.rest.repository.IAdicionalCursoRangoRepository;
 
 /**

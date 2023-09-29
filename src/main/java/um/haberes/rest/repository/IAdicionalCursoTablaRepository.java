@@ -7,8 +7,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import um.haberes.rest.model.AdicionalCursoTabla;
+import um.haberes.rest.kotlin.model.AdicionalCursoTabla;
 
 /**
  * @author daniel

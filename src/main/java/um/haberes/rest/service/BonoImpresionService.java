@@ -6,7 +6,7 @@ package um.haberes.rest.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.model.BonoImpresion;
+import um.haberes.rest.kotlin.model.BonoImpresion;
 import um.haberes.rest.repository.IBonoImpresionRepository;
 import um.haberes.rest.util.Tool;
 

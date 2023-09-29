@@ -54,7 +54,6 @@ import um.haberes.rest.exception.ContactoException;
 import um.haberes.rest.exception.LegajoBancoException;
 import um.haberes.rest.exception.LegajoControlException;
 import um.haberes.rest.exception.LetraException;
-import um.haberes.rest.model.BonoImpresion;
 import um.haberes.rest.model.CargoClaseDetalle;
 import um.haberes.rest.model.LegajoBanco;
 import um.haberes.rest.model.LegajoControl;

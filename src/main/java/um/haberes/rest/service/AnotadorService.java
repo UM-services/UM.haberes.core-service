@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.AnotadorNotFoundException;
-import um.haberes.rest.model.Anotador;
+import um.haberes.rest.kotlin.model.Anotador;
 import um.haberes.rest.repository.IAnotadorRepository;
 import lombok.extern.slf4j.Slf4j;
 
