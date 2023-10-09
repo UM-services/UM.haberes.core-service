@@ -30,8 +30,12 @@ import um.haberes.rest.service.ItemService;
 @RequestMapping("/item")
 public class ItemController {
 
+	private final ItemService service;
+
 	@Autowired
-	private ItemService service;
+	public ItemController(ItemService service) {
+		this.service = service;
+	}
 
 	@GetMapping("/legajo/{legajoId}/{anho}/{mes}")
 	public ResponseEntity<List<Item>> findAllByLegajo(@PathVariable Long legajoId, @PathVariable Integer anho, @PathVariable Integer mes) {

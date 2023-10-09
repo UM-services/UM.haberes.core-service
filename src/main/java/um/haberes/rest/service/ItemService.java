@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.ItemException;
+import um.haberes.rest.kotlin.model.CodigoGrupo;
 import um.haberes.rest.kotlin.model.Item;
 import um.haberes.rest.model.ItemVersion;
 import um.haberes.rest.repository.IItemRepository;
@@ -32,14 +33,18 @@ import um.haberes.rest.repository.IItemVersionRepository;
 @Slf4j
 public class ItemService {
 
-    @Autowired
-    private IItemRepository repository;
+    private final IItemRepository repository;
+
+    private final IItemVersionRepository itemVersionRepository;
+
+    private final CodigoGrupoService codigoGrupoService;
 
     @Autowired
-    private IItemVersionRepository itemVersionRepository;
-
-    @Autowired
-    private CodigoGrupoService codigoGrupoService;
+    public ItemService(IItemRepository repository, IItemVersionRepository itemVersionRepository, CodigoGrupoService codigoGrupoService) {
+        this.repository = repository;
+        this.itemVersionRepository = itemVersionRepository;
+        this.codigoGrupoService = codigoGrupoService;
+    }
 
     public List<Item> findAllByCodigo(Integer codigoId, Integer anho, Integer mes) {
         return repository.findAllByCodigoIdAndAnhoAndMes(codigoId, anho, mes);
@@ -110,7 +115,7 @@ public class ItemService {
 
     @Transactional
     public List<Item> saveAll(List<Item> items) {
-        List<ItemVersion> itemVersions = new ArrayList<ItemVersion>();
+        List<ItemVersion> itemVersions = new ArrayList<>();
         for (Item item : items) {
             ItemVersion itemVersion = new ItemVersion(null, item.getLegajoId(), item.getAnho(), item.getMes(),
                     item.getCodigoId(), item.getCodigoNombre(), item.getImporte());
@@ -123,13 +128,12 @@ public class ItemService {
 
     public Boolean onlyETEC(Long legajoId, Integer anho, Integer mes) {
         AtomicBoolean result = new AtomicBoolean(true);
-        List<Integer> codigoIds = codigoGrupoService.findAllByRemunerativo((byte) 1).stream().map(codigo -> codigo.getCodigoId()).collect(Collectors.toList());
+        List<Integer> codigoIds = codigoGrupoService.findAllByRemunerativo((byte) 1).stream().map(CodigoGrupo::getCodigoId).collect(Collectors.toList());
         log.debug(codigoIds.toString());
-        List<Item> items = repository.findAllByLegajoIdAndAnhoAndMesAndCodigoIdIn(legajoId, anho, mes, codigoIds).stream().map(item -> {
+        List<Item> items = repository.findAllByLegajoIdAndAnhoAndMesAndCodigoIdIn(legajoId, anho, mes, codigoIds).stream().peek(item -> {
             if (item.getCodigo().getIncluidoEtec() == 0) {
                 result.set(false);
             }
-            return item;
         }).collect(Collectors.toList());
         try {
             log.debug("Items -> {}", JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(items));
