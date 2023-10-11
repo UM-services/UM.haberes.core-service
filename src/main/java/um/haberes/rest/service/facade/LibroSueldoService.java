@@ -39,7 +39,7 @@ public class LibroSueldoService {
 
     private final ItemService itemService;
 
-    private final LegajoControlService legajoControlService
+    private final LegajoControlService legajoControlService;
 
     @Autowired
     public LibroSueldoService(Environment environment, LiquidacionService liquidacionService, LegajoBancoService legajoBancoService,
