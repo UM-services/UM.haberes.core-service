@@ -8,7 +8,8 @@ import java.math.BigDecimal
 @Table(uniqueConstraints = [UniqueConstraint(columnNames = ["legajoId", "anho", "mes", "codigoId"])])
 data class Item(
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var itemId: Long? = null,
     var legajoId: Long? = null,
     var anho: Int = 0,
@@ -17,13 +18,13 @@ data class Item(
     var codigoNombre: String = "",
     var importe: BigDecimal = BigDecimal.ZERO,
 
-    @OneToOne
+    @OneToOne(optional = true)
     @JoinColumn(name = "legajoId", insertable = false, updatable = false)
     var persona: Persona? = null,
 
-    @OneToOne
+    @OneToOne(optional = true)
     @JoinColumn(name = "codigoId", insertable = false, updatable = false)
-    var codigo: Codigo? = null
+    var codigo: Codigo? = null,
 
 ) : Auditable() {
     fun legajoKey(): String {

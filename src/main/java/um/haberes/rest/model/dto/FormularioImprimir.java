@@ -7,10 +7,10 @@ import java.io.Serializable;
 import java.util.List;
 
 import um.haberes.rest.kotlin.model.Contacto;
-import um.haberes.rest.model.LegajoControl;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import um.haberes.rest.kotlin.model.LegajoControl;
 
 /**
  * @author daniel

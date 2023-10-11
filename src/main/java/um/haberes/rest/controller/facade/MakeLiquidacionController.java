@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import um.haberes.rest.kotlin.model.Item;
 import um.haberes.rest.service.facade.MakeLiquidacionService;
+import um.haberes.rest.util.Tool;
 
 /**
  * @author daniel
@@ -88,16 +89,7 @@ public class MakeLiquidacionController {
     @GetMapping("/generateSIJP/{anho}/{mes}")
     public ResponseEntity<Resource> generateSIJP(@PathVariable Integer anho, @PathVariable Integer mes)
             throws IOException {
-        String filename = service.generateSIJP(anho, mes);
-        File file = new File(filename);
-        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=sijp.txt");
-        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-        headers.add("Pragma", "no-cache");
-        headers.add("Expires", "0");
-        return ResponseEntity.ok().headers(headers).contentLength(file.length())
-                .contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
+        return Tool.generateFile(service.generateSIJP(anho, mes), "sijp.txt");
     }
 
 }

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package um.haberes.rest.repository;
 
@@ -20,38 +20,40 @@ import um.haberes.rest.kotlin.model.Liquidacion;
 @Repository
 public interface ILiquidacionRepository extends JpaRepository<Liquidacion, Long> {
 
-	public List<Liquidacion> findAllByAnhoAndMesOrderByLegajoId(Integer anho, Integer mes, Pageable pageable);
+    List<Liquidacion> findAllByAnhoAndMesOrderByLegajoId(Integer anho, Integer mes, Pageable pageable);
 
-	public List<Liquidacion> findAllByAnhoAndMesAndLegajoId(Integer anho, Integer mes, Long legajoId,
-			Pageable pageable);
+    List<Liquidacion> findAllByAnhoAndMesAndLegajoId(Integer anho, Integer mes, Long legajoId,
+                                                     Pageable pageable);
 
-	public List<Liquidacion> findAllByAnhoAndMesBetweenOrderByLegajoId(Integer anho, Integer mesDesde,
-			Integer mesHasta, Pageable pageable);
+    List<Liquidacion> findAllByAnhoAndMesAndLegajoIdIn(Integer anho, Integer mes, List<Long> legajoIds);
 
-	public List<Liquidacion> findAllByAnhoAndMesBetweenAndLegajoId(Integer anho, Integer mesDesde, Integer mesHasta,
-			Long legajoId, Pageable pageable);
+    List<Liquidacion> findAllByAnhoAndMesBetweenOrderByLegajoId(Integer anho, Integer mesDesde,
+                                                                Integer mesHasta, Pageable pageable);
 
-	public List<Liquidacion> findAllByAnhoAndMesBetween(Integer anho, Integer mesDesde, Integer mesHasta);
+    List<Liquidacion> findAllByAnhoAndMesBetweenAndLegajoId(Integer anho, Integer mesDesde, Integer mesHasta,
+                                                            Long legajoId, Pageable pageable);
 
-	public List<Liquidacion> findAllByLegajoIdInAndAnhoAndMes(List<Long> legajoIds, Integer anho, Integer mes);
+    List<Liquidacion> findAllByAnhoAndMesBetween(Integer anho, Integer mesDesde, Integer mesHasta);
 
-	public List<Liquidacion> findAllByLegajoId(Long legajoId, Sort sort);
+    List<Liquidacion> findAllByLegajoIdInAndAnhoAndMes(List<Long> legajoIds, Integer anho, Integer mes);
 
-	public List<Liquidacion> findAllByDependenciaIdAndAnhoAndMesAndSalida(Integer dependenciaId, Integer anho,
-			Integer mes, String salida, Sort sort);
+    List<Liquidacion> findAllByLegajoId(Long legajoId, Sort sort);
 
-	public List<Liquidacion> findAllByAnhoAndMesAndFechaAcreditacionNotNull(Integer anho, Integer mes, Sort sort);
+    List<Liquidacion> findAllByDependenciaIdAndAnhoAndMesAndSalida(Integer dependenciaId, Integer anho,
+                                                                   Integer mes, String salida, Sort sort);
 
-	public List<Liquidacion> findAllByAnhoAndMesAndFechaAcreditacionNotNullAndLegajoIdIn(Integer anho, Integer mes, List<Long> legajoIds, Sort and);
+    List<Liquidacion> findAllByAnhoAndMesAndFechaAcreditacionNotNull(Integer anho, Integer mes, Sort sort);
 
-	public Optional<Liquidacion> findByLiquidacionId(Long liquidacionId);
+    List<Liquidacion> findAllByAnhoAndMesAndFechaAcreditacionNotNullAndLegajoIdIn(Integer anho, Integer mes, List<Long> legajoIds, Sort and);
 
-	public Optional<Liquidacion> findByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
+    Optional<Liquidacion> findByLiquidacionId(Long liquidacionId);
 
-	@Modifying
-	public void deleteAllByAnhoAndMes(Integer anho, Integer mes);
+    Optional<Liquidacion> findByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
 
-	@Modifying
-	public void deleteByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
+    @Modifying
+    void deleteAllByAnhoAndMes(Integer anho, Integer mes);
+
+    @Modifying
+    void deleteByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
 
 }

@@ -11,7 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.LegajoControlException;
-import um.haberes.rest.model.LegajoControl;
+import um.haberes.rest.kotlin.model.LegajoControl;
 import um.haberes.rest.repository.ILegajoControlRepository;
 import lombok.extern.slf4j.Slf4j;
 

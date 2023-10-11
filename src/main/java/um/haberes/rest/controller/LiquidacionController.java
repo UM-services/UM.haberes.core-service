@@ -34,64 +34,68 @@ import um.haberes.rest.service.LiquidacionService;
 @RequestMapping("/liquidacion")
 public class LiquidacionController {
 
+	private final LiquidacionService service;
+
 	@Autowired
-	private LiquidacionService service;
+	public LiquidacionController(LiquidacionService service) {
+		this.service = service;
+	}
 
 	@GetMapping("/periodo/{anho}/{mes}/{limit}")
 	public ResponseEntity<List<Liquidacion>> findAllByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes,
 															  @PathVariable Integer limit) {
-		return new ResponseEntity<List<Liquidacion>>(service.findAllByPeriodo(anho, mes, limit), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllByPeriodo(anho, mes, limit), HttpStatus.OK);
 	}
 
 	@GetMapping("/periodolegajo/{anho}/{mes}/{legajoId}/{limit}")
 	public ResponseEntity<List<Liquidacion>> findAllByPeriodoLegajo(@PathVariable Integer anho,
 			@PathVariable Integer mes, @PathVariable Long legajoId, @PathVariable Integer limit) {
-		return new ResponseEntity<List<Liquidacion>>(service.findAllByPeriodoLegajo(anho, mes, legajoId, limit),
+		return new ResponseEntity<>(service.findAllByPeriodoLegajo(anho, mes, legajoId, limit),
 				HttpStatus.OK);
 	}
 
 	@GetMapping("/semestre/{anho}/{semestre}/{limit}")
 	public ResponseEntity<List<Liquidacion>> findAllBySemestre(@PathVariable Integer anho,
 			@PathVariable Integer semestre, @PathVariable Integer limit) {
-		return new ResponseEntity<List<Liquidacion>>(service.findAllBySemestre(anho, semestre, limit), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllBySemestre(anho, semestre, limit), HttpStatus.OK);
 	}
 
-	@GetMapping("/semestrelegajo/{anho}/{mes}/{legajoId}/{limit}")
+	@GetMapping("/semestrelegajo/{anho}/{semestre}/{legajoId}/{limit}")
 	public ResponseEntity<List<Liquidacion>> findAllBySemestreLegajo(@PathVariable Integer anho,
 			@PathVariable Integer semestre, @PathVariable Long legajoId, @PathVariable Integer limit) {
-		return new ResponseEntity<List<Liquidacion>>(service.findAllBySemestreLegajo(anho, semestre, legajoId, limit),
+		return new ResponseEntity<>(service.findAllBySemestreLegajo(anho, semestre, legajoId, limit),
 				HttpStatus.OK);
 	}
 
 	@GetMapping("/legajo/{legajoId}")
 	public ResponseEntity<List<Liquidacion>> findAllByLegajo(@PathVariable Long legajoId) {
-		return new ResponseEntity<List<Liquidacion>>(service.findAllByLegajo(legajoId), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllByLegajo(legajoId), HttpStatus.OK);
 	}
 
 	@GetMapping("/legajoforward/{legajoId}/{anho}/{mes}")
 	public ResponseEntity<List<LiquidacionPeriodo>> findAllByLegajoForward(@PathVariable Long legajoId,
                                                                            @PathVariable Integer anho, @PathVariable Integer mes) {
-		return new ResponseEntity<List<LiquidacionPeriodo>>(service.findAllByLegajoForward(legajoId, anho, mes),
+		return new ResponseEntity<>(service.findAllByLegajoForward(legajoId, anho, mes),
 				HttpStatus.OK);
 	}
 
 	@GetMapping("/dependencia/{dependenciaId}/{anho}/{mes}/{salida}")
 	public ResponseEntity<List<Liquidacion>> findAllByDependencia(@PathVariable Integer dependenciaId,
 			@PathVariable Integer anho, @PathVariable Integer mes, @PathVariable String salida) {
-		return new ResponseEntity<List<Liquidacion>>(service.findAllByDependencia(dependenciaId, anho, mes, salida),
+		return new ResponseEntity<>(service.findAllByDependencia(dependenciaId, anho, mes, salida),
 				HttpStatus.OK);
 	}
 
 	@GetMapping("/acreditado/{anho}/{mes}")
 	public ResponseEntity<List<Liquidacion>> findAllByAcreditado(@PathVariable Integer anho,
 			@PathVariable Integer mes) {
-		return new ResponseEntity<List<Liquidacion>>(service.findAllByAcreditado(anho, mes), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllByAcreditado(anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/{liquidacionId}")
 	public ResponseEntity<Liquidacion> findByLiquidacionId(@PathVariable Long liquidacionId) {
 		try {
-			return new ResponseEntity<Liquidacion>(service.findByLiquidacionId(liquidacionId), HttpStatus.OK);
+			return new ResponseEntity<>(service.findByLiquidacionId(liquidacionId), HttpStatus.OK);
 		} catch (LiquidacionException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
@@ -101,7 +105,7 @@ public class LiquidacionController {
 	public ResponseEntity<Liquidacion> findByUnique(@PathVariable Long legajoId, @PathVariable Integer anho,
 			@PathVariable Integer mes) {
 		try {
-			return new ResponseEntity<Liquidacion>(service.findByLegajoIdAndAnhoAndMes(legajoId, anho, mes),
+			return new ResponseEntity<>(service.findByLegajoIdAndAnhoAndMes(legajoId, anho, mes),
 					HttpStatus.OK);
 		} catch (LiquidacionException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -110,42 +114,42 @@ public class LiquidacionController {
 
 	@PostMapping("/")
 	public ResponseEntity<Liquidacion> add(@RequestBody Liquidacion liquidacion) {
-		return new ResponseEntity<Liquidacion>(service.add(liquidacion), HttpStatus.OK);
+		return new ResponseEntity<>(service.add(liquidacion), HttpStatus.OK);
 	}
 
 	@PostMapping("/version/{version}")
 	public ResponseEntity<Liquidacion> addVersion(@RequestBody Liquidacion liquidacion, @PathVariable Integer version) {
-		return new ResponseEntity<Liquidacion>(service.addVersion(liquidacion, version), HttpStatus.OK);
+		return new ResponseEntity<>(service.addVersion(liquidacion, version), HttpStatus.OK);
 	}
 
 	@PostMapping("/acreditado/{fecha}")
 	public ResponseEntity<Liquidacion> acreditado(@RequestBody Liquidacion liquidacion,
 			@PathVariable @DateTimeFormat(iso = ISO.DATE_TIME) OffsetDateTime fecha) {
-		return new ResponseEntity<Liquidacion>(service.acreditado(liquidacion, fecha), HttpStatus.OK);
+		return new ResponseEntity<>(service.acreditado(liquidacion, fecha), HttpStatus.OK);
 	}
 
 	@PutMapping("/{liquidacionId}")
 	public ResponseEntity<Liquidacion> update(@RequestBody Liquidacion liquidacion, @PathVariable Long liquidacionId) {
-		return new ResponseEntity<Liquidacion>(service.update(liquidacion, liquidacionId), HttpStatus.OK);
+		return new ResponseEntity<>(service.update(liquidacion, liquidacionId), HttpStatus.OK);
 	}
 
 	@PutMapping("/saveall/{version}")
 	public ResponseEntity<List<Liquidacion>> saveall(@RequestBody List<Liquidacion> liquidaciones,
 			@PathVariable Integer version) {
-		return new ResponseEntity<List<Liquidacion>>(service.saveall(liquidaciones, version), HttpStatus.OK);
+		return new ResponseEntity<>(service.saveall(liquidaciones, version), HttpStatus.OK);
 	}
 
 	@PutMapping("/version/{liquidacionId}/{version}")
 	public ResponseEntity<Liquidacion> updateVersion(@RequestBody Liquidacion liquidacion,
 			@PathVariable Long liquidacionId, @PathVariable Integer version) {
-		return new ResponseEntity<Liquidacion>(service.updateVersion(liquidacion, liquidacionId, version),
+		return new ResponseEntity<>(service.updateVersion(liquidacion, liquidacionId, version),
 				HttpStatus.OK);
 	}
 
 	@DeleteMapping("/periodo/{anho}/{mes}")
 	public ResponseEntity<Void> deleteByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes) {
 		service.deleteByPeriodo(anho, mes);
-		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 }

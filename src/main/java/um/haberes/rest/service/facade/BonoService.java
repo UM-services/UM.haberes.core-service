@@ -56,7 +56,6 @@ import um.haberes.rest.exception.LegajoControlException;
 import um.haberes.rest.exception.LetraException;
 import um.haberes.rest.model.CargoClaseDetalle;
 import um.haberes.rest.model.LegajoBanco;
-import um.haberes.rest.model.LegajoControl;
 import um.haberes.rest.model.Letra;
 import um.haberes.rest.service.AntiguedadService;
 import um.haberes.rest.service.BonoImpresionService;

@@ -29,7 +29,6 @@ import um.haberes.rest.model.Designacion;
 import um.haberes.rest.model.DesignacionTipo;
 import um.haberes.rest.model.Facultad;
 import um.haberes.rest.model.Geografica;
-import um.haberes.rest.model.LegajoControl;
 import um.haberes.rest.service.AntiguedadLimiteService;
 import um.haberes.rest.service.AntiguedadService;
 import um.haberes.rest.service.CursoCargoService;
