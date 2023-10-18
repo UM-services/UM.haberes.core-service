@@ -1540,7 +1540,7 @@ public class SheetService {
             // Calcula los items remunerativos liquidados excepto basico y antiguedad
             codigoIdRemunerativos = codigoIdRemunerativos.stream().filter(codigoId -> codigoId > 2).collect(Collectors.toList());
             BigDecimal totalRemunerativosLiquidacion = BigDecimal.ZERO;
-            for (Item item : itemService.findAllCodigosByLegajo(liquidacion.getLegajoId(), anho, mes, codigoIdRemunerativos)) {
+            for (Item item : itemService.findAllCodigoIdsByLegajo(liquidacion.getLegajoId(), anho, mes, codigoIdRemunerativos)) {
                 totalRemunerativosLiquidacion = totalRemunerativosLiquidacion.add(item.getImporte()).setScale(2, RoundingMode.HALF_UP);
             }
 
@@ -1551,7 +1551,7 @@ public class SheetService {
 
             // Calcula los items no remunerativos liquidados
             BigDecimal totalNoRemunerativosLiquidacion = BigDecimal.ZERO;
-            for (Item item : itemService.findAllCodigosByLegajo(liquidacion.getLegajoId(), anho, mes, codigoIdNoRemunerativos)) {
+            for (Item item : itemService.findAllCodigoIdsByLegajo(liquidacion.getLegajoId(), anho, mes, codigoIdNoRemunerativos)) {
                 totalNoRemunerativosLiquidacion = totalNoRemunerativosLiquidacion.add(item.getImporte()).setScale(2, RoundingMode.HALF_UP);
             }
 

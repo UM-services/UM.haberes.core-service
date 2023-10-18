@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package um.haberes.rest.repository;
 
@@ -20,21 +20,23 @@ import um.haberes.rest.model.Novedad;
 @Repository
 public interface INovedadRepository extends JpaRepository<Novedad, Long> {
 
-	public List<Novedad> findAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
+    List<Novedad> findAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
 
-	public List<Novedad> findAllByCodigoIdAndAnhoAndMes(Integer codigoId, Integer anho, Integer mes, Sort sort);
+    List<Novedad> findAllByCodigoIdAndAnhoAndMes(Integer codigoId, Integer anho, Integer mes, Sort sort);
 
-	public List<Novedad> findAllByImportadoAndAnhoAndMes(Byte importado, Integer anho, Integer mes);
+    List<Novedad> findAllByImportadoAndAnhoAndMes(Byte importado, Integer anho, Integer mes);
 
-	public List<Novedad> findAllByLegajoIdAndAnhoAndMesAndCodigoId(Long legajoId, Integer anho, Integer mes,
-			Integer codigoId);
+    List<Novedad> findAllByLegajoIdAndAnhoAndMesAndCodigoId(Long legajoId, Integer anho, Integer mes,
+                                                            Integer codigoId);
 
-	public Optional<Novedad> findByNovedadId(Long novedadId);
+    Optional<Novedad> findByNovedadId(Long novedadId);
 
-	public Optional<Novedad> findByLegajoIdAndAnhoAndMesAndCodigoIdAndDependenciaId(Long legajoId, Integer anho,
-			Integer mes, Integer codigoId, Integer dependenciaId);
+    Optional<Novedad> findByLegajoIdAndAnhoAndMesAndCodigoIdAndDependenciaId(Long legajoId, Integer anho,
+                                                                             Integer mes, Integer codigoId, Integer dependenciaId);
 
-	@Modifying
-	public void deleteAllByAnhoAndMes(Integer anho, Integer mes);
+    Optional<Novedad> findByLegajoIdAndAnhoAndMesAndCodigoIdAndDependenciaIdIsNull(Long legajoId, Integer anho, Integer mes, Integer codigoId);
+
+    @Modifying
+    public void deleteAllByAnhoAndMes(Integer anho, Integer mes);
 
 }

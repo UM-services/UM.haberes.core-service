@@ -66,7 +66,7 @@ public class ItemService {
         return repository.findAllByAnhoAndMesAndCodigoIdAndImporteGreaterThan(anho, mes, 99, BigDecimal.ZERO);
     }
 
-    public List<Item> findAllCodigosByLegajo(Long legajoId, Integer anho, Integer mes, List<Integer> codigoIds) {
+    public List<Item> findAllCodigoIdsByLegajo(Long legajoId, Integer anho, Integer mes, List<Integer> codigoIds) {
         return repository.findAllByLegajoIdAndAnhoAndMesAndCodigoIdIn(legajoId, anho, mes, codigoIds);
     }
 

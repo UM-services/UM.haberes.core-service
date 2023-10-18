@@ -4,12 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import um.haberes.rest.kotlin.internal.AfipContext;
 import um.haberes.rest.kotlin.model.Control;
 import um.haberes.rest.kotlin.model.Item;
 import um.haberes.rest.kotlin.model.LegajoControl;
 import um.haberes.rest.kotlin.model.Liquidacion;
 import um.haberes.rest.model.LegajoBanco;
 import um.haberes.rest.service.*;
+import um.haberes.rest.service.internal.AfipContextService;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -25,7 +27,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class LibroSueldoService {
 
-    private List<Liquidacion> empleados;
+    private List<Liquidacion> empleadosLiquidados;
+
+    Map<Long, LegajoControl> legajoControls;
 
     private Control control;
 
@@ -41,15 +45,19 @@ public class LibroSueldoService {
 
     private final LegajoControlService legajoControlService;
 
+    private final AfipContextService afipContextService;
+
     @Autowired
     public LibroSueldoService(Environment environment, LiquidacionService liquidacionService, LegajoBancoService legajoBancoService,
-                              ControlService controlService, ItemService itemService, LegajoControlService legajoControlService) {
+                              ControlService controlService, ItemService itemService, LegajoControlService legajoControlService,
+                              AfipContextService afipContextService) {
         this.environment = environment;
         this.liquidacionService = liquidacionService;
         this.legajoBancoservice = legajoBancoService;
         this.controlService = controlService;
         this.itemService = itemService;
         this.legajoControlService = legajoControlService;
+        this.afipContextService = afipContextService;
     }
 
     public String generate(Integer anho, Integer mes) throws IOException {
@@ -58,8 +66,15 @@ public class LibroSueldoService {
         log.debug("Filename={}", filename);
 
         // pull empleados liquidados
+        this.legajoControls = legajoControlService.findAllByPeriodo(anho, mes).stream().collect(Collectors.toMap(LegajoControl::getLegajoId, legajoControl -> legajoControl));
+
 //        this.empleados = liquidacionService.findAllByPeriodo(anho, mes, 0);
-        this.empleados = liquidacionService.findAllTestingWith3(anho, mes);
+        this.empleadosLiquidados = liquidacionService.findAllTestingWith3(anho, mes).stream().filter(empleado -> {
+            boolean liquidado = false;
+            if (this.legajoControls.containsKey(empleado.getLegajoId()))
+                liquidado = this.legajoControls.get(empleado.getLegajoId()).getLiquidado() == 1;
+            return liquidado;
+        }).toList();
 
         // leyendo control del mes
         this.control = controlService.findByPeriodo(anho, mes);
@@ -85,14 +100,14 @@ public class LibroSueldoService {
         int numeroLiquidacion = 1;
         line += new DecimalFormat("00000").format(numeroLiquidacion); // Numero Liquidacion
         line += "30"; // Dias base
-        line += new DecimalFormat("000000").format(this.empleados.size());
+        line += new DecimalFormat("000000").format(this.empleadosLiquidados.size());
         bufferedWriter.write(line);
         bufferedWriter.write("\r\n");
     }
 
     private void writeRegistrosTipo02(BufferedWriter bufferedWriter) throws IOException {
         // Registro tipo 02
-        for (Liquidacion liquidacion : empleados) {
+        for (Liquidacion liquidacion : empleadosLiquidados) {
             String line = "02";
             Long legajoId = liquidacion.getPersona().getLegajoId();
             String cuil = liquidacion.getPersona().getCuil();
@@ -116,7 +131,7 @@ public class LibroSueldoService {
         if (mes > 6) {
             semestre = 2;
         }
-        for (Liquidacion liquidacion : empleados) {
+        for (Liquidacion liquidacion : empleadosLiquidados) {
             Long legajoId = liquidacion.getPersona().getLegajoId();
             String cuil = liquidacion.getPersona().getCuil();
             for (Item item : itemService.findAllByLegajo(legajoId, liquidacion.getAnho(), liquidacion.getMes())) {
@@ -145,12 +160,55 @@ public class LibroSueldoService {
 
     private void writeRegistrosTipo04(BufferedWriter bufferedWriter, Integer anho, Integer mes) throws IOException {
         // Registro tipo 04
-        Map<Long, LegajoControl> legajoControls = legajoControlService.findAllByPeriodo(anho, mes).stream().collect(Collectors.toMap(LegajoControl::getLegajoId, legajoControl -> legajoControl));
-        for (Liquidacion liquidacion : empleados) {
-            Long legajoId = liquidacion.getPersona().getLegajoId();
-            String cuil = liquidacion.getPersona().getCuil();
+        for (Liquidacion liquidacion : empleadosLiquidados) {
+            AfipContext afipContext = afipContextService.makeByLegajo(liquidacion, this.control);
             String line = "04";
-            line += cuil; // cuil
+            line += afipContext.getCuil();
+            line += afipContext.getConyuge();
+            line += new DecimalFormat("00").format(afipContext.getCantidadHijos());
+            line += afipContext.getMarcaCCT();
+            line += afipContext.getMarcaSCVO();
+            line += afipContext.getMarcaCorrespondeReduccion();
+            line += afipContext.getTipoEmpresa();
+            line += afipContext.getTipoOperacion();
+            line += new DecimalFormat("00").format(afipContext.getCodigoSituacion());
+            line += String.format("%-2s", afipContext.getCodigoCondicion());
+            line += new DecimalFormat("000").format(afipContext.getCodigoActividad());
+            line += String.format("%-3s", afipContext.getCodigoModalidadContratacion());
+            line += String.format("%-2s", afipContext.getCodigoSiniestrado());
+            line += new DecimalFormat("00").format(afipContext.getCodigoLocalidad());
+            line += new DecimalFormat("00").format(afipContext.getSituacionRevista1());
+            line += new DecimalFormat("00").format(afipContext.getDiaInicioSituacionRevista1());
+            line += new DecimalFormat("00").format(afipContext.getSituacionRevista2());
+            line += new DecimalFormat("00").format(afipContext.getDiaInicioSituacionRevista2());
+            line += new DecimalFormat("00").format(afipContext.getSituacionRevista3());
+            line += new DecimalFormat("00").format(afipContext.getDiaInicioSituacionRevista3());
+            line += new DecimalFormat("00").format(afipContext.getCantidadDiasTrabajados());
+            line += new DecimalFormat("000").format(afipContext.getHorasTrabajadas());
+            line += new DecimalFormat("00000").format(afipContext.getPorcentajeAporteAdicionalSS().multiply(BigDecimal.valueOf(100)));
+            line += new DecimalFormat("00000").format(afipContext.getContribucionTareaDiferencial().multiply(BigDecimal.valueOf(100)));
+            line += new DecimalFormat("000000").format(afipContext.getCodigoObraSocial());
+            line += new DecimalFormat("00").format(afipContext.getCantidadAdherentes());
+            line += new DecimalFormat("000000000000000").format(afipContext.getAporteAdicionalOS().multiply(BigDecimal.valueOf(100)));
+            line += new DecimalFormat("000000000000000").format(afipContext.getContribucionAdicionalOS().multiply(BigDecimal.valueOf(100)));
+            line += new DecimalFormat("000000000000000").format(afipContext.getBaseCalculoDiferencialAportesOSyFSR().multiply(BigDecimal.valueOf(100)));
+            line += new DecimalFormat("000000000000000").format(afipContext.getBaseCalculoDiferencialOSyFSR().multiply(BigDecimal.valueOf(100)));
+            line += new DecimalFormat("000000000000000").format(afipContext.getBaseCalculoDiferencialLRT().multiply(BigDecimal.valueOf(100)));
+            line += new DecimalFormat("000000000000000").format(afipContext.getRemuneracionMaternidadANSeS().multiply(BigDecimal.valueOf(100)));
+            line += new DecimalFormat("000000000000000").format(afipContext.getRemuneracionBruta().multiply(BigDecimal.valueOf(100)));
+            line += new DecimalFormat("000000000000000").format(afipContext.getBaseImponible1().multiply(BigDecimal.valueOf(100)));
+            line += new DecimalFormat("000000000000000").format(afipContext.getBaseImponible2().multiply(BigDecimal.valueOf(100)));
+            line += new DecimalFormat("000000000000000").format(afipContext.getBaseImponible3().multiply(BigDecimal.valueOf(100)));
+            line += new DecimalFormat("000000000000000").format(afipContext.getBaseImponible4().multiply(BigDecimal.valueOf(100)));
+            line += new DecimalFormat("000000000000000").format(afipContext.getBaseImponible5().multiply(BigDecimal.valueOf(100)));
+            line += new DecimalFormat("000000000000000").format(afipContext.getBaseImponible6().multiply(BigDecimal.valueOf(100)));
+            line += new DecimalFormat("000000000000000").format(afipContext.getBaseImponible7().multiply(BigDecimal.valueOf(100)));
+            line += new DecimalFormat("000000000000000").format(afipContext.getBaseImponible8().multiply(BigDecimal.valueOf(100)));
+            line += new DecimalFormat("000000000000000").format(afipContext.getBaseImponible9().multiply(BigDecimal.valueOf(100)));
+            line += new DecimalFormat("000000000000000").format(afipContext.getBaseParaElCalculoDiferencialDeAporteDeSeguridadSocial().multiply(BigDecimal.valueOf(100)));
+            line += new DecimalFormat("000000000000000").format(afipContext.getBaseParaElCalculoDiferencialDeContribucionesDeSeguridadSocial().multiply(BigDecimal.valueOf(100)));
+            line += new DecimalFormat("000000000000000").format(afipContext.getBaseImponible10().multiply(BigDecimal.valueOf(100)));
+            line += new DecimalFormat("000000000000000").format(afipContext.getImporteDetraer().multiply(BigDecimal.valueOf(100)));
             bufferedWriter.write(line);
             bufferedWriter.write("\r\n");
         }

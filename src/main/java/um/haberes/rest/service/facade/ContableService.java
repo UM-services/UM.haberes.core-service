@@ -358,7 +358,7 @@ public class ContableService {
             codigoIds.removeIf(codigoId -> codigoId < 3);
         }
 
-        for (Item item : itemService.findAllCodigosByLegajo(legajoId, anho, mes, codigoIds)) {
+        for (Item item : itemService.findAllCodigoIdsByLegajo(legajoId, anho, mes, codigoIds)) {
             Codigo codigo = new Codigo();
             if (codigos.containsKey(item.getCodigoId())) {
                 codigo = codigos.get(item.getCodigoId());
