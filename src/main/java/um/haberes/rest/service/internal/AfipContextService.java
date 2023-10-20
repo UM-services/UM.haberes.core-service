@@ -43,6 +43,7 @@ public class AfipContextService {
         int afipTipoEmpleado = 0;
         int afipDiasTrabajados = 0;
         int afipModeloContratacion = 0;
+        int afipReduccion = 0;
         BigDecimal afipCapitalLRT = BigDecimal.ZERO;
         BigDecimal remuneracionImponible1 = BigDecimal.ZERO;
         BigDecimal remuneracionImponible2 = BigDecimal.ZERO;
@@ -75,7 +76,6 @@ public class AfipContextService {
         BigDecimal afipAporteAdicionalSS = BigDecimal.ZERO;
         BigDecimal afipAporteAdicionalOS = BigDecimal.ZERO;
         BigDecimal afipRemuneracionTotal = BigDecimal.ZERO;
-        String afipReduccion = "";
         String afipLocalidad = "";
 
         remuneracionImponible1 = control.getMaximo1sijp();
@@ -194,7 +194,7 @@ public class AfipContextService {
         afipAdherentes = 0;
         afipLocalidad = "Mendoza-Gran Mendoza";
         afipSiniestrado = 0;
-        afipReduccion = " ";
+        afipReduccion = 0;
         afipCapitalLRT = BigDecimal.ZERO;
         afipTipoEmpleado = 1;
 
