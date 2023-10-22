@@ -241,7 +241,7 @@ public class AfipContextService {
         afipContext.setBaseImponible6(BigDecimal.ZERO);
         afipContext.setBaseImponible7(BigDecimal.ZERO);
         afipContext.setBaseImponible8(afipRemunerativo08);
-        afipContext.setBaseImponible9(afipRemunerativo01);
+        afipContext.setBaseImponible9(importeRemunerativo);
         afipContext.setBaseParaElCalculoDiferencialDeAporteDeSeguridadSocial(BigDecimal.ZERO);
         afipContext.setBaseParaElCalculoDiferencialDeContribucionesDeSeguridadSocial(BigDecimal.ZERO);
         afipContext.setBaseImponible10(afipRemunerativo02.subtract(afipImporteDetraer));

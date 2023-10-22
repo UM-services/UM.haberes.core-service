@@ -664,7 +664,7 @@ public class BonoService {
             PdfPTable tableGrupoCodigo = new PdfPTable(columnGrupoCodigo);
             tableGrupoCodigo.setWidthPercentage(100);
             tableGrupoCodigo.setHorizontalAlignment(Element.ALIGN_CENTER);
-            float[] columnCodigo = {2, 10, 4};
+            float[] columnCodigo = {2, 10, 5};
             PdfPTable tableCodigoRemun = new PdfPTable(columnCodigo);
             tableCodigoRemun.setWidthPercentage(100);
             tableCodigoRemun.setHorizontalAlignment(Element.ALIGN_CENTER);

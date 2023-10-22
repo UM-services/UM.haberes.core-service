@@ -5,15 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import um.haberes.rest.kotlin.internal.AfipContext;
-import um.haberes.rest.kotlin.model.Control;
-import um.haberes.rest.kotlin.model.Item;
-import um.haberes.rest.kotlin.model.LegajoControl;
-import um.haberes.rest.kotlin.model.Liquidacion;
+import um.haberes.rest.kotlin.model.*;
 import um.haberes.rest.model.LegajoBanco;
 import um.haberes.rest.service.*;
 import um.haberes.rest.service.internal.AfipContextService;
 
 import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -22,6 +20,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.zip.ZipOutputStream;
 
 @Service
 @Slf4j
@@ -47,10 +46,12 @@ public class LibroSueldoService {
 
     private final AfipContextService afipContextService;
 
+    private final CodigoGrupoService codigoGrupoService;
+
     @Autowired
     public LibroSueldoService(Environment environment, LiquidacionService liquidacionService, LegajoBancoService legajoBancoService,
                               ControlService controlService, ItemService itemService, LegajoControlService legajoControlService,
-                              AfipContextService afipContextService) {
+                              AfipContextService afipContextService, CodigoGrupoService codigoGrupoService) {
         this.environment = environment;
         this.liquidacionService = liquidacionService;
         this.legajoBancoservice = legajoBancoService;
@@ -58,10 +59,15 @@ public class LibroSueldoService {
         this.itemService = itemService;
         this.legajoControlService = legajoControlService;
         this.afipContextService = afipContextService;
+        this.codigoGrupoService = codigoGrupoService;
     }
 
     public String generate(Integer anho, Integer mes) throws IOException {
         String path = environment.getProperty("path.files");
+        String outputFilename = path + "LSD.zip";
+
+        ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(outputFilename));
+
         String filename = path + "libro.sueldos." + anho + "." + mes;
         log.debug("Filename={}", filename);
 
@@ -85,6 +91,8 @@ public class LibroSueldoService {
         writeRegistrosTipo03(bufferedWriter, anho, mes);
         writeRegistrosTipo04(bufferedWriter, anho, mes);
         bufferedWriter.close();
+
+        zipOutputStream.close();
         log.debug("Generado");
         return filename;
     }
@@ -102,12 +110,12 @@ public class LibroSueldoService {
         line += "30"; // Dias base
         line += new DecimalFormat("000000").format(this.empleadosLiquidados.size());
         bufferedWriter.write(line);
-        bufferedWriter.write("\r\n");
     }
 
     private void writeRegistrosTipo02(BufferedWriter bufferedWriter) throws IOException {
         // Registro tipo 02
         for (Liquidacion liquidacion : empleadosLiquidados) {
+            bufferedWriter.write("\r\n");
             String line = "02";
             Long legajoId = liquidacion.getPersona().getLegajoId();
             String cuil = liquidacion.getPersona().getCuil();
@@ -121,7 +129,6 @@ public class LibroSueldoService {
             line += String.format("%8s", ""); // fecha rubrica
             line += "3"; // acreditacion
             bufferedWriter.write(line);
-            bufferedWriter.write("\r\n");
         }
     }
 
@@ -131,12 +138,14 @@ public class LibroSueldoService {
         if (mes > 6) {
             semestre = 2;
         }
+        Map<Integer, CodigoGrupo> grupos = codigoGrupoService.findAll().stream().collect(Collectors.toMap(CodigoGrupo::getCodigoId, codigo -> codigo));
         for (Liquidacion liquidacion : empleadosLiquidados) {
             Long legajoId = liquidacion.getPersona().getLegajoId();
             String cuil = liquidacion.getPersona().getCuil();
             for (Item item : itemService.findAllByLegajo(legajoId, liquidacion.getAnho(), liquidacion.getMes())) {
                 log.debug("Item={}", item);
                 if (item.getCodigo().getAfipConceptoSueldoIdPrimerSemestre() != null) {
+                    bufferedWriter.write("\r\n");
                     String line = "03";
                     line += cuil; // cuil
                     Long afipConceptoSueldoId = semestre == 1 ? item.getCodigo().getAfipConceptoSueldoIdPrimerSemestre() : item.getCodigo().getAfipConceptoSueldoIdSegundoSemestre();
@@ -145,14 +154,24 @@ public class LibroSueldoService {
                     line += new DecimalFormat("00000").format(cantidad * 100); //cantidad
                     line += "M"; // unidades
                     line += new DecimalFormat("000000000000000").format(item.getImporte().multiply(new BigDecimal(100)).abs());
+                    // normal behavior
                     String tipoMovimiento = "C";
                     if (item.getImporte().compareTo(BigDecimal.ZERO) < 0) {
                         tipoMovimiento = "D";
                     }
+                    // if item is deduction
+                    if (grupos.containsKey(item.getCodigoId())) {
+                        CodigoGrupo codigoGrupo = grupos.get(item.getCodigoId());
+                        if (codigoGrupo.getDeduccion() == 1) {
+                            tipoMovimiento = "D";
+                            if (item.getImporte().compareTo(BigDecimal.ZERO) < 0) {
+                                tipoMovimiento = "C";
+                            }
+                        }
+                    }
                     line += tipoMovimiento; // credito/debito
                     line += "      "; // Periodo ajuste
                     bufferedWriter.write(line);
-                    bufferedWriter.write("\r\n");
                 }
             }
         }
@@ -162,6 +181,7 @@ public class LibroSueldoService {
         // Registro tipo 04
         for (Liquidacion liquidacion : empleadosLiquidados) {
             AfipContext afipContext = afipContextService.makeByLegajo(liquidacion, this.control);
+            bufferedWriter.write("\r\n");
             String line = "04";
             line += afipContext.getCuil();
             line += afipContext.getConyuge();
@@ -210,7 +230,6 @@ public class LibroSueldoService {
             line += new DecimalFormat("000000000000000").format(afipContext.getBaseImponible10().multiply(BigDecimal.valueOf(100)));
             line += new DecimalFormat("000000000000000").format(afipContext.getImporteDetraer().multiply(BigDecimal.valueOf(100)));
             bufferedWriter.write(line);
-            bufferedWriter.write("\r\n");
         }
     }
 
