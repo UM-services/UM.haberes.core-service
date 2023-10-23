@@ -374,24 +374,7 @@ public class MakeLiquidacionService {
         }
 
         // Jubilacion Secundario
-        boolean onlyETEC = false;
-        boolean hasETEC = false;
-        boolean hasBasico = false;
-        codigoId = 1;
-        if (items.containsKey(codigoId)) {
-            if (items.get(codigoId).getImporte().compareTo(BigDecimal.ZERO) != 0) {
-                hasBasico = true;
-            }
-        }
-        codigoId = 29;
-        if (items.containsKey(codigoId)) {
-            if (items.get(codigoId).getImporte().compareTo(BigDecimal.ZERO) != 0) {
-                hasETEC = true;
-            }
-        }
-        if (hasETEC && !hasBasico) {
-            onlyETEC = true;
-        }
+        boolean onlyETEC = this.evaluateOnlyETEC(items);
 
         if (onlyETEC) {
             conAportes = items.get(96).getImporte();
@@ -833,6 +816,28 @@ public class MakeLiquidacionService {
             Categoria categoria = categoriaService.findByCategoriaId(categoriaId);
             totalDependencia.put(dependencia.getDependenciaId(), totalDependencia.get(dependencia.getDependenciaId()).add(categoria.getBasico()).setScale(2, RoundingMode.HALF_UP));
         }
+    }
+
+    public boolean evaluateOnlyETEC(Map<Integer, Item> items) {
+        boolean onlyETEC = false;
+        boolean hasETEC = false;
+        boolean hasBasico = false;
+        int codigoId = 1;
+        if (items.containsKey(codigoId)) {
+            if (items.get(codigoId).getImporte().compareTo(BigDecimal.ZERO) != 0) {
+                hasBasico = true;
+            }
+        }
+        codigoId = 29;
+        if (items.containsKey(codigoId)) {
+            if (items.get(codigoId).getImporte().compareTo(BigDecimal.ZERO) != 0) {
+                hasETEC = true;
+            }
+        }
+        if (hasETEC && !hasBasico) {
+            onlyETEC = true;
+        }
+        return onlyETEC;
     }
 
 }

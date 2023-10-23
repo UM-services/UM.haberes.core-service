@@ -10,6 +10,7 @@ import um.haberes.rest.kotlin.model.Liquidacion;
 import um.haberes.rest.model.Novedad;
 import um.haberes.rest.service.ItemService;
 import um.haberes.rest.service.NovedadService;
+import um.haberes.rest.service.facade.MakeLiquidacionService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -23,10 +24,13 @@ public class AfipContextService {
 
     private final NovedadService novedadService;
 
+    private final MakeLiquidacionService makeLiquidacionService;
+
     @Autowired
-    public AfipContextService(ItemService itemService, NovedadService novedadService) {
+    public AfipContextService(ItemService itemService, NovedadService novedadService, MakeLiquidacionService makeLiquidacionService) {
         this.itemService = itemService;
         this.novedadService = novedadService;
+        this.makeLiquidacionService = makeLiquidacionService;
     }
 
     public AfipContext makeByLegajo(Liquidacion liquidacion, Control control) {
@@ -44,6 +48,7 @@ public class AfipContextService {
         int afipDiasTrabajados = 0;
         int afipModeloContratacion = 0;
         int afipReduccion = 0;
+        int afipTipoEmpresa = 0;
         BigDecimal afipCapitalLRT = BigDecimal.ZERO;
         BigDecimal remuneracionImponible1 = BigDecimal.ZERO;
         BigDecimal remuneracionImponible2 = BigDecimal.ZERO;
@@ -198,6 +203,11 @@ public class AfipContextService {
         afipCapitalLRT = BigDecimal.ZERO;
         afipTipoEmpleado = 1;
 
+        afipTipoEmpresa = 1;
+        if (makeLiquidacionService.evaluateOnlyETEC(items)) {
+            afipTipoEmpresa = 7;
+        }
+
         AfipContext afipContext = new AfipContext();
         afipContext.setLegajoId(legajoId);
         afipContext.setCuil(liquidacion.getPersona().getCuil());
@@ -206,7 +216,7 @@ public class AfipContextService {
         afipContext.setMarcaCCT(1);
         afipContext.setMarcaSCVO(1);
         afipContext.setMarcaCorrespondeReduccion(afipReduccion);
-        afipContext.setTipoEmpresa(1);
+        afipContext.setTipoEmpresa(afipTipoEmpresa);
         afipContext.setTipoOperacion(0);
         afipContext.setCodigoSituacion(afipSituacion);
         afipContext.setCodigoCondicion(afipCondicion);
