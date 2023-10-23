@@ -50,7 +50,7 @@ public class LiquidacionService {
     }
 
     public List<Liquidacion> findAllTestingWith3(Integer anho, Integer mes) {
-        Long[] legajos = {725L, 937L, 1515L};
+        Long[] legajos = {725L, 937L, 1515L, 5224L, 2011L, 1257L, 2030L};
         List<Long> legajoIds = Arrays.asList(legajos);
         return repository.findAllByAnhoAndMesAndLegajoIdIn(anho, mes, legajoIds);
     }

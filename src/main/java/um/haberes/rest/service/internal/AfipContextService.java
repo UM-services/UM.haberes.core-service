@@ -206,7 +206,7 @@ public class AfipContextService {
         afipContext.setMarcaCCT(1);
         afipContext.setMarcaSCVO(1);
         afipContext.setMarcaCorrespondeReduccion(afipReduccion);
-        afipContext.setTipoEmpresa(7);
+        afipContext.setTipoEmpresa(1);
         afipContext.setTipoOperacion(0);
         afipContext.setCodigoSituacion(afipSituacion);
         afipContext.setCodigoCondicion(afipCondicion);
