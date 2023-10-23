@@ -26,7 +26,7 @@ public class LibroSueldoController {
     @GetMapping("/generate/{anho}/{mes}")
     public ResponseEntity<Resource> generate(
             @PathVariable Integer anho, @PathVariable Integer mes) throws IOException {
-        return Tool.generateFile(service.generate(anho, mes), "libro_sueldos.txt");
+        return Tool.generateFile(service.generate(anho, mes), "libro_sueldos.zip");
     }
 
 }

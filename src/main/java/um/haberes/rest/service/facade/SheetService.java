@@ -1599,7 +1599,7 @@ public class SheetService {
     }
 
     private void setCellOffsetDateTime(Row row, int column, OffsetDateTime value, CellStyle style) {
-        this.setCellString(row, column, DateTimeFormatter.ofPattern("dd-MM-yyyy").format(value), style);
+        setCellString(row, column, DateTimeFormatter.ofPattern("dd-MM-yyyy").format(value), style);
     }
 
     private void setCellBigDecimal(Row row, int column, BigDecimal value, CellStyle style) {
@@ -1630,6 +1630,21 @@ public class SheetService {
         Cell cell = row.createCell(column);
         cell.setCellValue(value);
         cell.setCellStyle(style);
+    }
+
+    private Sheet makeWorkbook(Workbook book, CellStyle styleNormal, CellStyle styleBold, String sheetName) {
+        book = new XSSFWorkbook();
+        styleNormal = book.createCellStyle();
+        Font fontNormal = book.createFont();
+        fontNormal.setBold(false);
+        styleNormal.setFont(fontNormal);
+
+        styleBold = book.createCellStyle();
+        Font fontBold = book.createFont();
+        fontBold.setBold(true);
+        styleBold.setFont(fontBold);
+
+        return book.createSheet(sheetName);
     }
 
 }
