@@ -25,7 +25,6 @@ import um.haberes.rest.util.Periodo;
 
 /**
  * @author daniel
- *
  */
 @Service
 public class LiquidacionService {
@@ -49,9 +48,7 @@ public class LiquidacionService {
         return repository.findAllByAnhoAndMesOrderByLegajoId(anho, mes, PageRequest.of(0, limit));
     }
 
-    public List<Liquidacion> findAllTestingWith3(Integer anho, Integer mes) {
-        Long[] legajos = {725L, 937L, 1515L, 5224L, 2011L, 1257L, 2030L};
-        List<Long> legajoIds = Arrays.asList(legajos);
+    public List<Liquidacion> findAllByPeriodoAndLegajoIds(Integer anho, Integer mes, List<Long> legajoIds) {
         return repository.findAllByAnhoAndMesAndLegajoIdIn(anho, mes, legajoIds);
     }
 

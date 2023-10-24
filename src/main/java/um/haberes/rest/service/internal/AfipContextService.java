@@ -49,6 +49,7 @@ public class AfipContextService {
         int afipModeloContratacion = 0;
         int afipReduccion = 0;
         int afipTipoEmpresa = 0;
+        long afipObraSocial = 0;
         BigDecimal afipCapitalLRT = BigDecimal.ZERO;
         BigDecimal remuneracionImponible1 = BigDecimal.ZERO;
         BigDecimal remuneracionImponible2 = BigDecimal.ZERO;
@@ -193,7 +194,11 @@ public class AfipContextService {
         afipZona = liquidacion.getPersona().getLocalidadAfip();
         afipAporteAdicionalSS = BigDecimal.ZERO;
         afipRegimen = 1;
-        if (liquidacion.getPersona().getObraSocial() == 0) {
+        afipObraSocial = 0;
+        if (liquidacion.getPersona().getObraSocial() != null) {
+            afipObraSocial = liquidacion.getPersona().getObraSocial();
+        }
+        if (afipObraSocial == 0) {
             afipAporteAdicionalOS = BigDecimal.ZERO;
         }
         afipAdherentes = 0;
@@ -234,7 +239,7 @@ public class AfipContextService {
         afipContext.setHorasTrabajadas(0);
         afipContext.setPorcentajeAporteAdicionalSS(BigDecimal.ZERO);
         afipContext.setContribucionTareaDiferencial(BigDecimal.ZERO);
-        afipContext.setCodigoObraSocial(liquidacion.getPersona().getObraSocial());
+        afipContext.setCodigoObraSocial(afipObraSocial);
         afipContext.setCantidadAdherentes(0);
         afipContext.setAporteAdicionalOS(afipAporteAdicionalOS);
         afipContext.setContribucionAdicionalOS(BigDecimal.ZERO);

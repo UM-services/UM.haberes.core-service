@@ -16,12 +16,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import um.haberes.rest.kotlin.model.Liquidacion;
 import um.haberes.rest.kotlin.model.Persona;
 
@@ -29,12 +24,10 @@ import um.haberes.rest.kotlin.model.Persona;
  * @author daniel
  *
  */
+@Data
 @Entity
 @Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "legajoId", "anho", "mes", "cbu" }) })
 @EqualsAndHashCode(callSuper = false)
-@Getter
-@Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class LegajoBanco extends Auditable implements Serializable {

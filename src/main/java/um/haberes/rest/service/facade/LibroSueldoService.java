@@ -6,6 +6,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import um.haberes.rest.exception.LegajoBancoException;
 import um.haberes.rest.kotlin.internal.AfipContext;
 import um.haberes.rest.kotlin.model.*;
 import um.haberes.rest.model.LegajoBanco;
@@ -63,7 +64,7 @@ public class LibroSueldoService {
         this.codigoGrupoService = codigoGrupoService;
     }
 
-    public String generate(Integer anho, Integer mes) throws IOException {
+    public String generate(Integer anho, Integer mes, List<Long> legajoIds) throws IOException {
         String path = environment.getProperty("path.files");
         String outputFilename = path + "LSD.zip";
 
@@ -87,13 +88,21 @@ public class LibroSueldoService {
         // pull empleados liquidados
         this.legajoControls = legajoControlService.findAllByPeriodo(anho, mes).stream().collect(Collectors.toMap(LegajoControl::getLegajoId, legajoControl -> legajoControl));
 
-//        this.empleados = liquidacionService.findAllByPeriodo(anho, mes, 0);
-        this.empleadosLiquidados = liquidacionService.findAllTestingWith3(anho, mes).stream().filter(empleado -> {
-            boolean liquidado = false;
-            if (this.legajoControls.containsKey(empleado.getLegajoId()))
-                liquidado = this.legajoControls.get(empleado.getLegajoId()).getLiquidado() == 1;
-            return liquidado;
-        }).toList();
+        if (legajoIds.size() == 0) {
+            this.empleadosLiquidados = liquidacionService.findAllByPeriodo(anho, mes, 0).stream().filter(empleado -> {
+                boolean liquidado = false;
+                if (this.legajoControls.containsKey(empleado.getLegajoId()))
+                    liquidado = this.legajoControls.get(empleado.getLegajoId()).getLiquidado() == 1;
+                return liquidado;
+            }).toList();
+        } else {
+            this.empleadosLiquidados = liquidacionService.findAllByPeriodoAndLegajoIds(anho, mes, legajoIds).stream().filter(empleado -> {
+                boolean liquidado = false;
+                if (this.legajoControls.containsKey(empleado.getLegajoId()))
+                    liquidado = this.legajoControls.get(empleado.getLegajoId()).getLiquidado() == 1;
+                return liquidado;
+            }).toList();
+        }
 
         // leyendo control del mes
         this.control = controlService.findByPeriodo(anho, mes);
@@ -211,8 +220,14 @@ public class LibroSueldoService {
             line += cuil;  // CUIL
             line += String.format("%-10s", legajoId); // legajo
             line += String.format("%50s", ""); // dependencia
-            LegajoBanco legajoBanco = legajoBancoservice.findLegajoCbuPrincipal(legajoId, liquidacion.getAnho(), liquidacion.getMes());
-            line += legajoBanco.getCbu(); // cbu
+            String cbu = "";
+            try {
+                LegajoBanco legajoBanco = legajoBancoservice.findLegajoCbuPrincipal(legajoId, liquidacion.getAnho(), liquidacion.getMes());
+                cbu = legajoBanco.getCbu();
+            } catch (LegajoBancoException e) {
+                cbu = String.format("%22s", ""); // sin cbu
+            }
+            line += cbu; // cbu
             line += new DecimalFormat("000").format(0); // tope
             line += control.getFechaPago().format(DateTimeFormatter.ofPattern("yyyyMMdd")); // fecha pago
             line += String.format("%8s", ""); // fecha rubrica
@@ -224,7 +239,7 @@ public class LibroSueldoService {
             setCellString(row, 1, cuil, styleNormal);
             setCellLong(row, 2, legajoId, styleNormal);
             setCellString(row, 3, "", styleNormal);
-            setCellString(row, 4, legajoBanco.getCbu(), styleNormal);
+            setCellString(row, 4, cbu, styleNormal);
             setCellInteger(row, 5, 0, styleNormal);
             setCellString(row, 6, control.getFechaPago().format(DateTimeFormatter.ofPattern("yyyyMMdd")), styleNormal);
             setCellString(row, 7, "", styleNormal);
@@ -234,7 +249,8 @@ public class LibroSueldoService {
             sheet.autoSizeColumn(column);
     }
 
-    private void writeRegistrosTipo03(BufferedWriter bufferedWriter, Integer anho, Integer mes, Sheet sheet, CellStyle styleNormal, CellStyle styleBold) throws IOException {
+    private void writeRegistrosTipo03(BufferedWriter bufferedWriter, Integer anho, Integer mes, Sheet
+            sheet, CellStyle styleNormal, CellStyle styleBold) throws IOException {
         // Excel tipo 03
         Row row = null;
         int fila = -1;
@@ -307,7 +323,8 @@ public class LibroSueldoService {
 
     }
 
-    private void writeRegistrosTipo04(BufferedWriter bufferedWriter, Integer anho, Integer mes, Sheet sheet, CellStyle styleNormal, CellStyle styleBold) throws IOException {
+    private void writeRegistrosTipo04(BufferedWriter bufferedWriter, Integer anho, Integer mes, Sheet
+            sheet, CellStyle styleNormal, CellStyle styleBold) throws IOException {
         // Excel tipo 04
         Row row = null;
         int fila = -1;
