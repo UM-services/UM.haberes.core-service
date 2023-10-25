@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package um.haberes.rest.controller;
 
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.rest.exception.UsuarioException;
-import um.haberes.rest.model.Usuario;
+import um.haberes.rest.kotlin.model.Usuario;
 import um.haberes.rest.service.UsuarioService;
 
 /**
@@ -26,36 +26,40 @@ import um.haberes.rest.service.UsuarioService;
 @RequestMapping("/usuario")
 public class UsuarioController {
 
-	@Autowired
-	private UsuarioService service;
+    private final UsuarioService service;
 
-	@GetMapping("/{legajoId}")
-	public ResponseEntity<Usuario> findByLegajoId(@PathVariable Long legajoId) {
-		try {
-			return new ResponseEntity<Usuario>(service.findByLegajoId(legajoId), HttpStatus.OK);
-		} catch (UsuarioException e) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-		}
-	}
+    @Autowired
+    public UsuarioController(UsuarioService service) {
+        this.service = service;
+    }
 
-	@GetMapping("/lastlog/{legajoId}")
-	public ResponseEntity<Usuario> updateLastLog(@PathVariable Long legajoId) {
-		try {
-			return new ResponseEntity<Usuario>(service.updateLastLog(legajoId), HttpStatus.OK);
-		} catch (UsuarioException e) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-		}
-	}
+    @GetMapping("/{legajoId}")
+    public ResponseEntity<Usuario> findByLegajoId(@PathVariable Long legajoId) {
+        try {
+            return new ResponseEntity<>(service.findByLegajoId(legajoId), HttpStatus.OK);
+        } catch (UsuarioException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
 
-	@PutMapping("/isuservalid")
-	public ResponseEntity<Boolean> isUserValid(@RequestBody Usuario usuario) {
-		return new ResponseEntity<Boolean>(service.isUserValid(usuario), HttpStatus.OK);
-	}
+    @GetMapping("/lastlog/{legajoId}")
+    public ResponseEntity<Usuario> updateLastLog(@PathVariable Long legajoId) {
+        try {
+            return new ResponseEntity<>(service.updateLastLog(legajoId), HttpStatus.OK);
+        } catch (UsuarioException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
 
-	@PutMapping("/setpassword")
-	public ResponseEntity<Void> setPassword(@RequestBody Usuario usuario) {
-		service.setPassword(usuario);
-		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
-	}
+    @PutMapping("/isuservalid")
+    public ResponseEntity<Boolean> isUserValid(@RequestBody Usuario usuario) {
+        return new ResponseEntity<>(service.isUserValid(usuario), HttpStatus.OK);
+    }
+
+    @PutMapping("/setpassword")
+    public ResponseEntity<Void> setPassword(@RequestBody Usuario usuario) {
+        service.setPassword(usuario);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 
 }

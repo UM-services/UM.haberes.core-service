@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.rest.exception.SeguridadSocialException;
-import um.haberes.rest.model.SeguridadSocial;
+import um.haberes.rest.kotlin.model.SeguridadSocial;
 import um.haberes.rest.service.SeguridadSocialService;
 
 /**

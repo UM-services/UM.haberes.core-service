@@ -73,6 +73,7 @@ public class AfipContextService {
         BigDecimal afipRemunerativo04 = BigDecimal.ZERO;
         BigDecimal afipRemunerativo05 = BigDecimal.ZERO;
         BigDecimal afipRemunerativo08 = BigDecimal.ZERO;
+        BigDecimal afipRemunerativo10 = BigDecimal.ZERO;
         BigDecimal afipRemunerativo11 = BigDecimal.ZERO;
         BigDecimal afipNoRemunerativo = BigDecimal.ZERO;
         BigDecimal afipImporteDetraer = BigDecimal.ZERO;
@@ -156,6 +157,11 @@ public class AfipContextService {
         if (afipImporteDetraer.compareTo(BigDecimal.ZERO) < 0) {
             afipImporteDetraer = BigDecimal.ZERO;
         }
+        afipRemunerativo10 = afipRemunerativo02.subtract(afipImporteDetraer);
+        if (afipImporteDetraer.compareTo(BigDecimal.ZERO) == 0) {
+            afipRemunerativo10 = BigDecimal.ZERO;
+        }
+
 
         afipRemunerativo03 = importeRemunerativo;
         afipRemunerativo04 = importeRemunerativo;
@@ -259,7 +265,7 @@ public class AfipContextService {
         afipContext.setBaseImponible9(importeRemunerativo);
         afipContext.setBaseParaElCalculoDiferencialDeAporteDeSeguridadSocial(BigDecimal.ZERO);
         afipContext.setBaseParaElCalculoDiferencialDeContribucionesDeSeguridadSocial(BigDecimal.ZERO);
-        afipContext.setBaseImponible10(afipRemunerativo02.subtract(afipImporteDetraer));
+        afipContext.setBaseImponible10(afipRemunerativo10);
         afipContext.setImporteDetraer(afipImporteDetraer);
 
         return afipContext;

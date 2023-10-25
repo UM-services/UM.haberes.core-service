@@ -1311,9 +1311,7 @@ public class SheetService {
             if (persona.getLocalidadAfip() != null) {
                 this.setCellInteger(row, 20, persona.getLocalidadAfip(), style_normal);
             }
-            if (persona.getSituacionAfip() != null) {
-                this.setCellInteger(row, 21, persona.getSituacionAfip(), style_normal);
-            }
+            this.setCellInteger(row, 21, persona.getSituacionAfip(), style_normal);
             if (persona.getModeloContratacionAfip() != null) {
                 this.setCellInteger(row, 22, persona.getModeloContratacionAfip(), style_normal);
             }

@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.UsuarioException;
-import um.haberes.rest.model.Usuario;
+import um.haberes.rest.kotlin.model.Usuario;
 import um.haberes.rest.repository.IUsuarioRepository;
 import um.haberes.rest.util.Tool;
 

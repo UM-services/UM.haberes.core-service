@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.SituacionException;
-import um.haberes.rest.model.Situacion;
+import um.haberes.rest.kotlin.model.Situacion;
 import um.haberes.rest.repository.ISituacionRepository;
 
 /**

@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.SeguridadSocialException;
-import um.haberes.rest.model.SeguridadSocial;
+import um.haberes.rest.kotlin.model.SeguridadSocial;
 import um.haberes.rest.repository.ISeguridadSocialRepository;
 
 /**

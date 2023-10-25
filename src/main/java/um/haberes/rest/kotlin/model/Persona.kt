@@ -43,13 +43,17 @@ data class Persona(
     var obraSocial: Long? = null,
     var actividadAfip: Int? = null,
     var localidadAfip: Int? = null,
-    var situacionAfip: Int? = null,
+    var situacionAfip: Int = 0,
     var modeloContratacionAfip: Int? = null,
     var directivoEtec: Byte = 0,
 
     @OneToOne(optional = true)
     @JoinColumn(name = "dependenciaId", insertable = false, updatable = false)
-    var dependencia: Dependencia? = null
+    var dependencia: Dependencia? = null,
+
+    @OneToOne(optional = true)
+    @JoinColumn(name = "situacionAfip", insertable = false, updatable = false)
+    var afipSituacion: AfipSituacion? = null,
 
 ) : Auditable() {
     fun getApellidoNombre(): String {
