@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import um.haberes.rest.model.CargoClaseImputacion;
+import um.haberes.rest.kotlin.model.CargoClaseImputacion;
 import um.haberes.rest.service.CargoClaseImputacionService;
 
 /**
@@ -32,7 +32,7 @@ public class CargoClaseImputacionController {
 
 	@GetMapping("/")
 	public ResponseEntity<List<CargoClaseImputacion>> findAll() {
-		return new ResponseEntity<List<CargoClaseImputacion>>(service.findAll(), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAll(), HttpStatus.OK);
 	}
 
 	@GetMapping("/{cargoclaseimputacionId}")

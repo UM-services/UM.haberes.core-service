@@ -25,8 +25,6 @@ import org.springframework.stereotype.Service;
 import um.haberes.rest.exception.ItemException;
 import um.haberes.rest.exception.LegajoContabilidadException;
 import um.haberes.rest.exception.LiquidacionException;
-import um.haberes.rest.model.CargoClaseDetalle;
-import um.haberes.rest.model.CargoClaseImputacion;
 import um.haberes.rest.model.CodigoImputacion;
 import um.haberes.rest.model.LegajoCargoClaseImputacion;
 import um.haberes.rest.model.LegajoCodigoImputacion;

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.rest.exception.CargoLiquidacionNotFoundException;
-import um.haberes.rest.model.Cargo;
+import um.haberes.rest.kotlin.model.Cargo;
 import um.haberes.rest.service.CargoService;
 
 /**

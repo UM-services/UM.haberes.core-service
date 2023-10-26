@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import um.haberes.rest.exception.CargoClaseDetalleNotFoundException;
-import um.haberes.rest.model.CargoClaseDetalle;
+import um.haberes.rest.kotlin.model.CargoClaseDetalle;
 import um.haberes.rest.repository.ICargoClaseDetalleRepository;
 
 /**

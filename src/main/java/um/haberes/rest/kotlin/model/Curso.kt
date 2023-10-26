@@ -4,7 +4,6 @@ import jakarta.persistence.*
 import um.haberes.rest.model.Auditable
 import um.haberes.rest.model.Facultad
 import um.haberes.rest.model.Geografica
-import um.haberes.rest.model.Nivel
 
 @Entity
 @Table

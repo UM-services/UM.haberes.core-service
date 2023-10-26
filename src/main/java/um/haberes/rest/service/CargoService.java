@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.CargoLiquidacionNotFoundException;
-import um.haberes.rest.model.Cargo;
+import um.haberes.rest.kotlin.model.Cargo;
 import um.haberes.rest.repository.ICargoRepository;
 import um.haberes.rest.util.Periodo;
 

@@ -83,6 +83,9 @@ public class AfipContextService {
         BigDecimal afipAporteAdicionalSS = BigDecimal.ZERO;
         BigDecimal afipAporteAdicionalOS = BigDecimal.ZERO;
         BigDecimal afipRemuneracionTotal = BigDecimal.ZERO;
+        BigDecimal afipBaseCalculoDiferencialAportesOSyFSR = BigDecimal.ZERO;
+        BigDecimal afipBaseCalculoDiferencialOSyFSR = BigDecimal.ZERO;
+
         String afipLocalidad = "";
 
         remuneracionImponible1 = control.getMaximo1sijp();
@@ -164,21 +167,12 @@ public class AfipContextService {
 
 
         afipRemunerativo03 = importeRemunerativo;
-        afipRemunerativo04 = importeRemunerativo;
-        if (afipRemuneracionTotal.compareTo(remuneracionImponible4.multiply(coeficiente)) > 0) {
-            afipRemunerativo04 = remuneracionImponible4.multiply(coeficiente);
-        }
-        if (afipRemuneracionTotal.compareTo(minimoObraSocial.multiply(coeficiente)) < 0) {
-            afipRemunerativo04 = minimoObraSocial.multiply(coeficiente);
-        }
+        afipRemunerativo04 = afipRemunerativo01;
         afipRemunerativo05 = importeRemunerativo;
         if (afipRemuneracionTotal.compareTo(remuneracionImponible5.multiply(coeficiente)) > 0) {
             afipRemunerativo05 = remuneracionImponible5.multiply(coeficiente);
         }
-        afipRemunerativo08 = importeRemunerativo;
-        if (afipRemuneracionTotal.compareTo(minimoObraSocial.multiply(coeficiente)) < 0) {
-            afipRemunerativo08 = minimoObraSocial.multiply(coeficiente);
-        }
+        afipRemunerativo08 = afipRemunerativo01;
 
         int diasNoTrabajados = 0;
         try {
@@ -219,6 +213,9 @@ public class AfipContextService {
             afipTipoEmpresa = 7;
         }
 
+        afipBaseCalculoDiferencialAportesOSyFSR = afipRemunerativo04.subtract(control.getMinimoAporte());
+        afipBaseCalculoDiferencialOSyFSR = afipBaseCalculoDiferencialAportesOSyFSR;
+
         AfipContext afipContext = new AfipContext();
         afipContext.setLegajoId(legajoId);
         afipContext.setCuil(liquidacion.getPersona().getCuil());
@@ -249,8 +246,8 @@ public class AfipContextService {
         afipContext.setCantidadAdherentes(0);
         afipContext.setAporteAdicionalOS(afipAporteAdicionalOS);
         afipContext.setContribucionAdicionalOS(BigDecimal.ZERO);
-        afipContext.setBaseCalculoDiferencialAportesOSyFSR(BigDecimal.ZERO);
-        afipContext.setBaseCalculoDiferencialOSyFSR(BigDecimal.ZERO);
+        afipContext.setBaseCalculoDiferencialAportesOSyFSR(afipBaseCalculoDiferencialAportesOSyFSR);
+        afipContext.setBaseCalculoDiferencialOSyFSR(afipBaseCalculoDiferencialOSyFSR);
         afipContext.setBaseCalculoDiferencialLRT(afipCapitalLRT);
         afipContext.setRemuneracionMaternidadANSeS(BigDecimal.ZERO);
         afipContext.setRemuneracionBruta(importeBruto);

@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.CargoClaseImputacionNotFoundException;
-import um.haberes.rest.model.CargoClaseImputacion;
+import um.haberes.rest.kotlin.model.CargoClaseImputacion;
 import um.haberes.rest.repository.ICargoClaseImputacionRepository;
 
 /**
