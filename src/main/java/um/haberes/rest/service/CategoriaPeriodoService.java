@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.CategoriaPeriodoException;
-import um.haberes.rest.model.CategoriaPeriodo;
+import um.haberes.rest.kotlin.model.CategoriaPeriodo;
 import um.haberes.rest.repository.ICategoriaPeriodoRepository;
 
 /**

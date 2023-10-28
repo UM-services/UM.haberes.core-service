@@ -213,7 +213,10 @@ public class AfipContextService {
             afipTipoEmpresa = 7;
         }
 
-        afipBaseCalculoDiferencialAportesOSyFSR = afipRemunerativo04.subtract(control.getMinimoAporte());
+        afipBaseCalculoDiferencialAportesOSyFSR = control.getMinimoAporte().subtract(afipRemunerativo04);
+        if (afipBaseCalculoDiferencialAportesOSyFSR.compareTo(BigDecimal.ZERO) < 0) {
+            afipBaseCalculoDiferencialAportesOSyFSR = BigDecimal.ZERO;
+        }
         afipBaseCalculoDiferencialOSyFSR = afipBaseCalculoDiferencialAportesOSyFSR;
 
         AfipContext afipContext = new AfipContext();

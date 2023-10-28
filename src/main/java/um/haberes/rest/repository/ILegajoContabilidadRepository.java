@@ -7,8 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import um.haberes.rest.model.LegajoContabilidad;
+import um.haberes.rest.kotlin.model.LegajoContabilidad;
 
 /**
  * @author daniel

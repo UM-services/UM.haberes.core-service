@@ -12,7 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.LetraException;
-import um.haberes.rest.model.Letra;
+import um.haberes.rest.kotlin.model.Letra;
 import um.haberes.rest.repository.ILetraRepository;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class LetraService {
+
 	@Autowired
 	private ILetraRepository repository;
 

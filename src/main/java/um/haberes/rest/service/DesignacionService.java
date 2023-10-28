@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.DesignacionException;
-import um.haberes.rest.model.Designacion;
+import um.haberes.rest.kotlin.model.Designacion;
 import um.haberes.rest.repository.IDesignacionRepository;
 
 /**

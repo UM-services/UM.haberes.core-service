@@ -16,11 +16,7 @@ import jakarta.persistence.Table;
 
 import org.hibernate.annotations.Immutable;
 
-import um.haberes.rest.kotlin.model.Curso;
-import um.haberes.rest.kotlin.model.Persona;
-import um.haberes.rest.model.CargoTipo;
-import um.haberes.rest.model.Categoria;
-import um.haberes.rest.model.DesignacionTipo;
+import um.haberes.rest.kotlin.model.*;
 import lombok.Data;
 
 /**

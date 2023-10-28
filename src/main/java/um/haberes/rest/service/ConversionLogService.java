@@ -8,7 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.model.ConversionLog;
+import um.haberes.rest.kotlin.model.ConversionLog;
 import um.haberes.rest.repository.IConversionLogRepository;
 
 /**

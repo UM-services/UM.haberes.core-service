@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import um.haberes.rest.model.DesignacionTipo;
+import um.haberes.rest.kotlin.model.DesignacionTipo;
 import um.haberes.rest.service.DesignacionTipoService;
 
 /**

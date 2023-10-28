@@ -10,7 +10,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.model.LegajoCargoClaseImputacion;
+import um.haberes.rest.kotlin.model.LegajoCargoClaseImputacion;
 import um.haberes.rest.repository.ILegajoCargoClaseImputacionRepository;
 
 /**

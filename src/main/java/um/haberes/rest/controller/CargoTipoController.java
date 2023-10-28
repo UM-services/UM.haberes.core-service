@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import um.haberes.rest.model.CargoTipo;
+import um.haberes.rest.kotlin.model.CargoTipo;
 import um.haberes.rest.service.CargoTipoService;
 
 /**
@@ -29,7 +29,7 @@ public class CargoTipoController {
 
 	@GetMapping("/")
 	public ResponseEntity<List<CargoTipo>> findAll() {
-		return new ResponseEntity<List<CargoTipo>>(service.findAll(), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAll(), HttpStatus.OK);
 	}
 
 	@GetMapping("/{cargoTipoId}")

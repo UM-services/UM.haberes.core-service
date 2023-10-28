@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.FacultadException;
-import um.haberes.rest.model.Facultad;
+import um.haberes.rest.kotlin.model.Facultad;
 import um.haberes.rest.repository.IFacultadRepository;
 
 /**

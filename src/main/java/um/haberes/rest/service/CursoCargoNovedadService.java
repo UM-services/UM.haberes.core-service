@@ -14,7 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.CursoCargoNovedadException;
-import um.haberes.rest.model.CursoCargoNovedad;
+import um.haberes.rest.kotlin.model.CursoCargoNovedad;
 import um.haberes.rest.repository.ICursoCargoNovedadRepository;
 
 /**

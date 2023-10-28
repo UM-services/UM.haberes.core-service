@@ -13,7 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.LegajoBancoException;
-import um.haberes.rest.model.LegajoBanco;
+import um.haberes.rest.kotlin.model.LegajoBanco;
 import um.haberes.rest.repository.ILegajoBancoRepository;
 
 /**

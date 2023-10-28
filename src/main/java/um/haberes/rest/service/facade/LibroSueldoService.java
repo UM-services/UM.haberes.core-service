@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import um.haberes.rest.exception.LegajoBancoException;
 import um.haberes.rest.kotlin.internal.AfipContext;
 import um.haberes.rest.kotlin.model.*;
-import um.haberes.rest.model.LegajoBanco;
 import um.haberes.rest.service.*;
 import um.haberes.rest.service.internal.AfipContextService;
 

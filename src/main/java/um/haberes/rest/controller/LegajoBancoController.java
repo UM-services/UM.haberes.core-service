@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.rest.exception.LegajoBancoException;
-import um.haberes.rest.model.LegajoBanco;
+import um.haberes.rest.kotlin.model.LegajoBanco;
 import um.haberes.rest.service.LegajoBancoService;
 import lombok.extern.slf4j.Slf4j;
 

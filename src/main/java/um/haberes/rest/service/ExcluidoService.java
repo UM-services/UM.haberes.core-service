@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.ExcluidoException;
-import um.haberes.rest.model.Excluido;
+import um.haberes.rest.kotlin.model.Excluido;
 import um.haberes.rest.repository.IExcluidoRepository;
 
 /**

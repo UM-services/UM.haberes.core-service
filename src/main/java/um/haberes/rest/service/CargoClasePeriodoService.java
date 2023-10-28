@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.view.CargoClasePeriodoNotFoundException;
-import um.haberes.rest.model.CargoClasePeriodo;
+import um.haberes.rest.kotlin.model.CargoClasePeriodo;
 import um.haberes.rest.repository.ICargoClasePeriodoRepository;
 
 /**

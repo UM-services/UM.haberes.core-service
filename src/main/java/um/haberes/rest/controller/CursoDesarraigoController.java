@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import um.haberes.rest.model.CursoDesarraigo;
+import um.haberes.rest.kotlin.model.CursoDesarraigo;
 import um.haberes.rest.service.CursoDesarraigoService;
 
 /**
@@ -34,7 +34,7 @@ public class CursoDesarraigoController {
 
 	@GetMapping("/")
 	public @ResponseBody ResponseEntity<List<CursoDesarraigo>> findAll() {
-		return new ResponseEntity<List<CursoDesarraigo>>(service.findAll(), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAll(), HttpStatus.OK);
 	}
 
 	@GetMapping("/legajoId/{legajoId}/{anho}/{mes}")

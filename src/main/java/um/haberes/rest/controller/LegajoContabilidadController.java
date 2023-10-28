@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import um.haberes.rest.model.LegajoContabilidad;
+import um.haberes.rest.kotlin.model.LegajoContabilidad;
 import um.haberes.rest.service.LegajoContabilidadService;
 
 /**
@@ -34,7 +34,7 @@ public class LegajoContabilidadController {
 
 	@GetMapping("/diferencia/{anho}/{mes}")
 	public ResponseEntity<List<LegajoContabilidad>> findAllDiferenciaByPeriodo(@PathVariable Integer anho,
-			@PathVariable Integer mes) {
+																			   @PathVariable Integer mes) {
 		return new ResponseEntity<List<LegajoContabilidad>>(service.findAllDiferenciaByPeriodo(anho, mes),
 				HttpStatus.OK);
 	}

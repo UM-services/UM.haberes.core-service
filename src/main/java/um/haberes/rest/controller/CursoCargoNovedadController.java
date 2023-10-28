@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.rest.exception.CursoCargoNovedadException;
-import um.haberes.rest.model.CursoCargoNovedad;
+import um.haberes.rest.kotlin.model.CursoCargoNovedad;
 import um.haberes.rest.service.CursoCargoNovedadService;
 
 /**
@@ -35,8 +35,8 @@ public class CursoCargoNovedadController {
 
 	@GetMapping("/pendiente/{anho}/{mes}")
 	public ResponseEntity<List<CursoCargoNovedad>> findAllPendientes(@PathVariable Integer anho,
-			@PathVariable Integer mes) {
-		return new ResponseEntity<List<CursoCargoNovedad>>(service.findAllPendientes(anho, mes), HttpStatus.OK);
+																	 @PathVariable Integer mes) {
+		return new ResponseEntity<>(service.findAllPendientes(anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/pendientealta/{anho}/{mes}")

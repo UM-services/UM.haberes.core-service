@@ -23,12 +23,6 @@ import um.haberes.rest.exception.CursoDesarraigoException;
 import um.haberes.rest.exception.DesignacionException;
 import um.haberes.rest.exception.LegajoControlException;
 import um.haberes.rest.kotlin.model.*;
-import um.haberes.rest.model.CargoTipo;
-import um.haberes.rest.model.CursoDesarraigo;
-import um.haberes.rest.model.Designacion;
-import um.haberes.rest.model.DesignacionTipo;
-import um.haberes.rest.model.Facultad;
-import um.haberes.rest.model.Geografica;
 import um.haberes.rest.service.AntiguedadLimiteService;
 import um.haberes.rest.service.AntiguedadService;
 import um.haberes.rest.service.CursoCargoService;
@@ -308,7 +302,7 @@ public class DesignacionToolService {
         log.debug("CursoDesarraigos -> {}", cursoDesarraigos);
         Map<String, CursoDesarraigo> cursoDesarraigoMap = cursoDesarraigos.stream()
                 .collect(Collectors.toMap(
-                        curso -> curso.getLegajoId().toString() + "." + curso.getAnho().toString() + "."
+                        curso -> curso.getLegajoId().toString() + "." + curso.getAnho() + "."
                                 + curso.getMes().toString() + "." + curso.getCursoId().toString(),
                         cursoDesarraigo -> cursoDesarraigo));
         log.debug("CursoDesarraigoMap -> {}", cursoDesarraigoMap);

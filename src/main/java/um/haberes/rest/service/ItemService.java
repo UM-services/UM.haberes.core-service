@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 import um.haberes.rest.exception.ItemException;
 import um.haberes.rest.kotlin.model.CodigoGrupo;
 import um.haberes.rest.kotlin.model.Item;
-import um.haberes.rest.model.ItemVersion;
+import um.haberes.rest.kotlin.model.ItemVersion;
 import um.haberes.rest.repository.IItemRepository;
 import um.haberes.rest.repository.IItemVersionRepository;
 

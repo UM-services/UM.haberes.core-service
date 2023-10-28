@@ -54,8 +54,6 @@ import um.haberes.rest.exception.ContactoException;
 import um.haberes.rest.exception.LegajoBancoException;
 import um.haberes.rest.exception.LegajoControlException;
 import um.haberes.rest.exception.LetraException;
-import um.haberes.rest.model.LegajoBanco;
-import um.haberes.rest.model.Letra;
 import um.haberes.rest.service.AntiguedadService;
 import um.haberes.rest.service.BonoImpresionService;
 import um.haberes.rest.service.CargoClaseDetalleService;
@@ -641,7 +639,7 @@ public class BonoService {
                                     cargoClaseDetalle.getCargoClase().getNombre(),
                                     cargoClaseDetalle.getCargoClasePeriodo().getDescripcion(),
                                     cargoClaseDetalle.getCargoClasePeriodo().getGeografica().getNombre(),
-                                    cargoClaseDetalle.getCargoClasePeriodo().getHoras().toString(), "horas"),
+                                    cargoClaseDetalle.getCargoClasePeriodo().getHoras(), "horas"),
                             new Font(Font.HELVETICA, 8)));
                     cell.setBorder(Rectangle.NO_BORDER);
                     cell.setHorizontalAlignment(Element.ALIGN_LEFT);

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.AcreditacionException;
 import um.haberes.rest.exception.CursoDesarraigoException;
-import um.haberes.rest.model.CursoDesarraigo;
+import um.haberes.rest.kotlin.model.CursoDesarraigo;
 import um.haberes.rest.repository.ICursoDesarraigoRepository;
 import lombok.extern.slf4j.Slf4j;
 

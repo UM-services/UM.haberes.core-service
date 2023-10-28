@@ -2,9 +2,6 @@ package um.haberes.rest.kotlin.model
 
 import jakarta.persistence.*
 import um.haberes.rest.model.Auditable
-import um.haberes.rest.model.CargoClasePeriodo
-import um.haberes.rest.model.Facultad
-import um.haberes.rest.model.Geografica
 import java.math.BigDecimal
 
 @Entity

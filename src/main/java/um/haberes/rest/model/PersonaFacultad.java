@@ -19,6 +19,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import um.haberes.rest.kotlin.model.Facultad;
 import um.haberes.rest.kotlin.model.Persona;
 
 /**

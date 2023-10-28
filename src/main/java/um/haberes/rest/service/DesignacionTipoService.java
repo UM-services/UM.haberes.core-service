@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.DesignacionTipoException;
-import um.haberes.rest.model.DesignacionTipo;
+import um.haberes.rest.kotlin.model.DesignacionTipo;
 import um.haberes.rest.repository.IDesignacionTipoRepository;
 
 /**

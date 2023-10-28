@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.CargoLiquidacionNotFoundException;
 import um.haberes.rest.kotlin.model.CargoLiquidacion;
-import um.haberes.rest.model.CargoLiquidacionVersion;
+import um.haberes.rest.kotlin.model.CargoLiquidacionVersion;
 import um.haberes.rest.repository.ICargoLiquidacionRepository;
 
 /**
@@ -33,7 +33,7 @@ public class CargoLiquidacionService {
 	private CategoriaService categoriaService;
 
 	@Autowired
-	private CargoVersionService cargoVersionService;
+	private CargoLiquidacionVersionService cargoLiquidacionVersionService;
 
 	public List<CargoLiquidacion> findAllByLegajo(Long legajoId, Integer anho, Integer mes) {
 		return repository.findAllByLegajoIdAndAnhoAndMes(legajoId, anho, mes);
@@ -129,7 +129,7 @@ public class CargoLiquidacionService {
 								cargoLiquidacion.getPresentismo(), cargoLiquidacion.getFechaDesde(),
 								cargoLiquidacion.getFechaHasta(), cargoLiquidacion.getSituacion()));
 			}
-			backups = cargoVersionService.saveAll(backups);
+			backups = cargoLiquidacionVersionService.saveAll(backups);
 		}
 		return cargos;
 	}

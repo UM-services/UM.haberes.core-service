@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import um.haberes.rest.model.ConversionLog;
+import um.haberes.rest.kotlin.model.ConversionLog;
 import um.haberes.rest.service.ConversionLogService;
 
 /**
@@ -30,7 +30,7 @@ public class ConversionLogController {
 	
 	@GetMapping("/")
 	public ResponseEntity<List<ConversionLog>> findAll() {
-		return new ResponseEntity<List<ConversionLog>>(service.findAll(), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAll(), HttpStatus.OK);
 	}
 	
 	@PostMapping("/")

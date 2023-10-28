@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.LegajoContabilidadException;
-import um.haberes.rest.model.LegajoContabilidad;
+import um.haberes.rest.kotlin.model.LegajoContabilidad;
 import um.haberes.rest.repository.ILegajoContabilidadRepository;
 
 /**

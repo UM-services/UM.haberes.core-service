@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import um.haberes.rest.model.Facultad;
+import um.haberes.rest.kotlin.model.Facultad;
 import um.haberes.rest.service.FacultadService;
 
 /**
@@ -29,7 +29,7 @@ public class FacultadController {
 	
 	@GetMapping("/")
 	public ResponseEntity<List<Facultad>> findAll() {
-		return new ResponseEntity<List<Facultad>>(service.findAll(), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAll(), HttpStatus.OK);
 	}
 	
 	@GetMapping("/facultades")

@@ -25,10 +25,6 @@ import org.springframework.stereotype.Service;
 import um.haberes.rest.exception.ItemException;
 import um.haberes.rest.exception.LegajoContabilidadException;
 import um.haberes.rest.exception.LiquidacionException;
-import um.haberes.rest.model.CodigoImputacion;
-import um.haberes.rest.model.LegajoCargoClaseImputacion;
-import um.haberes.rest.model.LegajoCodigoImputacion;
-import um.haberes.rest.model.LegajoContabilidad;
 import um.haberes.rest.util.Proporcion;
 import lombok.extern.slf4j.Slf4j;
 

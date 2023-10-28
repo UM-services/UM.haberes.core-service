@@ -10,7 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.GeograficaException;
-import um.haberes.rest.model.Geografica;
+import um.haberes.rest.kotlin.model.Geografica;
 import um.haberes.rest.repository.IGeograficaRepository;
 import lombok.extern.slf4j.Slf4j;
 

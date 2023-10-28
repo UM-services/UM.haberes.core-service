@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.CodigoImputacionException;
-import um.haberes.rest.model.CodigoImputacion;
+import um.haberes.rest.kotlin.model.CodigoImputacion;
 import um.haberes.rest.repository.ICodigoImputacionRepository;
 
 /**
