@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import um.haberes.rest.exception.LiquidacionException;
 import um.haberes.rest.kotlin.model.Liquidacion;
 import um.haberes.rest.kotlin.model.LiquidacionVersion;
-import um.haberes.rest.model.view.LiquidacionPeriodo;
+import um.haberes.rest.kotlin.model.view.LiquidacionPeriodo;
 import um.haberes.rest.repository.ILiquidacionRepository;
 import um.haberes.rest.service.view.LiquidacionPeriodoService;
 import um.haberes.rest.util.Periodo;

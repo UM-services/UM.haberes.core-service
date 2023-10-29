@@ -2,7 +2,6 @@ package um.haberes.rest.kotlin.model
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import jakarta.persistence.*
-import um.haberes.rest.model.Auditable
 import java.time.OffsetDateTime
 
 @Entity

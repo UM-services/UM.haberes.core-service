@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import um.haberes.rest.exception.AcreditacionPagoException;
 import um.haberes.rest.exception.extern.ProveedorMovimientoException;
-import um.haberes.rest.kotlin.internal.OrdenPagoRequest;
+import um.haberes.rest.kotlin.model.internal.OrdenPagoRequest;
 import um.haberes.rest.kotlin.model.AcreditacionPago;
 import um.haberes.rest.kotlin.model.extern.Ejercicio;
 import um.haberes.rest.kotlin.model.extern.ProveedorMovimiento;

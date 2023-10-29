@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import um.haberes.rest.model.view.CargoLiquidacionNoDocente;
+import um.haberes.rest.kotlin.model.view.CargoLiquidacionNoDocente;
 import um.haberes.rest.service.view.CargoLiquidacionNoDocenteService;
 
 /**
@@ -29,8 +29,8 @@ public class CargoLiquidacionNoDocenteController {
 
 	@GetMapping("/periodo/{anho}/{mes}")
 	public ResponseEntity<List<CargoLiquidacionNoDocente>> findAllByPeriodo(@PathVariable Integer anho,
-			@PathVariable Integer mes) {
-		return new ResponseEntity<List<CargoLiquidacionNoDocente>>(service.findAllByPeriodo(anho, mes), HttpStatus.OK);
+																			@PathVariable Integer mes) {
+		return new ResponseEntity<>(service.findAllByPeriodo(anho, mes), HttpStatus.OK);
 	}
 
 }

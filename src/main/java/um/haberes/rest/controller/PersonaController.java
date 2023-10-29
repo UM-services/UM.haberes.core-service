@@ -20,7 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.rest.exception.PersonaException;
 import um.haberes.rest.kotlin.model.Persona;
-import um.haberes.rest.kotlin.view.PersonaSearch;
+import um.haberes.rest.kotlin.model.view.PersonaSearch;
 import um.haberes.rest.service.PersonaService;
 import um.haberes.rest.util.transfer.FileInfo;
 import lombok.extern.slf4j.Slf4j;

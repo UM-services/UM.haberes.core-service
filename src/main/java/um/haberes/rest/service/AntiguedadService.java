@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import um.haberes.rest.exception.AntiguedadNotFoundException;
 import um.haberes.rest.kotlin.model.Antiguedad;
 import um.haberes.rest.kotlin.model.Persona;
-import um.haberes.rest.kotlin.view.AntiguedadPeriodo;
+import um.haberes.rest.kotlin.model.view.AntiguedadPeriodo;
 import um.haberes.rest.repository.IAntiguedadRepository;
 import um.haberes.rest.service.view.AntiguedadPeriodoService;
 import um.haberes.rest.util.Periodo;

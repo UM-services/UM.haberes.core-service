@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import um.haberes.rest.model.NovedadUpload;
+import um.haberes.rest.kotlin.model.NovedadUpload;
 import um.haberes.rest.service.NovedadUploadService;
 
 /**
@@ -29,7 +29,7 @@ public class NovedadUploadController {
 
 	@GetMapping("/pendiente/{anho}/{mes}/{pendiente}")
 	public ResponseEntity<List<NovedadUpload>> findAllByPendiente(@PathVariable Integer anho, @PathVariable Integer mes,
-			@PathVariable Byte pendiente) {
-		return new ResponseEntity<List<NovedadUpload>>(service.findAllByPendiente(anho, mes, pendiente), HttpStatus.OK);
+																  @PathVariable Byte pendiente) {
+		return new ResponseEntity<>(service.findAllByPendiente(anho, mes, pendiente), HttpStatus.OK);
 	}
 }

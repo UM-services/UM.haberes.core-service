@@ -30,9 +30,9 @@ import um.haberes.rest.exception.NovedadException;
 import um.haberes.rest.exception.common.ImportNewsException;
 import um.haberes.rest.exception.common.TituloNotFoundException;
 import um.haberes.rest.kotlin.model.Codigo;
+import um.haberes.rest.kotlin.model.Novedad;
+import um.haberes.rest.kotlin.model.NovedadUpload;
 import um.haberes.rest.kotlin.model.Persona;
-import um.haberes.rest.model.Novedad;
-import um.haberes.rest.model.NovedadUpload;
 import um.haberes.rest.service.CodigoService;
 import um.haberes.rest.service.NovedadService;
 import um.haberes.rest.service.NovedadUploadService;
@@ -68,7 +68,7 @@ public class NovedadFileService {
         novedadUploadService.deleteAllByPendiente((byte) 1);
 
         Map<Long, Persona> legajoIds = personaService.findAll().stream().collect(Collectors.toMap(Persona::getLegajoId, persona -> persona));
-        List<NovedadUpload> novedades = new ArrayList<NovedadUpload>();
+        List<NovedadUpload> novedades = new ArrayList<>();
         File file = Tool.writeFile(fileInfo);
 
         // Procesa Excel
@@ -197,7 +197,7 @@ public class NovedadFileService {
 
     @Transactional
     public void importNews(Integer anho, Integer mes) {
-        List<Novedad> novedades = new ArrayList<Novedad>();
+        List<Novedad> novedades = new ArrayList<>();
         for (NovedadUpload novedadUpload : novedadUploadService.findAllByPendiente(anho, mes, (byte) 1)) {
             Long novedadId = null;
             try {

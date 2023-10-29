@@ -7,8 +7,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import um.haberes.rest.model.view.CargoClaseDetallePeriodo;
+import um.haberes.rest.kotlin.model.view.CargoClaseDetallePeriodo;
 
 /**
  * @author daniel

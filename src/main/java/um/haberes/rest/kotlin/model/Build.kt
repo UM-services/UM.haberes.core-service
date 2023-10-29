@@ -1,6 +1,5 @@
 package um.haberes.rest.kotlin.model
 
-import um.haberes.rest.model.Auditable
 import jakarta.persistence.*
 
 @Entity

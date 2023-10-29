@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import um.haberes.rest.model.PersonaFacultad;
+import um.haberes.rest.kotlin.model.PersonaFacultad;
 import um.haberes.rest.service.PersonaFacultadService;
 
 /**
@@ -32,7 +32,7 @@ public class PersonaFacultadController {
 
 	@GetMapping("/facultad/{facultadId}")
 	public ResponseEntity<List<PersonaFacultad>> findAllByFacultad(@PathVariable Integer facultadId) {
-		return new ResponseEntity<List<PersonaFacultad>>(service.findAllByFacultad(facultadId), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllByFacultad(facultadId), HttpStatus.OK);
 	}
 
 	@GetMapping("/persona/{legajoId}")

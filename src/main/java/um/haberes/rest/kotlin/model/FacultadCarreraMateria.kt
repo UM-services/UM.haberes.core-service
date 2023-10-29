@@ -1,7 +1,6 @@
 package um.haberes.rest.kotlin.model
 
 import jakarta.persistence.*
-import um.haberes.rest.model.Auditable
 
 @Entity
 @Table(uniqueConstraints = [UniqueConstraint(columnNames = ["facultadId", "planId", "carreraId", "materiaId"])])

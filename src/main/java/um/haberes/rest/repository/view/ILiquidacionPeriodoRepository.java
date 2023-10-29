@@ -8,8 +8,7 @@ import java.util.List;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import um.haberes.rest.model.view.LiquidacionPeriodo;
+import um.haberes.rest.kotlin.model.view.LiquidacionPeriodo;
 
 /**
  * @author daniel

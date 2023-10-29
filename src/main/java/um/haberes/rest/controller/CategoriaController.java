@@ -22,7 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 import um.haberes.rest.exception.CategoriaException;
 import um.haberes.rest.exception.common.TituloNotFoundException;
 import um.haberes.rest.kotlin.model.Categoria;
-import um.haberes.rest.kotlin.view.CategoriaSearch;
+import um.haberes.rest.kotlin.model.view.CategoriaSearch;
 import um.haberes.rest.service.CategoriaService;
 import um.haberes.rest.util.transfer.FileInfo;
 import lombok.extern.slf4j.Slf4j;

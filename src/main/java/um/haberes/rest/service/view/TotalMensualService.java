@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.view.TotalMensualNotFoundException;
-import um.haberes.rest.model.view.TotalMensual;
+import um.haberes.rest.kotlin.model.view.TotalMensual;
 import um.haberes.rest.repository.view.ITotalMensualRepository;
 
 /**

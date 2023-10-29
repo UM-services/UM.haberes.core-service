@@ -6,7 +6,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.beans.factory.annotation.Autowired;
-import um.haberes.rest.kotlin.view.AfipConceptoSueldoSearch;
+import um.haberes.rest.kotlin.model.view.AfipConceptoSueldoSearch;
 import um.haberes.rest.repository.view.IAfipConceptoSueldoSearchRepositoryCustom;
 
 import java.util.ArrayList;

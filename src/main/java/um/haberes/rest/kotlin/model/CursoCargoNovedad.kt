@@ -1,7 +1,6 @@
 package um.haberes.rest.kotlin.model
 
 import jakarta.persistence.*
-import um.haberes.rest.model.Auditable
 import java.math.BigDecimal
 
 @Entity

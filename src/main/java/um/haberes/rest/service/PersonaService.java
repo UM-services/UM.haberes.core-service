@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.ContactoException;
 import um.haberes.rest.exception.PersonaException;
-import um.haberes.rest.kotlin.view.PersonaSearch;
+import um.haberes.rest.kotlin.model.view.PersonaSearch;
 import um.haberes.rest.repository.IPersonaRepository;
 import um.haberes.rest.service.facade.ToolService;
 import um.haberes.rest.service.view.PersonaSearchService;

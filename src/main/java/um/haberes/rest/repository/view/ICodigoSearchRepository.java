@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import um.haberes.rest.kotlin.view.CodigoSearch;
+import um.haberes.rest.kotlin.model.view.CodigoSearch;
 
 /**
  * @author daniel

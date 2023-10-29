@@ -1,6 +1,6 @@
 package um.haberes.rest.repository.view;
 
-import um.haberes.rest.kotlin.view.AfipConceptoSueldoSearch;
+import um.haberes.rest.kotlin.model.view.AfipConceptoSueldoSearch;
 
 import java.util.List;
 

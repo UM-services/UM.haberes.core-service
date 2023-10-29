@@ -20,7 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 import um.haberes.rest.exception.AntiguedadNotFoundException;
 import um.haberes.rest.exception.view.AntiguedadPeriodoNotFoundException;
 import um.haberes.rest.kotlin.model.Antiguedad;
-import um.haberes.rest.kotlin.view.AntiguedadPeriodo;
+import um.haberes.rest.kotlin.model.view.AntiguedadPeriodo;
 import um.haberes.rest.service.AntiguedadService;
 
 /**

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import um.haberes.rest.model.dto.FormularioAsignacionCargo;
+import um.haberes.rest.kotlin.model.dto.FormularioAsignacionCargo;
 import um.haberes.rest.service.dto.FormularioAsignacionCargoService;
 
 /**
@@ -26,7 +26,7 @@ public class FormularioAsignacionCargoController {
 
 	@GetMapping("/")
 	public ResponseEntity<FormularioAsignacionCargo> findData() {
-		return new ResponseEntity<FormularioAsignacionCargo>(service.findData(), HttpStatus.OK);
+		return new ResponseEntity<>(service.findData(), HttpStatus.OK);
 	}
 	
 }

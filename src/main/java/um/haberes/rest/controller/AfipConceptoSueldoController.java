@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import um.haberes.rest.kotlin.model.AfipConceptoSueldo;
-import um.haberes.rest.kotlin.view.AfipConceptoSueldoSearch;
+import um.haberes.rest.kotlin.model.view.AfipConceptoSueldoSearch;
 import um.haberes.rest.service.AfipConceptoSueldoService;
 
 import java.util.List;

@@ -20,7 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.rest.exception.CargoLiquidacionNotFoundException;
 import um.haberes.rest.kotlin.model.CargoLiquidacion;
-import um.haberes.rest.model.view.CargoLiquidacionPeriodo;
+import um.haberes.rest.kotlin.model.view.CargoLiquidacionPeriodo;
 import um.haberes.rest.service.CargoLiquidacionService;
 import um.haberes.rest.service.view.CargoLiquidacionPeriodoService;
 
@@ -69,8 +69,8 @@ public class CargoLiquidacionController {
 
 	@GetMapping("/legajoresto/{legajoId}/{anho}/{mes}/{categoriaId}")
 	public ResponseEntity<List<CargoLiquidacionPeriodo>> findAllRestoByLegajo(@PathVariable Long legajoId,
-			@PathVariable Integer anho, @PathVariable Integer mes, @PathVariable Integer categoriaId) {
-		return new ResponseEntity<List<CargoLiquidacionPeriodo>>(
+																			  @PathVariable Integer anho, @PathVariable Integer mes, @PathVariable Integer categoriaId) {
+		return new ResponseEntity<>(
 				cargoLiquidacionPeriodoService.findAllRestoByLegajo(legajoId, anho, mes, categoriaId), HttpStatus.OK);
 	}
 

@@ -3,7 +3,7 @@
  */
 package um.haberes.rest.repository.view;
 
-import um.haberes.rest.kotlin.view.PersonaSearch;
+import um.haberes.rest.kotlin.model.view.PersonaSearch;
 
 import java.util.List;
 

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.rest.exception.NovedadException;
-import um.haberes.rest.model.Novedad;
+import um.haberes.rest.kotlin.model.Novedad;
 import um.haberes.rest.service.NovedadService;
 
 /**
@@ -35,7 +35,7 @@ public class NovedadController {
 
 	@GetMapping("/legajo/{legajoId}/{anho}/{mes}")
 	public ResponseEntity<List<Novedad>> findAllByLegajo(@PathVariable Long legajoId, @PathVariable Integer anho,
-			@PathVariable Integer mes) {
+														 @PathVariable Integer mes) {
 		return new ResponseEntity<List<Novedad>>(service.findAllByLegajo(legajoId, anho, mes), HttpStatus.OK);
 	}
 

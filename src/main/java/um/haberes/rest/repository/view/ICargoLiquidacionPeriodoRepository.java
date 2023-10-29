@@ -7,8 +7,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import um.haberes.rest.model.view.CargoLiquidacionPeriodo;
+import um.haberes.rest.kotlin.model.view.CargoLiquidacionPeriodo;
 
 /**
  * @author daniel
@@ -18,6 +17,6 @@ import um.haberes.rest.model.view.CargoLiquidacionPeriodo;
 public interface ICargoLiquidacionPeriodoRepository extends JpaRepository<CargoLiquidacionPeriodo, Long> {
 
 	public List<CargoLiquidacionPeriodo> findAllByLegajoIdAndCategoriaIdAndPeriodoGreaterThanEqual(Long legajoId,
-			Integer categoriaId, Long periodo);
+																								   Integer categoriaId, Long periodo);
 
 }

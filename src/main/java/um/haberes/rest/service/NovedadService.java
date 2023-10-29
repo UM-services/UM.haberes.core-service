@@ -12,7 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.NovedadException;
-import um.haberes.rest.model.Novedad;
+import um.haberes.rest.kotlin.model.Novedad;
 import um.haberes.rest.repository.INovedadRepository;
 import lombok.extern.slf4j.Slf4j;
 

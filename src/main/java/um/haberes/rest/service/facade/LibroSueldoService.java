@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import um.haberes.rest.exception.LegajoBancoException;
-import um.haberes.rest.kotlin.internal.AfipContext;
+import um.haberes.rest.kotlin.model.internal.AfipContext;
 import um.haberes.rest.kotlin.model.*;
 import um.haberes.rest.service.*;
 import um.haberes.rest.service.internal.AfipContextService;

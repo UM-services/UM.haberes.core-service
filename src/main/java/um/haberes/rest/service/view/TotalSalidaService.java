@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.view.TotalSalidaNotFoundException;
-import um.haberes.rest.model.view.TotalSalida;
+import um.haberes.rest.kotlin.model.view.TotalSalida;
 import um.haberes.rest.repository.view.ITotalSalidaRepository;
 
 /**

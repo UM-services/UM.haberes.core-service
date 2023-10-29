@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.kotlin.model.LegajoControl;
-import um.haberes.rest.model.dto.FormularioImprimir;
+import um.haberes.rest.kotlin.model.dto.FormularioImprimir;
 import um.haberes.rest.service.ContactoService;
 import um.haberes.rest.service.LegajoControlService;
 

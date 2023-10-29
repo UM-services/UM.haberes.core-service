@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.rest.exception.view.TotalSalidaNotFoundException;
-import um.haberes.rest.model.view.TotalSalida;
+import um.haberes.rest.kotlin.model.view.TotalSalida;
 import um.haberes.rest.service.view.TotalSalidaService;
 
 /**
@@ -30,7 +30,7 @@ public class TotalSalidaController {
 	@GetMapping("/periodo/{anho}/{mes}")
 	public ResponseEntity<TotalSalida> findAByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes) {
 		try {
-			return new ResponseEntity<TotalSalida>(service.findByPeriodo(anho, mes), HttpStatus.OK);
+			return new ResponseEntity<>(service.findByPeriodo(anho, mes), HttpStatus.OK);
 		} catch (TotalSalidaNotFoundException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}

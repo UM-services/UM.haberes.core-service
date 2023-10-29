@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import um.haberes.rest.kotlin.model.Codigo;
-import um.haberes.rest.kotlin.view.CodigoSearch;
+import um.haberes.rest.kotlin.model.view.CodigoSearch;
 import um.haberes.rest.service.CodigoService;
 
 /**

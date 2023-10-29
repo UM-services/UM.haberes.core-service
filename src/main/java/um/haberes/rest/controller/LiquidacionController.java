@@ -23,7 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.rest.exception.LiquidacionException;
 import um.haberes.rest.kotlin.model.Liquidacion;
-import um.haberes.rest.model.view.LiquidacionPeriodo;
+import um.haberes.rest.kotlin.model.view.LiquidacionPeriodo;
 import um.haberes.rest.service.LiquidacionService;
 
 /**
@@ -74,7 +74,7 @@ public class LiquidacionController {
 
 	@GetMapping("/legajoforward/{legajoId}/{anho}/{mes}")
 	public ResponseEntity<List<LiquidacionPeriodo>> findAllByLegajoForward(@PathVariable Long legajoId,
-                                                                           @PathVariable Integer anho, @PathVariable Integer mes) {
+																		   @PathVariable Integer anho, @PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findAllByLegajoForward(legajoId, anho, mes),
 				HttpStatus.OK);
 	}

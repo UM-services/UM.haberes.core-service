@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import um.haberes.rest.model.dto.FormularioImprimir;
+import um.haberes.rest.kotlin.model.dto.FormularioImprimir;
 import um.haberes.rest.service.dto.FormularioImprimirService;
 
 /**
@@ -27,7 +27,7 @@ public class FormularioImprimirController {
 
 	@GetMapping("/{anho}/{mes}/{dependenciaId}/{filtro}")
 	public ResponseEntity<FormularioImprimir> findData(@PathVariable Integer anho, @PathVariable Integer mes,
-			@PathVariable Integer dependenciaId, @PathVariable String filtro) {
+													   @PathVariable Integer dependenciaId, @PathVariable String filtro) {
 		return new ResponseEntity<FormularioImprimir>(service.findData(anho, mes, dependenciaId, filtro),
 				HttpStatus.OK);
 	}

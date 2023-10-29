@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import um.haberes.rest.kotlin.view.AsignadoCategoria;
+import um.haberes.rest.kotlin.model.view.AsignadoCategoria;
 import um.haberes.rest.service.view.AsignadoCategoriaService;
 
 /**
