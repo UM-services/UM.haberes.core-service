@@ -7,6 +7,7 @@ tmp/
 data/
 cloudbeaver/
 /target/
+.vscode/
 !.mvn/wrapper/maven-wrapper.jar
 
 ### STS ###

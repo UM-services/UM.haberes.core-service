@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.view.ImputadoTotalNotFoundException;
-import um.haberes.rest.model.view.ImputadoTotal;
+import um.haberes.rest.kotlin.model.view.ImputadoTotal;
 import um.haberes.rest.repository.view.IImputadoTotalRepository;
 
 /**

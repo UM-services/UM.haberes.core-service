@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import um.haberes.rest.model.view.ImputadoSueldo;
+import um.haberes.rest.kotlin.model.view.ImputadoSueldo;
 import um.haberes.rest.service.view.ImputadoSueldoService;
 
 /**
@@ -29,7 +29,7 @@ public class ImputadoSueldoController {
 	
 	@GetMapping("/periodo/{anho}/{mes}")
 	public ResponseEntity<List<ImputadoSueldo>> findAllByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes) {
-		return new ResponseEntity<List<ImputadoSueldo>>(service.findAllByPeriodo(anho, mes), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllByPeriodo(anho, mes), HttpStatus.OK);
 	}
 
 }

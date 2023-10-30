@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.model.view.CategoriaByPeriodo;
+import um.haberes.rest.kotlin.model.view.CategoriaByPeriodo;
 import um.haberes.rest.repository.ICategoriaRepository;
 import um.haberes.rest.repository.view.ICategoriaByPeriodoRepository;
 
