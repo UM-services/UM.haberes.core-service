@@ -164,7 +164,7 @@ public class BonoService {
         for (Liquidacion liquidacion : liquidacionService.findAllByDependencia(dependenciaId, anho, mes, salida)) {
             filenames.add(filename = path + "bono." + liquidacion.getLegajoId() + "." + anho + "." + mes + ".pdf");
             log.debug("Filename -> {}", filename);
-            filename = makePdf(filename, liquidacion.getLegajoId(), anho, mes, legajoIdSolicitud, ipAddress, control);
+            filename = makePdfConFusion(filename, liquidacion.getLegajoId(), anho, mes, legajoIdSolicitud, ipAddress, control);
         }
 
         try {
@@ -200,11 +200,11 @@ public class BonoService {
         String filename = path + "bono." + legajoId + "." + anho + "." + mes + ".pdf";
         Control control = controlService.findByPeriodo(anho, mes);
 
-        return makePdf(filename, legajoId, anho, mes, legajoIdSolicitud, ipAddress, control);
+        return makePdfConFusion(filename, legajoId, anho, mes, legajoIdSolicitud, ipAddress, control);
     }
 
     @Transactional
-    public String makePdf(String filename, Long legajoId, Integer anho, Integer mes, Long legajoIdSolicitud,
+    public String makePdfConFusion(String filename, Long legajoId, Integer anho, Integer mes, Long legajoIdSolicitud,
                           String ipAddress, Control control) {
         Persona persona = personaService.findByLegajoId(legajoId);
         Antiguedad antiguedad = antiguedadService.findByUnique(legajoId, anho, mes);
