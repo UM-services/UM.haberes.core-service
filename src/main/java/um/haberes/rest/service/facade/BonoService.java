@@ -1071,16 +1071,17 @@ public class BonoService {
             return "ERROR: No pudo ENVIARSE";
         }
 
+        javaMailSender.send(message);
+
         LegajoControl legajoControl = null;
         try {
-            legajoControl = legajoControlService.findByUnique(legajoIdSolicitud, anho, mes);
+            legajoControl = legajoControlService.findByUnique(legajoId, anho, mes);
             legajoControl.setBonoEnviado((byte) 1);
             legajoControl = legajoControlService.update(legajoControl, legajoControl.getLegajoControlId());
         } catch (LegajoControlException e) {
             legajoControl = new LegajoControl(null, legajoId, anho, mes, (byte) 0, (byte) 0, (byte) 1, persona);
             legajoControl = legajoControlService.add(legajoControl);
         }
-        javaMailSender.send(message);
 
         return "Envío de Correo Ok!!";
     }
