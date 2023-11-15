@@ -223,8 +223,10 @@ public class LibroSueldoService {
             try {
                 LegajoBanco legajoBanco = legajoBancoservice.findLegajoCbuPrincipal(legajoId, liquidacion.getAnho(), liquidacion.getMes());
                 cbu = legajoBanco.getCbu();
+                log.info("cbu try={}", cbu);
             } catch (LegajoBancoException e) {
-                cbu = String.format("%22s", ""); // sin cbu
+                cbu = String.format("%022d", 0); // sin cbu
+                log.info("cbu catch={}", cbu);
             }
             line += cbu; // cbu
             line += new DecimalFormat("000").format(0); // tope

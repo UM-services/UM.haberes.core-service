@@ -403,16 +403,16 @@ public class MakeLiquidacionService {
         }
 
         // Obra Social
-        coeficiente = control.getOsociaem().divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
-        if (conAportes.compareTo(coeficienteLiquidacion.multiply(control.getMinimoAporte())) < 0) {
-            value = coeficiente.multiply(coeficienteLiquidacion.multiply(control.getMinimoAporte())).setScale(2, RoundingMode.HALF_UP);
-        }
-        if (conAportes.compareTo(coeficienteLiquidacion.multiply(control.getMinimoAporte())) >= 0 && conAportes.compareTo(coeficienteLiquidacion.multiply(control.getMaximoAporte())) <= 0) {
-            value = coeficiente.multiply(conAportes).setScale(2, RoundingMode.HALF_UP);
-        }
-        if (conAportes.compareTo(coeficienteLiquidacion.multiply(control.getMaximoAporte())) > 0) {
-            value = coeficiente.multiply(coeficienteLiquidacion.multiply(control.getMaximoAporte())).setScale(2, RoundingMode.HALF_UP);
-        }
+//        coeficiente = control.getOsociaem().divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
+//        if (conAportes.compareTo(coeficienteLiquidacion.multiply(control.getMinimoAporte())) < 0) {
+//            value = coeficiente.multiply(coeficienteLiquidacion.multiply(control.getMinimoAporte())).setScale(2, RoundingMode.HALF_UP);
+//        }
+//        if (conAportes.compareTo(coeficienteLiquidacion.multiply(control.getMinimoAporte())) >= 0 && conAportes.compareTo(coeficienteLiquidacion.multiply(control.getMaximoAporte())) <= 0) {
+//            value = coeficiente.multiply(conAportes).setScale(2, RoundingMode.HALF_UP);
+//        }
+//        if (conAportes.compareTo(coeficienteLiquidacion.multiply(control.getMaximoAporte())) > 0) {
+//            value = coeficiente.multiply(coeficienteLiquidacion.multiply(control.getMaximoAporte())).setScale(2, RoundingMode.HALF_UP);
+//        }
         if (persona.getEstadoAfip() == 2 || conAportes.compareTo(BigDecimal.ZERO) == 0) {
             value = BigDecimal.ZERO;
         }

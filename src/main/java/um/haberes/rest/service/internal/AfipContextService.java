@@ -165,7 +165,6 @@ public class AfipContextService {
             afipRemunerativo10 = BigDecimal.ZERO;
         }
 
-
         afipRemunerativo03 = importeRemunerativo;
         afipRemunerativo04 = afipRemunerativo01;
         afipRemunerativo05 = importeRemunerativo;
@@ -213,11 +212,11 @@ public class AfipContextService {
             afipTipoEmpresa = 7;
         }
 
-        afipBaseCalculoDiferencialAportesOSyFSR = control.getMinimoAporte().subtract(afipRemunerativo04);
-        if (afipBaseCalculoDiferencialAportesOSyFSR.compareTo(BigDecimal.ZERO) < 0) {
-            afipBaseCalculoDiferencialAportesOSyFSR = BigDecimal.ZERO;
-        }
-        afipBaseCalculoDiferencialOSyFSR = afipBaseCalculoDiferencialAportesOSyFSR;
+//        afipBaseCalculoDiferencialAportesOSyFSR = control.getMinimoAporte().subtract(afipRemunerativo04);
+//        if (afipBaseCalculoDiferencialAportesOSyFSR.compareTo(BigDecimal.ZERO) < 0) {
+//            afipBaseCalculoDiferencialAportesOSyFSR = BigDecimal.ZERO;
+//        }
+//        afipBaseCalculoDiferencialOSyFSR = afipBaseCalculoDiferencialAportesOSyFSR;
 
         AfipContext afipContext = new AfipContext();
         afipContext.setLegajoId(legajoId);
