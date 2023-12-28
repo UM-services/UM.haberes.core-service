@@ -1,7 +1,8 @@
 version: "3.9"
 
 services:
-    mysql:
+
+    haberes.mysql:
         image: dqmdz/mysql:5.7
         ports:
             - "3306:3306"
@@ -16,15 +17,15 @@ services:
         networks:
             - haberes
 
-#    haberes:
+#    haberes.app:
 #        build: .
 #        ports:
 #            - "8091:8091"
 #        depends_on:
-#            - mysql
+#            - haberes.mysql
 #        restart: always
 #        environment:
-#            APP_SERVER: mysql:3306
+#            APP_SERVER: "haberes.mysql:3306"
 #            APP_DATABASE: haberes
 #            APP_USER: root
 #            APP_PASSWORD: root
@@ -41,11 +42,13 @@ services:
 #        networks:
 #            - haberes
 
-    cloudbeaver:
+    haberes.cloudbeaver:
         image: dbeaver/cloudbeaver:latest
         restart: always
+        depends_on:
+            - haberes.mysql
         ports:
-            - '9978:8978'
+            - '8978:8978'
         volumes:
             - ./cloudbeaver:/opt/cloudbeaver/workspace
         networks:
@@ -55,5 +58,5 @@ networks:
     haberes:
 
 volumes:
-    mysql:
-    cloudbeaver:
+    haberes.mysql:
+    haberes.cloudbeaver:
