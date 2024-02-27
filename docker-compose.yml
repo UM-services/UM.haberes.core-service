@@ -42,21 +42,21 @@ services:
 #        networks:
 #            - haberes
 
-    haberes.cloudbeaver:
-        image: dbeaver/cloudbeaver:latest
-        restart: always
-        depends_on:
-            - haberes.mysql
-        ports:
-            - '8978:8978'
-        volumes:
-            - ./cloudbeaver:/opt/cloudbeaver/workspace
-        networks:
-            - haberes
+#    haberes.cloudbeaver:
+#        image: dbeaver/cloudbeaver:latest
+#        restart: always
+#        depends_on:
+#            - haberes.mysql
+#        ports:
+#            - '8978:8978'
+#        volumes:
+#            - ./cloudbeaver:/opt/cloudbeaver/workspace
+#        networks:
+#            - haberes
 
 networks:
     haberes:
 
 volumes:
     haberes.mysql:
-    haberes.cloudbeaver:
+#    haberes.cloudbeaver:
