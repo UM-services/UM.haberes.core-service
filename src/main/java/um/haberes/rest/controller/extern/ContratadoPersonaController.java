@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import um.haberes.rest.kotlin.model.extern.ContratadoPersona;
+import um.haberes.rest.kotlin.model.extern.ContratadoPersonaDto;
 import um.haberes.rest.service.extern.ContratadoPersonaService;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class ContratadoPersonaController {
     private ContratadoPersonaService service;
 
     @GetMapping("/")
-    public ResponseEntity<List<ContratadoPersona>> findAll() {
+    public ResponseEntity<List<ContratadoPersonaDto>> findAll() {
         return new ResponseEntity<>(service.findAll(), HttpStatus.OK);
     }
 }

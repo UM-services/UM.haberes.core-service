@@ -1,8 +1,6 @@
 package um.haberes.rest.kotlin.model.extern
 
-import jakarta.persistence.Column
-
-data class Comprobante(
+data class ComprobanteDto(
 
     var comprobanteId: Int? = null,
     var descripcion: String = "",

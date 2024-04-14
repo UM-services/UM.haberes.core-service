@@ -2,7 +2,7 @@ package um.haberes.rest.kotlin.model.extern
 
 import java.math.BigDecimal
 
-data class ContratadoPersona(
+data class ContratadoPersonaDto(
 
     var contratadoId: Long? = null,
     var personaId: BigDecimal? = null,

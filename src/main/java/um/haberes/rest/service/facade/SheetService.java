@@ -14,13 +14,13 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import um.haberes.rest.client.CuentaMovimientoClient;
 import um.haberes.rest.exception.ContactoException;
 import um.haberes.rest.kotlin.model.*;
-import um.haberes.rest.kotlin.model.extern.Cuenta;
-import um.haberes.rest.kotlin.model.extern.CuentaMovimiento;
+import um.haberes.rest.kotlin.model.extern.CuentaDto;
+import um.haberes.rest.kotlin.model.extern.CuentaMovimientoDto;
 import um.haberes.rest.kotlin.model.view.LegajoCursoCantidad;
 import um.haberes.rest.kotlin.model.view.NovedadAcumulado;
-import um.haberes.rest.service.extern.CuentaMovimientoService;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
@@ -90,8 +90,6 @@ public class SheetService {
 
     private final Environment environment;
 
-    private final CuentaMovimientoService cuentaMovimientoService;
-
     private final LegajoCategoriaImputacionService legajoCategoriaImputacionService;
 
     private final LegajoCargoClaseImputacionService legajoCargoClaseImputacionService;
@@ -100,13 +98,15 @@ public class SheetService {
 
     private final LegajoCodigoImputacionService legajoCodigoImputacionService;
 
+    private final CuentaMovimientoClient cuentaMovimientoClient;
+
     @Autowired
     public SheetService(CursoService cursoService, PersonaService personaService, FacultadService facultadService, CategoriaService categoriaService, CargoTipoService cargoTipoService, GeograficaService geograficaService,
                         CursoCargoService cursoCargoService, DependenciaService dependenciaService, LiquidacionService liquidacionService, CodigoService codigoService, ItemService itemService,
                         NovedadAcumuladoService novedadAcumuladoService, NovedadService novedadService, AcreditacionService acreditacionService, LegajoCursoCantidadService legajoCursoCantidadService,
                         CargoLiquidacionService cargoLiquidacionService, CargoClaseDetalleService cargoClaseDetalleService, LiquidacionAdicionalService liquidacionAdicionalService, LegajoBancoService legajoBancoService,
-                        ContactoService contactoService, Environment environment, CuentaMovimientoService cuentaMovimientoService, LegajoCategoriaImputacionService legajoCategoriaImputacionService,
-                        LegajoCargoClaseImputacionService legajoCargoClaseImputacionService, CodigoGrupoService codigoGrupoService, LegajoCodigoImputacionService legajoCodigoImputacionService) {
+                        ContactoService contactoService, Environment environment, LegajoCategoriaImputacionService legajoCategoriaImputacionService,
+                        LegajoCargoClaseImputacionService legajoCargoClaseImputacionService, CodigoGrupoService codigoGrupoService, LegajoCodigoImputacionService legajoCodigoImputacionService, CuentaMovimientoClient cuentaMovimientoClient) {
         this.cursoService = cursoService;
         this.personaService = personaService;
         this.facultadService = facultadService;
@@ -128,11 +128,11 @@ public class SheetService {
         this.legajoBancoService = legajoBancoService;
         this.contactoService = contactoService;
         this.environment = environment;
-        this.cuentaMovimientoService = cuentaMovimientoService;
         this.legajoCategoriaImputacionService = legajoCategoriaImputacionService;
         this.legajoCargoClaseImputacionService = legajoCargoClaseImputacionService;
         this.codigoGrupoService = codigoGrupoService;
         this.legajoCodigoImputacionService = legajoCodigoImputacionService;
+        this.cuentaMovimientoClient = cuentaMovimientoClient;
     }
 
     public String generateLiquidables() {
@@ -1371,7 +1371,7 @@ public class SheetService {
         font_bold.setBold(true);
         style_bold.setFont(font_bold);
 
-        Map<BigDecimal, Cuenta> cuentaMap = new HashMap<>();
+        Map<BigDecimal, CuentaDto> cuentaMap = new HashMap<>();
 
         Sheet sheet = book.createSheet("Personales");
         Row row = null;
@@ -1387,12 +1387,12 @@ public class SheetService {
             builder.append(".");
             builder.append(anho);
             this.setCellString(row, column, builder.toString(), style_bold);
-            Map<BigDecimal, CuentaMovimiento> cuentaMovimientoMap = null;
+            Map<BigDecimal, CuentaMovimientoDto> cuentaMovimientoMap = null;
             if (acreditacion.getOrdenContable() > 0) {
-                cuentaMovimientoMap = cuentaMovimientoService.findAllByAsiento(acreditacion.getFechaContable(), acreditacion.getOrdenContable()).stream().collect(Collectors.toMap(CuentaMovimiento::getNumeroCuenta, cuentaMovimiento -> cuentaMovimiento));
-                for (CuentaMovimiento cuentaMovimiento : cuentaMovimientoMap.values()) {
-                    if (!cuentaMap.containsKey(cuentaMovimiento.getNumeroCuenta())) {
-                        cuentaMap.put(cuentaMovimiento.getNumeroCuenta(), cuentaMovimiento.getCuenta());
+                cuentaMovimientoMap = cuentaMovimientoClient.findAllByAsiento(acreditacion.getFechaContable(), acreditacion.getOrdenContable()).stream().collect(Collectors.toMap(CuentaMovimientoDto::getNumeroCuenta, cuentaMovimiento -> cuentaMovimiento));
+                for (CuentaMovimientoDto cuentaMovimientoDto : cuentaMovimientoMap.values()) {
+                    if (!cuentaMap.containsKey(cuentaMovimientoDto.getNumeroCuenta())) {
+                        cuentaMap.put(cuentaMovimientoDto.getNumeroCuenta(), cuentaMovimientoDto.getCuentaDto());
                     }
                 }
             }
@@ -1402,7 +1402,7 @@ public class SheetService {
             mes = next.getMes();
         }
 
-        for (Cuenta cuenta : cuentaMap.values()) {
+        for (CuentaDto cuenta : cuentaMap.values()) {
             row = sheet.createRow(++fila);
             StringBuilder builder = new StringBuilder();
             builder.append(cuenta.getNumeroCuenta());
@@ -1415,12 +1415,12 @@ public class SheetService {
                 builder.append(".");
                 builder.append(anho);
                 if (saldos.containsKey(builder.toString())) {
-                    Map<BigDecimal, CuentaMovimiento> cuentaMovimientoMap = saldos.get(builder.toString());
+                    Map<BigDecimal, CuentaMovimientoDto> cuentaMovimientoMap = saldos.get(builder.toString());
                     if (cuentaMovimientoMap != null) {
                         if (cuentaMovimientoMap.containsKey(cuenta.getNumeroCuenta())) {
-                            CuentaMovimiento cuentaMovimiento = cuentaMovimientoMap.get(cuenta.getNumeroCuenta());
-                            BigDecimal importe = cuentaMovimiento.getImporte();
-                            if (cuentaMovimiento.getDebita() == 0) {
+                            CuentaMovimientoDto cuentaMovimientoDto = cuentaMovimientoMap.get(cuenta.getNumeroCuenta());
+                            BigDecimal importe = cuentaMovimientoDto.getImporte();
+                            if (cuentaMovimientoDto.getDebita() == 0) {
                                 importe = new BigDecimal(-1).multiply(importe).setScale(2, RoundingMode.HALF_UP);
                             }
                             this.setCellBigDecimal(row, column, importe, style_normal);

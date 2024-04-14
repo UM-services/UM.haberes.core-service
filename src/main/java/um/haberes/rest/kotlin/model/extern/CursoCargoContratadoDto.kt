@@ -2,7 +2,7 @@ package um.haberes.rest.kotlin.model.extern
 
 import java.math.BigDecimal
 
-data class CursoCargoContratado(
+data class CursoCargoContratadoDto(
 
     var cursoCargoContratadoId: Long? = null,
     var cursoId: Long? = null,
@@ -17,6 +17,6 @@ data class CursoCargoContratado(
     var categoriaId: Int? = null,
     var cursoCargoNovedadId: Long? = null,
     var acreditado: Byte = 0,
-    var contratadoPersona: ContratadoPersona? = null
+    var contratadoPersonaDto: ContratadoPersonaDto? = null
 
 )

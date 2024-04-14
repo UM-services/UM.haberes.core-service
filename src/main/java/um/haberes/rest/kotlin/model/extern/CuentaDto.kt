@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 
-data class Cuenta(
+data class CuentaDto(
 
     var numeroCuenta: BigDecimal? = null,
     var nombre: String = "",

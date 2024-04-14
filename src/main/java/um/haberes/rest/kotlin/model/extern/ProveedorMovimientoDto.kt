@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 
-data class ProveedorMovimiento(
+data class ProveedorMovimientoDto(
 
     var proveedorMovimientoId: Long? = null,
     var proveedorId: Int? = null,
@@ -34,6 +34,6 @@ data class ProveedorMovimiento(
     var conCargo: Byte = 0,
     var solicitaFactura: Byte = 0,
     var geograficaId: Int? = null,
-    var comprobante: Comprobante? = null
+    var comprobanteDto: ComprobanteDto? = null
 
 )

@@ -20,10 +20,4 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @PropertySource("classpath:config/haberes.properties")
 public class HaberesConfiguration {
 
-    @Value("${app.tesium.server}")
-    private String tesiumServer;
-
-    @Value("${app.tesium.port}")
-    private Integer tesiumPort;
-
 }

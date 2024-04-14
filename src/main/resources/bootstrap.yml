@@ -13,14 +13,13 @@ app:
   mail:
     username: sueldos@um.edu.ar
     password: Daniel22
-  tesium:
-    server: 127.0.0.1
-    port: 8092
-    
-server:
-  port: ${app.port}
-  
+
 spring:
+  application:
+    name: haberes-service
+  cloud:
+    config:
+      uri: http://localhost:8888
   datasource:
     url: jdbc:mysql://${app.server}/${app.database}?useSSL=false&serverTimezone=UTC
     username: ${app.user}
@@ -51,11 +50,3 @@ spring:
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
-
-logging:
-  level:
-    um.haberes.rest: DEBUG
-    web: ${app.logging}
-    org:
-      hibernate:
-        SQL: ${app.logging}

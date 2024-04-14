@@ -1,7 +1,8 @@
 package um.haberes.rest.service.extern;
 
-import um.haberes.rest.extern.consumer.EjercicioConsumer;
-import um.haberes.rest.kotlin.model.extern.Ejercicio;
+import lombok.extern.slf4j.Slf4j;
+import um.haberes.rest.client.EjercicioClient;
+import um.haberes.rest.kotlin.model.extern.EjercicioDto;
 import um.haberes.rest.util.Periodo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,17 +10,23 @@ import org.springframework.stereotype.Service;
 import java.time.OffsetDateTime;
 
 @Service
+@Slf4j
 public class EjercicioService {
 
-    @Autowired
-    private EjercicioConsumer consumer;
+    private final EjercicioClient ejercicioClient;
 
-    public Ejercicio findByPeriodo(Integer anho, Integer mes) {
-        OffsetDateTime lastDate = Periodo.lastDay(anho, mes);
-        return consumer.findByFecha(lastDate);
+    @Autowired
+    public EjercicioService(EjercicioClient ejercicioClient) {
+        this.ejercicioClient = ejercicioClient;
     }
 
-    public Ejercicio findByFecha(OffsetDateTime fecha) {
-        return consumer.findByFecha(fecha);
+    public EjercicioDto findByPeriodo(Integer anho, Integer mes) {
+        OffsetDateTime lastDate = Periodo.lastDay(anho, mes);
+        log.debug("LastDate -> {}", lastDate);
+        return ejercicioClient.findByFecha(lastDate);
+    }
+
+    public EjercicioDto findByFecha(OffsetDateTime fecha) {
+        return ejercicioClient.findByFecha(fecha);
     }
 }
