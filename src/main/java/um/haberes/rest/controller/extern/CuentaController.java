@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import um.haberes.rest.exception.extern.CuentaException;
-import um.haberes.rest.kotlin.model.extern.Cuenta;
+import um.haberes.rest.kotlin.model.extern.CuentaDto;
 import um.haberes.rest.service.extern.CuentaService;
 
 import java.math.BigDecimal;
@@ -20,17 +20,17 @@ public class CuentaController {
     private CuentaService service;
 
     @GetMapping("/")
-    public ResponseEntity<List<Cuenta>> findAll() {
+    public ResponseEntity<List<CuentaDto>> findAll() {
         return new ResponseEntity<>(service.findAll(), HttpStatus.OK);
     }
 
     @PostMapping("/search/{visible}")
-    public ResponseEntity<List<Cuenta>> findByStrings(@RequestBody List<String> conditions, @PathVariable Boolean visible) {
+    public ResponseEntity<List<CuentaDto>> findByStrings(@RequestBody List<String> conditions, @PathVariable Boolean visible) {
         return new ResponseEntity<>(service.findByStrings(conditions, visible), HttpStatus.OK);
     }
 
     @GetMapping("/{numeroCuenta}")
-    public ResponseEntity<Cuenta> findByNumeroCuenta(@PathVariable BigDecimal numeroCuenta) {
+    public ResponseEntity<CuentaDto> findByNumeroCuenta(@PathVariable BigDecimal numeroCuenta) {
         try {
             return new ResponseEntity<>(service.findByNumeroCuenta(numeroCuenta), HttpStatus.OK);
         } catch (CuentaException e) {
@@ -39,7 +39,7 @@ public class CuentaController {
     }
 
     @GetMapping("/id/{cuentaContableId}")
-    public ResponseEntity<Cuenta> findByCuentaContableId(@PathVariable Long cuentaContableId) {
+    public ResponseEntity<CuentaDto> findByCuentaContableId(@PathVariable Long cuentaContableId) {
         try {
             return new ResponseEntity<>(service.findByCuentaContableId(cuentaContableId), HttpStatus.OK);
         } catch (CuentaException e) {

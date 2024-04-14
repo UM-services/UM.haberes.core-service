@@ -1,7 +1,7 @@
 package um.haberes.rest.service.extern;
 
-import um.haberes.rest.extern.consumer.CuentaConsumer;
-import um.haberes.rest.kotlin.model.extern.Cuenta;
+import um.haberes.rest.client.CuentaClient;
+import um.haberes.rest.kotlin.model.extern.CuentaDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,23 +11,27 @@ import java.util.List;
 @Service
 public class CuentaService {
 
+    private final CuentaClient cuentaClient;
+
     @Autowired
-    private CuentaConsumer consumer;
-
-    public List<Cuenta> findAll() {
-        return consumer.findAll();
+    public CuentaService(CuentaClient cuentaClient) {
+        this.cuentaClient = cuentaClient;
     }
 
-    public List<Cuenta> findByStrings(List<String> conditions, Boolean visible) {
-        return consumer.findByStrings(conditions, visible);
+    public List<CuentaDto> findAll() {
+        return cuentaClient.findAll();
     }
 
-    public Cuenta findByNumeroCuenta(BigDecimal numeroCuenta) {
-        return consumer.findByNumeroCuenta(numeroCuenta);
+    public List<CuentaDto> findByStrings(List<String> conditions, Boolean visible) {
+        return cuentaClient.findByStrings(conditions, visible);
     }
 
-    public Cuenta findByCuentaContableId(Long cuentaContableId) {
-        return consumer.findByCuentaContableId(cuentaContableId);
+    public CuentaDto findByNumeroCuenta(BigDecimal numeroCuenta) {
+        return cuentaClient.findByNumeroCuenta(numeroCuenta);
+    }
+
+    public CuentaDto findByCuentaContableId(Long cuentaContableId) {
+        return cuentaClient.findByCuentaContableId(cuentaContableId);
     }
 
 }

@@ -3,7 +3,7 @@ package um.haberes.rest.kotlin.model.extern
 import com.fasterxml.jackson.annotation.JsonFormat
 import java.time.OffsetDateTime
 
-data class Ejercicio(
+data class EjercicioDto(
 
     var ejercicioId: Int? = null,
     var nombre: String? = null,

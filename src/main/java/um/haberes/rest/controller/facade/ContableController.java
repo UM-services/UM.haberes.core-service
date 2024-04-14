@@ -3,7 +3,7 @@
  */
 package um.haberes.rest.controller.facade;
 
-import um.haberes.rest.kotlin.model.extern.CuentaMovimiento;
+import um.haberes.rest.kotlin.model.extern.CuentaMovimientoDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -55,7 +55,7 @@ public class ContableController {
 	}
 
 	@GetMapping("/asiento/{fechaContable}/{ordenContable}")
-	public ResponseEntity<List<CuentaMovimiento>> findAllByAsiento(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime fechaContable, @PathVariable Integer ordenContable) {
+	public ResponseEntity<List<CuentaMovimientoDto>> findAllByAsiento(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime fechaContable, @PathVariable Integer ordenContable) {
 		return new ResponseEntity<>(service.findAllByAsiento(fechaContable, ordenContable), HttpStatus.OK);
 	}
 

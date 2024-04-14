@@ -12,11 +12,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import um.haberes.rest.client.CuentaMovimientoClient;
 import um.haberes.rest.exception.LiquidacionAdicionalException;
 import um.haberes.rest.kotlin.model.*;
-import um.haberes.rest.kotlin.model.extern.CuentaMovimiento;
+import um.haberes.rest.kotlin.model.extern.CuentaMovimientoDto;
 import um.haberes.rest.service.*;
-import um.haberes.rest.service.extern.CuentaMovimientoService;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,56 +36,64 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ContableService {
 
-    @Autowired
-    private LegajoCargoClaseImputacionService legajoCargoClaseImputacionService;
+    private final LegajoCargoClaseImputacionService legajoCargoClaseImputacionService;
+
+    private final LegajoCategoriaImputacionService legajoCategoriaImputacionService;
+
+    private final LegajoCodigoImputacionService legajoCodigoImputacionService;
+
+    private final ItemService itemService;
+
+    private final DesignacionToolService designacionToolService;
+
+    private final LiquidacionService liquidacionService;
+
+    private final CargoLiquidacionService cargoLiquidacionService;
+
+    private final CategoriaImputacionService categoriaImputacionService;
+
+    private final CargoClaseDetalleService cargoClaseDetalleService;
+
+    private final CargoClaseImputacionService cargoClaseImputacionService;
+
+    private final ActividadService actividadService;
+
+    private final CodigoService codigoService;
+
+    private final CodigoImputacionService codigoImputacionService;
+
+    private final LegajoContabilidadService legajoContabilidadService;
+
+    private final CodigoGrupoService codigoGrupoService;
+
+    private final LiquidacionAdicionalService liquidacionAdicionalService;
+    private final CuentaMovimientoClient cuentaMovimientoClient;
 
     @Autowired
-    private LegajoCategoriaImputacionService legajoCategoriaImputacionService;
-
-    @Autowired
-    private LegajoCodigoImputacionService legajoCodigoImputacionService;
-
-    @Autowired
-    private ItemService itemService;
-
-    @Autowired
-    private DesignacionToolService designacionToolService;
-
-    @Autowired
-    private LiquidacionService liquidacionService;
-
-    @Autowired
-    private CargoLiquidacionService cargoLiquidacionService;
-
-    @Autowired
-    private CategoriaImputacionService categoriaImputacionService;
-
-    @Autowired
-    private CargoClaseDetalleService cargoClaseDetalleService;
-
-    @Autowired
-    private CargoClaseImputacionService cargoClaseImputacionService;
-
-    @Autowired
-    private ActividadService actividadService;
-
-    @Autowired
-    private CodigoService codigoService;
-
-    @Autowired
-    private CodigoImputacionService codigoImputacionService;
-
-    @Autowired
-    private LegajoContabilidadService legajoContabilidadService;
-
-    @Autowired
-    private CuentaMovimientoService cuentaMovimientoService;
-
-    @Autowired
-    private CodigoGrupoService codigoGrupoService;
-
-    @Autowired
-    private LiquidacionAdicionalService liquidacionAdicionalService;
+    public ContableService(LegajoCargoClaseImputacionService legajoCargoClaseImputacionService, LegajoCategoriaImputacionService legajoCategoriaImputacionService,
+                           LegajoCodigoImputacionService legajoCodigoImputacionService, ItemService itemService, DesignacionToolService designacionToolService,
+                           LiquidacionService liquidacionService, CargoLiquidacionService cargoLiquidacionService, CategoriaImputacionService categoriaImputacionService,
+                           CargoClaseDetalleService cargoClaseDetalleService, CargoClaseImputacionService cargoClaseImputacionService, ActividadService actividadService,
+                           CodigoService codigoService, CodigoImputacionService codigoImputacionService, LegajoContabilidadService legajoContabilidadService,
+                           CodigoGrupoService codigoGrupoService, LiquidacionAdicionalService liquidacionAdicionalService, CuentaMovimientoClient cuentaMovimientoClient) {
+        this.legajoCargoClaseImputacionService = legajoCargoClaseImputacionService;
+        this.legajoCategoriaImputacionService = legajoCategoriaImputacionService;
+        this.legajoCodigoImputacionService = legajoCodigoImputacionService;
+        this.itemService = itemService;
+        this.designacionToolService = designacionToolService;
+        this.liquidacionService = liquidacionService;
+        this.cargoLiquidacionService = cargoLiquidacionService;
+        this.categoriaImputacionService = categoriaImputacionService;
+        this.cargoClaseDetalleService = cargoClaseDetalleService;
+        this.cargoClaseImputacionService = cargoClaseImputacionService;
+        this.actividadService = actividadService;
+        this.codigoService = codigoService;
+        this.codigoImputacionService = codigoImputacionService;
+        this.legajoContabilidadService = legajoContabilidadService;
+        this.codigoGrupoService = codigoGrupoService;
+        this.liquidacionAdicionalService = liquidacionAdicionalService;
+        this.cuentaMovimientoClient = cuentaMovimientoClient;
+    }
 
     @Transactional
     public void generateByLegajo(Long legajoId, Integer anho, Integer mes) {
@@ -104,7 +112,7 @@ public class ContableService {
         Map<Integer, Codigo> codigos = codigoService.findAll().stream()
                 .collect(Collectors.toMap(Codigo::getCodigoId, codigo -> codigo));
 
-        Boolean docenteEtec = false;
+        boolean docenteEtec = false;
         try {
             itemService.findByUnique(legajoId, anho, mes, 29);
             docenteEtec = true;
@@ -121,9 +129,9 @@ public class ContableService {
         BigDecimal totalDocente = BigDecimal.ZERO;
         BigDecimal totalRemunerativo = BigDecimal.ZERO;
         BigDecimal totalNoRemunerativo = BigDecimal.ZERO;
-        Boolean sinBasico = true;
+        boolean sinBasico = true;
 
-        Map<String, Proporcion> proporciones = new HashMap<String, Proporcion>();
+        Map<String, Proporcion> proporciones = new HashMap<>();
         Map<String, Proporcion> proporcionesAdministrativo = new HashMap<String, Proporcion>();
         Map<String, Proporcion> proporcionesDocente = new HashMap<String, Proporcion>();
 
@@ -218,7 +226,7 @@ public class ContableService {
                     basico = basico.add(liquidacionAdicional.getAdicional()).setScale(2, RoundingMode.HALF_UP);
                     imputacion.setBasico(basico);
                     BigDecimal antiguedadAdicional = BigDecimal.ZERO;
-                    antiguedadAdicional = liquidacionAdicional.getAdicional().multiply(indices.get(0)).setScale(2, RoundingMode.HALF_UP);
+                    antiguedadAdicional = liquidacionAdicional.getAdicional().multiply(indices.getFirst()).setScale(2, RoundingMode.HALF_UP);
                     imputacion.setAntiguedad(imputacion.getAntiguedad().add(antiguedadAdicional).setScale(2, RoundingMode.HALF_UP));
                 }
             } catch (LiquidacionAdicionalException e) {
@@ -295,7 +303,7 @@ public class ContableService {
                 totalRemunerativo = totalRemunerativo.add(imputacion.getBasico()).add(imputacion.getAntiguedad());
             }
         }
-        if (proporciones.size() == 0 && proporcionesDocente.size() == 0 && proporcionesAdministrativo.size() == 0) {
+        if (proporciones.isEmpty() && proporcionesDocente.isEmpty() && proporcionesAdministrativo.isEmpty()) {
             Actividad actividad = actividadService.findByUnique(legajoId, anho, mes);
             if (actividad.getDependenciaId() == null) {
                 if (docenteEtec) {
@@ -345,8 +353,8 @@ public class ContableService {
             }
         }
 
-        List<Integer> codigoIdRemunerativos = codigoGrupoService.findAllByRemunerativo((byte) 1).stream().map(codigo -> codigo.getCodigoId()).collect(Collectors.toList());
-        List<Integer> codigoIdNoRemunerativos = codigoGrupoService.findAllByNoRemunerativo((byte) 1).stream().map(codigo -> codigo.getCodigoId()).collect(Collectors.toList());
+        List<Integer> codigoIdRemunerativos = codigoGrupoService.findAllByRemunerativo((byte) 1).stream().map(CodigoGrupo::getCodigoId).toList();
+        List<Integer> codigoIdNoRemunerativos = codigoGrupoService.findAllByNoRemunerativo((byte) 1).stream().map(CodigoGrupo::getCodigoId).toList();
         List<Integer> codigoIds = Stream.concat(codigoIdRemunerativos.stream(), codigoIdNoRemunerativos.stream()).collect(Collectors.toList());
         if (sinBasico) {
             codigoIds.removeIf(codigoId -> codigoId < 3);
@@ -515,8 +523,8 @@ public class ContableService {
         legajoCodigoImputacionService.deleteAllByPeriodo(anho, mes);
     }
 
-    public List<CuentaMovimiento> findAllByAsiento(OffsetDateTime fechaContable, Integer ordenContable) {
-        return cuentaMovimientoService.findAllByAsiento(fechaContable, ordenContable);
+    public List<CuentaMovimientoDto> findAllByAsiento(OffsetDateTime fechaContable, Integer ordenContable) {
+        return cuentaMovimientoClient.findAllByAsiento(fechaContable, ordenContable);
     }
 
 }

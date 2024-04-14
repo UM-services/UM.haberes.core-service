@@ -1,9 +1,11 @@
-version: "3.9"
-
 services:
 
     haberes.mysql:
         image: dqmdz/mysql:5.7
+        ulimits:
+            nofile: # Fix memory leak issue on some systems when LimitCORE=infinity (containerd)
+                soft: 1048576
+                hard: 1048576
         ports:
             - "3306:3306"
         volumes:

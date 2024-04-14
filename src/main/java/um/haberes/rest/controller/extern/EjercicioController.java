@@ -2,7 +2,7 @@ package um.haberes.rest.controller.extern;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import um.haberes.rest.exception.extern.EjercicioException;
-import um.haberes.rest.kotlin.model.extern.Ejercicio;
+import um.haberes.rest.kotlin.model.extern.EjercicioDto;
 import um.haberes.rest.service.extern.EjercicioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +23,7 @@ public class EjercicioController {
     private EjercicioService service;
 
     @GetMapping("/periodo/{anho}/{mes}")
-    public ResponseEntity<Ejercicio> findByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes) {
+    public ResponseEntity<EjercicioDto> findByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes) {
         try {
             return new ResponseEntity<>(service.findByPeriodo(anho, mes), HttpStatus.OK);
         } catch (EjercicioException e) {
@@ -32,7 +32,7 @@ public class EjercicioController {
     }
 
     @GetMapping("/fecha/{fecha}")
-    public ResponseEntity<Ejercicio> findByFecha(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime fecha) {
+    public ResponseEntity<EjercicioDto> findByFecha(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime fecha) {
         try {
             return new ResponseEntity<>(service.findByFecha(fecha), HttpStatus.OK);
         } catch (EjercicioException e) {
