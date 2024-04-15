@@ -21,6 +21,7 @@ data class ImputadoAporte(
     var anho: Int? = null,
     var mes: Int? = null,
     var cuentaAportes: BigDecimal? = null,
+    var porcentajeImputado: BigDecimal? = null,
     var totalImputado: BigDecimal? = null
 
 )
