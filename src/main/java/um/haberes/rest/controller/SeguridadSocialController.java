@@ -33,7 +33,7 @@ public class SeguridadSocialController {
 	@GetMapping("/unique/{anho}/{mes}")
 	public ResponseEntity<SeguridadSocial> findByUnique(@PathVariable Integer anho, @PathVariable Integer mes) {
 		try {
-			return new ResponseEntity<SeguridadSocial>(service.findByUnique(anho, mes), HttpStatus.OK);
+			return new ResponseEntity<>(service.findByUnique(anho, mes), HttpStatus.OK);
 		} catch (SeguridadSocialException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
@@ -41,13 +41,13 @@ public class SeguridadSocialController {
 
 	@PostMapping("/")
 	public ResponseEntity<SeguridadSocial> add(@RequestBody SeguridadSocial seguridadSocial) {
-		return new ResponseEntity<SeguridadSocial>(service.add(seguridadSocial), HttpStatus.OK);
+		return new ResponseEntity<>(service.add(seguridadSocial), HttpStatus.OK);
 	}
 
 	@PutMapping("/{seguridadSocialId}")
 	public ResponseEntity<SeguridadSocial> update(@RequestBody SeguridadSocial seguridadSocial,
 			@PathVariable Long seguridadSocialId) {
-		return new ResponseEntity<SeguridadSocial>(service.update(seguridadSocial, seguridadSocialId), HttpStatus.OK);
+		return new ResponseEntity<>(service.update(seguridadSocial, seguridadSocialId), HttpStatus.OK);
 	}
 
 }
