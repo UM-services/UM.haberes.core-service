@@ -50,3 +50,11 @@ spring:
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
+
+logging:
+  level:
+    um.haberes.rest: ${app.logging}
+    web: ${app.logging}
+    org:
+      hibernate:
+        SQL: ${app.logging}

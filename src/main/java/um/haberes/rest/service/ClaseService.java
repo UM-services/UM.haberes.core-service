@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.ClaseException;
 import um.haberes.rest.kotlin.model.Clase;
-import um.haberes.rest.repository.IClaseRepository;
+import um.haberes.rest.kotlin.repository.ClaseRepository;
 
 /**
  * @author daniel
@@ -19,10 +19,10 @@ import um.haberes.rest.repository.IClaseRepository;
 @Service
 public class ClaseService {
 
-	private final IClaseRepository repository;
+	private final ClaseRepository repository;
 
 	@Autowired
-	public ClaseService(IClaseRepository repository) {
+	public ClaseService(ClaseRepository repository) {
 		this.repository = repository;
 	}
 

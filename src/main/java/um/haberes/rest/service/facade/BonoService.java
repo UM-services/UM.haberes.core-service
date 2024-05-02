@@ -125,13 +125,15 @@ public class BonoService {
 
     private final DesignacionToolService designacionToolService;
 
+    private final LiquidacionEtecService liquidacionEtecService;
+
     @Autowired
     public BonoService(Environment environment, PersonaService personaService, ControlService controlService, DependenciaService dependenciaService,
                        ItemService itemService, AntiguedadService antiguedadService, LegajoBancoService legajoBancoService, CursoCargoService cursoCargoService,
                        CargoLiquidacionService cargoLiquidacionService, CargoClaseDetalleService cargoClaseDetalleService, CodigoGrupoService codigoGrupoService,
                        LetraService letraService, BonoImpresionService bonoImpresionService, LiquidacionService liquidacionService, ContactoService contactoService,
                        JavaMailSender javaMailSender, LegajoControlService legajoControlService, LiquidacionAdicionalService liquidacionAdicionalService,
-                       CodigoService codigoService, DesignacionToolService designacionToolService) {
+                       CodigoService codigoService, DesignacionToolService designacionToolService, LiquidacionEtecService liquidacionEtecService) {
         this.environment = environment;
         this.personaService = personaService;
         this.controlService = controlService;
@@ -152,6 +154,7 @@ public class BonoService {
         this.liquidacionAdicionalService = liquidacionAdicionalService;
         this.codigoService = codigoService;
         this.designacionToolService = designacionToolService;
+        this.liquidacionEtecService = liquidacionEtecService;
     }
 
     public String generatePdfDependencia(Integer anho, Integer mes, Integer dependenciaId, String salida,
@@ -280,6 +283,8 @@ public class BonoService {
             BigDecimal presentismoETEC = BigDecimal.ZERO;
             BigDecimal antiguedadETEC = BigDecimal.ZERO;
             BigDecimal adicionalETEC = BigDecimal.ZERO;
+            BigDecimal porcentajeAntiguedadETEC = liquidacionEtecService.calcularPorcentajeAntiguedad(legajoId, anho, mes, 15, 1);
+            
             if (items.containsKey(29) && persona.getDirectivoEtec() == 0) {
                 item = items.get(29);
                 BigDecimal totalETEC = item.getImporte();
@@ -288,7 +293,7 @@ public class BonoService {
                 }
                 basicoETEC = basicoETEC.add(horasETEC.multiply(control.getHoraReferenciaEtec())).setScale(2, RoundingMode.HALF_UP);
                 antiguedadETEC = basicoETEC.multiply(indices.get(0)).setScale(2, RoundingMode.HALF_UP);
-                presentismoETEC = basicoETEC.multiply(new BigDecimal(0.2)).setScale(2, RoundingMode.HALF_UP);
+                presentismoETEC = basicoETEC.multiply(porcentajeAntiguedadETEC).setScale(2, RoundingMode.HALF_UP);
                 adicionalETEC = totalETEC.subtract(basicoETEC).subtract(antiguedadETEC).subtract(presentismoETEC).setScale(2, RoundingMode.HALF_UP);
 
             }
