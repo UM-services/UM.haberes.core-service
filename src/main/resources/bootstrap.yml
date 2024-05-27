@@ -58,3 +58,4 @@ logging:
     org:
       hibernate:
         SQL: ${app.logging}
+      springframework.cloud.config: ${app.logging}
