@@ -392,28 +392,33 @@ public class SheetService {
         String filename = path + "cursos" + anho + String.format("%02d", mes) + ".xlsx";
 
         Workbook book = new XSSFWorkbook();
-        CellStyle style_normal = book.createCellStyle();
-        Font font_normal = book.createFont();
-        font_normal.setBold(false);
-        style_normal.setFont(font_normal);
+        CellStyle styleNormal = book.createCellStyle();
+        Font fontNormal = book.createFont();
+        fontNormal.setBold(false);
+        styleNormal.setFont(fontNormal);
+
+        CellStyle styleBold = book.createCellStyle();
+        Font fontBold = book.createFont();
+        fontBold.setBold(true);
+        styleBold.setFont(fontBold);
 
         Sheet sheet = book.createSheet("Cursos");
         Row row = null;
         int fila = 0;
         row = sheet.createRow(fila);
-        this.setCellString(row, 0, "Legajo", style_normal);
-        this.setCellString(row, 1, "Apellido, Nombre", style_normal);
-        this.setCellString(row, 2, "Periodo", style_normal);
-        this.setCellString(row, 3, "#Facultad", style_normal);
-        this.setCellString(row, 4, "Facultad", style_normal);
-        this.setCellString(row, 5, "#Sede", style_normal);
-        this.setCellString(row, 6, "Sede", style_normal);
-        this.setCellString(row, 7, "#Curso", style_normal);
-        this.setCellString(row, 8, "Curso", style_normal);
-        this.setCellString(row, 9, "#Cargo", style_normal);
-        this.setCellString(row, 10, "Cargo", style_normal);
-        this.setCellString(row, 11, "Horas", style_normal);
-        this.setCellString(row, 12, "Dictado", style_normal);
+        this.setCellString(row, 0, "Legajo", styleBold);
+        this.setCellString(row, 1, "Apellido, Nombre", styleBold);
+        this.setCellString(row, 2, "Periodo", styleBold);
+        this.setCellString(row, 3, "#Facultad", styleBold);
+        this.setCellString(row, 4, "Facultad", styleBold);
+        this.setCellString(row, 5, "#Sede", styleBold);
+        this.setCellString(row, 6, "Sede", styleBold);
+        this.setCellString(row, 7, "#Curso", styleBold);
+        this.setCellString(row, 8, "Curso", styleBold);
+        this.setCellString(row, 9, "#Cargo", styleBold);
+        this.setCellString(row, 10, "Cargo", styleBold);
+        this.setCellString(row, 11, "Horas", styleBold);
+        this.setCellString(row, 12, "Dictado", styleBold);
 
         Map<Integer, Facultad> facultades = facultadService.findAll().stream()
                 .collect(Collectors.toMap(Facultad::getFacultadId, facultad -> facultad));
@@ -437,18 +442,18 @@ public class SheetService {
                 Geografica geografica = geograficas.get(curso.getGeograficaId());
                 CargoTipo cargoTipo = cargos.get(cursoCargo.getCargoTipoId());
                 row = sheet.createRow(++fila);
-                this.setCellLong(row, 0, cursoCargo.getLegajoId(), style_normal);
-                this.setCellString(row, 1, persona.getApellido() + ", " + persona.getNombre(), style_normal);
-                this.setCellString(row, 2, mes + "/" + anho, style_normal);
-                this.setCellInteger(row, 3, curso.getFacultadId(), style_normal);
-                this.setCellString(row, 4, facultad.getNombre(), style_normal);
-                this.setCellInteger(row, 5, curso.getGeograficaId(), style_normal);
-                this.setCellString(row, 6, geografica.getNombre(), style_normal);
-                this.setCellLong(row, 7, cursoCargo.getCursoId(), style_normal);
-                this.setCellString(row, 8, curso.getNombre(), style_normal);
-                this.setCellInteger(row, 9, cursoCargo.getCargoTipoId(), style_normal);
-                this.setCellString(row, 10, cargoTipo.getNombre(), style_normal);
-                this.setCellBigDecimal(row, 11, cursoCargo.getHorasSemanales(), style_normal);
+                this.setCellLong(row, 0, cursoCargo.getLegajoId(), styleNormal);
+                this.setCellString(row, 1, persona.getApellido() + ", " + persona.getNombre(), styleNormal);
+                this.setCellString(row, 2, mes + "/" + anho, styleNormal);
+                this.setCellInteger(row, 3, curso.getFacultadId(), styleNormal);
+                this.setCellString(row, 4, facultad.getNombre(), styleNormal);
+                this.setCellInteger(row, 5, curso.getGeograficaId(), styleNormal);
+                this.setCellString(row, 6, geografica.getNombre(), styleNormal);
+                this.setCellLong(row, 7, cursoCargo.getCursoId(), styleNormal);
+                this.setCellString(row, 8, curso.getNombre(), styleNormal);
+                this.setCellInteger(row, 9, cursoCargo.getCargoTipoId(), styleNormal);
+                this.setCellString(row, 10, cargoTipo.getNombre(), styleNormal);
+                this.setCellBigDecimal(row, 11, cursoCargo.getHorasSemanales(), styleNormal);
                 String dictado = "";
                 if (curso.getAnual() == 1)
                     dictado = "Anual";
@@ -456,7 +461,7 @@ public class SheetService {
                     dictado = "1er Semestre";
                 if (curso.getSemestre2() == 1)
                     dictado = "2do Semestre";
-                this.setCellString(row, 12, dictado, style_normal);
+                this.setCellString(row, 12, dictado, styleNormal);
             }
         }
 
@@ -1627,21 +1632,6 @@ public class SheetService {
         Cell cell = row.createCell(column);
         cell.setCellValue(value);
         cell.setCellStyle(style);
-    }
-
-    private Sheet makeWorkbook(Workbook book, CellStyle styleNormal, CellStyle styleBold, String sheetName) {
-        book = new XSSFWorkbook();
-        styleNormal = book.createCellStyle();
-        Font fontNormal = book.createFont();
-        fontNormal.setBold(false);
-        styleNormal.setFont(fontNormal);
-
-        styleBold = book.createCellStyle();
-        Font fontBold = book.createFont();
-        fontBold.setBold(true);
-        styleBold.setFont(fontBold);
-
-        return book.createSheet(sheetName);
     }
 
 }

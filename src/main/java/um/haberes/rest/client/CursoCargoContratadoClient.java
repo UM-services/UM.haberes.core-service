@@ -1,6 +1,7 @@
 package um.haberes.rest.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import um.haberes.rest.kotlin.model.extern.CursoCargoContratadoDto;
 
@@ -12,6 +13,9 @@ public interface CursoCargoContratadoClient {
     @GetMapping("/cursos/{contratadoId}/{anho}/{mes}/{contratoId}")
     List<CursoCargoContratadoDto> findAllByContratado(@PathVariable Long contratadoId,
                                                       @PathVariable Integer anho, @PathVariable Integer mes, @PathVariable Long contratoId);
+
+    @GetMapping("/cursosContratado/{contratadoId}/{anho}/{mes}")
+    List<CursoCargoContratadoDto> findAllByCursosContratado(@PathVariable Long contratadoId, @PathVariable Integer anho, @PathVariable Integer mes);
 
     @GetMapping("/curso/{cursoId}/{anho}/{mes}")
     List<CursoCargoContratadoDto> findAllByCurso(@PathVariable Long cursoId,

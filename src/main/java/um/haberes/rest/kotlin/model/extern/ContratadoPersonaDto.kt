@@ -8,6 +8,7 @@ data class ContratadoPersonaDto(
     var personaId: BigDecimal? = null,
     var documentoId: Int? = null,
     var apellido: String? = null,
-    var nombre: String? = null
+    var nombre: String? = null,
+    var cuit: String? = null
 
 )
