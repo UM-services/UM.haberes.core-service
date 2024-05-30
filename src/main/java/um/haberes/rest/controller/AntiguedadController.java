@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import um.haberes.rest.exception.AntiguedadNotFoundException;
+import um.haberes.rest.exception.AntiguedadException;
 import um.haberes.rest.exception.view.AntiguedadPeriodoNotFoundException;
 import um.haberes.rest.kotlin.model.Antiguedad;
 import um.haberes.rest.kotlin.model.view.AntiguedadPeriodo;
@@ -39,7 +39,7 @@ public class AntiguedadController {
                                                    @PathVariable Integer mes) {
         try {
             return new ResponseEntity<>(service.findByUnique(legajoId, anho, mes), HttpStatus.OK);
-        } catch (AntiguedadNotFoundException e) {
+        } catch (AntiguedadException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }

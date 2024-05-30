@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.CargoLiquidacionNotFoundException;
+import um.haberes.rest.exception.CargoLiquidacionException;
 import um.haberes.rest.kotlin.model.CargoLiquidacion;
 import um.haberes.rest.kotlin.model.CargoLiquidacionVersion;
 import um.haberes.rest.repository.ICargoLiquidacionRepository;
@@ -87,12 +87,12 @@ public class CargoLiquidacionService {
 
 	public CargoLiquidacion findByCargoId(Long cargoLiquidacionId) {
 		return repository.findByCargoLiquidacionId(cargoLiquidacionId)
-				.orElseThrow(() -> new CargoLiquidacionNotFoundException(cargoLiquidacionId));
+				.orElseThrow(() -> new CargoLiquidacionException(cargoLiquidacionId));
 	}
 
 	public CargoLiquidacion findByCategoriaNoDocente(Long legajoId, Integer anho, Integer mes, Integer categoriaId) {
 		return repository.findByLegajoIdAndAnhoAndMesAndCategoriaId(legajoId, anho, mes, categoriaId)
-				.orElseThrow(() -> new CargoLiquidacionNotFoundException(legajoId, anho, mes, categoriaId));
+				.orElseThrow(() -> new CargoLiquidacionException(legajoId, anho, mes, categoriaId));
 	}
 
 	public CargoLiquidacion add(CargoLiquidacion cargoLiquidacion) {
@@ -112,7 +112,7 @@ public class CargoLiquidacionService {
 					newCargoLiquidacion.getDependencia(), newCargoLiquidacion.getCategoria());
 			cargoLiquidacion = repository.save(cargoLiquidacion);
 			return cargoLiquidacion;
-		}).orElseThrow(() -> new CargoLiquidacionNotFoundException(cargoLiquidacionId));
+		}).orElseThrow(() -> new CargoLiquidacionException(cargoLiquidacionId));
 	}
 
 	@Transactional

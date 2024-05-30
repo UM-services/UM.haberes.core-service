@@ -12,7 +12,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.CargoLiquidacionNotFoundException;
+import um.haberes.rest.exception.CargoLiquidacionException;
 import um.haberes.rest.kotlin.model.Cargo;
 import um.haberes.rest.repository.ICargoRepository;
 import um.haberes.rest.util.Periodo;
@@ -56,7 +56,7 @@ public class CargoService {
 	}
 
 	public Cargo findByCargoId(Long cargoId) {
-		return repository.findByCargoId(cargoId).orElseThrow(() -> new CargoLiquidacionNotFoundException(cargoId));
+		return repository.findByCargoId(cargoId).orElseThrow(() -> new CargoLiquidacionException(cargoId));
 	}
 
 	public Cargo add(Cargo cargo) {
@@ -72,7 +72,7 @@ public class CargoService {
 					newCargo.getDependencia(), newCargo.getCategoria());
 			cargo = repository.save(cargo);
 			return cargo;
-		}).orElseThrow(() -> new CargoLiquidacionNotFoundException(cargoId));
+		}).orElseThrow(() -> new CargoLiquidacionException(cargoId));
 	}
 
 	@Transactional

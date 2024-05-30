@@ -7,13 +7,13 @@ package um.haberes.rest.exception;
  * @author daniel
  *
  */
-public class CargoClaseNotFoundException extends RuntimeException {
+public class CargoClaseException extends RuntimeException {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 5929880875063849507L;
 
-	public CargoClaseNotFoundException(Long cargoclaseId) {
+	public CargoClaseException(Long cargoclaseId) {
 		super("Cannot find CargoClase " + cargoclaseId);
 	}
 

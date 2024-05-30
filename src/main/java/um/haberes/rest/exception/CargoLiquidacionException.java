@@ -7,17 +7,17 @@ package um.haberes.rest.exception;
  * @author daniel
  *
  */
-public class CargoLiquidacionNotFoundException extends RuntimeException {
+public class CargoLiquidacionException extends RuntimeException {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 6041246655118136892L;
 
-	public CargoLiquidacionNotFoundException(Long legajoId, Integer anho, Integer mes, Integer categoriaId) {
+	public CargoLiquidacionException(Long legajoId, Integer anho, Integer mes, Integer categoriaId) {
 		super("Cannot find Cargo " + legajoId + "/" + anho + "/" + mes + "/" + categoriaId);
 	}
 
-	public CargoLiquidacionNotFoundException(Long cargoId) {
+	public CargoLiquidacionException(Long cargoId) {
 		super("Cannot find Cargo " + cargoId);
 	}
 

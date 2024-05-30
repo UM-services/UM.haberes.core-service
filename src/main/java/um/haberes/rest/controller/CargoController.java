@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import um.haberes.rest.exception.CargoLiquidacionNotFoundException;
+import um.haberes.rest.exception.CargoLiquidacionException;
 import um.haberes.rest.kotlin.model.Cargo;
 import um.haberes.rest.service.CargoService;
 
@@ -42,7 +42,7 @@ public class CargoController {
 	public ResponseEntity<Cargo> findByCargoId(@PathVariable Long cargoId) {
 		try {
 			return new ResponseEntity<Cargo>(service.findByCargoId(cargoId), HttpStatus.OK);
-		} catch (CargoLiquidacionNotFoundException e) {
+		} catch (CargoLiquidacionException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}

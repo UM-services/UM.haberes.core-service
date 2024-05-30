@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.AnotadorNotFoundException;
+import um.haberes.rest.exception.AnotadorException;
 import um.haberes.rest.kotlin.model.Anotador;
 import um.haberes.rest.repository.IAnotadorRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -70,7 +70,7 @@ public class AnotadorService {
 	}
 
 	public Anotador findByAnotadorId(Long anotadorId) {
-		return repository.findByAnotadorId(anotadorId).orElseThrow(() -> new AnotadorNotFoundException(anotadorId));
+		return repository.findByAnotadorId(anotadorId).orElseThrow(() -> new AnotadorException(anotadorId));
 	}
 
 	public Anotador add(Anotador anotador) {
@@ -87,7 +87,7 @@ public class AnotadorService {
 					newAnotador.getTransferido(), newAnotador.getPersona(), newAnotador.getFacultad());
 			repository.save(anotador);
 			return anotador;
-		}).orElseThrow(() -> new AnotadorNotFoundException(anotadorId));
+		}).orElseThrow(() -> new AnotadorException(anotadorId));
 	}
 
 }
