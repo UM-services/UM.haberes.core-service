@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package um.haberes.rest.repository;
 
@@ -16,9 +16,11 @@ import um.haberes.rest.kotlin.model.AdicionalCursoTabla;
 @Repository
 public interface IAdicionalCursoTablaRepository extends JpaRepository<AdicionalCursoTabla, Long> {
 
-	public Optional<AdicionalCursoTabla> findByAdicionalCursoTablaId(Long adicionalCursoTablaId);
+    Optional<AdicionalCursoTabla> findByAdicionalCursoTablaId(Long adicionalCursoTablaId);
 
-	public Optional<AdicionalCursoTabla> findByFacultadIdAndPeriodoDesdeLessThanEqualAndPeriodoHastaGreaterThanEqual(
-			Integer facultadId, Long periodoDesde, Long periodoHasta);
+    Optional<AdicionalCursoTabla> findByFacultadIdAndGeograficaIdIsNullAndPeriodoDesdeLessThanEqualAndPeriodoHastaGreaterThanEqual(
+            Integer facultadId, Long periodoDesde, Long periodoHasta);
+
+    Optional<AdicionalCursoTabla> findByFacultadIdAndGeograficaIdAndPeriodoDesdeLessThanEqualAndPeriodoHastaGreaterThanEqual(Integer facultadId, Integer geograficaId, Long periodoDesde, Long periodoHasta);
 
 }

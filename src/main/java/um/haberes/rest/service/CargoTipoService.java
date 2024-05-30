@@ -8,7 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.CargoTipoNotFoundException;
+import um.haberes.rest.exception.CargoTipoException;
 import um.haberes.rest.kotlin.model.CargoTipo;
 import um.haberes.rest.repository.ICargoTipoRepository;
 
@@ -31,7 +31,7 @@ public class CargoTipoService {
 	}
 
 	public CargoTipo findByCargoTipoId(Integer cargoTipoId) {
-		return repository.findByCargoTipoId(cargoTipoId).orElseThrow(() -> new CargoTipoNotFoundException(cargoTipoId));
+		return repository.findByCargoTipoId(cargoTipoId).orElseThrow(() -> new CargoTipoException(cargoTipoId));
 	}
 
 }

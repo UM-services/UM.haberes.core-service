@@ -8,7 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.CargoClaseNotFoundException;
+import um.haberes.rest.exception.CargoClaseException;
 import um.haberes.rest.kotlin.model.CargoClase;
 import um.haberes.rest.repository.ICargoClaseRepository;
 
@@ -28,7 +28,7 @@ public class CargoClaseService {
 
 	public CargoClase findByCargoClaseId(Long cargoClaseId) {
 		return repository.findByCargoClaseId(cargoClaseId)
-				.orElseThrow(() -> new CargoClaseNotFoundException(cargoClaseId));
+				.orElseThrow(() -> new CargoClaseException(cargoClaseId));
 	}
 
 	public CargoClase add(CargoClase cargoClase) {
@@ -42,7 +42,7 @@ public class CargoClaseService {
 					newCargoClase.getClase());
 			repository.save(cargoClase);
 			return cargoClase;
-		}).orElseThrow(() -> new CargoClaseNotFoundException(cargoClaseId));
+		}).orElseThrow(() -> new CargoClaseException(cargoClaseId));
 	}
 
 }

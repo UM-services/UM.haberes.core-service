@@ -9,11 +9,11 @@ import java.text.MessageFormat;
  * @author daniel
  *
  */
-public class AdicionalCursoRangoNotFoundException extends RuntimeException {
+public class AdicionalCursoRangoException extends RuntimeException {
 
 	private static final long serialVersionUID = -2138729640886420324L;
 
-	public AdicionalCursoRangoNotFoundException(Long adicionalCursoRangoId) {
+	public AdicionalCursoRangoException(Long adicionalCursoRangoId) {
 		super(MessageFormat.format("Cannot find AdicionalCursoRango {}", adicionalCursoRangoId));
 	}
 

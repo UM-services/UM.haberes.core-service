@@ -10,7 +10,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.AdicionalCursoRangoNotFoundException;
+import um.haberes.rest.exception.AdicionalCursoRangoException;
 import um.haberes.rest.kotlin.model.AdicionalCursoRango;
 import um.haberes.rest.repository.IAdicionalCursoRangoRepository;
 
@@ -30,7 +30,7 @@ public class AdicionalCursoRangoService {
 
 	public AdicionalCursoRango findByAdicionalCursoRangoId(Long adicionalCursoRangoId) {
 		return repository.findByAdicionalCursoRangoId(adicionalCursoRangoId)
-				.orElseThrow(() -> new AdicionalCursoRangoNotFoundException(adicionalCursoRangoId));
+				.orElseThrow(() -> new AdicionalCursoRangoException(adicionalCursoRangoId));
 	}
 
 	public AdicionalCursoRango add(AdicionalCursoRango adicionalCursoRango) {

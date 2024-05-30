@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import um.haberes.rest.exception.AdicionalCursoTablaNotFoundException;
+import um.haberes.rest.exception.AdicionalCursoTablaException;
 import um.haberes.rest.kotlin.model.AdicionalCursoTabla;
 import um.haberes.rest.service.AdicionalCursoTablaService;
 
@@ -39,7 +39,7 @@ public class AdicionalCursoTablaController {
 		try {
 			return new ResponseEntity<>(service.findByAdicionalCursoTablaId(adicionalCursoTablaId),
 					HttpStatus.OK);
-		} catch (AdicionalCursoTablaNotFoundException e) {
+		} catch (AdicionalCursoTablaException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}

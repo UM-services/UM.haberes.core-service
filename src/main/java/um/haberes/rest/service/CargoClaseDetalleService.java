@@ -10,7 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import um.haberes.rest.exception.CargoClaseDetalleNotFoundException;
+import um.haberes.rest.exception.CargoClaseDetalleException;
 import um.haberes.rest.kotlin.model.CargoClaseDetalle;
 import um.haberes.rest.repository.ICargoClaseDetalleRepository;
 
@@ -68,7 +68,7 @@ public class CargoClaseDetalleService {
 					newCargoClaseDetalle.getGeografica(), newCargoClaseDetalle.getCargoClasePeriodo());
 			cargoClaseDetalle = repository.save(cargoClaseDetalle);
 			return cargoClaseDetalle;
-		}).orElseThrow(() -> new CargoClaseDetalleNotFoundException(cargoClaseDetalleId));
+		}).orElseThrow(() -> new CargoClaseDetalleException(cargoClaseDetalleId));
 	}
 
 	@Transactional

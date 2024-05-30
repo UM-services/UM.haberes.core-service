@@ -12,10 +12,15 @@ data class AdicionalCursoTabla(
     var periodoDesde: Long = 0L,
     var periodoHasta: Long = 0L,
     var facultadId: Int? = null,
+    var geograficaId: Int? = null,
 
     @OneToOne
     @JoinColumn(name = "facultadId", insertable = false, updatable = false)
     var facultad: Facultad? = null,
+
+    @OneToOne
+    @JoinColumn(name = "geograficaId", insertable = false, updatable = false)
+    var geografica: Geografica? = null,
 
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "adicionalCursoTablaId", insertable = false, updatable = false)

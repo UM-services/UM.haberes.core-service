@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.AntiguedadNotFoundException;
+import um.haberes.rest.exception.AntiguedadException;
 import um.haberes.rest.kotlin.model.Antiguedad;
 import um.haberes.rest.kotlin.model.Persona;
 import um.haberes.rest.kotlin.model.view.AntiguedadPeriodo;
@@ -44,7 +44,7 @@ public class AntiguedadService {
 
 	public Antiguedad findByUnique(Long legajoId, Integer anho, Integer mes) {
 		return repository.findByLegajoIdAndAnhoAndMes(legajoId, anho, mes)
-				.orElseThrow(() -> new AntiguedadNotFoundException(legajoId, anho, mes));
+				.orElseThrow(() -> new AntiguedadException(legajoId, anho, mes));
 	}
 
 	public AntiguedadPeriodo findLastByUnique(Long legajoId, Integer anho, Integer mes) {
@@ -64,7 +64,7 @@ public class AntiguedadService {
 					newAntiguedad.getPersona());
 			antiguedad = repository.save(antiguedad);
 			return antiguedad;
-		}).orElseThrow(() -> new AntiguedadNotFoundException(antiguedadId));
+		}).orElseThrow(() -> new AntiguedadException(antiguedadId));
 	}
 
 	@Transactional
@@ -96,7 +96,7 @@ public class AntiguedadService {
 		try {
 			antiguedad = this.findByUnique(legajoId, anho, mes);
 			antiguedadId = antiguedad.getAntiguedadId();
-		} catch (AntiguedadNotFoundException e) {
+		} catch (AntiguedadException e) {
 		}
 		antiguedad = new Antiguedad(antiguedadId, legajoId, anho, mes, mesesDocentes, mesesAdministrativos, null);
 		if (antiguedadId == null) {

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import um.haberes.rest.exception.AnotadorNotFoundException;
+import um.haberes.rest.exception.AnotadorException;
 import um.haberes.rest.kotlin.model.Anotador;
 import um.haberes.rest.service.AnotadorService;
 
@@ -77,7 +77,7 @@ public class AnotadorController {
 	public ResponseEntity<Anotador> findByAnotadorId(@PathVariable Long anotadorId) {
 		try {
 			return new ResponseEntity<Anotador>(service.findByAnotadorId(anotadorId), HttpStatus.OK);
-		} catch (AnotadorNotFoundException e) {
+		} catch (AnotadorException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}

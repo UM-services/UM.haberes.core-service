@@ -17,8 +17,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.AntiguedadLimiteNotFoundException;
-import um.haberes.rest.exception.AntiguedadNotFoundException;
+import um.haberes.rest.exception.AntiguedadLimiteException;
+import um.haberes.rest.exception.AntiguedadException;
 import um.haberes.rest.exception.CursoDesarraigoException;
 import um.haberes.rest.exception.DesignacionException;
 import um.haberes.rest.exception.LegajoControlException;
@@ -405,7 +405,7 @@ public class DesignacionToolService {
         Antiguedad antiguedad = null;
         try {
             antiguedad = antiguedadService.findByUnique(legajoId, anho, mes);
-        } catch (AntiguedadNotFoundException e) {
+        } catch (AntiguedadException e) {
             antiguedadService.calculate(legajoId, anho, mes);
             antiguedad = antiguedadService.findByUnique(legajoId, anho, mes);
         }
@@ -416,7 +416,7 @@ public class DesignacionToolService {
         AntiguedadLimite antiguedadLimite = null;
         try {
             antiguedadLimite = antiguedadLimiteService.findByMeses(mesesDocentes);
-        } catch (AntiguedadLimiteNotFoundException e) {
+        } catch (AntiguedadLimiteException e) {
             antiguedadLimite = new AntiguedadLimite();
         }
         int anhosAntiguedad = mesesAdministrativos / 12;

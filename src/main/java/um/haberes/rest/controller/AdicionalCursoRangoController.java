@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import um.haberes.rest.exception.AdicionalCursoRangoNotFoundException;
+import um.haberes.rest.exception.AdicionalCursoRangoException;
 import um.haberes.rest.kotlin.model.AdicionalCursoRango;
 import um.haberes.rest.service.AdicionalCursoRangoService;
 
@@ -44,7 +44,7 @@ public class AdicionalCursoRangoController {
 		try {
 			return new ResponseEntity<>(service.findByAdicionalCursoRangoId(adicionalCursoRangoId),
 					HttpStatus.OK);
-		} catch (AdicionalCursoRangoNotFoundException e) {
+		} catch (AdicionalCursoRangoException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}

@@ -549,11 +549,23 @@ public class MakeLiquidacionService {
         }
         log.debug("Total Dependencia -> {}", totalDependencia);
 
-        // Calcula basico y antiguedad para cada dependencia
+        // Calcula basico y antiguedad para cada dependencia considerando adicionales
         for (Integer dependenciaId : totalDependencia.keySet()) {
+            Dependencia dependencia = dependenciaService.findByDependenciaId(dependenciaId);
+            AdicionalCursoTabla adicionalCursoTabla = null;
             try {
-                Dependencia dependencia = dependenciaService.findByDependenciaId(dependenciaId);
-                AdicionalCursoTabla adicionalCursoTabla = adicionalCursoTablaService.findByFacultadIdAndPeriodo(dependencia.getFacultadId(), anho, mes);
+                adicionalCursoTabla = adicionalCursoTablaService.findByFacultadIdAndPeriodo(dependencia.getFacultadId(), anho, mes);
+            } catch (AdicionalCursoTablaException e) {
+                log.debug("Sin Tabla Adicional de Facultad");
+                // Busco por facultad y geografica
+                try {
+                    adicionalCursoTabla = adicionalCursoTablaService.findByFacultadIdAndGeograficaIdAndPeriodo(dependencia.getFacultadId(), dependencia.getGeograficaId(), anho, mes);
+                } catch (AdicionalCursoTablaException e1) {
+                    log.debug("Sin Tabla Adicional de Facultad y Geografica");
+                }
+            }
+
+            if (adicionalCursoTabla != null) {
                 Integer horas = horasDependencia.get(dependenciaId);
                 BigDecimal totalCategoria = totalDependencia.get(dependenciaId);
                 BigDecimal porcentaje = BigDecimal.ZERO;
@@ -580,8 +592,6 @@ public class MakeLiquidacionService {
                     }
 
                 }
-            } catch (AdicionalCursoTablaNotFoundException e) {
-                log.debug("Sin Tabla Adicional");
             }
         }
 

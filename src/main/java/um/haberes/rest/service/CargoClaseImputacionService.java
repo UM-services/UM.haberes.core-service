@@ -8,7 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.rest.exception.CargoClaseImputacionNotFoundException;
+import um.haberes.rest.exception.CargoClaseImputacionException;
 import um.haberes.rest.kotlin.model.CargoClaseImputacion;
 import um.haberes.rest.repository.ICargoClaseImputacionRepository;
 
@@ -28,7 +28,7 @@ public class CargoClaseImputacionService {
 
 	public CargoClaseImputacion findByCargoclaseimputacionId(Long cargoClaseImputacionId) {
 		return repository.findByCargoClaseImputacionId(cargoClaseImputacionId)
-				.orElseThrow(() -> new CargoClaseImputacionNotFoundException(cargoClaseImputacionId));
+				.orElseThrow(() -> new CargoClaseImputacionException(cargoClaseImputacionId));
 	}
 
 	public CargoClaseImputacion findByUnique(Integer dependenciaId, Integer facultadId, Integer geograficaId,
@@ -36,7 +36,7 @@ public class CargoClaseImputacionService {
 		return repository
 				.findByDependenciaIdAndFacultadIdAndGeograficaIdAndCargoClaseId(dependenciaId, facultadId, geograficaId,
 						cargoClaseId)
-				.orElseThrow(() -> new CargoClaseImputacionNotFoundException(dependenciaId, facultadId, geograficaId,
+				.orElseThrow(() -> new CargoClaseImputacionException(dependenciaId, facultadId, geograficaId,
 						cargoClaseId));
 	}
 
@@ -53,7 +53,7 @@ public class CargoClaseImputacionService {
 					newCargoClaseImputacion.getCuentaSueldos(), newCargoClaseImputacion.getCuentaAportes());
 			repository.save(cargoClaseImputacion);
 			return cargoClaseImputacion;
-		}).orElseThrow(() -> new CargoClaseImputacionNotFoundException(cargoClaseImputacionId));
+		}).orElseThrow(() -> new CargoClaseImputacionException(cargoClaseImputacionId));
 	}
 
 }

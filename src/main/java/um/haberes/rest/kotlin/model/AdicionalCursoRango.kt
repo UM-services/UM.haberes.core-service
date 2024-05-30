@@ -4,7 +4,6 @@ import jakarta.persistence.*
 import java.math.BigDecimal
 
 @Entity
-@Table
 data class AdicionalCursoRango(
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
