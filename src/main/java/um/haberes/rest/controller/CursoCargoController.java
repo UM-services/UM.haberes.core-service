@@ -5,6 +5,9 @@ package um.haberes.rest.controller;
 
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +31,7 @@ import um.haberes.rest.service.CursoCargoService;
  */
 @RestController
 @RequestMapping("/cursoCargo")
+@Slf4j
 public class CursoCargoController {
 
 	private final CursoCargoService service;
@@ -60,7 +64,13 @@ public class CursoCargoController {
 	@GetMapping("/curso/{cursoId}/{anho}/{mes}")
 	public ResponseEntity<List<CursoCargo>> findAllByCurso(@PathVariable Long cursoId, @PathVariable Integer anho,
 			@PathVariable Integer mes) {
-		return new ResponseEntity<>(service.findAllByCurso(cursoId, anho, mes), HttpStatus.OK);
+		var cursoCargos = this.service.findAllByCurso(cursoId, anho, mes);
+        try {
+            log.debug("CursoCargos -> {}", JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(cursoCargos));
+        } catch (JsonProcessingException e) {
+            log.debug("CursoCargos -> null");
+        }
+        return new ResponseEntity<>(cursoCargos, HttpStatus.OK);
 	}
 
 	@GetMapping("/facultad/{legajoId}/{anho}/{mes}/{facultadId}")
