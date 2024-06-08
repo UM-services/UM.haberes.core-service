@@ -17,6 +17,6 @@ data class CursoCargoContratadoDto(
     var categoriaId: Int? = null,
     var cursoCargoNovedadId: Long? = null,
     var acreditado: Byte = 0,
-    var contratadoPersonaDto: ContratadoPersonaDto? = null
+    var contratadoPersona: ContratadoPersonaDto? = null
 
 )

@@ -16,8 +16,12 @@ import java.util.List;
 @RequestMapping("/cursoCargoContratado")
 public class CursoCargoContratadoController {
 
+    private final CursoCargoContratadoService service;
+
     @Autowired
-    private CursoCargoContratadoService service;
+    public CursoCargoContratadoController(CursoCargoContratadoService service) {
+        this.service = service;
+    }
 
     @GetMapping("/curso/{cursoId}/{anho}/{mes}")
     public ResponseEntity<List<CursoCargoContratadoDto>> findAllByCurso(@PathVariable Long cursoId, @PathVariable Integer anho, @PathVariable Integer mes) {
