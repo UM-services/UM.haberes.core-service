@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package um.haberes.rest.repository;
 
@@ -19,24 +19,26 @@ import um.haberes.rest.kotlin.model.CargoClaseDetalle;
 @Repository
 public interface ICargoClaseDetalleRepository extends JpaRepository<CargoClaseDetalle, Long> {
 
-	public List<CargoClaseDetalle> findAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
+    List<CargoClaseDetalle> findAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
 
-	public List<CargoClaseDetalle> findAllByCargoClaseDetalleIdIn(List<Long> cargoClaseDetalleIds);
+    List<CargoClaseDetalle> findAllByLegajoIdAndAnhoAndMesAndFacultadId(Long legajoId, Integer anho, Integer mes, Integer facultadId);
 
-	public List<CargoClaseDetalle> findAllByFacultadIdAndAnhoAndMes(Integer facultadId, Integer anho, Integer mes,
-			Sort sort);
+    List<CargoClaseDetalle> findAllByCargoClaseDetalleIdIn(List<Long> cargoClaseDetalleIds);
 
-	public List<CargoClaseDetalle> findAllByCargoClasePeriodoIdOrderByCargoClaseDetalleId(Long cargoClasePeriodoId);
+    List<CargoClaseDetalle> findAllByFacultadIdAndAnhoAndMes(Integer facultadId, Integer anho, Integer mes,
+                                                             Sort sort);
 
-	public List<CargoClaseDetalle> findAllByCargoClaseIdAndAnhoAndMesOrderByLegajoId(Long cargoClaseId, Integer anho,
-			Integer mes);
+    List<CargoClaseDetalle> findAllByCargoClasePeriodoIdOrderByCargoClaseDetalleId(Long cargoClasePeriodoId);
 
-	public Optional<CargoClaseDetalle> findByCargoClaseDetalleId(Long cargoClasePeriodoId);
+    List<CargoClaseDetalle> findAllByCargoClaseIdAndAnhoAndMesOrderByLegajoId(Long cargoClaseId, Integer anho,
+                                                                              Integer mes);
 
-	@Modifying
-	public void deleteByCargoClaseDetalleId(Long cargoClasePeriodoId);
+    Optional<CargoClaseDetalle> findByCargoClaseDetalleId(Long cargoClasePeriodoId);
 
-	@Modifying
-	public void deleteAllByCargoClasePeriodoId(Long cargoClasePeriodoId);
+    @Modifying
+    void deleteByCargoClaseDetalleId(Long cargoClasePeriodoId);
+
+    @Modifying
+    void deleteAllByCargoClasePeriodoId(Long cargoClasePeriodoId);
 
 }

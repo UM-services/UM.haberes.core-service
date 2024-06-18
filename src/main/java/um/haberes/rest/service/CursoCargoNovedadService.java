@@ -147,4 +147,8 @@ public class CursoCargoNovedadService {
 				(byte) 0, (byte) 0);
 	}
 
+	@Transactional
+    public void delete(Long cursoCargoNovedadId) {
+		repository.deleteByCursoCargoNovedadId(cursoCargoNovedadId);
+    }
 }

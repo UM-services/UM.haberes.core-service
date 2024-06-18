@@ -33,7 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author daniel
- *
  */
 @Service
 @Slf4j
@@ -53,10 +52,12 @@ public class PersonaService {
 
     private final ContactoService contactoService;
 
+    private final CursoService cursoService;
+
     @Autowired
     public PersonaService(IPersonaRepository repository, PersonaSearchService personaSearchService, LiquidacionService liquidacionService,
                           CategoriaService categoriaService, CargoLiquidacionService cargoLiquidacionService, CursoCargoService cursoCargoService,
-                          ContactoService contactoService) {
+                          ContactoService contactoService, CursoService cursoService) {
         this.repository = repository;
         this.personaSearchService = personaSearchService;
         this.liquidacionService = liquidacionService;
@@ -64,6 +65,7 @@ public class PersonaService {
         this.cargoLiquidacionService = cargoLiquidacionService;
         this.cursoCargoService = cursoCargoService;
         this.contactoService = contactoService;
+        this.cursoService = cursoService;
     }
 
     public List<Persona> findAll() {
@@ -132,6 +134,14 @@ public class PersonaService {
     public List<Persona> findAllOrderByDependencia() {
         return repository.findAll(Sort.by("dependencia.dependenciaId")
                 .and(Sort.by("apellido").and(Sort.by("nombre").and(Sort.by("legajoId")))));
+    }
+
+    public List<Persona> findAllByFacultad(Integer facultadId) {
+        List<Long> cursoIds = cursoService.findAllByFacultadId(facultadId).stream().map(Curso::getCursoId).toList();
+        List<Long> legajoIds = cursoCargoService.findAllByCursoIdIn(cursoIds).stream()
+                .map(CursoCargo::getLegajoId).collect(Collectors.toList());
+        return repository.findAllByLegajoIdIn(legajoIds,
+                Sort.by("apellido").ascending().and(Sort.by("nombre").ascending()));
     }
 
     public Persona findByLegajoId(Long legajoId) {

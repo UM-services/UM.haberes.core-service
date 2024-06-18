@@ -28,6 +28,10 @@ public class CargoClaseDetalleService {
 		return repository.findAllByLegajoIdAndAnhoAndMes(legajoId, anho, mes);
 	}
 
+	public List<CargoClaseDetalle> findAllByLegajoAndFacultad(Long legajoId, Integer anho, Integer mes, Integer facultadId) {
+		return repository.findAllByLegajoIdAndAnhoAndMesAndFacultadId(legajoId, anho, mes, facultadId);
+	}
+
 	public List<CargoClaseDetalle> findAllByFacultad(Integer facultadId, Integer anho, Integer mes) {
 		return repository.findAllByFacultadIdAndAnhoAndMes(facultadId, anho, mes,
 				Sort.by("geograficaId").ascending().and(Sort.by("legajoId").ascending()));

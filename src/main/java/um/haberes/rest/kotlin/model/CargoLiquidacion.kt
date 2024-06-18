@@ -26,12 +26,15 @@ data class CargoLiquidacion(
     var jornada: Int = 0,
     var presentismo: Int = 0,
     var situacion: String? = null,
+
     @OneToOne
     @JoinColumn(name = "legajoId", insertable = false, updatable = false)
     var persona: Persona? = null,
+
     @OneToOne
     @JoinColumn(name = "dependenciaId", insertable = false, updatable = false)
     var dependencia: Dependencia? = null,
+
     @OneToOne
     @JoinColumn(name = "categoriaId", insertable = false, updatable = false)
     var categoria: Categoria? = null

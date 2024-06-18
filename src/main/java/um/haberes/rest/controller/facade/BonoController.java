@@ -39,6 +39,13 @@ public class BonoController {
         return Tool.generateFile(service.generatePdf(legajoId, anho, mes, legajoIdSolicitud, ipAddress), "bono.pdf");
     }
 
+    @GetMapping("/detalleCargos/{legajoId}/{anho}/{mes}/{facultadId}")
+    public ResponseEntity<Resource> generateDetalleCargos(@PathVariable Long legajoId, @PathVariable Integer anho,
+                                                @PathVariable Integer mes, @PathVariable Integer facultadId)
+            throws FileNotFoundException {
+        return Tool.generateFile(service.generateDetalleCargosPdf(legajoId, anho, mes, facultadId), "bono.pdf");
+    }
+
     @GetMapping("/generatePdfDependencia/{anho}/{mes}/{dependenciaId}/{salida}/{legajoIdSolicitud}/{ipAddress}")
     public ResponseEntity<Resource> generatePdfDependencia(@PathVariable Integer anho, @PathVariable Integer mes,
                                                            @PathVariable Integer dependenciaId, @PathVariable String salida, @PathVariable Long legajoIdSolicitud,

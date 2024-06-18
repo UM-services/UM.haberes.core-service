@@ -34,8 +34,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PersonaController {
 
+	private final PersonaService service;
+
 	@Autowired
-	private PersonaService service;
+	public PersonaController(PersonaService service) {
+		this.service = service;
+	}
 
 	@GetMapping("/")
 	public ResponseEntity<List<Persona>> findAll() {
@@ -71,6 +75,11 @@ public class PersonaController {
 	@GetMapping("/liquidables")
 	public ResponseEntity<List<Persona>> findAllLiquidables() {
 		return new ResponseEntity<>(service.findAllLiquidables(), HttpStatus.OK);
+	}
+
+	@GetMapping("/facultad/{facultadId}")
+	public ResponseEntity<List<Persona>> findAllByFacultad(@PathVariable Integer facultadId) {
+		return new ResponseEntity<>(service.findAllByFacultad(facultadId), HttpStatus.OK);
 	}
 
 	@PostMapping("/search")
