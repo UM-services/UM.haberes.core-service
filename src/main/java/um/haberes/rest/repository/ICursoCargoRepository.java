@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package um.haberes.rest.repository;
 
@@ -19,37 +19,41 @@ import um.haberes.rest.kotlin.model.CursoCargo;
 @Repository
 public interface ICursoCargoRepository extends JpaRepository<CursoCargo, Long> {
 
-	public List<CursoCargo> findAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes, Sort sort);
+    List<CursoCargo> findAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes, Sort sort);
 
-	public List<CursoCargo> findAllByLegajoIdAndAnhoAndMesAndDesarraigo(Long legajoId, Integer anho, Integer mes,
-			Byte desarraigo);
+    List<CursoCargo> findAllByLegajoIdAndAnhoAndMesAndDesarraigo(Long legajoId, Integer anho, Integer mes,
+                                                                 Byte desarraigo);
 
-	public List<CursoCargo> findAllByLegajoIdAndAnhoAndMesAndCargoTipoId(Long legajoId, Integer anho,
-			Integer mes, Integer cargoTipoId);
+    List<CursoCargo> findAllByLegajoIdAndAnhoAndMesAndCargoTipoId(Long legajoId, Integer anho,
+                                                                  Integer mes, Integer cargoTipoId);
 
-	public List<CursoCargo> findAllByCursoIdAndAnhoAndMes(Long cursoId, Integer anho, Integer mes, Sort sort);
+    List<CursoCargo> findAllByCursoIdAndAnhoAndMes(Long cursoId, Integer anho, Integer mes, Sort sort);
 
-	public List<CursoCargo> findTopByCursoId(Long cursoId);
+    List<CursoCargo> findTopByCursoId(Long cursoId);
 
-	public List<CursoCargo> findAllByAnhoAndMes(Integer anho, Integer mes);
+    List<CursoCargo> findAllByAnhoAndMes(Integer anho, Integer mes);
 
-	public List<CursoCargo> findTopByAnhoAndMes(Integer anho, Integer mes);
+    List<CursoCargo> findTopByAnhoAndMes(Integer anho, Integer mes);
 
-	public List<CursoCargo> findAllByAnhoAndMesAndDesarraigo(Integer anho, Integer mes, Byte desarraigo);
+    List<CursoCargo> findAllByAnhoAndMesAndDesarraigo(Integer anho, Integer mes, Byte desarraigo);
 
-	public Optional<CursoCargo> findByCursoIdAndAnhoAndMesAndCargoTipoIdAndLegajoId(Long cursoId, Integer anho,
-			Integer mes, Integer cargoTipoId, Long legajoId);
+    List<CursoCargo> findAllByCursoIdIn(List<Long> cursoIds);
 
-	public Optional<CursoCargo> findByCursoCargoId(Long cursoCargoId);
+    List<CursoCargo> findAllByLegajoIdAndAnhoAndMesAndCursoFacultadId(Long legajoId, Integer anho, Integer mes, Integer facultadId);
 
-	public Optional<CursoCargo> findByCursoIdAndAnhoAndMesAndLegajoId(Long cursoId, Integer anho, Integer mes,
-			Long legajoId);
+    Optional<CursoCargo> findByCursoIdAndAnhoAndMesAndCargoTipoIdAndLegajoId(Long cursoId, Integer anho,
+                                                                             Integer mes, Integer cargoTipoId, Long legajoId);
 
-	@Modifying
-	public void deleteByCursoCargoId(Long cursoCargoId);
+    Optional<CursoCargo> findByCursoCargoId(Long cursoCargoId);
 
-	@Modifying
-	public void deleteByCursoIdAndAnhoAndMesAndCargoTipoIdAndLegajoId(Long cursoId, Integer anho, Integer mes,
-			Integer cargoTipoId, Long legajoId);
+    Optional<CursoCargo> findByCursoIdAndAnhoAndMesAndLegajoId(Long cursoId, Integer anho, Integer mes,
+                                                               Long legajoId);
+
+    @Modifying
+    void deleteByCursoCargoId(Long cursoCargoId);
+
+    @Modifying
+    void deleteByCursoIdAndAnhoAndMesAndCargoTipoIdAndLegajoId(Long cursoId, Integer anho, Integer mes,
+                                                               Integer cargoTipoId, Long legajoId);
 
 }

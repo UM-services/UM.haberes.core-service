@@ -12,9 +12,11 @@ data class Dependencia(
     var acronimo: String = "",
     var facultadId: Int? = null,
     var geograficaId: Int? = null,
+
     @OneToOne(optional = false)
     @JoinColumn(name = "facultadId", insertable = false, updatable = false)
     var facultad: Facultad? = null,
+
     @OneToOne(optional = false)
     @JoinColumn(name = "geograficaId", insertable = false, updatable = false)
     var geografica: Geografica? = null

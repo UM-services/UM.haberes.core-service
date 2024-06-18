@@ -3,6 +3,7 @@
  */
 package um.haberes.rest.service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,8 +60,9 @@ public class CursoCargoService {
     }
 
     public List<CursoCargo> findAllByFacultad(Long legajoId, Integer anho, Integer mes, Integer facultadId) {
-        return repository.findAllByLegajoIdAndAnhoAndMes(legajoId, anho, mes, null).stream()
-                .filter(c -> c.getCurso().getFacultadId().equals(facultadId)).collect(Collectors.toList());
+        return repository.findAllByLegajoIdAndAnhoAndMesAndCursoFacultadId(legajoId, anho, mes, facultadId);
+//        return repository.findAllByLegajoIdAndAnhoAndMes(legajoId, anho, mes, null).stream()
+//                .filter(c -> c.getCurso().getFacultadId().equals(facultadId)).collect(Collectors.toList());
     }
 
     public List<CursoCargo> findAllByCargoTipo(Long legajoId, Integer anho, Integer mes, Integer facultadId,
@@ -88,6 +90,10 @@ public class CursoCargoService {
         return repository.findAllByLegajoIdAndAnhoAndMes(legajoId, anho, mes, Sort.by("cursoCargoId")).stream()
                 .filter(cursoCargo -> cursoCargo.getCurso().getAdicionalCargaHoraria() == 1)
                 .collect(Collectors.toList());
+    }
+
+    public List<CursoCargo> findAllByCursoIdIn(List<Long> cursoIds) {
+        return repository.findAllByCursoIdIn(cursoIds);
     }
 
     public CursoCargo findByCursoCargoId(Long cursoCargoId) {

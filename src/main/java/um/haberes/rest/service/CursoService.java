@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.CursoException;
 import um.haberes.rest.kotlin.model.Curso;
+import um.haberes.rest.kotlin.model.CursoCargo;
 import um.haberes.rest.repository.ICursoRepository;
 
 /**
@@ -22,8 +23,12 @@ import um.haberes.rest.repository.ICursoRepository;
 @Service
 public class CursoService {
 
+	private final ICursoRepository repository;
+
 	@Autowired
-	private ICursoRepository repository;
+	public CursoService(ICursoRepository repository) {
+		this.repository = repository;
+	}
 
 	public List<Curso> findAll() {
 		return repository.findAll();
@@ -40,6 +45,15 @@ public class CursoService {
 
 	public List<Curso> findAllByCursoIdIn(List<Long> ids) {
 		return repository.findAllByCursoIdIn(ids);
+	}
+
+	public List<Curso> findAllByFacultadId(Integer facultadId) {
+		return repository.findAllByFacultadId(facultadId);
+	}
+
+	public List<Curso> findAllByFacultadIdAndGeograficaIdAndAnhoAndMes(Integer facultadId, Integer geograficaId, Integer anho, Integer mes, CursoCargoService cursoCargoService) {
+		List<Long> cursoIds = cursoCargoService.findAllByAnhoAndMes(anho, mes).stream().map(CursoCargo::getCursoId).toList();
+		return repository.findAllByFacultadIdAndGeograficaIdAndCursoIdInOrderByNombre(facultadId, geograficaId, cursoIds);
 	}
 
 	public Curso findByCursoId(Long cursoId) {

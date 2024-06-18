@@ -45,7 +45,7 @@ public class AnotadorService {
 	}
 
 	public List<Anotador> findPendientesByFacultad(Integer facultadId, Integer anho, Integer mes) {
-		return repository.findTop1000ByAnhoAndMesAndAutorizadoAndRechazadoAndFacultadIdOrderByAnotadorId(anho, mes,
+		return repository.findTop1000ByAnhoAndMesAndAutorizadoAndRechazadoAndFacultadIdOrderByLegajoId(anho, mes,
 				(byte) 0, (byte) 0, facultadId);
 	}
 

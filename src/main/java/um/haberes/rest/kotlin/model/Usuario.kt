@@ -5,7 +5,6 @@ import jakarta.persistence.*
 import java.time.OffsetDateTime
 
 @Entity
-@Table
 data class Usuario(
 
     @Id
@@ -15,6 +14,7 @@ data class Usuario(
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ", timezone = "UTC")
     var lastLog: OffsetDateTime? = null,
 
-    var usuarioId: Long? = null
+    var usuarioId: Long? = null,
+    var facultadId: Int? = null
 
 ) : Auditable()

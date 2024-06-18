@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import um.haberes.rest.controller.FacultadController;
 import um.haberes.rest.kotlin.model.*;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -54,23 +55,7 @@ import um.haberes.rest.exception.ContactoException;
 import um.haberes.rest.exception.LegajoBancoException;
 import um.haberes.rest.exception.LegajoControlException;
 import um.haberes.rest.exception.LetraException;
-import um.haberes.rest.service.AntiguedadService;
-import um.haberes.rest.service.BonoImpresionService;
-import um.haberes.rest.service.CargoClaseDetalleService;
-import um.haberes.rest.service.CargoLiquidacionService;
-import um.haberes.rest.service.CodigoGrupoService;
-import um.haberes.rest.service.CodigoService;
-import um.haberes.rest.service.ContactoService;
-import um.haberes.rest.service.ControlService;
-import um.haberes.rest.service.CursoCargoService;
-import um.haberes.rest.service.DependenciaService;
-import um.haberes.rest.service.ItemService;
-import um.haberes.rest.service.LegajoBancoService;
-import um.haberes.rest.service.LegajoControlService;
-import um.haberes.rest.service.LetraService;
-import um.haberes.rest.service.LiquidacionAdicionalService;
-import um.haberes.rest.service.LiquidacionService;
-import um.haberes.rest.service.PersonaService;
+import um.haberes.rest.service.*;
 import um.haberes.rest.util.Tool;
 import lombok.extern.slf4j.Slf4j;
 
@@ -127,13 +112,15 @@ public class BonoService {
 
     private final LiquidacionEtecService liquidacionEtecService;
 
+    private final FacultadService facultadService;
+
     @Autowired
     public BonoService(Environment environment, PersonaService personaService, ControlService controlService, DependenciaService dependenciaService,
                        ItemService itemService, AntiguedadService antiguedadService, LegajoBancoService legajoBancoService, CursoCargoService cursoCargoService,
                        CargoLiquidacionService cargoLiquidacionService, CargoClaseDetalleService cargoClaseDetalleService, CodigoGrupoService codigoGrupoService,
                        LetraService letraService, BonoImpresionService bonoImpresionService, LiquidacionService liquidacionService, ContactoService contactoService,
                        JavaMailSender javaMailSender, LegajoControlService legajoControlService, LiquidacionAdicionalService liquidacionAdicionalService,
-                       CodigoService codigoService, DesignacionToolService designacionToolService, LiquidacionEtecService liquidacionEtecService) {
+                       CodigoService codigoService, DesignacionToolService designacionToolService, LiquidacionEtecService liquidacionEtecService, FacultadService facultadService) {
         this.environment = environment;
         this.personaService = personaService;
         this.controlService = controlService;
@@ -155,6 +142,7 @@ public class BonoService {
         this.codigoService = codigoService;
         this.designacionToolService = designacionToolService;
         this.liquidacionEtecService = liquidacionEtecService;
+        this.facultadService = facultadService;
     }
 
     public String generatePdfDependencia(Integer anho, Integer mes, Integer dependenciaId, String salida,
@@ -198,6 +186,354 @@ public class BonoService {
         outputStream.close();
     }
 
+    public String generateDetalleCargosPdf(Long legajoId, Integer anho, Integer mes, Integer facultadId) {
+        String path = environment.getProperty("path.files");
+        String filename = path + "cargos." + legajoId + "." + anho + "." + mes + "." + facultadId + ".pdf";
+
+        return makePdfCargos(filename, legajoId, anho, mes, facultadId);
+    }
+
+    private String makePdfCargos(String filename, Long legajoId, Integer anho, Integer mes, Integer facultadId) {
+        Persona persona = personaService.findByLegajoId(legajoId);
+        Facultad facultad = facultadService.findByFacultadId(facultadId);
+        Antiguedad antiguedad = antiguedadService.findByUnique(legajoId, anho, mes);
+        int mesesAntiguedad = Math.max(antiguedad.getMesesDocentes(), antiguedad.getMesesAdministrativos());
+        List<BigDecimal> indices = designacionToolService.indiceAntiguedad(legajoId, anho, mes);
+        log.debug("Indices={}", indices);
+
+        try {
+            Document document = new Document(new Rectangle(PageSize.A4));
+            PdfWriter.getInstance(document, new FileOutputStream(filename));
+            document.setMargins(20, 20, 20, 20);
+            document.open();
+
+            Image marca = Image.getInstance("marca_um.png");
+
+            // Tabla logo y datos UM
+            float[] columnHeader = {2, 8};
+            PdfPTable tableHeader = new PdfPTable(columnHeader);
+            tableHeader.setWidthPercentage(100);
+
+            PdfPCell cell = new PdfPCell(marca);
+            cell.setBorder(Rectangle.NO_BORDER);
+            tableHeader.addCell(cell);
+
+            Paragraph paragraph = new Paragraph();
+            paragraph.add(new Phrase("Universidad de Mendoza", new Font(Font.HELVETICA, 16, Font.BOLD)));
+            paragraph.add(new Phrase("\n" + facultad.getNombre(), new Font(Font.HELVETICA, 11, Font.BOLD)));
+            cell = new PdfPCell(paragraph);
+            cell.setBorder(Rectangle.NO_BORDER);
+            cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            cell.setLeading(0, 1.5f);
+            tableHeader.addCell(cell);
+            document.add(tableHeader);
+
+            // Centrado Título
+            paragraph = new Paragraph("Detalle de Cargos", new Font(Font.HELVETICA, 12, Font.BOLD));
+            paragraph.setAlignment(Element.ALIGN_CENTER);
+            paragraph.setMultipliedLeading(2f);
+            document.add(paragraph);
+            // Nombre, documento y cuil
+            paragraph = new Paragraph(new Phrase("Apellido, Nombre: ", new Font(Font.HELVETICA, 8)));
+            paragraph.add(new Phrase(MessageFormat.format("{0}, {1}", persona.getApellido(), persona.getNombre()),
+                    new Font(Font.HELVETICA, 9, Font.BOLD)));
+            paragraph.setAlignment(Element.ALIGN_CENTER);
+            paragraph.setMultipliedLeading(2f);
+            document.add(paragraph);
+
+            paragraph = new Paragraph(new Phrase("Legajo: ", new Font(Font.HELVETICA, 8)));
+            paragraph.add(new Phrase(persona.getLegajoId().toString(), new Font(Font.HELVETICA, 9, Font.BOLD)));
+            paragraph.add(new Phrase("         Antigüedad: ", new Font(Font.HELVETICA, 8)));
+            paragraph.add(new Phrase(MessageFormat.format("{0}.{1}", mesesAntiguedad / 12, mesesAntiguedad % 12),
+                    new Font(Font.HELVETICA, 9, Font.BOLD)));
+            paragraph.setAlignment(Element.ALIGN_CENTER);
+            paragraph.setMultipliedLeading(2f);
+            document.add(paragraph);
+            // Cursos
+            List<CursoCargo> cursos = cursoCargoService.findAllByFacultad(legajoId, anho, mes, facultadId);
+            if (!cursos.isEmpty()) {
+                float[] columnCurso = {4, 24, 1.5f, 1.5f, 1.5f, 1.5f, 1.5f};
+                PdfPTable tableCurso = new PdfPTable(columnCurso);
+                tableCurso.setWidthPercentage(90);
+                tableCurso.setHorizontalAlignment(Element.ALIGN_CENTER);
+                cell = new PdfPCell(new Paragraph("Cargo", new Font(Font.HELVETICA, 8, Font.BOLD)));
+                cell.setBorder(Rectangle.BOTTOM);
+                cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                tableCurso.addCell(cell);
+                cell = new PdfPCell(new Paragraph("Curso", new Font(Font.HELVETICA, 8, Font.BOLD)));
+                cell.setBorder(Rectangle.BOTTOM);
+                cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+                tableCurso.addCell(cell);
+                cell = new PdfPCell(new Paragraph("Ds", new Font(Font.HELVETICA, 8, Font.BOLD)));
+                cell.setBorder(Rectangle.BOTTOM);
+                cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                tableCurso.addCell(cell);
+                cell = new PdfPCell(new Paragraph("An", new Font(Font.HELVETICA, 8, Font.BOLD)));
+                cell.setBorder(Rectangle.BOTTOM);
+                cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                tableCurso.addCell(cell);
+                cell = new PdfPCell(new Paragraph("S1", new Font(Font.HELVETICA, 8, Font.BOLD)));
+                cell.setBorder(Rectangle.BOTTOM);
+                cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                tableCurso.addCell(cell);
+                cell = new PdfPCell(new Paragraph("S2", new Font(Font.HELVETICA, 8, Font.BOLD)));
+                cell.setBorder(Rectangle.BOTTOM);
+                cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                tableCurso.addCell(cell);
+                cell = new PdfPCell(new Paragraph("Hr", new Font(Font.HELVETICA, 8, Font.BOLD)));
+                cell.setBorder(Rectangle.BOTTOM);
+                cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                tableCurso.addCell(cell);
+                for (CursoCargo cursoCargo : cursos) {
+                    cell = new PdfPCell(new Paragraph(cursoCargo.getCargoTipo().getNombre(),
+                            new Font(Font.HELVETICA, 8, Font.BOLD)));
+                    cell.setBorder(Rectangle.NO_BORDER);
+                    cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                    tableCurso.addCell(cell);
+                    cell = new PdfPCell(new Paragraph(cursoCargo.getCurso().getNombre(), new Font(Font.HELVETICA, 8)));
+                    cell.setBorder(Rectangle.NO_BORDER);
+                    cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+                    tableCurso.addCell(cell);
+                    cell = new PdfPCell(new Paragraph(cursoCargo.getDesarraigo() == 1 ? "*" : "",
+                            new Font(Font.HELVETICA, 8, Font.BOLD)));
+                    cell.setBorder(Rectangle.NO_BORDER);
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    tableCurso.addCell(cell);
+                    cell = new PdfPCell(new Paragraph(cursoCargo.getCurso().getAnual() == 1 ? "*" : "",
+                            new Font(Font.HELVETICA, 8, Font.BOLD)));
+                    cell.setBorder(Rectangle.NO_BORDER);
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    tableCurso.addCell(cell);
+                    cell = new PdfPCell(new Paragraph(cursoCargo.getCurso().getSemestre1() == 1 ? "*" : "",
+                            new Font(Font.HELVETICA, 8, Font.BOLD)));
+                    cell.setBorder(Rectangle.NO_BORDER);
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    tableCurso.addCell(cell);
+                    cell = new PdfPCell(new Paragraph(cursoCargo.getCurso().getSemestre2() == 1 ? "*" : "",
+                            new Font(Font.HELVETICA, 8, Font.BOLD)));
+                    cell.setBorder(Rectangle.NO_BORDER);
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    tableCurso.addCell(cell);
+                    cell = new PdfPCell(new Paragraph(new DecimalFormat("#0").format(cursoCargo.getHorasSemanales()),
+                            new Font(Font.HELVETICA, 8, Font.BOLD)));
+                    cell.setBorder(Rectangle.NO_BORDER);
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    tableCurso.addCell(cell);
+                }
+                document.add(tableCurso);
+            }
+            // Actividad Docente
+            List<CargoLiquidacion> cargos = cargoLiquidacionService.findAllDocenteByLegajoAndFacultad(legajoId, anho, mes, facultadId);
+            if (!cargos.isEmpty()) {
+                paragraph = new Paragraph("Actividad Docente", new Font(Font.HELVETICA, 8, Font.BOLD));
+                paragraph.setAlignment(Element.ALIGN_CENTER);
+                paragraph.setMultipliedLeading(2f);
+                document.add(paragraph);
+                // Cargos Liquidados
+                float[] columnGrupo = {1, 1};
+                PdfPTable tableGrupo = new PdfPTable(columnGrupo);
+                tableGrupo.setWidthPercentage(90);
+                tableGrupo.setHorizontalAlignment(Element.ALIGN_CENTER);
+                float[] columnCargo = {2, 6, 3};
+                PdfPTable tableCargo = new PdfPTable(columnCargo);
+                tableCargo.setWidthPercentage(100);
+                tableCargo.setHorizontalAlignment(Element.ALIGN_CENTER);
+                cell = new PdfPCell(new Paragraph("Dep", new Font(Font.HELVETICA, 8, Font.BOLD)));
+                cell.setBorder(Rectangle.BOTTOM);
+                cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+                tableCargo.addCell(cell);
+                cell = new PdfPCell(new Paragraph("Cargo", new Font(Font.HELVETICA, 8, Font.BOLD)));
+                cell.setBorder(Rectangle.BOTTOM);
+                cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+                tableCargo.addCell(cell);
+                cell = new PdfPCell(new Paragraph("Básico", new Font(Font.HELVETICA, 8, Font.BOLD)));
+                cell.setBorder(Rectangle.BOTTOM);
+                cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                tableCargo.addCell(cell);
+                cell = new PdfPCell(tableCargo);
+                cell.setBorder(Rectangle.NO_BORDER);
+                tableGrupo.addCell(cell);
+                tableGrupo.addCell(cell);
+                document.add(tableGrupo);
+                tableGrupo = new PdfPTable(columnGrupo);
+                tableGrupo.setWidthPercentage(90);
+                tableGrupo.setHorizontalAlignment(Element.ALIGN_CENTER);
+                int count = 0;
+                for (CargoLiquidacion cargoLiquidacion : cargos) {
+                    count++;
+                    tableCargo = new PdfPTable(columnCargo);
+                    tableCargo.setWidthPercentage(100);
+                    tableCargo.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    cell = new PdfPCell(new Paragraph(cargoLiquidacion.getDependencia().getAcronimo(),
+                            new Font(Font.HELVETICA, 8)));
+                    cell.setBorder(Rectangle.NO_BORDER);
+                    cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+                    tableCargo.addCell(cell);
+                    cell = new PdfPCell(
+                            new Paragraph(cargoLiquidacion.getCategoria().getNombre(), new Font(Font.HELVETICA, 8)));
+                    cell.setBorder(Rectangle.NO_BORDER);
+                    cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+                    tableCargo.addCell(cell);
+                    cell = new PdfPCell(
+                            new Paragraph(new DecimalFormat("#,###.00").format(cargoLiquidacion.getCategoriaBasico()),
+                                    new Font(Font.HELVETICA, 8)));
+                    cell.setBorder(Rectangle.NO_BORDER);
+                    cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                    tableCargo.addCell(cell);
+                    cell = new PdfPCell(tableCargo);
+                    cell.setBorder(Rectangle.NO_BORDER);
+                    tableGrupo.addCell(cell);
+                }
+                // Completa con una celda vacía si la cantidad de cargos es impar
+                if (count % 2 != 0) {
+                    cell = new PdfPCell();
+                    cell.setBorder(Rectangle.NO_BORDER);
+                    tableGrupo.addCell(cell);
+                }
+                document.add(tableGrupo);
+            }
+            // Actividad No Docente
+            cargos = cargoLiquidacionService.findAllNoDocenteByLegajoAndFacultad(legajoId, anho, mes, facultadId);
+            if (!cargos.isEmpty()) {
+                paragraph = new Paragraph("Actividad No Docente", new Font(Font.HELVETICA, 8, Font.BOLD));
+                paragraph.setAlignment(Element.ALIGN_CENTER);
+                paragraph.setMultipliedLeading(2f);
+                document.add(paragraph);
+                // Cargos Liquidados
+                float[] columnGrupo = {1, 1};
+                PdfPTable tableGrupo = new PdfPTable(columnGrupo);
+                tableGrupo.setWidthPercentage(90);
+                tableGrupo.setHorizontalAlignment(Element.ALIGN_CENTER);
+                float[] columnCargo = {2, 6, 3};
+                PdfPTable tableCargo = new PdfPTable(columnCargo);
+                tableCargo.setWidthPercentage(100);
+                tableCargo.setHorizontalAlignment(Element.ALIGN_CENTER);
+                cell = new PdfPCell(new Paragraph("Dep", new Font(Font.HELVETICA, 8, Font.BOLD)));
+                cell.setBorder(Rectangle.BOTTOM);
+                cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+                tableCargo.addCell(cell);
+                cell = new PdfPCell(new Paragraph("Cargo", new Font(Font.HELVETICA, 8, Font.BOLD)));
+                cell.setBorder(Rectangle.BOTTOM);
+                cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+                tableCargo.addCell(cell);
+                cell = new PdfPCell(new Paragraph("Básico", new Font(Font.HELVETICA, 8, Font.BOLD)));
+                cell.setBorder(Rectangle.BOTTOM);
+                cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                tableCargo.addCell(cell);
+                cell = new PdfPCell(tableCargo);
+                cell.setBorder(Rectangle.NO_BORDER);
+                tableGrupo.addCell(cell);
+                tableGrupo.addCell(cell);
+                document.add(tableGrupo);
+                tableGrupo = new PdfPTable(columnGrupo);
+                tableGrupo.setWidthPercentage(90);
+                tableGrupo.setHorizontalAlignment(Element.ALIGN_CENTER);
+                int count = 0;
+                for (CargoLiquidacion cargoLiquidacion : cargos) {
+                    count++;
+                    tableCargo = new PdfPTable(columnCargo);
+                    tableCargo.setWidthPercentage(100);
+                    tableCargo.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    cell = new PdfPCell(new Paragraph(cargoLiquidacion.getDependencia().getAcronimo(),
+                            new Font(Font.HELVETICA, 8)));
+                    cell.setBorder(Rectangle.NO_BORDER);
+                    cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+                    tableCargo.addCell(cell);
+                    cell = new PdfPCell(
+                            new Paragraph(cargoLiquidacion.getCategoria().getNombre(), new Font(Font.HELVETICA, 8)));
+                    cell.setBorder(Rectangle.NO_BORDER);
+                    cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+                    tableCargo.addCell(cell);
+                    BigDecimal multiplicador = BigDecimal.ONE;
+                    if (cargoLiquidacion.getHorasJornada().compareTo(BigDecimal.ZERO) == 0) {
+                        multiplicador = new BigDecimal(cargoLiquidacion.getJornada());
+                    } else {
+                        multiplicador = cargoLiquidacion.getHorasJornada();
+                    }
+                    cell = new PdfPCell(new Paragraph(
+                            new DecimalFormat("#,###.00").format(cargoLiquidacion.getCategoriaBasico()
+                                    .multiply(multiplicador).setScale(2, RoundingMode.HALF_UP)),
+                            new Font(Font.HELVETICA, 8)));
+                    cell.setBorder(Rectangle.NO_BORDER);
+                    cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                    tableCargo.addCell(cell);
+                    cell = new PdfPCell(tableCargo);
+                    cell.setBorder(Rectangle.NO_BORDER);
+                    tableGrupo.addCell(cell);
+                }
+                // Completa con una celda vacía si la cantidad de cargos es impar
+                if (count % 2 != 0) {
+                    cell = new PdfPCell();
+                    cell.setBorder(Rectangle.NO_BORDER);
+                    tableGrupo.addCell(cell);
+                }
+                document.add(tableGrupo);
+            }
+            // Cargos con Clase
+            List<CargoClaseDetalle> clases = cargoClaseDetalleService.findAllByLegajoAndFacultad(legajoId, anho, mes, facultadId);
+            if (!clases.isEmpty()) {
+                paragraph = new Paragraph("Actividad Académica", new Font(Font.HELVETICA, 8, Font.BOLD));
+                paragraph.setAlignment(Element.ALIGN_CENTER);
+                paragraph.setMultipliedLeading(2f);
+                document.add(paragraph);
+                float[] columnCargo = {2, 14, 3};
+                PdfPTable tableCargo = new PdfPTable(columnCargo);
+                tableCargo.setWidthPercentage(90);
+                tableCargo.setHorizontalAlignment(Element.ALIGN_CENTER);
+                cell = new PdfPCell(new Paragraph("Dep", new Font(Font.HELVETICA, 8, Font.BOLD)));
+                cell.setBorder(Rectangle.BOTTOM);
+                cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+                tableCargo.addCell(cell);
+                cell = new PdfPCell(new Paragraph("Cargo", new Font(Font.HELVETICA, 8, Font.BOLD)));
+                cell.setBorder(Rectangle.BOTTOM);
+                cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+                tableCargo.addCell(cell);
+                cell = new PdfPCell(new Paragraph("Básico", new Font(Font.HELVETICA, 8, Font.BOLD)));
+                cell.setBorder(Rectangle.BOTTOM);
+                cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                tableCargo.addCell(cell);
+                for (CargoClaseDetalle cargoClaseDetalle : clases) {
+                    cell = new PdfPCell(new Paragraph(cargoClaseDetalle.getDependencia().getAcronimo(),
+                            new Font(Font.HELVETICA, 8)));
+                    cell.setBorder(Rectangle.NO_BORDER);
+                    cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+                    tableCargo.addCell(cell);
+                    cell = new PdfPCell(new Paragraph(
+                            MessageFormat.format("{0} / {1} / {2} / {3} / {4} {5}",
+                                    cargoClaseDetalle.getCargoClase().getClase().getNombre(),
+                                    cargoClaseDetalle.getCargoClase().getNombre(),
+                                    cargoClaseDetalle.getCargoClasePeriodo().getDescripcion(),
+                                    cargoClaseDetalle.getCargoClasePeriodo().getGeografica().getNombre(),
+                                    cargoClaseDetalle.getCargoClasePeriodo().getHoras(), "horas"),
+                            new Font(Font.HELVETICA, 8)));
+                    cell.setBorder(Rectangle.NO_BORDER);
+                    cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+                    tableCargo.addCell(cell);
+                    cell = new PdfPCell(
+                            new Paragraph(new DecimalFormat("#,###.00").format(
+                                    cargoClaseDetalle.getValorHora()
+                                            .multiply(new BigDecimal(cargoClaseDetalle.getHoras()))).toString(),
+                                    new Font(Font.HELVETICA, 8)));
+                    cell.setBorder(Rectangle.NO_BORDER);
+                    cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                    tableCargo.addCell(cell);
+                }
+                document.add(tableCargo);
+            }
+            document.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (BadElementException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return filename;
+    }
+
     public String generatePdf(Long legajoId, Integer anho, Integer mes, Long legajoIdSolicitud, String ipAddress) {
         String path = environment.getProperty("path.files");
         String filename = path + "bono." + legajoId + "." + anho + "." + mes + ".pdf";
@@ -208,7 +544,7 @@ public class BonoService {
 
     @Transactional
     public String makePdfConFusion(String filename, Long legajoId, Integer anho, Integer mes, Long legajoIdSolicitud,
-                          String ipAddress, Control control) {
+                                   String ipAddress, Control control) {
         Persona persona = personaService.findByLegajoId(legajoId);
         Antiguedad antiguedad = antiguedadService.findByUnique(legajoId, anho, mes);
         int mesesAntiguedad = Math.max(antiguedad.getMesesDocentes(), antiguedad.getMesesAdministrativos());
@@ -284,7 +620,7 @@ public class BonoService {
             BigDecimal antiguedadETEC = BigDecimal.ZERO;
             BigDecimal adicionalETEC = BigDecimal.ZERO;
             BigDecimal porcentajeAntiguedadETEC = liquidacionEtecService.calcularPorcentajeAntiguedad(legajoId, anho, mes, 15, 1);
-            
+
             if (items.containsKey(29) && persona.getDirectivoEtec() == 0) {
                 item = items.get(29);
                 BigDecimal totalETEC = item.getImporte();
@@ -650,9 +986,9 @@ public class BonoService {
                     cell.setHorizontalAlignment(Element.ALIGN_LEFT);
                     tableCargo.addCell(cell);
                     cell = new PdfPCell(
-                            new Paragraph(
+                            new Paragraph(new DecimalFormat("#,###.00").format(
                                     cargoClaseDetalle.getValorHora()
-                                            .multiply(new BigDecimal(cargoClaseDetalle.getHoras())).toString(),
+                                            .multiply(new BigDecimal(cargoClaseDetalle.getHoras()))).toString(),
                                     new Font(Font.HELVETICA, 8)));
                     cell.setBorder(Rectangle.NO_BORDER);
                     cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
@@ -812,7 +1148,7 @@ public class BonoService {
                     }
                 }
             }
-            // Si no hay códigos remun
+            // Si no hay códigos remunerativos
             if (count == 0) {
                 cell = new PdfPCell(new Paragraph(" ", new Font(Font.HELVETICA, 8)));
                 cell.setBorder(Rectangle.NO_BORDER);
@@ -849,7 +1185,7 @@ public class BonoService {
                     count++;
                 }
             }
-            // Si no hay códigos no remun
+            // Si no hay códigos no remunerativos
             if (count == 0) {
                 cell = new PdfPCell(new Paragraph(" ", new Font(Font.HELVETICA, 8)));
                 cell.setBorder(Rectangle.NO_BORDER);
@@ -886,7 +1222,7 @@ public class BonoService {
                     count++;
                 }
             }
-            // Si no hay códigos deduc
+            // Si no hay códigos deducciones
             if (count == 0) {
                 cell = new PdfPCell(new Paragraph(" ", new Font(Font.HELVETICA, 8)));
                 cell.setBorder(Rectangle.NO_BORDER);

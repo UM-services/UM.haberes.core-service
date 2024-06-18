@@ -44,9 +44,17 @@ public class CargoLiquidacionService {
 				.filter(c -> c.getCategoria().getDocente() == 1).collect(Collectors.toList());
 	}
 
+	public List<CargoLiquidacion> findAllDocenteByLegajoAndFacultad(Long legajoId, Integer anho, Integer mes, Integer facultadId) {
+		return repository.findAllByLegajoIdAndAnhoAndMesAndDependenciaFacultadIdAndCategoriaDocente(legajoId, anho, mes, facultadId, (byte) 1);
+	}
+
 	public List<CargoLiquidacion> findAllNoDocenteByLegajo(Long legajoId, Integer anho, Integer mes) {
 		return repository.findAllByLegajoIdAndAnhoAndMes(legajoId, anho, mes).stream()
 				.filter(c -> c.getCategoria().getNoDocente() == 1).collect(Collectors.toList());
+	}
+
+	public List<CargoLiquidacion> findAllNoDocenteByLegajoAndFacultad(Long legajoId, Integer anho, Integer mes, Integer facultadId) {
+		return repository.findAllByLegajoIdAndAnhoAndMesAndDependenciaFacultadIdAndCategoriaNoDocente(legajoId, anho, mes, facultadId, (byte) 1);
 	}
 
 	public List<CargoLiquidacion> findAllAdicionalHCSByLegajo(Long legajoId, Integer anho, Integer mes) {

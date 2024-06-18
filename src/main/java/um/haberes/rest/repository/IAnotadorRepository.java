@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package um.haberes.rest.repository;
 
@@ -12,30 +12,29 @@ import um.haberes.rest.kotlin.model.Anotador;
 
 /**
  * @author daniel
- *
  */
 @Repository
 public interface IAnotadorRepository extends JpaRepository<Anotador, Long> {
 
-	public List<Anotador> findAllByLegajoIdOrderByAnotadorIdDesc(Long legajoId);
+    List<Anotador> findAllByLegajoIdOrderByAnotadorIdDesc(Long legajoId);
 
-	public List<Anotador> findAllByAnhoAndMesAndAutorizadoAndRechazado(Integer anho, Integer mes, Byte autorizado,
-			Byte rechazado);
+    List<Anotador> findAllByAnhoAndMesAndAutorizadoAndRechazado(Integer anho, Integer mes, Byte autorizado,
+                                                                Byte rechazado);
 
-	public List<Anotador> findTop1000ByAnhoAndMes(Integer anho, Integer mes);
+    List<Anotador> findTop1000ByAnhoAndMes(Integer anho, Integer mes);
 
-	public List<Anotador> findTop1000ByAnhoAndMesAndAutorizadoAndRechazadoAndLegajoIdInOrderByAnotadorId(Integer anho,
-			Integer mes, Byte autorizado, Byte rechazado, List<Long> legajos);
+    List<Anotador> findTop1000ByAnhoAndMesAndAutorizadoAndRechazadoAndLegajoIdInOrderByAnotadorId(Integer anho,
+                                                                                                  Integer mes, Byte autorizado, Byte rechazado, List<Long> legajos);
 
-	public List<Anotador> findTop1000ByAnhoAndMesAndLegajoIdInOrderByAnotadorIdDesc(Integer anho, Integer mes,
-			List<Long> legajos);
+    List<Anotador> findTop1000ByAnhoAndMesAndLegajoIdInOrderByAnotadorIdDesc(Integer anho, Integer mes,
+                                                                             List<Long> legajos);
 
-	public List<Anotador> findTop1000ByAnhoAndMesAndAutorizadoAndRechazadoAndFacultadIdOrderByAnotadorId(Integer anho,
-			Integer mes, Byte autorizado, Byte rechazado, Integer facultadId);
+    List<Anotador> findTop1000ByAnhoAndMesAndAutorizadoAndRechazadoAndFacultadIdOrderByLegajoId(Integer anho,
+                                                                                                Integer mes, Byte autorizado, Byte rechazado, Integer facultadId);
 
-	public List<Anotador> findTop1000ByAnhoAndMesAndFacultadIdOrderByAnotadorIdDesc(Integer anho, Integer mes,
-			Integer facultadId);
+    List<Anotador> findTop1000ByAnhoAndMesAndFacultadIdOrderByAnotadorIdDesc(Integer anho, Integer mes,
+                                                                             Integer facultadId);
 
-	public Optional<Anotador> findByAnotadorId(Long anotadorId);
+    Optional<Anotador> findByAnotadorId(Long anotadorId);
 
 }

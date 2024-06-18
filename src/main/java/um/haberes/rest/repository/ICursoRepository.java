@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package um.haberes.rest.repository;
 
@@ -18,12 +18,16 @@ import um.haberes.rest.kotlin.model.Curso;
 @Repository
 public interface ICursoRepository extends JpaRepository<Curso, Long>, ICursoRepositoryCustom {
 
-	public List<Curso> findAllByFacultadIdAndGeograficaId(Integer facultadId, Integer geograficaId, Sort ascending);
+    List<Curso> findAllByFacultadIdAndGeograficaId(Integer facultadId, Integer geograficaId, Sort ascending);
 
-	public List<Curso> findAllByCursoIdIn(List<Long> cursoIds);
+    List<Curso> findAllByCursoIdIn(List<Long> cursoIds);
 
-	public Optional<Curso> findByCursoId(Long cursoId);
+    List<Curso> findAllByFacultadId(Integer facultadId);
 
-	public void deleteByCursoId(Long cursoId);
+    List<Curso> findAllByFacultadIdAndGeograficaIdAndCursoIdInOrderByNombre(Integer facultadId, Integer geograficaId, List<Long> cursoIds);
+
+    Optional<Curso> findByCursoId(Long cursoId);
+
+    void deleteByCursoId(Long cursoId);
 
 }
