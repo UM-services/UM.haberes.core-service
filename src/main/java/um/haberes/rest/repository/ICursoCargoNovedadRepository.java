@@ -56,6 +56,14 @@ public interface ICursoCargoNovedadRepository extends JpaRepository<CursoCargoNo
     List<CursoCargoNovedad> findAllByAnhoAndMesAndBajaAndRechazado(Integer anho, Integer mes, Byte baja,
                                                                    Byte rechazado, Sort sort);
 
+    List<CursoCargoNovedad> findAllByCursoFacultadIdAndAnhoAndMes(Integer facultadId, Integer anho, Integer mes);
+
+    List<CursoCargoNovedad> findAllByCursoFacultadIdAndCursoGeograficaIdAndAnhoAndMesAndAltaOrderByCursoNombre(Integer facultadId, Integer geograficaId, Integer anho, Integer mes, Byte alta);
+
+    List<CursoCargoNovedad> findAllByCursoFacultadIdAndCursoGeograficaIdAndAnhoAndMesAndCambioOrderByCursoNombre(Integer facultadId, Integer geograficaId, Integer anho, Integer mes, Byte cambio);
+
+    List<CursoCargoNovedad> findAllByCursoFacultadIdAndCursoGeograficaIdAndAnhoAndMesAndBajaOrderByCursoNombre(Integer facultadId, Integer geograficaId, Integer anho, Integer mes, Byte baja);
+
     Optional<CursoCargoNovedad> findByCursoCargoNovedadId(Long cursoCargoNovedadId);
 
     Optional<CursoCargoNovedad> findByLegajoIdAndCursoIdAndAnhoAndMes(Long legajoId, Long cursoId, Integer anho,
@@ -70,4 +78,5 @@ public interface ICursoCargoNovedadRepository extends JpaRepository<CursoCargoNo
 
     @Modifying
     void deleteByCursoCargoNovedadId(Long cursoCargoNovedadId);
+
 }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.AnotadorException;
 import um.haberes.rest.kotlin.model.Anotador;
+import um.haberes.rest.kotlin.model.Persona;
 import um.haberes.rest.repository.IAnotadorRepository;
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,6 +50,16 @@ public class AnotadorService {
 				(byte) 0, (byte) 0, facultadId);
 	}
 
+	public List<Anotador> findAutorizadosByFacultad(Integer facultadId, Integer anho, Integer mes) {
+		return repository.findTop1000ByAnhoAndMesAndAutorizadoAndRechazadoAndFacultadIdOrderByLegajoId(anho, mes,
+				(byte) 1, (byte) 0, facultadId);
+	}
+
+	public List<Anotador> findRechazadosByFacultad(Integer facultadId, Integer anho, Integer mes) {
+		return repository.findTop1000ByAnhoAndMesAndAutorizadoAndRechazadoAndFacultadIdOrderByLegajoId(anho, mes,
+				(byte) 0, (byte) 1, facultadId);
+	}
+
 	public List<Anotador> findRevisados(Integer anho, Integer mes) {
 		return repository.findTop1000ByAnhoAndMes(anho, mes).stream()
 				.filter(anotador -> anotador.getAutorizado() == 1 || anotador.getRechazado() == 1)
@@ -56,7 +67,7 @@ public class AnotadorService {
 	}
 
 	public List<Anotador> findRevisadosFiltro(Integer anho, Integer mes, String filtro) {
-		List<Long> legajos = personaservice.findAllByFiltro(filtro).stream().map(persona -> persona.getLegajoId())
+		List<Long> legajos = personaservice.findAllByFiltro(filtro).stream().map(Persona::getLegajoId)
 				.collect(Collectors.toList());
 		return repository.findTop1000ByAnhoAndMesAndLegajoIdInOrderByAnotadorIdDesc(anho, mes, legajos).stream()
 				.filter(anotador -> anotador.getAutorizado() == 1 || anotador.getRechazado() == 1)

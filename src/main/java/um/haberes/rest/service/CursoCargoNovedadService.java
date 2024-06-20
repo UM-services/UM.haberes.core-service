@@ -104,6 +104,22 @@ public class CursoCargoNovedadService {
 				(byte) 0, (byte) 0, legajoId);
 	}
 
+	public List<CursoCargoNovedad> findAllByFacultad(Integer facultadId, Integer anho, Integer mes) {
+		return repository.findAllByCursoFacultadIdAndAnhoAndMes(facultadId, anho, mes);
+	}
+
+	public List<CursoCargoNovedad> findAllByFacultadAndGeograficaAndAlta(Integer facultadId, Integer geograficaId, Integer anho, Integer mes) {
+		return repository.findAllByCursoFacultadIdAndCursoGeograficaIdAndAnhoAndMesAndAltaOrderByCursoNombre(facultadId, geograficaId, anho, mes, (byte) 1);
+	}
+
+	public List<CursoCargoNovedad> findAllByFacultadAndGeograficaAndCambio(Integer facultadId, Integer geograficaId, Integer anho, Integer mes) {
+		return repository.findAllByCursoFacultadIdAndCursoGeograficaIdAndAnhoAndMesAndCambioOrderByCursoNombre(facultadId, geograficaId, anho, mes, (byte) 1);
+	}
+
+	public List<CursoCargoNovedad> findAllByFacultadAndGeograficaAndBaja(Integer facultadId, Integer geograficaId, Integer anho, Integer mes) {
+		return repository.findAllByCursoFacultadIdAndCursoGeograficaIdAndAnhoAndMesAndBajaOrderByCursoNombre(facultadId, geograficaId, anho, mes, (byte) 1);
+	}
+
 	public CursoCargoNovedad findByCursoCargoNovedadId(Long cursoCargoNovedadId) {
 		return repository.findByCursoCargoNovedadId(cursoCargoNovedadId)
 				.orElseThrow(() -> new CursoCargoNovedadException(cursoCargoNovedadId));
@@ -151,4 +167,5 @@ public class CursoCargoNovedadService {
     public void delete(Long cursoCargoNovedadId) {
 		repository.deleteByCursoCargoNovedadId(cursoCargoNovedadId);
     }
+
 }
