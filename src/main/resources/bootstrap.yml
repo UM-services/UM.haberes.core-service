@@ -14,19 +14,27 @@ app:
     username: sueldos@um.edu.ar
     password: Daniel22
 
+server:
+  port: ${app.port}
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://eureka:@eureka-service:8761/eureka
+
 spring:
   application:
     name: haberes-service
-  cloud:
-    config:
-      uri: http://localhost:8888
   datasource:
     url: jdbc:mysql://${app.server}/${app.database}?useSSL=false&serverTimezone=UTC
     username: ${app.user}
     password: ${app.password}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
-    database-platform: org.hibernate.dialect.MySQLDialect
     open-in-view: ${app.open-in-view}
     hibernate:
       ddl-auto: none
