@@ -17,7 +17,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @Configuration
 @EnableJpaAuditing
 @EnableDiscoveryClient
-@EnableFeignClients
+@EnableFeignClients(basePackages = "um.haberes.rest.client")
 @PropertySource("classpath:config/haberes.properties")
 public class HaberesConfiguration {
 
