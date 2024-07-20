@@ -24,7 +24,7 @@ import um.haberes.rest.service.CodigoGrupoService;
  *
  */
 @RestController
-@RequestMapping("/codigogrupo")
+@RequestMapping("/api/haberes/core/codigogrupo")
 public class CodigoGrupoController {
 	
 	@Autowired

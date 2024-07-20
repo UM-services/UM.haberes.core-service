@@ -21,7 +21,7 @@ import um.haberes.rest.service.view.TotalSalidaService;
  *
  */
 @RestController
-@RequestMapping("/totalsalida")
+@RequestMapping("/api/haberes/core/totalsalida")
 public class TotalSalidaController {
 
 	@Autowired

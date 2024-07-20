@@ -21,7 +21,7 @@ import um.haberes.rest.service.facade.DesignacionToolService;
  *
  */
 @RestController
-@RequestMapping("/designaciontool")
+@RequestMapping("/api/haberes/core/designaciontool")
 public class DesignacionToolController {
 
 	private final DesignacionToolService service;

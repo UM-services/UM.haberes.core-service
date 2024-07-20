@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @RestController
-@RequestMapping("/persona")
+@RequestMapping("/api/haberes/core/persona")
 @Slf4j
 public class PersonaController {
 

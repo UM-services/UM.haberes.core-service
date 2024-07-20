@@ -24,7 +24,7 @@ import um.haberes.rest.service.SeguridadSocialService;
  *
  */
 @RestController
-@RequestMapping("/seguridadSocial")
+@RequestMapping("/api/haberes/core/seguridadSocial")
 public class SeguridadSocialController {
 
 	@Autowired

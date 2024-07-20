@@ -7,7 +7,7 @@ import um.haberes.rest.kotlin.model.extern.CursoCargoContratadoDto;
 
 import java.util.List;
 
-@FeignClient(name = "core-service/cursocargocontratado")
+@FeignClient(name = "tesoreria-core-service/cursocargocontratado")
 public interface CursoCargoContratadoClient {
 
     @GetMapping("/cursos/{contratadoId}/{anho}/{mes}/{contratoId}")

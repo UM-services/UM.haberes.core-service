@@ -27,7 +27,7 @@ import um.haberes.rest.service.ItemService;
  *
  */
 @RestController
-@RequestMapping("/item")
+@RequestMapping("/api/haberes/core/item")
 public class ItemController {
 
 	private final ItemService service;

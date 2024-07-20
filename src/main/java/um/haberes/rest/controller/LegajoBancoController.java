@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @RestController
-@RequestMapping("/legajobanco")
+@RequestMapping("/api/haberes/core/legajobanco")
 @Slf4j
 public class LegajoBancoController {
 

@@ -27,7 +27,7 @@ import um.haberes.rest.service.ActividadService;
  *
  */
 @RestController
-@RequestMapping("/actividad")
+@RequestMapping("/api/haberes/core/actividad")
 public class ActividadController {
 	@Autowired
 	private ActividadService service;

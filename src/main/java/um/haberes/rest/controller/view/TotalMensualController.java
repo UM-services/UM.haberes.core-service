@@ -21,7 +21,7 @@ import um.haberes.rest.service.view.TotalMensualService;
  *
  */
 @RestController
-@RequestMapping("/totalmensual")
+@RequestMapping("/api/haberes/core/totalmensual")
 public class TotalMensualController {
 
 	@Autowired

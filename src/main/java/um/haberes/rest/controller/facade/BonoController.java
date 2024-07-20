@@ -22,7 +22,7 @@ import um.haberes.rest.util.Tool;
  * @author daniel
  */
 @RestController
-@RequestMapping("/bono")
+@RequestMapping("/api/haberes/core/bono")
 public class BonoController {
 
     private final BonoService service;

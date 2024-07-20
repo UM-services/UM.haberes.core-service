@@ -31,7 +31,7 @@ import um.haberes.rest.service.LiquidacionService;
  *
  */
 @RestController
-@RequestMapping("/liquidacion")
+@RequestMapping("/api/haberes/core/liquidacion")
 public class LiquidacionController {
 
 	private final LiquidacionService service;

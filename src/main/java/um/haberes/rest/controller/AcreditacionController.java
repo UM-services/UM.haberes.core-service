@@ -28,7 +28,7 @@ import um.haberes.rest.service.AcreditacionService;
  *
  */
 @RestController
-@RequestMapping(value = "/acreditacion")
+@RequestMapping("/api/haberes/core/acreditacion")
 public class AcreditacionController {
 
 	@Autowired

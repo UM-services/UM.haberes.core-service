@@ -19,7 +19,7 @@ import um.haberes.rest.service.BonoImpresionService;
  *
  */
 @RestController
-@RequestMapping("/bonoimpresion")
+@RequestMapping("/api/haberes/core/bonoimpresion")
 public class BonoImpresionController {
 
 	@Autowired

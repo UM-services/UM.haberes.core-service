@@ -27,7 +27,7 @@ import um.haberes.rest.service.ExcluidoService;
  *
  */
 @RestController
-@RequestMapping("/excluido")
+@RequestMapping("/api/haberes/core/excluido")
 public class ExcluidoController {
 
 	@Autowired

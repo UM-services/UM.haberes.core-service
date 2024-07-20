@@ -21,7 +21,7 @@ import um.haberes.rest.service.LegajoCargoClaseImputacionService;
  *
  */
 @RestController
-@RequestMapping("/legajocargoclaseimputacion")
+@RequestMapping("/api/haberes/core/legajocargoclaseimputacion")
 public class LegajoCargoClaseImputacionController {
 
 	@Autowired

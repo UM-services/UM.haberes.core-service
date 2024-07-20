@@ -21,7 +21,7 @@ import um.haberes.rest.service.view.AsignadoCategoriaService;
  *
  */
 @RestController
-@RequestMapping("/asignadocategoria")
+@RequestMapping("/api/haberes/core/asignadocategoria")
 public class AsignadoCategoriaController {
 
 	@Autowired

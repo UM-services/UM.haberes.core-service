@@ -21,7 +21,7 @@ import um.haberes.rest.service.FacultadService;
  *
  */
 @RestController
-@RequestMapping("/facultad")
+@RequestMapping("/api/haberes/core/facultad")
 public class FacultadController {
 	
 	@Autowired
@@ -41,4 +41,5 @@ public class FacultadController {
 	public ResponseEntity<Facultad> findByFacultadId(@PathVariable Integer facultadId) {
 		return new ResponseEntity<Facultad>(service.findByFacultadId(facultadId), HttpStatus.OK);
 	}
+
 }

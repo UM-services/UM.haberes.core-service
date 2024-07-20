@@ -24,7 +24,7 @@ import um.haberes.rest.service.LegajoControlService;
  *
  */
 @RestController
-@RequestMapping("/legajocontrol")
+@RequestMapping("/api/haberes/core/legajocontrol")
 public class LegajoControlController {
 
 	@Autowired

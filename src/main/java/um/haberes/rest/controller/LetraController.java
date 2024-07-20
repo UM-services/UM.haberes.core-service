@@ -25,7 +25,7 @@ import um.haberes.rest.service.LetraService;
  *
  */
 @RestController
-@RequestMapping("/letra")
+@RequestMapping("/api/haberes/core/letra")
 public class LetraController {
 	
 	@Autowired

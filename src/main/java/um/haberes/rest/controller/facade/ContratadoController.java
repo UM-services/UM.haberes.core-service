@@ -17,7 +17,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/contratado")
+@RequestMapping("/api/haberes/core/contratado")
 public class ContratadoController {
 
     private final ContratadoService service;

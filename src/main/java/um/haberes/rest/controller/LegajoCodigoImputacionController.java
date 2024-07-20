@@ -21,7 +21,7 @@ import um.haberes.rest.service.LegajoCodigoImputacionService;
  *
  */
 @RestController
-@RequestMapping("/legajocodigoimputacion")
+@RequestMapping("/api/haberes/core/legajocodigoimputacion")
 public class LegajoCodigoImputacionController {
 
 	@Autowired

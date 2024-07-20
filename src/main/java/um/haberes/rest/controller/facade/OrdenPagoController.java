@@ -11,7 +11,7 @@ import um.haberes.rest.kotlin.model.internal.OrdenPagoRequest;
 import um.haberes.rest.service.facade.OrdenPagoService;
 
 @RestController
-@RequestMapping("/ordenPago")
+@RequestMapping("/api/haberes/core/ordenPago")
 public class OrdenPagoController {
 
     private final OrdenPagoService service;

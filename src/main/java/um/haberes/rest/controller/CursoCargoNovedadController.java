@@ -27,7 +27,7 @@ import um.haberes.rest.service.CursoCargoNovedadService;
  *
  */
 @RestController
-@RequestMapping("/cursocargonovedad")
+@RequestMapping("/api/haberes/core/cursocargonovedad")
 public class CursoCargoNovedadController {
 
 	private final CursoCargoNovedadService service;
@@ -114,8 +114,29 @@ public class CursoCargoNovedadController {
 				service.findAllPendientesLegajo(legajoId, cursoId, anho, mes), HttpStatus.OK);
 	}
 
+	@GetMapping("/facultad/{facultadId}/{anho}/{mes}")
+	public ResponseEntity<List<CursoCargoNovedad>> findAllByFacultad(@PathVariable Integer facultadId,
+			@PathVariable Integer anho, @PathVariable Integer mes) {
+		return new ResponseEntity<>(service.findAllByFacultad(facultadId, anho, mes), HttpStatus.OK);
+	}
+
+	@GetMapping("/facultad/{facultadId}/geografica/{geograficaId}/periodo/{anho}/{mes}/alta")
+	public ResponseEntity<List<CursoCargoNovedad>> findAllByFacultadAndGeograficaAndAlta(@PathVariable Integer facultadId, @PathVariable Integer geograficaId, @PathVariable Integer anho, @PathVariable Integer mes) {
+		return new ResponseEntity<>(service.findAllByFacultadAndGeograficaAndAlta(facultadId, geograficaId, anho, mes), HttpStatus.OK);
+	}
+
+	@GetMapping("/facultad/{facultadId}/geografica/{geograficaId}/periodo/{anho}/{mes}/cambio")
+	public ResponseEntity<List<CursoCargoNovedad>> findAllByFacultadAndGeograficaAndCambio(@PathVariable Integer facultadId, @PathVariable Integer geograficaId, @PathVariable Integer anho, @PathVariable Integer mes) {
+		return new ResponseEntity<>(service.findAllByFacultadAndGeograficaAndCambio(facultadId, geograficaId, anho, mes), HttpStatus.OK);
+	}
+
+	@GetMapping("/facultad/{facultadId}/geografica/{geograficaId}/periodo/{anho}/{mes}/baja")
+	public ResponseEntity<List<CursoCargoNovedad>> findAllByFacultadAndGeograficaAndBaja(@PathVariable Integer facultadId, @PathVariable Integer geograficaId, @PathVariable Integer anho, @PathVariable Integer mes) {
+		return new ResponseEntity<>(service.findAllByFacultadAndGeograficaAndBaja(facultadId, geograficaId, anho, mes), HttpStatus.OK);
+	}
+
 	@GetMapping("/{cursoCargoNovedadId}")
-	public ResponseEntity<CursoCargoNovedad> findByCursocargonovedadId(@PathVariable Long cursoCargoNovedadId) {
+	public ResponseEntity<CursoCargoNovedad> findByCursoCargoNovedadId(@PathVariable Long cursoCargoNovedadId) {
 		try {
 			return new ResponseEntity<>(service.findByCursoCargoNovedadId(cursoCargoNovedadId),
 					HttpStatus.OK);

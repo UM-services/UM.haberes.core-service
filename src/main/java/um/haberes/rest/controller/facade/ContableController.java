@@ -24,7 +24,7 @@ import java.util.List;
  *
  */
 @RestController
-@RequestMapping("/contable")
+@RequestMapping("/api/haberes/core/contable")
 public class ContableController {
 
 	private final ContableService service;

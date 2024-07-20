@@ -29,7 +29,7 @@ import um.haberes.rest.service.view.CargoLiquidacionPeriodoService;
  *
  */
 @RestController
-@RequestMapping("/cargoliquidacion")
+@RequestMapping("/api/haberes/core/cargoliquidacion")
 public class CargoLiquidacionController {
 
 	@Autowired

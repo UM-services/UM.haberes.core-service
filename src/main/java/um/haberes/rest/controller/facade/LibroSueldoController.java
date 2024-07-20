@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/libroSueldo")
+@RequestMapping("/api/haberes/core/libroSueldo")
 public class LibroSueldoController {
 
     private final LibroSueldoService service;

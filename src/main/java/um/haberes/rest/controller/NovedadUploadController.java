@@ -21,7 +21,7 @@ import um.haberes.rest.service.NovedadUploadService;
  *
  */
 @RestController
-@RequestMapping("/novedadupload")
+@RequestMapping("/api/haberes/core/novedadupload")
 public class NovedadUploadController {
 
 	@Autowired

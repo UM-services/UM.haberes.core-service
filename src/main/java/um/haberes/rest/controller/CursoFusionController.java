@@ -24,7 +24,7 @@ import um.haberes.rest.service.CursoFusionService;
  *
  */
 @RestController
-@RequestMapping("/cursofusion")
+@RequestMapping("/api/haberes/core/cursofusion")
 public class CursoFusionController {
 	
 	@Autowired

@@ -21,7 +21,7 @@ import um.haberes.rest.service.DesignacionTipoService;
  *
  */
 @RestController
-@RequestMapping("/designaciontipo")
+@RequestMapping("/api/haberes/core/designaciontipo")
 public class DesignacionTipoController {
 
 	@Autowired

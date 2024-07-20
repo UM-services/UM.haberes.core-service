@@ -24,7 +24,7 @@ import um.haberes.rest.util.transfer.FileInfo;
  *
  */
 @RestController
-@RequestMapping("/novedadfile")
+@RequestMapping("/api/haberes/core/novedadfile")
 public class NovedadFileController {
 
     private final NovedadFileService service;

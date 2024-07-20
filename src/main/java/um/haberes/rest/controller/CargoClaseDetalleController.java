@@ -25,7 +25,7 @@ import um.haberes.rest.service.CargoClaseDetalleService;
  *
  */
 @RestController
-@RequestMapping("/cargoclasedetalle")
+@RequestMapping("/api/haberes/core/cargoclasedetalle")
 public class CargoClaseDetalleController {
 
 	@Autowired

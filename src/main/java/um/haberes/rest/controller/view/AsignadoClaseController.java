@@ -21,7 +21,7 @@ import um.haberes.rest.service.view.AsignadoClaseService;
  *
  */
 @RestController
-@RequestMapping("/asignadoclase")
+@RequestMapping("/api/haberes/core/asignadoclase")
 public class AsignadoClaseController {
 
 	@Autowired

@@ -21,7 +21,7 @@ import um.haberes.rest.service.view.ImputadoAporteService;
  *
  */
 @RestController
-@RequestMapping("/imputadoaporte")
+@RequestMapping("/api/haberes/core/imputadoaporte")
 public class ImputadoAporteController {
 	
 	@Autowired

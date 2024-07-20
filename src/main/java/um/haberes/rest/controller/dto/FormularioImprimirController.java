@@ -19,7 +19,7 @@ import um.haberes.rest.service.dto.FormularioImprimirService;
  *
  */
 @RestController
-@RequestMapping("/formularioImprimir")
+@RequestMapping("/api/haberes/core/formularioImprimir")
 public class FormularioImprimirController {
 
 	@Autowired

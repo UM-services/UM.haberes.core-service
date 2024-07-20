@@ -13,7 +13,7 @@ import um.haberes.rest.service.ModoLiquidacionService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/modoLiquidacion")
+@RequestMapping("/api/haberes/core/modoLiquidacion")
 public class ModoLiquidacionController {
 
     private final ModoLiquidacionService service;

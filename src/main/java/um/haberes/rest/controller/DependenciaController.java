@@ -21,7 +21,7 @@ import um.haberes.rest.service.DependenciaService;
  *
  */
 @RestController
-@RequestMapping("/dependencia")
+@RequestMapping("/api/haberes/core/dependencia")
 public class DependenciaController {
 	
 	@Autowired
