@@ -28,11 +28,14 @@ import um.haberes.rest.service.AntiguedadService;
  *
  */
 @RestController
-@RequestMapping(value = "/antiguedad")
+@RequestMapping("/api/haberes/core/antiguedad")
 public class AntiguedadController {
 
-    @Autowired
-    private AntiguedadService service;
+    private final AntiguedadService service;
+
+    public AntiguedadController(AntiguedadService service) {
+        this.service = service;
+    }
 
     @GetMapping("/unique/{legajoId}/{anho}/{mes}")
     public ResponseEntity<Antiguedad> findByUnique(@PathVariable Long legajoId, @PathVariable Integer anho,

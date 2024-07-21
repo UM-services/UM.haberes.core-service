@@ -77,7 +77,7 @@ public class DesignacionToolController {
 	}
 
 	@GetMapping("/indiceantiguedad/{legajoId}/{anho}/{mes}")
-	public ResponseEntity<List<BigDecimal>> indiceantiguedad(@PathVariable Long legajoId, @PathVariable Integer anho,
+	public ResponseEntity<List<BigDecimal>> indiceAntiguedad(@PathVariable Long legajoId, @PathVariable Integer anho,
 			@PathVariable Integer mes) {
 		return new ResponseEntity<>(service.indiceAntiguedad(legajoId, anho, mes), HttpStatus.OK);
 	}

@@ -3,7 +3,6 @@
  */
 package um.haberes.rest.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,8 +21,11 @@ import um.haberes.rest.service.BonoImpresionService;
 @RequestMapping("/api/haberes/core/bonoimpresion")
 public class BonoImpresionController {
 
-	@Autowired
-	private BonoImpresionService service;
+	private final BonoImpresionService service;
+
+	public BonoImpresionController(BonoImpresionService service) {
+		this.service = service;
+	}
 
 	@PostMapping("/")
 	public ResponseEntity<BonoImpresion> add(@RequestBody BonoImpresion bonoimpresion) {

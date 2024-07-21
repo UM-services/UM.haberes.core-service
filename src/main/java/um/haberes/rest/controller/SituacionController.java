@@ -21,7 +21,7 @@ import um.haberes.rest.service.SituacionService;
  *
  */
 @RestController
-@RequestMapping(value = "/situacion")
+@RequestMapping("/api/haberes/core/situacion")
 public class SituacionController {
 	
 	@Autowired

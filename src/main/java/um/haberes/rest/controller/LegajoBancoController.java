@@ -76,6 +76,15 @@ public class LegajoBancoController {
 				HttpStatus.OK);
 	}
 
+	@GetMapping("/cbuprincipal/{legajoId}/{anho}/{mes}")
+	public ResponseEntity<LegajoBanco> findLegajoCbuPrincipal(@PathVariable Long legajoId, @PathVariable Integer anho, @PathVariable Integer mes) {
+		try {
+			return new ResponseEntity<>(service.findLegajoCbuPrincipal(legajoId, anho, mes), HttpStatus.OK);
+		} catch (LegajoBancoException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
+	}
+
 	@GetMapping("/periodo/{anho}/{mes}")
 	public ResponseEntity<List<LegajoBanco>> findAllPeriodo(@PathVariable Integer anho, @PathVariable Integer mes) {
 		return new ResponseEntity<List<LegajoBanco>>(service.findAllPeriodo(anho, mes), HttpStatus.OK);

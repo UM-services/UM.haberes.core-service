@@ -89,4 +89,5 @@ public class CodigoController {
 	public ResponseEntity<List<Codigo>> saveAll(@RequestBody List<Codigo> codigos) {
 		return new ResponseEntity<>(service.saveAll(codigos), HttpStatus.OK);
 	}
+
 }

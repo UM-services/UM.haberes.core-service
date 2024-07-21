@@ -26,27 +26,46 @@ import um.haberes.rest.service.CodigoGrupoService;
 @RestController
 @RequestMapping("/api/haberes/core/codigogrupo")
 public class CodigoGrupoController {
-	
-	@Autowired
-	private CodigoGrupoService service;
+
+	private final CodigoGrupoService service;
+
+	public CodigoGrupoController(CodigoGrupoService service) {
+		this.service = service;
+	}
 
 	@GetMapping("/")
 	public ResponseEntity<List<CodigoGrupo>> findAll() {
-		return new ResponseEntity<List<CodigoGrupo>>(service.findAll(), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAll(), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/{codigoId}")
 	public ResponseEntity<CodigoGrupo> findByCodigoId(@PathVariable Integer codigoId) {
-		return new ResponseEntity<CodigoGrupo>(service.findByCodigoId(codigoId), HttpStatus.OK);
+		return new ResponseEntity<>(service.findByCodigoId(codigoId), HttpStatus.OK);
+	}
+
+	@GetMapping("/noremunerativo/{noRemunerativo}")
+	public ResponseEntity<List<CodigoGrupo>> findAllByNoRemunerativo(@PathVariable Byte noRemunerativo) {
+		return new ResponseEntity<>(service.findAllByNoRemunerativo(noRemunerativo), HttpStatus.OK);
+	}
+
+	@GetMapping("/remunerativo/{remunerativo}")
+	public ResponseEntity<List<CodigoGrupo>> findAllByRemunerativo(@PathVariable Byte remunerativo) {
+		return new ResponseEntity<>(service.findAllByRemunerativo(remunerativo), HttpStatus.OK);
+	}
+
+	@GetMapping("/deduccion/{deduccion}")
+	public ResponseEntity<List<CodigoGrupo>> findAllByDeduccion(@PathVariable Byte deduccion) {
+		return new ResponseEntity<>(service.findAllByDeduccion(deduccion), HttpStatus.OK);
 	}
 
 	@PostMapping("/")
 	public ResponseEntity<CodigoGrupo> add(@RequestBody CodigoGrupo codigo) {
-		return new ResponseEntity<CodigoGrupo>(service.add(codigo), HttpStatus.OK);
+		return new ResponseEntity<>(service.add(codigo), HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/{codigoId}")
 	public ResponseEntity<CodigoGrupo> update(@RequestBody CodigoGrupo codigogrupo, @PathVariable Integer codigoId) {
-		return new ResponseEntity<CodigoGrupo>(service.update(codigogrupo, codigoId), HttpStatus.OK);
+		return new ResponseEntity<>(service.update(codigogrupo, codigoId), HttpStatus.OK);
 	}
+
 }

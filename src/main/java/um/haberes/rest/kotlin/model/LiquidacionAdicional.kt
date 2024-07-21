@@ -7,7 +7,8 @@ import java.math.BigDecimal
 @Table
 data class LiquidacionAdicional(
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var liquidacionAdicionalId: Long? = null,
     var legajoId: Long? = null,
     var anho: Int? = null,

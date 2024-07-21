@@ -5,7 +5,6 @@ package um.haberes.rest.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.rest.exception.CodigoGrupoException;
@@ -19,8 +18,11 @@ import um.haberes.rest.repository.ICodigoGrupoRepository;
 @Service
 public class CodigoGrupoService {
 
-	@Autowired
-	private ICodigoGrupoRepository repository;
+	private final ICodigoGrupoRepository repository;
+
+	public CodigoGrupoService(ICodigoGrupoRepository repository) {
+		this.repository = repository;
+	}
 
 	public List<CodigoGrupo> findAll() {
 		return repository.findAll();

@@ -5,6 +5,9 @@ package um.haberes.rest.service;
 
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +20,14 @@ import um.haberes.rest.repository.IFacultadRepository;
  *
  */
 @Service
+@Slf4j
 public class FacultadService {
-	@Autowired
-	private IFacultadRepository repository;
+
+	private final IFacultadRepository repository;
+
+	public FacultadService(IFacultadRepository repository) {
+		this.repository = repository;
+	}
 
 	public List<Facultad> findAll() {
 		return repository.findAll();
@@ -35,7 +43,13 @@ public class FacultadService {
 	}
 
 	public Facultad findByFacultadId(Integer facultadId) {
-		return repository.findByFacultadId(facultadId).orElseThrow(() -> new FacultadException(facultadId));
+		var facultad = repository.findByFacultadId(facultadId).orElseThrow(() -> new FacultadException(facultadId));
+        try {
+            log.debug("Facultad: {}", JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(facultad));
+        } catch (JsonProcessingException e) {
+            log.debug("Facultad: error {}", e.getMessage());
+        }
+        return facultad;
 	}
 
 }

@@ -28,8 +28,11 @@ import um.haberes.rest.service.LetraService;
 @RequestMapping("/api/haberes/core/letra")
 public class LetraController {
 	
-	@Autowired
-	private LetraService service;
+	private final LetraService service;
+
+	public LetraController(LetraService service) {
+		this.service = service;
+	}
 	
 	@GetMapping("/periodo/{anho}/{mes}/{limit}")
 	public ResponseEntity<List<Letra>> findAllByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes, @PathVariable Integer limit) {

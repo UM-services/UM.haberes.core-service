@@ -24,16 +24,19 @@ import um.haberes.rest.service.DesignacionTipoService;
 @RequestMapping("/api/haberes/core/designaciontipo")
 public class DesignacionTipoController {
 
-	@Autowired
-	private DesignacionTipoService service;
+	private final DesignacionTipoService service;
+
+	public DesignacionTipoController(DesignacionTipoService service) {
+		this.service = service;
+	}
 
 	@GetMapping("/")
 	public ResponseEntity<List<DesignacionTipo>> findAll() {
-		return new ResponseEntity<List<DesignacionTipo>>(service.findAll(), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAll(), HttpStatus.OK);
 	}
 
 	@GetMapping("/{designacionTipoId}")
 	public ResponseEntity<DesignacionTipo> findByDesignacionTipoId(@PathVariable Integer designacionTipoId) {
-		return new ResponseEntity<DesignacionTipo>(service.findByDesignacionTipoId(designacionTipoId), HttpStatus.OK);
+		return new ResponseEntity<>(service.findByDesignacionTipoId(designacionTipoId), HttpStatus.OK);
 	}
 }

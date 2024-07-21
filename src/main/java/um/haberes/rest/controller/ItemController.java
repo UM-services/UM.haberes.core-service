@@ -96,6 +96,13 @@ public class ItemController {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
+	@DeleteMapping("/legajo/{legajoId}/{anho}/{mes}/deleteallbyzero")
+	public ResponseEntity<Void> deleteAllByZero(@PathVariable Long legajoId, @PathVariable Integer anho,
+												@PathVariable Integer mes) {
+		service.deleteAllByZero(legajoId, anho, mes);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
 	@GetMapping("/onlyETEC/{legajoId}/{anho}/{mes}")
 	public ResponseEntity<Boolean> onlyETEC(@PathVariable Long legajoId, @PathVariable Integer anho,
 			@PathVariable Integer mes) {

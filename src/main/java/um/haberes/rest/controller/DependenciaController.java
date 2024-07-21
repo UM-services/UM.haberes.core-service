@@ -24,26 +24,29 @@ import um.haberes.rest.service.DependenciaService;
 @RequestMapping("/api/haberes/core/dependencia")
 public class DependenciaController {
 	
-	@Autowired
-	private DependenciaService service;
+	private final DependenciaService service;
+
+	public DependenciaController(DependenciaService service) {
+		this.service = service;
+	}
 
 	@GetMapping("/")
 	public ResponseEntity<List<Dependencia>> findAll() {
-		return new ResponseEntity<List<Dependencia>>(service.findAll(), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAll(), HttpStatus.OK);
 	}
 	
 	@GetMapping("/context/{facultadId}/{geograficaId}")
 	public ResponseEntity<List<Dependencia>> findAllByFacultadIdAndGeograficaId(@PathVariable Integer facultadId, @PathVariable Integer geograficaId) {
-		return new ResponseEntity<List<Dependencia>>(service.findAllByFacultadIdAndGeograficaId(facultadId, geograficaId), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllByFacultadIdAndGeograficaId(facultadId, geograficaId), HttpStatus.OK);
 	}
 	
 	@GetMapping("/{dependenciaId}")
 	public ResponseEntity<Dependencia> findByDependenciaId(@PathVariable Integer dependenciaId) {
-		return new ResponseEntity<Dependencia>(service.findByDependenciaId(dependenciaId), HttpStatus.OK);
+		return new ResponseEntity<>(service.findByDependenciaId(dependenciaId), HttpStatus.OK);
 	}
 
 	@GetMapping("/facultad/{facultadId}/{geograficaId}")
 	public ResponseEntity<Dependencia> findFirstByFacultadIdAndGeograficaId(@PathVariable Integer facultadId, @PathVariable Integer geograficaId) {
-		return new ResponseEntity<Dependencia>(service.findFirstByFacultadIdAndGeograficaId(facultadId, geograficaId), HttpStatus.OK);
+		return new ResponseEntity<>(service.findFirstByFacultadIdAndGeograficaId(facultadId, geograficaId), HttpStatus.OK);
 	}
 }

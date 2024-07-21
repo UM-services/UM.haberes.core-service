@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package um.haberes.rest.repository;
 
@@ -16,15 +16,15 @@ import um.haberes.rest.kotlin.model.Persona;
  *
  */
 public interface IPersonaRepository extends JpaRepository<Persona, Long> {
-	
-	public List<Persona> findAllByLegajoIdIn(List<Long> legajos, Sort sort);
 
-	public List<Persona> findAllByApellidoLike(String apellido);
+    List<Persona> findAllByLegajoIdIn(List<Long> legajos, Sort sort);
 
-	public List<Persona> findAllByLiquida(String liquida, Sort sort);
+    List<Persona> findAllByApellidoLike(String apellido);
 
-	public Optional<Persona> findByDocumento(BigDecimal documento);
-	
-	public Optional<Persona> findByLegajoId(Long legajoId);
+    List<Persona> findAllByLiquida(String liquida, Sort sort);
+
+    Optional<Persona> findTopByDocumentoOrderByLegajoIdDesc(BigDecimal documento);
+
+    Optional<Persona> findByLegajoId(Long legajoId);
 
 }

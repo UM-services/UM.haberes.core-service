@@ -46,5 +46,4 @@ data class CargoClaseDetalle(
     @JoinColumn(name = "cargoClasePeriodoId", insertable = false, updatable = false)
     var cargoClasePeriodo: CargoClasePeriodo? = null
 
-
 ) : Auditable()
