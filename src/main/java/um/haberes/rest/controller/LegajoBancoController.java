@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @RestController
-@RequestMapping("/legajobanco")
+@RequestMapping("/api/haberes/core/legajobanco")
 @Slf4j
 public class LegajoBancoController {
 
@@ -74,6 +74,15 @@ public class LegajoBancoController {
 		log.debug(String.format("Search %d/%d/%d", legajoId, anho, mes));
 		return new ResponseEntity<List<LegajoBanco>>(service.findAllByLegajoPeriodo(legajoId, anho, mes),
 				HttpStatus.OK);
+	}
+
+	@GetMapping("/cbuprincipal/{legajoId}/{anho}/{mes}")
+	public ResponseEntity<LegajoBanco> findLegajoCbuPrincipal(@PathVariable Long legajoId, @PathVariable Integer anho, @PathVariable Integer mes) {
+		try {
+			return new ResponseEntity<>(service.findLegajoCbuPrincipal(legajoId, anho, mes), HttpStatus.OK);
+		} catch (LegajoBancoException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
 	}
 
 	@GetMapping("/periodo/{anho}/{mes}")

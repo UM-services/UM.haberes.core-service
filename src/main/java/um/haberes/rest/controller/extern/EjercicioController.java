@@ -16,7 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.OffsetDateTime;
 
 @RestController
-@RequestMapping("/ejercicio")
+@RequestMapping("/api/haberes/core/ejercicio")
 public class EjercicioController {
 
     @Autowired

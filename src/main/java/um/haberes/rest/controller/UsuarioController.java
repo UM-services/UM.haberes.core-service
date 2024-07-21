@@ -23,7 +23,7 @@ import um.haberes.rest.service.UsuarioService;
  *
  */
 @RestController
-@RequestMapping("/usuario")
+@RequestMapping("/api/haberes/core/usuario")
 public class UsuarioController {
 
     private final UsuarioService service;

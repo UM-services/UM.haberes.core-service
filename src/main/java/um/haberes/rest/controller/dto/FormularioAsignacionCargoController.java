@@ -18,7 +18,7 @@ import um.haberes.rest.service.dto.FormularioAsignacionCargoService;
  *
  */
 @RestController
-@RequestMapping("/formularioAsignacionCargo")
+@RequestMapping("/api/haberes/core/formularioAsignacionCargo")
 public class FormularioAsignacionCargoController {
 
 	@Autowired

@@ -19,7 +19,7 @@ import um.haberes.rest.service.view.ImputadoTotalService;
  *
  */
 @RestController
-@RequestMapping("/imputadototal")
+@RequestMapping("/api/haberes/core/imputadototal")
 public class ImputadoTotalController {
 	
 	@Autowired

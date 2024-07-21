@@ -26,7 +26,7 @@ import um.haberes.rest.service.AdicionalCursoRangoService;
  *
  */
 @RestController
-@RequestMapping("/adicionalCursoRango")
+@RequestMapping("/api/haberes/core/adicionalCursoRango")
 public class AdicionalCursoRangoController {
 
 	@Autowired

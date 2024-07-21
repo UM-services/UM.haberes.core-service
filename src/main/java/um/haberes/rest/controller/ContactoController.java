@@ -27,7 +27,7 @@ import um.haberes.rest.service.ContactoService;
  *
  */
 @RestController
-@RequestMapping("/contacto")
+@RequestMapping("/api/haberes/core/contacto")
 public class ContactoController {
 
 	@Autowired

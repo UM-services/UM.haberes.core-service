@@ -22,11 +22,14 @@ import um.haberes.rest.service.ConversionLogService;
  *
  */
 @RestController
-@RequestMapping(value = "/conversionlog")
+@RequestMapping("/api/haberes/core/conversionlog")
 public class ConversionLogController {
 	
-	@Autowired
-	private ConversionLogService service;
+	private final ConversionLogService service;
+
+	public ConversionLogController(ConversionLogService service) {
+		this.service = service;
+	}
 	
 	@GetMapping("/")
 	public ResponseEntity<List<ConversionLog>> findAll() {

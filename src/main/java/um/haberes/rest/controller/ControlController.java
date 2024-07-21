@@ -24,7 +24,7 @@ import um.haberes.rest.service.ControlService;
  *
  */
 @RestController
-@RequestMapping("/control")
+@RequestMapping("/api/haberes/core/control")
 public class ControlController {
 
 	private final ControlService service;

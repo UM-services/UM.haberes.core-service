@@ -27,7 +27,7 @@ import um.haberes.rest.service.NovedadService;
  *
  */
 @RestController
-@RequestMapping("/novedad")
+@RequestMapping("/api/haberes/core/novedad")
 public class NovedadController {
 
 	@Autowired

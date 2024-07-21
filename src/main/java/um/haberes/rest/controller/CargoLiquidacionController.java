@@ -29,42 +29,56 @@ import um.haberes.rest.service.view.CargoLiquidacionPeriodoService;
  *
  */
 @RestController
-@RequestMapping("/cargoliquidacion")
+@RequestMapping("/api/haberes/core/cargoliquidacion")
 public class CargoLiquidacionController {
 
-	@Autowired
-	private CargoLiquidacionService service;
+	private final CargoLiquidacionService service;
+	private final CargoLiquidacionPeriodoService cargoLiquidacionPeriodoService;
 
-	@Autowired
-	private CargoLiquidacionPeriodoService cargoLiquidacionPeriodoService;
+	public CargoLiquidacionController(CargoLiquidacionService service, CargoLiquidacionPeriodoService cargoLiquidacionPeriodoService) {
+		this.service = service;
+		this.cargoLiquidacionPeriodoService = cargoLiquidacionPeriodoService;
+	}
 
 	@GetMapping("/legajo/{legajoId}/{anho}/{mes}")
 	public ResponseEntity<List<CargoLiquidacion>> findAllByLegajo(@PathVariable Long legajoId, @PathVariable Integer anho,
 																  @PathVariable Integer mes) {
-		return new ResponseEntity<List<CargoLiquidacion>>(service.findAllByLegajo(legajoId, anho, mes), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllByLegajo(legajoId, anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/legajodocente/{legajoId}/{anho}/{mes}")
 	public ResponseEntity<List<CargoLiquidacion>> findAllDocenteByLegajo(@PathVariable Long legajoId, @PathVariable Integer anho,
 			@PathVariable Integer mes) {
-		return new ResponseEntity<List<CargoLiquidacion>>(service.findAllDocenteByLegajo(legajoId, anho, mes), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllDocenteByLegajo(legajoId, anho, mes), HttpStatus.OK);
+	}
+
+	@GetMapping("/legajodocente/{legajoId}/{anho}/{mes}/facultad/{facultadId}")
+	public ResponseEntity<List<CargoLiquidacion>> findAllDocenteByLegajoAndFacultad(@PathVariable Long legajoId,
+																					@PathVariable Integer anho, @PathVariable Integer mes, @PathVariable Integer facultadId) {
+		return new ResponseEntity<>(service.findAllDocenteByLegajoAndFacultad(legajoId, anho, mes, facultadId), HttpStatus.OK);
 	}
 
 	@GetMapping("/legajonodocente/{legajoId}/{anho}/{mes}")
 	public ResponseEntity<List<CargoLiquidacion>> findAllNoDocenteByLegajo(@PathVariable Long legajoId, @PathVariable Integer anho,
 			@PathVariable Integer mes) {
-		return new ResponseEntity<List<CargoLiquidacion>>(service.findAllNoDocenteByLegajo(legajoId, anho, mes), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllNoDocenteByLegajo(legajoId, anho, mes), HttpStatus.OK);
+	}
+
+	@GetMapping("/legajonodocente/{legajoId}/{anho}/{mes}/facultad/{facultadId}")
+	public ResponseEntity<List<CargoLiquidacion>> findAllNoDocenteByLegajoAndFacultad(@PathVariable Long legajoId,
+																					  @PathVariable Integer anho, @PathVariable Integer mes, @PathVariable Integer facultadId) {
+		return new ResponseEntity<>(service.findAllNoDocenteByLegajoAndFacultad(legajoId, anho, mes, facultadId), HttpStatus.OK);
 	}
 
 	@GetMapping("/legajonodocentehist/{legajoId}")
 	public ResponseEntity<List<CargoLiquidacion>> findAllNoDocenteHistByLegajo(@PathVariable Long legajoId) {
-		return new ResponseEntity<List<CargoLiquidacion>>(service.findAllNoDocenteHistByLegajo(legajoId), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllNoDocenteHistByLegajo(legajoId), HttpStatus.OK);
 	}
 
 	@GetMapping("/legajoadicionalhcs/{legajoId}/{anho}/{mes}")
 	public ResponseEntity<List<CargoLiquidacion>> findAllAdicionalHCSByLegajo(@PathVariable Long legajoId,
 			@PathVariable Integer anho, @PathVariable Integer mes) {
-		return new ResponseEntity<List<CargoLiquidacion>>(service.findAllAdicionalHCSByLegajo(legajoId, anho, mes), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllAdicionalHCSByLegajo(legajoId, anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/legajoresto/{legajoId}/{anho}/{mes}/{categoriaId}")
@@ -77,14 +91,14 @@ public class CargoLiquidacionController {
 	@GetMapping("/categorianodocente/{legajoId}/{anho}/{mes}/{categoriaId}")
 	public ResponseEntity<CargoLiquidacion> findByCategoriaNoDocente(@PathVariable Long legajoId, @PathVariable Integer anho,
 			@PathVariable Integer mes, @PathVariable Integer categoriaId) {
-		return new ResponseEntity<CargoLiquidacion>(service.findByCategoriaNoDocente(legajoId, anho, mes, categoriaId),
+		return new ResponseEntity<>(service.findByCategoriaNoDocente(legajoId, anho, mes, categoriaId),
 				HttpStatus.OK);
 	}
 	
 	@GetMapping("/{cargoId}")
 	public ResponseEntity<CargoLiquidacion> findByCargoId(@PathVariable Long cargoId) {
 		try {
-			return new ResponseEntity<CargoLiquidacion>(service.findByCargoId(cargoId), HttpStatus.OK);
+			return new ResponseEntity<>(service.findByCargoId(cargoId), HttpStatus.OK);
 		} catch (CargoLiquidacionException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
@@ -92,23 +106,23 @@ public class CargoLiquidacionController {
 
 	@PostMapping("/")
 	public ResponseEntity<CargoLiquidacion> add(@RequestBody CargoLiquidacion cargoLiquidacion) {
-		return new ResponseEntity<CargoLiquidacion>(service.add(cargoLiquidacion), HttpStatus.OK);
+		return new ResponseEntity<>(service.add(cargoLiquidacion), HttpStatus.OK);
 	}
 
 	@PutMapping("/{cargoLiquidacionId}")
 	public ResponseEntity<CargoLiquidacion> update(@RequestBody CargoLiquidacion cargoLiquidacion, @PathVariable Long cargoLiquidacionId) {
-		return new ResponseEntity<CargoLiquidacion>(service.update(cargoLiquidacion, cargoLiquidacionId), HttpStatus.OK);
+		return new ResponseEntity<>(service.update(cargoLiquidacion, cargoLiquidacionId), HttpStatus.OK);
 	}
 
 	@PutMapping("/saveall/{version}")
 	public ResponseEntity<List<CargoLiquidacion>> saveall(@RequestBody List<CargoLiquidacion> cargos, @PathVariable Integer version) {
-		return new ResponseEntity<List<CargoLiquidacion>>(service.saveAll(cargos, version, true), HttpStatus.OK);
+		return new ResponseEntity<>(service.saveAll(cargos, version, true), HttpStatus.OK);
 	}
 
 	@DeleteMapping("/periodo/{anho}/{mes}")
 	public ResponseEntity<Void> deleteByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes) {
 		service.deleteByPeriodo(anho, mes);
-		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 }

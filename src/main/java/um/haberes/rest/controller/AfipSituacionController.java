@@ -14,7 +14,7 @@ import um.haberes.rest.service.AfipSituacionService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/afipSituacion")
+@RequestMapping("/api/haberes/core/afipSituacion")
 public class AfipSituacionController {
 
     private final AfipSituacionService service;

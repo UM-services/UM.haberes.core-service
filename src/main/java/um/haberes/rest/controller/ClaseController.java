@@ -27,7 +27,7 @@ import um.haberes.rest.service.ClaseService;
  *
  */
 @RestController
-@RequestMapping(value = "/clase")
+@RequestMapping("/api/haberes/core/clase")
 public class ClaseController {
 
 	private final ClaseService service;

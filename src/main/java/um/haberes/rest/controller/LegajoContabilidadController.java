@@ -26,7 +26,7 @@ import um.haberes.rest.service.LegajoContabilidadService;
  *
  */
 @RestController
-@RequestMapping("/legajocontabilidad")
+@RequestMapping("/api/haberes/core/legajocontabilidad")
 public class LegajoContabilidadController {
 	
 	@Autowired

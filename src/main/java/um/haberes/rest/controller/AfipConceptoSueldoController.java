@@ -11,7 +11,7 @@ import um.haberes.rest.service.AfipConceptoSueldoService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/afipConceptoSueldo")
+@RequestMapping("/api/haberes/core/afipConceptoSueldo")
 public class AfipConceptoSueldoController {
 
     @Autowired

@@ -25,7 +25,7 @@ import um.haberes.rest.service.CargoClaseDetalleService;
  *
  */
 @RestController
-@RequestMapping("/cargoclasedetalle")
+@RequestMapping("/api/haberes/core/cargoclasedetalle")
 public class CargoClaseDetalleController {
 
 	@Autowired
@@ -34,50 +34,55 @@ public class CargoClaseDetalleController {
 	@GetMapping("/legajo/{legajoId}/{anho}/{mes}")
 	public ResponseEntity<List<CargoClaseDetalle>> findAllByLegajo(@PathVariable Long legajoId,
 																   @PathVariable Integer anho, @PathVariable Integer mes) {
-		return new ResponseEntity<List<CargoClaseDetalle>>(service.findAllByLegajo(legajoId, anho, mes), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllByLegajo(legajoId, anho, mes), HttpStatus.OK);
+	}
+
+	@GetMapping("/legajo/{legajoId}/{anho}/{mes}/facultad/{facultadId}")
+	public ResponseEntity<List<CargoClaseDetalle>> findAllByLegajoAndFacultad(@PathVariable Long legajoId, @PathVariable Integer anho, @PathVariable Integer mes, @PathVariable Integer facultadId) {
+		return new ResponseEntity<>(service.findAllByLegajoAndFacultad(legajoId, anho, mes, facultadId), HttpStatus.OK);
 	}
 
 	@GetMapping("/facultad/{facultadId}/{anho}/{mes}")
 	public ResponseEntity<List<CargoClaseDetalle>> findAllByFacultad(@PathVariable Integer facultadId,
 			@PathVariable Integer anho, @PathVariable Integer mes) {
-		return new ResponseEntity<List<CargoClaseDetalle>>(service.findAllByFacultad(facultadId, anho, mes),
+		return new ResponseEntity<>(service.findAllByFacultad(facultadId, anho, mes),
 				HttpStatus.OK);
 	}
 
 	@GetMapping("/cargoclaseperiodo/{cargoclaseperiodoId}")
-	public ResponseEntity<List<CargoClaseDetalle>> findAllByCargoclaseperiodo(@PathVariable Long cargoclaseperiodoId) {
-		return new ResponseEntity<List<CargoClaseDetalle>>(service.findAllByCargoClasePeriodo(cargoclaseperiodoId),
+	public ResponseEntity<List<CargoClaseDetalle>> findAllByCargoClasePeriodo(@PathVariable Long cargoclaseperiodoId) {
+		return new ResponseEntity<>(service.findAllByCargoClasePeriodo(cargoclaseperiodoId),
 				HttpStatus.OK);
 	}
 
 	@GetMapping("/cargoclase/{cargoclaseId}/{anho}/{mes}")
 	public ResponseEntity<List<CargoClaseDetalle>> findAllByCargoclase(@PathVariable Long cargoclaseId,
 			@PathVariable Integer anho, @PathVariable Integer mes) {
-		return new ResponseEntity<List<CargoClaseDetalle>>(service.findAllByCargoClase(cargoclaseId, anho, mes),
+		return new ResponseEntity<>(service.findAllByCargoClase(cargoclaseId, anho, mes),
 				HttpStatus.OK);
 	}
 
 	@PostMapping("/")
 	public ResponseEntity<CargoClaseDetalle> add(@RequestBody CargoClaseDetalle cargoclasedetalle) {
-		return new ResponseEntity<CargoClaseDetalle>(service.add(cargoclasedetalle), HttpStatus.OK);
+		return new ResponseEntity<>(service.add(cargoclasedetalle), HttpStatus.OK);
 	}
 
 	@PutMapping("/{cargoclasedetalleId}")
 	public ResponseEntity<CargoClaseDetalle> update(@RequestBody CargoClaseDetalle cargoclasedetalle,
 			@PathVariable Long cargoclasedetalleId) {
-		return new ResponseEntity<CargoClaseDetalle>(service.update(cargoclasedetalle, cargoclasedetalleId),
+		return new ResponseEntity<>(service.update(cargoclasedetalle, cargoclasedetalleId),
 				HttpStatus.OK);
 	}
 
 	@PutMapping("/")
 	public ResponseEntity<List<CargoClaseDetalle>> saveall(@RequestBody List<CargoClaseDetalle> cargoclasedetalles) {
-		return new ResponseEntity<List<CargoClaseDetalle>>(service.saveAll(cargoclasedetalles), HttpStatus.OK);
+		return new ResponseEntity<>(service.saveAll(cargoclasedetalles), HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{cargoClaseDetalleId}")
 	public ResponseEntity<Void> delete(@PathVariable Long cargoClaseDetalleId) {
 		service.delete(cargoClaseDetalleId);
-		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 }

@@ -24,7 +24,7 @@ import um.haberes.rest.service.CategoriaImputacionService;
  *
  */
 @RestController
-@RequestMapping("/categoriaimputacion")
+@RequestMapping("/api/haberes/core/categoriaimputacion")
 public class CategoriaImputacionController {
 
 	@Autowired

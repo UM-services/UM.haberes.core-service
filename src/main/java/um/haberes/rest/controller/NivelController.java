@@ -20,7 +20,7 @@ import um.haberes.rest.service.NivelService;
  *
  */
 @RestController
-@RequestMapping("/nivel")
+@RequestMapping("/api/haberes/core/nivel")
 public class NivelController {
 	
 	@Autowired

@@ -27,7 +27,7 @@ import um.haberes.rest.service.ItemService;
  *
  */
 @RestController
-@RequestMapping("/item")
+@RequestMapping("/api/haberes/core/item")
 public class ItemController {
 
 	private final ItemService service;
@@ -93,6 +93,13 @@ public class ItemController {
 	@DeleteMapping("/periodo/{anho}/{mes}")
 	public ResponseEntity<Void> deleteByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes) {
 		service.deleteByPeriodo(anho, mes);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	@DeleteMapping("/legajo/{legajoId}/{anho}/{mes}/deleteallbyzero")
+	public ResponseEntity<Void> deleteAllByZero(@PathVariable Long legajoId, @PathVariable Integer anho,
+												@PathVariable Integer mes) {
+		service.deleteAllByZero(legajoId, anho, mes);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 

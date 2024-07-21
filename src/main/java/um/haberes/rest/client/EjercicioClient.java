@@ -8,7 +8,7 @@ import um.haberes.rest.kotlin.model.extern.EjercicioDto;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-@FeignClient(name = "core-service/ejercicio")
+@FeignClient(name = "tesoreria-core-service/ejercicio")
 public interface EjercicioClient {
 
     @GetMapping("/")

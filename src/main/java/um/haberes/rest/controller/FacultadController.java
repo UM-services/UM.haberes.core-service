@@ -21,11 +21,14 @@ import um.haberes.rest.service.FacultadService;
  *
  */
 @RestController
-@RequestMapping("/facultad")
+@RequestMapping("/api/haberes/core/facultad")
 public class FacultadController {
 	
-	@Autowired
-	private FacultadService service;
+	private final FacultadService service;
+
+	public FacultadController(FacultadService service) {
+		this.service = service;
+	}
 	
 	@GetMapping("/")
 	public ResponseEntity<List<Facultad>> findAll() {
@@ -34,11 +37,12 @@ public class FacultadController {
 	
 	@GetMapping("/facultades")
 	public ResponseEntity<List<Facultad>> findAllFacultades() {
-		return new ResponseEntity<List<Facultad>>(service.findAllFacultades(), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllFacultades(), HttpStatus.OK);
 	}
 
 	@GetMapping("/{facultadId}")
 	public ResponseEntity<Facultad> findByFacultadId(@PathVariable Integer facultadId) {
-		return new ResponseEntity<Facultad>(service.findByFacultadId(facultadId), HttpStatus.OK);
+		return new ResponseEntity<>(service.findByFacultadId(facultadId), HttpStatus.OK);
 	}
+
 }

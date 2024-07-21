@@ -12,7 +12,7 @@ import um.haberes.rest.service.extern.ContratadoPersonaService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/contratadoPersona")
+@RequestMapping("/api/haberes/core/contratadoPersona")
 public class ContratadoPersonaController {
 
     @Autowired

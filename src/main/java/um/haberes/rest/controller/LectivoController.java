@@ -23,7 +23,7 @@ import um.haberes.rest.service.LectivoService;
  *
  */
 @RestController
-@RequestMapping("/lectivo")
+@RequestMapping("/api/haberes/core/lectivo")
 public class LectivoController {
 
 	@Autowired

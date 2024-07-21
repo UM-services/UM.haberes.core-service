@@ -23,7 +23,7 @@ import um.haberes.rest.util.transfer.MailInfo;
  *
  */
 @RestController
-@RequestMapping("/mailing")
+@RequestMapping("/api/haberes/core/mailing")
 public class MailingController {
 
     private final MailingService service;

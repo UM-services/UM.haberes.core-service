@@ -24,7 +24,7 @@ import um.haberes.rest.service.PersonaFacultadService;
  *
  */
 @RestController
-@RequestMapping("/personaFacultad")
+@RequestMapping("/api/haberes/core/personaFacultad")
 public class PersonaFacultadController {
 
 	@Autowired

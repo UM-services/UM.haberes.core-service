@@ -149,7 +149,7 @@ public class PersonaService {
     }
 
     public Persona findByDocumento(BigDecimal documento) {
-        return repository.findByDocumento(documento).orElseThrow(() -> new PersonaException(documento));
+        return repository.findTopByDocumentoOrderByLegajoIdDesc(documento).orElseThrow(() -> new PersonaException(documento));
     }
 
     public Persona add(Persona persona) {

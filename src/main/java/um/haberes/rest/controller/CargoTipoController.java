@@ -21,11 +21,14 @@ import um.haberes.rest.service.CargoTipoService;
  *
  */
 @RestController
-@RequestMapping("/cargotipo")
+@RequestMapping("/api/haberes/core/cargotipo")
 public class CargoTipoController {
 
-	@Autowired
-	private CargoTipoService service;
+	private final CargoTipoService service;
+
+	public CargoTipoController(CargoTipoService service) {
+		this.service = service;
+	}
 
 	@GetMapping("/")
 	public ResponseEntity<List<CargoTipo>> findAll() {

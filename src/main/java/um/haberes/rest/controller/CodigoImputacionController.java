@@ -24,7 +24,7 @@ import um.haberes.rest.service.CodigoImputacionService;
  *
  */
 @RestController
-@RequestMapping("/codigoimputacion")
+@RequestMapping("/api/haberes/core/codigoimputacion")
 public class CodigoImputacionController {
 
 	@Autowired

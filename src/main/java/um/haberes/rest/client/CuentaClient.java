@@ -7,7 +7,7 @@ import um.haberes.rest.kotlin.model.extern.CuentaDto;
 import java.math.BigDecimal;
 import java.util.List;
 
-@FeignClient(name = "core-service/cuenta")
+@FeignClient(name = "tesoreria-core-service/cuenta")
 public interface CuentaClient {
 
     @GetMapping("/")

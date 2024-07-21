@@ -30,7 +30,7 @@ import um.haberes.rest.service.CursoCargoService;
  *
  */
 @RestController
-@RequestMapping("/cursoCargo")
+@RequestMapping("/api/haberes/core/cursoCargo")
 @Slf4j
 public class CursoCargoController {
 

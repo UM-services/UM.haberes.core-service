@@ -30,7 +30,7 @@ import um.haberes.rest.util.Tool;
  *
  */
 @RestController
-@RequestMapping("/makeLiquidacion")
+@RequestMapping("/api/haberes/core/makeLiquidacion")
 public class MakeLiquidacionController {
 
     private final MakeLiquidacionService service;

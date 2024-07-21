@@ -9,7 +9,7 @@ app:
     enabled: true
     port: 35791
   open-in-view: true
-  port: 8091
+  port: 8093
   mail:
     username: sueldos@um.edu.ar
     password: Daniel22
@@ -28,7 +28,7 @@ eureka:
 
 spring:
   application:
-    name: haberes-service
+    name: haberes-core-service
   datasource:
     url: jdbc:mysql://${app.server}/${app.database}?useSSL=false&serverTimezone=UTC
     username: ${app.user}

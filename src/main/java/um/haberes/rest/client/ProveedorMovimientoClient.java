@@ -11,7 +11,7 @@ import um.haberes.rest.kotlin.model.extern.ProveedorMovimientoDto;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-@FeignClient(name = "core-service/proveedorMovimiento")
+@FeignClient(name = "tesoreria-core-service/proveedorMovimiento")
 public interface ProveedorMovimientoClient {
 
     @GetMapping("/eliminables/{ejercicioId}")

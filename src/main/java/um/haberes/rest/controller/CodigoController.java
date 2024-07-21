@@ -27,7 +27,7 @@ import um.haberes.rest.service.CodigoService;
  *
  */
 @RestController
-@RequestMapping("/codigo")
+@RequestMapping("/api/haberes/core/codigo")
 public class CodigoController {
 	@Autowired
 	private CodigoService service;
@@ -89,4 +89,5 @@ public class CodigoController {
 	public ResponseEntity<List<Codigo>> saveAll(@RequestBody List<Codigo> codigos) {
 		return new ResponseEntity<>(service.saveAll(codigos), HttpStatus.OK);
 	}
+
 }

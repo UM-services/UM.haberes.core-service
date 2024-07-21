@@ -17,10 +17,8 @@ import java.math.RoundingMode;
 public class LiquidacionEtecService {
 
     private final LegajoInasistenciaService legajoInasistenciaService;
-
     private final InasistenciaDescuentoService inasistenciaDescuentoService;
 
-    @Autowired
     public LiquidacionEtecService(LegajoInasistenciaService legajoInasistenciaService, InasistenciaDescuentoService inasistenciaDescuentoService) {
         this.legajoInasistenciaService = legajoInasistenciaService;
         this.inasistenciaDescuentoService = inasistenciaDescuentoService;
@@ -47,4 +45,5 @@ public class LiquidacionEtecService {
         log.debug("Porcentaje Antiguedad -> {}", porcentajeAntiguedad);
         return porcentajeAntiguedad;
     }
+
 }

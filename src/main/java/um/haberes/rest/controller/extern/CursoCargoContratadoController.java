@@ -13,7 +13,7 @@ import um.haberes.rest.service.extern.CursoCargoContratadoService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/cursoCargoContratado")
+@RequestMapping("/api/haberes/core/cursoCargoContratado")
 public class CursoCargoContratadoController {
 
     private final CursoCargoContratadoService service;

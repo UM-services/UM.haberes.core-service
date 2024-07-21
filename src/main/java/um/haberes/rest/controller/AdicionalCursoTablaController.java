@@ -23,7 +23,7 @@ import um.haberes.rest.service.AdicionalCursoTablaService;
  *
  */
 @RestController
-@RequestMapping("/adicionalCursoTabla")
+@RequestMapping("/api/haberes/core/adicionalCursoTabla")
 public class AdicionalCursoTablaController {
 
 	@Autowired

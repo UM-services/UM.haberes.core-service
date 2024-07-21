@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import um.haberes.rest.kotlin.model.Curso;
+import um.haberes.rest.service.CursoCargoService;
 import um.haberes.rest.service.CursoService;
 
 /**
@@ -28,15 +29,17 @@ import um.haberes.rest.service.CursoService;
  *
  */
 @RestController
-@RequestMapping("/curso")
+@RequestMapping("/api/haberes/core/curso")
 @Slf4j
 public class CursoController {
 
 	private final CursoService service;
+	private final CursoCargoService cursoCargoService;
 
 	@Autowired
-	public CursoController(CursoService service) {
+	public CursoController(CursoService service, CursoCargoService cursoCargoService) {
 		this.service = service;
+		this.cursoCargoService = cursoCargoService;
 	}
 
 	@GetMapping("/")
@@ -58,7 +61,13 @@ public class CursoController {
 				HttpStatus.OK);
 	}
 
-	@GetMapping("/{cursoId}")
+	@GetMapping("/facultad/{facultadId}/geografica/{geograficaId}/periodo/{anho}/{mes}")
+	public ResponseEntity<List<Curso>> findAllByFacultadIdAndGeograficaIdAndAnhoAndMes(@PathVariable Integer facultadId, @PathVariable Integer geograficaId, @PathVariable Integer anho, @PathVariable Integer mes) {
+		return new ResponseEntity<>(service.findAllByFacultadIdAndGeograficaIdAndAnhoAndMes(facultadId, geograficaId, anho, mes, cursoCargoService), HttpStatus.OK);
+	}
+
+
+		@GetMapping("/{cursoId}")
 	public ResponseEntity<Curso> findByCursoId(@PathVariable Long cursoId) {
 		Curso curso = service.findByCursoId(cursoId);
         try {

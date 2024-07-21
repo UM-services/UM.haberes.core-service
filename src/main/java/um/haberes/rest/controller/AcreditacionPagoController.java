@@ -26,7 +26,7 @@ import um.haberes.rest.service.AcreditacionPagoService;
  *
  */
 @RestController
-@RequestMapping("/acreditacionpago")
+@RequestMapping("/api/haberes/core/acreditacionpago")
 public class AcreditacionPagoController {
 	@Autowired
 	private AcreditacionPagoService service;

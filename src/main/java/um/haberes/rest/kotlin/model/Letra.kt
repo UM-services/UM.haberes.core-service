@@ -7,7 +7,8 @@ import java.math.BigDecimal
 @Table(uniqueConstraints = [UniqueConstraint(columnNames = ["legajoId", "anho", "mes"])])
 data class Letra(
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var letraId: Long? = null,
 
     var legajoId: Long? = null,

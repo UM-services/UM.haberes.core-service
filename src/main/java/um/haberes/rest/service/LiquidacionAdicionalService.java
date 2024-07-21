@@ -21,8 +21,11 @@ import um.haberes.rest.repository.ILiquidacionAdicionalRepository;
 @Service
 public class LiquidacionAdicionalService {
 
-	@Autowired
-	private ILiquidacionAdicionalRepository repository;
+	private final ILiquidacionAdicionalRepository repository;
+
+	public LiquidacionAdicionalService(ILiquidacionAdicionalRepository repository) {
+		this.repository = repository;
+	}
 
 	public List<LiquidacionAdicional> findAllByLegajo(Long legajoId, Integer anho, Integer mes) {
 		return repository.findAllByLegajoIdAndAnhoAndMes(legajoId, anho, mes);

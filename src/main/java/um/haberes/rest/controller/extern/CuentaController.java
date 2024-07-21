@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/cuenta")
+@RequestMapping("/api/haberes/core/cuenta")
 public class CuentaController {
 
     @Autowired

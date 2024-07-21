@@ -11,7 +11,7 @@ import um.haberes.rest.kotlin.model.extern.CuentaMovimientoDto;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-@FeignClient(name = "core-service/cuentaMovimiento")
+@FeignClient(name = "tesoreria-core-service/cuentaMovimiento")
 public interface CuentaMovimientoClient {
 
     @GetMapping("/asiento/{fechaContable}/{ordenContable}")

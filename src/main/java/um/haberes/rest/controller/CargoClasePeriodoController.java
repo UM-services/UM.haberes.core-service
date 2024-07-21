@@ -25,7 +25,7 @@ import um.haberes.rest.service.CargoClasePeriodoService;
  *
  */
 @RestController
-@RequestMapping("/cargoclaseperiodo")
+@RequestMapping("/api/haberes/core/cargoclaseperiodo")
 public class CargoClasePeriodoController {
 
 	@Autowired

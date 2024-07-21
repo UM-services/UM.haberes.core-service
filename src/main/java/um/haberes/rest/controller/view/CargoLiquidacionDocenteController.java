@@ -21,7 +21,7 @@ import um.haberes.rest.service.view.CargoLiquidacionDocenteService;
  *
  */
 @RestController
-@RequestMapping("/cargoLiquidacionDocente")
+@RequestMapping("/api/haberes/core/cargoLiquidacionDocente")
 public class CargoLiquidacionDocenteController {
 
 	@Autowired

@@ -19,7 +19,7 @@ import um.haberes.rest.service.BuildService;
  *
  */
 @RestController
-@RequestMapping("/build")
+@RequestMapping("/api/haberes/core/build")
 public class BuildController {
 	
 	@Autowired

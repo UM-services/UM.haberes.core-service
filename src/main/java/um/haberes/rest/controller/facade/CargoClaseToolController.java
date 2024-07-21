@@ -23,7 +23,7 @@ import um.haberes.rest.service.facade.CargoClaseToolService;
  *
  */
 @RestController
-@RequestMapping("/cargoclasetool")
+@RequestMapping("/api/haberes/core/cargoclasetool")
 public class CargoClaseToolController {
 
 	private final CargoClaseToolService service;

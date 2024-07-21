@@ -8,7 +8,8 @@ import java.time.OffsetDateTime
 @Table
 data class BonoImpresion(
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var bonoImpresionId: Long? = null,
 
     var legajoId: Long? = null,

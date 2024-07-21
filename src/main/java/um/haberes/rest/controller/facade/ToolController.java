@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @RestController
-@RequestMapping("/tool")
+@RequestMapping("/api/haberes/core/tool")
 @Slf4j
 public class ToolController {
 

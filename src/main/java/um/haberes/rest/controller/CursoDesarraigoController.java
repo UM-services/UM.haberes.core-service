@@ -26,7 +26,7 @@ import um.haberes.rest.service.CursoDesarraigoService;
  *
  */
 @RestController
-@RequestMapping("/cursodesarraigo")
+@RequestMapping("/api/haberes/core/cursodesarraigo")
 public class CursoDesarraigoController {
 
 	@Autowired

@@ -27,7 +27,7 @@ import um.haberes.rest.service.facade.SheetService;
  *
  */
 @RestController
-@RequestMapping("/sheet")
+@RequestMapping("/api/haberes/core/sheet")
 public class SheetController {
 
     private final SheetService service;
