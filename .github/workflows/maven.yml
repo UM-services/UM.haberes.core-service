@@ -32,7 +32,7 @@ jobs:
     - uses: mr-smithers-excellent/docker-build-push@v6
       name: Build & push Docker image
       env:
-        VERSION: 2024.07.22+build224469
+        VERSION: 'v2024.07.22-build224470'
       with:
         image: dqmdz/um.haberes.core-service
         tags: ${VERSION}, latest, "${GITHUB_REF#refs/heads/}.$(git rev-parse --short ${GITHUB_SHA})"
