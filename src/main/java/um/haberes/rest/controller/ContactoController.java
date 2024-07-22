@@ -30,8 +30,11 @@ import um.haberes.rest.service.ContactoService;
 @RequestMapping("/api/haberes/core/contacto")
 public class ContactoController {
 
-	@Autowired
-	private ContactoService service;
+	private final ContactoService service;
+
+	public ContactoController(ContactoService service) {
+		this.service = service;
+	}
 
 	@GetMapping("/")
 	public ResponseEntity<List<Contacto>> findAll() {
