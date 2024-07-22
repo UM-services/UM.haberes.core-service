@@ -32,9 +32,9 @@ public class UsuarioService {
 		return repository.findByLegajoId(legajoId).orElseThrow(() -> new UsuarioException(legajoId));
 	}
 
-	public Usuario updateLastLog(Long legajoId) {
+	public Usuario updateLastLog(Long legajoId, Long build) {
 		return repository.findByLegajoId(legajoId).map(usuario -> {
-			usuario = new Usuario(legajoId, usuario.getPassword(), Tool.hourAbsoluteArgentina(),
+			usuario = new Usuario(legajoId, usuario.getPassword(), Tool.hourAbsoluteArgentina(), build,
 					usuario.getUsuarioId(), usuario.getFacultadId());
 			repository.save(usuario);
 			return usuario;
@@ -50,7 +50,7 @@ public class UsuarioService {
 	public void setPassword(Usuario newUsuario) {
 		Usuario usuario = repository.findByLegajoId(newUsuario.getLegajoId()).get();
 		usuario = new Usuario(usuario.getLegajoId(), DigestUtils.sha256Hex(newUsuario.getPassword()),
-				usuario.getLastLog(), usuario.getUsuarioId(), usuario.getFacultadId());
+				usuario.getLastLog(), newUsuario.getBuild(), usuario.getUsuarioId(), usuario.getFacultadId());
 		repository.save(usuario);
 	}
 

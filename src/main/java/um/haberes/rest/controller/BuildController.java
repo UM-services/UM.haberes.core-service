@@ -22,8 +22,11 @@ import um.haberes.rest.service.BuildService;
 @RequestMapping("/api/haberes/core/build")
 public class BuildController {
 	
-	@Autowired
-	private BuildService service;
+	private final BuildService service;
+
+	public BuildController(BuildService service) {
+		this.service = service;
+	}
 	
 	@GetMapping("/last")
 	public ResponseEntity<Build> findLast() {
