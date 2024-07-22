@@ -27,8 +27,11 @@ import um.haberes.rest.service.LegajoControlService;
 @RequestMapping("/api/haberes/core/legajocontrol")
 public class LegajoControlController {
 
-	@Autowired
-	private LegajoControlService service;
+	private final LegajoControlService service;
+
+	public LegajoControlController(LegajoControlService service) {
+		this.service = service;
+	}
 
 	@GetMapping("/periodo/{anho}/{mes}")
 	public ResponseEntity<List<LegajoControl>> findAllByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes) {
