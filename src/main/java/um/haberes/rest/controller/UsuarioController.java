@@ -42,10 +42,10 @@ public class UsuarioController {
         }
     }
 
-    @GetMapping("/lastlog/{legajoId}")
-    public ResponseEntity<Usuario> updateLastLog(@PathVariable Long legajoId) {
+    @GetMapping("/lastlog/{legajoId}/{build}")
+    public ResponseEntity<Usuario> updateLastLog(@PathVariable Long legajoId, @PathVariable Long build) {
         try {
-            return new ResponseEntity<>(service.updateLastLog(legajoId), HttpStatus.OK);
+            return new ResponseEntity<>(service.updateLastLog(legajoId, build), HttpStatus.OK);
         } catch (UsuarioException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }

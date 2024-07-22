@@ -14,6 +14,7 @@ data class Usuario(
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ", timezone = "UTC")
     var lastLog: OffsetDateTime? = null,
 
+    var build: Long? = null,
     var usuarioId: Long? = null,
     var facultadId: Int? = null
 
