@@ -28,7 +28,7 @@ public class FormularioImprimirController {
 	@GetMapping("/{anho}/{mes}/{dependenciaId}/{filtro}")
 	public ResponseEntity<FormularioImprimir> findData(@PathVariable Integer anho, @PathVariable Integer mes,
 													   @PathVariable Integer dependenciaId, @PathVariable String filtro) {
-		return new ResponseEntity<FormularioImprimir>(service.findData(anho, mes, dependenciaId, filtro),
+		return new ResponseEntity<>(service.findData(anho, mes, dependenciaId, filtro),
 				HttpStatus.OK);
 	}
 
