@@ -5,7 +5,6 @@ package um.haberes.rest.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,7 +31,6 @@ public class CursoCargoNovedadController {
 
 	private final CursoCargoNovedadService service;
 
-	@Autowired
 	public CursoCargoNovedadController(CursoCargoNovedadService service) {
 		this.service = service;
 	}
