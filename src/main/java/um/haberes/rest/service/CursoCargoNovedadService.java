@@ -7,8 +7,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import jakarta.transaction.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,7 @@ import um.haberes.rest.repository.ICursoCargoNovedadRepository;
  *
  */
 @Service
+@Slf4j
 public class CursoCargoNovedadService {
 
 	@Autowired
@@ -32,11 +36,17 @@ public class CursoCargoNovedadService {
 	}
 
 	public List<CursoCargoNovedad> findAllPendientesAlta(Integer anho, Integer mes) {
-		return repository
+		var pendientesAlta = repository
 				.findAllByAnhoAndMesAndAutorizadoAndRechazado(anho, mes, (byte) 0, (byte) 0,
 						Sort.by("persona.apellido").ascending().and(Sort.by("persona.nombre").ascending())
 								.and(Sort.by("cargoTipo.aCargo").descending()).and(Sort.by("cargoTipoId").ascending()))
 				.stream().filter(cargo -> cargo.getAlta() == 1 || cargo.getCambio() == 1).collect(Collectors.toList());
+        try {
+            log.debug("PendientesAlta: {}", JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(pendientesAlta));
+        } catch (JsonProcessingException e) {
+            log.debug("PendientesAlta: {}", e.getMessage());
+        }
+        return pendientesAlta;
 	}
 
 	public List<CursoCargoNovedad> findAllCursoPendientesAlta(Long cursoId, Integer anho, Integer mes) {
@@ -69,9 +79,15 @@ public class CursoCargoNovedadService {
 	}
 
 	public List<CursoCargoNovedad> findAllPendientesBaja(Integer anho, Integer mes) {
-		return repository.findAllByAnhoAndMesAndBajaAndAutorizadoAndRechazado(anho, mes, (byte) 1, (byte) 0, (byte) 0,
+		var pendientesBaja = repository.findAllByAnhoAndMesAndBajaAndAutorizadoAndRechazado(anho, mes, (byte) 1, (byte) 0, (byte) 0,
 				Sort.by("persona.apellido").ascending().and(Sort.by("persona.nombre").ascending())
 						.and(Sort.by("cargoTipo.aCargo").descending()).and(Sort.by("cargoTipoId").ascending()));
+        try {
+            log.debug("PendientesBaja: {}", JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(pendientesBaja));
+        } catch (JsonProcessingException e) {
+            log.debug("PendientesBaja: {}", e.getMessage());
+        }
+        return pendientesBaja;
 	}
 
 	public List<CursoCargoNovedad> findAllCursoPendientesBaja(Long cursoId, Integer anho, Integer mes) {
