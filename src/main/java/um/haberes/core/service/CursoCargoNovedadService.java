@@ -116,8 +116,14 @@ public class CursoCargoNovedadService {
 	}
 
 	public List<CursoCargoNovedad> findAllPendientesLegajo(Long legajoId, Long cursoId, Integer anho, Integer mes) {
-		return repository.findAllByCursoIdAndAnhoAndMesAndAutorizadoAndRechazadoAndLegajoId(cursoId, anho, mes,
+		var pendientesLegajo = repository.findAllByCursoIdAndAnhoAndMesAndAutorizadoAndRechazadoAndLegajoId(cursoId, anho, mes,
 				(byte) 0, (byte) 0, legajoId);
+        try {
+            log.debug("PendientesLegajo: {}", JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(pendientesLegajo));
+        } catch (JsonProcessingException e) {
+            log.debug("PendientesLegajo: {}", e.getMessage());
+        }
+        return pendientesLegajo;
 	}
 
 	public List<CursoCargoNovedad> findAllByFacultad(Integer facultadId, Integer anho, Integer mes) {
@@ -137,8 +143,14 @@ public class CursoCargoNovedadService {
 	}
 
 	public CursoCargoNovedad findByCursoCargoNovedadId(Long cursoCargoNovedadId) {
-		return repository.findByCursoCargoNovedadId(cursoCargoNovedadId)
+		var cursoCargoNovedad = repository.findByCursoCargoNovedadId(cursoCargoNovedadId)
 				.orElseThrow(() -> new CursoCargoNovedadException(cursoCargoNovedadId));
+        try {
+            log.debug("CursoCargoNovedad -> " + JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(cursoCargoNovedad));
+        } catch (JsonProcessingException e) {
+            log.debug("CursoCargoNovedad -> null {}", e.getMessage());
+        }
+        return cursoCargoNovedad;
 	}
 
 	public CursoCargoNovedad findByLegajo(Long legajoId, Long cursoId, Integer anho, Integer mes) {
