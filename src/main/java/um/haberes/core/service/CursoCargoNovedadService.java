@@ -154,8 +154,14 @@ public class CursoCargoNovedadService {
 	}
 
 	public CursoCargoNovedad findByLegajo(Long legajoId, Long cursoId, Integer anho, Integer mes) {
-		return repository.findByLegajoIdAndCursoIdAndAnhoAndMes(legajoId, cursoId, anho, mes)
+		var cursoCargoNovedad = repository.findByLegajoIdAndCursoIdAndAnhoAndMes(legajoId, cursoId, anho, mes)
 				.orElseThrow(() -> new CursoCargoNovedadException(legajoId, cursoId, anho, mes));
+        try {
+            log.debug("CursoCargoNovedad -> " + JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(cursoCargoNovedad));
+        } catch (JsonProcessingException e) {
+            log.debug("CursoCargoNovedad -> null {}", e.getMessage());
+        }
+        return cursoCargoNovedad;
 	}
 
 	public CursoCargoNovedad findByUnique(Long cursoId, Integer anho, Integer mes, Integer cargoTipoId, Long legajoId) {
@@ -164,7 +170,17 @@ public class CursoCargoNovedadService {
 	}
 
 	public CursoCargoNovedad add(CursoCargoNovedad cursoCargoNovedad) {
-		repository.save(cursoCargoNovedad);
+        try {
+            log.debug("CursoCargoNovedad (before) -> " + JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(cursoCargoNovedad));
+        } catch (JsonProcessingException e) {
+            log.debug("CursoCargoNovedad (before) -> null {}", e.getMessage());
+        }
+        cursoCargoNovedad = repository.save(cursoCargoNovedad);
+        try {
+            log.debug("CursoCargoNovedad (after) -> " + JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(cursoCargoNovedad));
+        } catch (JsonProcessingException e) {
+            log.debug("CursoCargoNovedad (after) -> null {}", e.getMessage());
+        }
 		return cursoCargoNovedad;
 	}
 
