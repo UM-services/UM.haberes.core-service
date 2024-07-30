@@ -6,8 +6,11 @@ package um.haberes.core.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import jakarta.transaction.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,7 @@ import um.haberes.core.repository.ICursoCargoRepository;
  * @author daniel
  */
 @Service
+@Slf4j
 public class CursoCargoService {
 
     private final ICursoCargoRepository repository;
@@ -106,8 +110,14 @@ public class CursoCargoService {
     }
 
     public CursoCargo findByLegajo(Long cursoId, Integer anho, Integer mes, Long legajoId) {
-        return repository.findByCursoIdAndAnhoAndMesAndLegajoId(cursoId, anho, mes, legajoId)
+        var cursoCargo = repository.findByCursoIdAndAnhoAndMesAndLegajoId(cursoId, anho, mes, legajoId)
                 .orElseThrow(() -> new CursoCargoException(cursoId, anho, mes, legajoId));
+        try {
+            log.debug("CursoCargo -> " + JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(cursoCargo));
+        } catch (JsonProcessingException e) {
+            log.debug("CursoCargo -> null {}", e.getMessage());
+        }
+        return cursoCargo;
     }
 
     public CursoCargo add(CursoCargo cursoCargo) {
