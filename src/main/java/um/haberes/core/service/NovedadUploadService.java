@@ -30,8 +30,8 @@ public class NovedadUploadService {
 	}
 
 	@Transactional
-	public void saveAll(List<NovedadUpload> novedades) {
-		repository.saveAll(novedades);
+	public List<NovedadUpload> saveAll(List<NovedadUpload> novedades) {
+		return repository.saveAll(novedades);
 	}
 
 	@Transactional

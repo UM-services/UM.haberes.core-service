@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import jakarta.transaction.Transactional;
 
 import org.apache.poi.ss.usermodel.Row;
@@ -61,7 +63,7 @@ public class NovedadFileService {
     @Autowired
     private PersonaService personaService;
 
-    public String upload(FileInfo fileInfo, Integer anho, Integer mes) throws TituloNotFoundException {
+    public String upload(FileInfo fileInfo, Integer anho, Integer mes, Boolean stepByStep) throws TituloNotFoundException {
         String response = "";
         // Elimina todas las pendientes anteriores
         novedadUploadService.deleteAllByPendiente((byte) 1);
@@ -177,8 +179,9 @@ public class NovedadFileService {
                             Integer dependenciaId = null;
                             if (cellDependenciaId != null)
                                 dependenciaId = cellDependenciaId.intValue();
-                            novedades.add(new NovedadUpload(null, legajoId, anho, mes, codigoId, dependenciaId, importe,
-                                    value, (byte) 1, null, null, null));
+                            var novedadUpload = new NovedadUpload(null, legajoId, anho, mes, codigoId, dependenciaId, importe,
+                                    value, (byte) 1, null, null, null);
+                            novedades.add(novedadUpload);
                         }
                     }
                 }
@@ -190,7 +193,30 @@ public class NovedadFileService {
         } catch (IOException e) {
             log.debug(e.getMessage());
         }
-        novedadUploadService.saveAll(novedades);
+
+        if (stepByStep) {
+            for (NovedadUpload novedadUpload : novedades) {
+                String detail = "";
+                try {
+                    log.debug("NovedadUpload -> {}", detail =JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(novedadUpload));
+                } catch (JsonProcessingException e) {
+                    log.debug("NovedadUpload -> null {}", e.getMessage());
+                }
+                try {
+                novedadUploadService.add(novedadUpload);
+                } catch (Exception e) {
+                    log.debug(e.getMessage());
+                    return "Error uploading -> " + detail + " " +e.getMessage();
+                }
+            }
+        } else {
+            try {
+                novedades = novedadUploadService.saveAll(novedades);
+            } catch (Exception e) {
+                log.debug(e.getMessage());
+                return "Error uploading -> " + e.getMessage();
+            }
+        }
         return response;
     }
 
