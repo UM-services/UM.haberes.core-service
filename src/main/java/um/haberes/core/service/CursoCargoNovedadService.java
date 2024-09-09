@@ -165,8 +165,14 @@ public class CursoCargoNovedadService {
 	}
 
 	public CursoCargoNovedad findByUnique(Long cursoId, Integer anho, Integer mes, Integer cargoTipoId, Long legajoId) {
-		return repository.findByCursoIdAndAnhoAndMesAndCargoTipoIdAndLegajoId(cursoId, anho, mes, cargoTipoId, legajoId)
+		var cursoCargoNovedad = repository.findByCursoIdAndAnhoAndMesAndCargoTipoIdAndLegajoId(cursoId, anho, mes, cargoTipoId, legajoId)
 				.orElseThrow(() -> new CursoCargoNovedadException(cursoId, anho, mes, cargoTipoId, legajoId));
+        try {
+            log.debug("CursoCargoNovedad -> " + JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(cursoCargoNovedad));
+        } catch (JsonProcessingException e) {
+            log.debug("CursoCargoNovedad -> null {}", e.getMessage());
+        }
+        return cursoCargoNovedad;
 	}
 
 	public CursoCargoNovedad add(CursoCargoNovedad cursoCargoNovedad) {
