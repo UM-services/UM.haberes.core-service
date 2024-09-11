@@ -1,10 +1,10 @@
 app:
+  port: ${APP_PORT:8093}
+  logging: debug
   server: 127.0.0.1:3306
   database: haberes
   user: root
   password: root
-  logging: debug
-  port: 8093
   mail:
     username: uid
     password: pwd
