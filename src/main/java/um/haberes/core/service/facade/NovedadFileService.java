@@ -23,7 +23,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -51,17 +50,17 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class NovedadFileService {
 
-    @Autowired
-    private NovedadService novedadService;
+    private final NovedadService novedadService;
+    private final NovedadUploadService novedadUploadService;
+    private final CodigoService codigoService;
+    private final PersonaService personaService;
 
-    @Autowired
-    private NovedadUploadService novedadUploadService;
-
-    @Autowired
-    private CodigoService codigoService;
-
-    @Autowired
-    private PersonaService personaService;
+    public NovedadFileService(NovedadService novedadService, NovedadUploadService novedadUploadService, CodigoService codigoService, PersonaService personaService) {
+        this.novedadService = novedadService;
+        this.novedadUploadService = novedadUploadService;
+        this.codigoService = codigoService;
+        this.personaService = personaService;
+    }
 
     public String upload(FileInfo fileInfo, Integer anho, Integer mes, Boolean stepByStep) throws TituloNotFoundException {
         String response = "";

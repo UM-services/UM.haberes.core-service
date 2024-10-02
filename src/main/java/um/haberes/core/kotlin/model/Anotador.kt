@@ -3,7 +3,6 @@ package um.haberes.core.kotlin.model
 import jakarta.persistence.*
 
 @Entity
-@Table
 data class Anotador(
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
