@@ -187,8 +187,6 @@ public class NovedadFileService {
             }
             workbook.close();
             input.close();
-        } catch (FileNotFoundException e) {
-            log.debug(e.getMessage());
         } catch (IOException e) {
             log.debug(e.getMessage());
         }
