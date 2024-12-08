@@ -37,4 +37,22 @@ public interface IAnotadorRepository extends JpaRepository<Anotador, Long> {
 
     Optional<Anotador> findByAnotadorId(Long anotadorId);
 
+    List<Anotador> findAllByAnhoAndMesAndAutorizadoAndRechazadoOrderByPersonaApellidoAscPersonaNombreAsc(
+        Integer anho, Integer mes, Byte autorizado, Byte rechazado);
+
+    List<Anotador> findTop1000ByAnhoAndMesAndAutorizadoAndRechazadoAndLegajoIdInOrderByPersonaApellidoAscPersonaNombreAsc(
+        Integer anho, Integer mes, Byte autorizado, Byte rechazado, List<Long> legajos);
+
+    List<Anotador> findTop1000ByAnhoAndMesAndAutorizadoAndRechazadoAndFacultadIdOrderByPersonaApellidoAscPersonaNombreAsc(
+        Integer anho, Integer mes, Byte autorizado, Byte rechazado, Integer facultadId);
+
+    List<Anotador> findTop1000ByAnhoAndMesOrderByPersonaApellidoAscPersonaNombreAsc(
+        Integer anho, Integer mes);
+
+    List<Anotador> findTop1000ByAnhoAndMesAndLegajoIdInOrderByPersonaApellidoAscPersonaNombreAsc(
+        Integer anho, Integer mes, List<Long> legajos);
+
+    List<Anotador> findTop1000ByAnhoAndMesAndFacultadIdOrderByPersonaApellidoAscPersonaNombreAsc(
+        Integer anho, Integer mes, Integer facultadId);
+
 }
