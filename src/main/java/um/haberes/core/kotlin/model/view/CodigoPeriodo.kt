@@ -13,10 +13,9 @@ import org.hibernate.annotations.Immutable
 data class CodigoPeriodo(
 
     @Id
-    var uniqueId: String? = null,
+    var codigoId: Int? = null,
 
     var anho: Int? = null,
-    var mes: Int? = null,
-    var codigoId: Int? = null
+    var mes: Int? = null
 
 )

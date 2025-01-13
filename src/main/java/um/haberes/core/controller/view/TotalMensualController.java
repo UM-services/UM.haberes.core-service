@@ -29,13 +29,13 @@ public class TotalMensualController {
 
 	@GetMapping("/periodo/{anho}/{mes}")
 	public ResponseEntity<List<TotalMensual>> findAllByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes) {
-		return new ResponseEntity<List<TotalMensual>>(service.findAllByPeriodo(anho, mes), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllByPeriodo(anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/unique/{anho}/{mes}/{codigoId}")
 	public ResponseEntity<TotalMensual> findByUnique(@PathVariable Integer anho, @PathVariable Integer mes,
 			@PathVariable Integer codigoId) {
-		return new ResponseEntity<TotalMensual>(service.findByUnique(anho, mes, codigoId), HttpStatus.OK);
+		return new ResponseEntity<>(service.findByUnique(anho, mes, codigoId), HttpStatus.OK);
 	}
 
 }
