@@ -36,40 +36,43 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CategoriaController {
 
-	@Autowired
-	private CategoriaService service;
+	private final CategoriaService service;
+
+	public CategoriaController(CategoriaService service) {
+		this.service = service;
+	}
 
 	@GetMapping("/")
 	public ResponseEntity<List<Categoria>> findAll() {
-		return new ResponseEntity<List<Categoria>>(service.findAll(), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAll(), HttpStatus.OK);
 	}
 
 	@GetMapping("/nogrado")
 	public ResponseEntity<List<Categoria>> findAllNoGrado() {
-		return new ResponseEntity<List<Categoria>>(service.findAllNoDocentes(), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllNoDocentes(), HttpStatus.OK);
 	}
 
 	@GetMapping("/search/{chain}")
 	public ResponseEntity<List<CategoriaSearch>> findAllSearch(@PathVariable String chain) {
-		return new ResponseEntity<List<CategoriaSearch>>(service.findAllSearch(chain), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllSearch(chain), HttpStatus.OK);
 	}
 
 	@GetMapping("/nodocente/{anho}/{mes}")
 	public ResponseEntity<List<Categoria>> findAllNoDocente(@PathVariable Integer anho, @PathVariable Integer mes) {
-		return new ResponseEntity<List<Categoria>>(service.findAllNoDocenteByPeriodo(anho, mes), HttpStatus.OK);
+		return new ResponseEntity<>(service.findAllNoDocenteByPeriodo(anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/nodocentelegajo/{legajoId}/{anho}/{mes}")
 	public ResponseEntity<List<Categoria>> findAllNoDocentesByLegajoId(@PathVariable Long legajoId,
 			@PathVariable Integer anho, @PathVariable Integer mes) {
-		return new ResponseEntity<List<Categoria>>(service.findAllNoDocenteByLegajoId(legajoId, anho, mes),
+		return new ResponseEntity<>(service.findAllNoDocenteByLegajoId(legajoId, anho, mes),
 				HttpStatus.OK);
 	}
 
 	@GetMapping("/{categoriaId}")
 	public ResponseEntity<Categoria> findByCategoriaId(@PathVariable Integer categoriaId) {
 		try {
-			return new ResponseEntity<Categoria>(service.findByCategoriaId(categoriaId), HttpStatus.OK);
+			return new ResponseEntity<>(service.findByCategoriaId(categoriaId), HttpStatus.OK);
 		} catch (CategoriaException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
@@ -78,7 +81,7 @@ public class CategoriaController {
 	@GetMapping("/last")
 	public @ResponseBody ResponseEntity<Categoria> findLast() {
 		try {
-			return new ResponseEntity<Categoria>(service.findLast(), HttpStatus.OK);
+			return new ResponseEntity<>(service.findLast(), HttpStatus.OK);
 		} catch (CategoriaException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
@@ -87,26 +90,26 @@ public class CategoriaController {
 	@DeleteMapping("/{categoriaId}")
 	public ResponseEntity<Void> delete(@PathVariable Integer categoriaId) {
 		service.delete(categoriaId);
-		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 	@PostMapping("/{anho}/{mes}")
 	public ResponseEntity<Categoria> add(@RequestBody Categoria categoria, @PathVariable Integer anho,
 			@PathVariable Integer mes) {
-		return new ResponseEntity<Categoria>(service.add(categoria, anho, mes), HttpStatus.OK);
+		return new ResponseEntity<>(service.add(categoria, anho, mes), HttpStatus.OK);
 	}
 
 	@PutMapping("/{categoriaId}/{anho}/{mes}")
 	public ResponseEntity<Categoria> update(@RequestBody Categoria categoria, @PathVariable Integer categoriaId,
 			@PathVariable Integer anho, @PathVariable Integer mes) {
 		log.debug("Categoria -> {}", categoria);	
-		return new ResponseEntity<Categoria>(service.update(categoria, categoriaId, anho, mes), HttpStatus.OK);
+		return new ResponseEntity<>(service.update(categoria, categoriaId, anho, mes), HttpStatus.OK);
 	}
 
 	@PutMapping("/all/{anho}/{mes}")
 	public ResponseEntity<List<Categoria>> saveAll(@RequestBody List<Categoria> categorias, @PathVariable Integer anho,
 			@PathVariable Integer mes) {
-		return new ResponseEntity<List<Categoria>>(service.saveAll(categorias, anho, mes), HttpStatus.OK);
+		return new ResponseEntity<>(service.saveAll(categorias, anho, mes), HttpStatus.OK);
 	}
 
 	@PostMapping("/upload/{anho}/{mes}")
@@ -114,7 +117,7 @@ public class CategoriaController {
 			@PathVariable Integer mes) {
 		try {
 			service.upload(fileInfo, anho, mes);
-			return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		} catch (TituloNotFoundException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
