@@ -27,8 +27,11 @@ import um.haberes.core.service.CursoFusionService;
 @RequestMapping("/api/haberes/core/cursofusion")
 public class CursoFusionController {
 	
-	@Autowired
-	private CursoFusionService service;
+	private final CursoFusionService service;
+
+	public CursoFusionController(CursoFusionService service) {
+		this.service = service;
+	}
 
 	@GetMapping("/legajo/{legajoId}/{anho}/{mes}")
 	public ResponseEntity<List<CursoFusion>> findAllByLegajoId(@PathVariable Long legajoId, @PathVariable Integer anho,

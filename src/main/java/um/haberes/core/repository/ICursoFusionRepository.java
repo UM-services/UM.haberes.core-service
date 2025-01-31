@@ -17,23 +17,23 @@ import um.haberes.core.kotlin.model.CursoFusion;
 @Repository
 public interface ICursoFusionRepository extends JpaRepository<CursoFusion, Long> {
 
-	public List<CursoFusion> findAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
+	List<CursoFusion> findAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
 
-	public List<CursoFusion> findAllByLegajoIdAndAnhoAndMesAndFacultadId(Long legajoId, Integer anho, Integer mes,
+	List<CursoFusion> findAllByLegajoIdAndAnhoAndMesAndFacultadId(Long legajoId, Integer anho, Integer mes,
 			Integer facultadId);
 
-	public List<CursoFusion> findAllByAnhoAndMes(Integer anho, Integer mes);
+	List<CursoFusion> findAllByAnhoAndMes(Integer anho, Integer mes);
 
 	@Modifying
-	public void deleteAllByLegajoIdAndAnhoAndMesAndFacultadIdAndGeograficaId(Long legajoId, Integer anho, Integer mes,
+	void deleteAllByLegajoIdAndAnhoAndMesAndFacultadIdAndGeograficaId(Long legajoId, Integer anho, Integer mes,
 			Integer facultadId, Integer geograficaId);
 
-	public void deleteByCursoFusionId(Long cursoFusionId);
+	void deleteByCursoFusionId(Long cursoFusionId);
 
 	@Modifying
-	public void deleteAllByLegajoIdInAndAnhoAndMes(List<Long> ids, Integer anho, Integer mes);
+	void deleteAllByLegajoIdInAndAnhoAndMes(List<Long> ids, Integer anho, Integer mes);
 
 	@Modifying
-	public void deleteAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
+	void deleteAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
 
 }
