@@ -28,9 +28,9 @@ Servicio core para la gestión de haberes de la Universidad de Mendoza. Este mic
 
 ## Documentación
 
-- [Documentación de la API](https://um-services.github.io/um.tesoreria.haberes.service)
-- [Wiki del Proyecto](https://github.com/UM-services/um.tesoreria.haberes.service/wiki)
-- [Documentación Técnica](https://um-services.github.io/um.tesoreria.haberes.service/project-documentation)
+- [Documentación de la API](https://um-services.github.io/UM.haberes.core-service)
+- [Wiki del Proyecto](https://github.com/UM-services/UM.haberes.core-service/wiki)
+- [Documentación Técnica](https://um-services.github.io/UM.haberes.core-service/project-documentation)
 
 ## Configuración del Proyecto
 
@@ -43,8 +43,8 @@ Servicio core para la gestión de haberes de la Universidad de Mendoza. Este mic
 ### Instalación
 
 ```bash
-git clone https://github.com/UM-services/um.tesoreria.haberes.service.git
-cd um.tesoreria.haberes.service
+git clone https://github.com/UM-services/UM.haberes.core-service.git
+cd UM.haberes.core-service
 mvn clean install
 ```
 
