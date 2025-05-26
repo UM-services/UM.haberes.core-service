@@ -18,6 +18,7 @@ data class CategoriaPeriodo(
     var basico: BigDecimal = BigDecimal.ZERO,
     var docente: Byte = 0,
     var noDocente: Byte = 0,
-    var liquidaPorHora: Byte = 0
+    var liquidaPorHora: Byte = 0,
+    var estadoDocente: BigDecimal = BigDecimal.ZERO
 
 ) : Auditable()

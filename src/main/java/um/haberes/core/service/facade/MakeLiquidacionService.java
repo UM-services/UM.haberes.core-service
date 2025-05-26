@@ -3,6 +3,8 @@
  */
 package um.haberes.core.service.facade;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +19,7 @@ import um.haberes.core.util.Tool;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -529,7 +528,7 @@ public class MakeLiquidacionService {
         // cantidad de horas por dependencia
         Map<Integer, Integer> horasDependencia = new HashMap<>();
         for (CursoCargo cursoCargo : cursoCargoService.findAllByLegajoWithAdicional(legajoId, anho, mes)) {
-            Dependencia dependencia = dependenciaService.findFirstByFacultadIdAndGeograficaId(cursoCargo.getCurso().getFacultadId(), cursoCargo.getCurso().getGeograficaId());
+            Dependencia dependencia = dependenciaService.findFirstByFacultadIdAndGeograficaId(Objects.requireNonNull(cursoCargo.getCurso()).getFacultadId(), cursoCargo.getCurso().getGeograficaId());
             if (!horasDependencia.containsKey(dependencia.getDependenciaId())) {
                 horasDependencia.put(dependencia.getDependenciaId(), 0);
             }
@@ -550,6 +549,7 @@ public class MakeLiquidacionService {
         log.debug("Total Dependencia -> {}", totalDependencia);
 
         // Calcula basico y antiguedad para cada dependencia considerando adicionales
+        assert totalDependencia != null;
         for (Integer dependenciaId : totalDependencia.keySet()) {
             Dependencia dependencia = dependenciaService.findByDependenciaId(dependenciaId);
             AdicionalCursoTabla adicionalCursoTabla = null;
@@ -569,7 +569,7 @@ public class MakeLiquidacionService {
                 Integer horas = horasDependencia.get(dependenciaId);
                 BigDecimal totalCategoria = totalDependencia.get(dependenciaId);
                 BigDecimal porcentaje = BigDecimal.ZERO;
-                for (AdicionalCursoRango adicionalCursoRango : adicionalCursoTabla.getAdicionalCursoRangos()) {
+                for (AdicionalCursoRango adicionalCursoRango : Objects.requireNonNull(adicionalCursoTabla.getAdicionalCursoRangos())) {
                     if (horas >= adicionalCursoRango.getHorasDesde() && horas <= adicionalCursoRango.getHorasHasta()) {
                         porcentaje = adicionalCursoRango.getPorcentaje();
                     }
@@ -602,15 +602,24 @@ public class MakeLiquidacionService {
             // Basico
             BigDecimal basico = cargoLiquidacion.getCategoriaBasico().multiply(new BigDecimal(cargoLiquidacion.getJornada())).setScale(2, RoundingMode.HALF_UP);
             BigDecimal horas = BigDecimal.ONE;
+            BigDecimal estadoDocenteNuevo;
             if (cargoLiquidacion.getHorasJornada().compareTo(BigDecimal.ZERO) > 0) {
                 horas = cargoLiquidacion.getHorasJornada();
             }
             basico = basico.multiply(horas).setScale(2, RoundingMode.HALF_UP);
             Categoria categoria = cargoLiquidacion.getCategoria();
+            assert categoria != null;
+            estadoDocenteNuevo = categoria.getEstadoDocente();
+            if (estadoDocenteNuevo.compareTo(BigDecimal.ZERO) != 0) {
+                int codigoId = 4;
+                this.addItem(legajoId, anho, mes, codigoId, estadoDocenteNuevo);
+            }
+
             if (categoria.getBasico().compareTo(basico) > 0) {
                 basico = categoria.getBasico();
             }
             valorMes = valorMes.add(basico).setScale(2, RoundingMode.HALF_UP);
+            valorMes = valorMes.add(estadoDocenteNuevo).setScale(2, RoundingMode.HALF_UP);
             int codigoId = 1;
             Item item;
             if (basico.compareTo(BigDecimal.ZERO) != 0) {
@@ -627,7 +636,7 @@ public class MakeLiquidacionService {
                 antiguedad = basico.multiply(indices.get(1).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
             }
             if (cargoLiquidacion.getCategoria().getDocente() == 1) {
-                antiguedad = basico.multiply(indices.get(0)).setScale(2, RoundingMode.HALF_UP);
+                antiguedad = basico.multiply(indices.getFirst()).setScale(2, RoundingMode.HALF_UP);
             }
             valorMes = valorMes.add(antiguedad).setScale(2, RoundingMode.HALF_UP);
             codigoId = 2;
@@ -687,10 +696,26 @@ public class MakeLiquidacionService {
         Map<String, Dependencia> dependencias = dependenciaService.findAll().stream().collect(Collectors.toMap(Dependencia::getSedeKey, Function.identity(), (dependencia, replacement) -> dependencia));
         List<CargoLiquidacion> cargoLiquidacions = new ArrayList<>();
         for (Cargo cargo : cargoService.findAllDocenteByPeriodo(legajoId, anho, mes)) {
-            log.debug("Cargo -> {}", cargo);
+            logCargo(cargo);
             Categoria categoria = cargo.getCategoria();
             if (categoria.getCategoriaId() != 980) {
-                cargoLiquidacions.add(new CargoLiquidacion(null, legajoId, anho, mes, cargo.getDependenciaId(), Periodo.firstDay(anho, mes), Periodo.lastDay(anho, mes), categoria.getCategoriaId(), categoria.getNombre(), categoria.getBasico(), cargo.getHorasJornada(), cargo.getJornada(), cargo.getPresentismo(), "A", null, null, categoria));
+                cargoLiquidacions.add(new CargoLiquidacion(null,
+                        legajoId,
+                        anho, mes,
+                        cargo.getDependenciaId(),
+                        Periodo.firstDay(anho, mes),
+                        Periodo.lastDay(anho, mes),
+                        categoria.getCategoriaId(),
+                        categoria.getNombre(),
+                        categoria.getBasico(),
+                        categoria.getEstadoDocente(),
+                        cargo.getHorasJornada(),
+                        cargo.getJornada(),
+                        cargo.getPresentismo(),
+                        "A",
+                        null,
+                        null,
+                        categoria));
             }
         }
         control = controlService.findByPeriodo(anho, mes);
@@ -698,23 +723,75 @@ public class MakeLiquidacionService {
             for (CursoFusion cursoFusion : cursoFusionService.findAllByLegajoId(legajoId, anho, mes)) {
                 Dependencia dependencia = dependencias.get(cursoFusion.getFacultadId() + "." + cursoFusion.getGeograficaId());
                 Categoria categoria = cursoFusion.getCategoria();
-                cargoLiquidacions.add(new CargoLiquidacion(null, legajoId, anho, mes, dependencia.getDependenciaId(), Periodo.firstDay(anho, mes), Periodo.lastDay(anho, mes), categoria.getCategoriaId(), categoria.getNombre(), categoria.getBasico(), BigDecimal.ZERO, 1, 0, "A", null, dependencia, categoria));
+                cargoLiquidacions.add(new CargoLiquidacion(null,
+                        legajoId,
+                        anho,
+                        mes,
+                        dependencia.getDependenciaId(),
+                        Periodo.firstDay(anho, mes),
+                        Periodo.lastDay(anho, mes),
+                        categoria.getCategoriaId(),
+                        categoria.getNombre(),
+                        categoria.getBasico(),
+                        categoria.getEstadoDocente(),
+                        BigDecimal.ZERO,
+                        1,
+                        0,
+                        "A",
+                        null,
+                        dependencia,
+                        categoria));
             }
         }
         if (control.getModoLiquidacionId() == constLiquidarSinFusion) {
             for (CursoCargo cursoCargo : cursoCargoService.findAllByLegajo(legajoId, anho, mes)) {
                 if (cursoCargo.getCategoriaId() != null) {
-                    Dependencia dependencia = dependencias.get(cursoCargo.getCurso().getFacultadId() + "." + cursoCargo.getCurso().getGeograficaId());
+                    Dependencia dependencia = dependencias.get(Objects.requireNonNull(cursoCargo.getCurso()).getFacultadId() + "." + cursoCargo.getCurso().getGeograficaId());
                     Categoria categoria = cursoCargo.getCategoria();
-                    cargoLiquidacions.add(new CargoLiquidacion(null, legajoId, anho, mes, dependencia.getDependenciaId(), Periodo.firstDay(anho, mes), Periodo.lastDay(anho, mes), categoria.getCategoriaId(), categoria.getNombre(), categoria.getBasico(), BigDecimal.ZERO, 1, 0, "A", null, dependencia, categoria));
+                    cargoLiquidacions.add(new CargoLiquidacion(null,
+                            legajoId,
+                            anho,
+                            mes,
+                            dependencia.getDependenciaId(),
+                            Periodo.firstDay(anho, mes),
+                            Periodo.lastDay(anho, mes),
+                            categoria.getCategoriaId(),
+                            categoria.getNombre(),
+                            categoria.getBasico(),
+                            categoria.getEstadoDocente(),
+                            BigDecimal.ZERO,
+                            1,
+                            0,
+                            "A",
+                            null,
+                            dependencia,
+                            categoria));
                 }
             }
         }
         Categoria categoria = categoriaService.findByCategoriaId(980);
         for (Novedad novedad : novedadService.findAllByLegajoAndCodigo(legajoId, anho, mes, 980)) {
-            cargoLiquidacions.add(new CargoLiquidacion(null, legajoId, anho, mes, novedad.getDependenciaId(), Periodo.firstDay(anho, mes), Periodo.lastDay(anho, mes), categoria.getCategoriaId(), categoria.getNombre(), novedad.getImporte(), BigDecimal.ZERO, 1, 0, "A", null, novedad.getDependencia(), categoria));
+            cargoLiquidacions.add(new CargoLiquidacion(null,
+                    legajoId,
+                    anho,
+                    mes,
+                    novedad.getDependenciaId(),
+                    Periodo.firstDay(anho, mes),
+                    Periodo.lastDay(anho, mes),
+                    categoria.getCategoriaId(),
+                    categoria.getNombre(),
+                    novedad.getImporte(),
+                    BigDecimal.ZERO,
+                    BigDecimal.ZERO,
+                    1,
+                    0,
+                    "A",
+                    null,
+                    novedad.getDependencia(),
+                    categoria));
         }
-        cargoLiquidacionService.saveAll(cargoLiquidacions, mes, false);
+        cargoLiquidacions = cargoLiquidacionService.saveAll(cargoLiquidacions, mes, false);
+        logCargoLiquidacions(cargoLiquidacions);
     }
 
     @Transactional
@@ -726,7 +803,24 @@ public class MakeLiquidacionService {
             Categoria categoria = cargo.getCategoria();
             if (categoria.getCategoriaId() != 980) {
                 CargoLiquidacion cargoLiquidacion;
-                cargoLiquidacions.add(cargoLiquidacion = new CargoLiquidacion(null, legajoId, anho, mes, cargo.getDependenciaId(), Periodo.firstDay(anho, mes), Periodo.lastDay(anho, mes), categoria.getCategoriaId(), categoria.getNombre(), categoria.getBasico(), cargo.getHorasJornada(), cargo.getJornada(), cargo.getPresentismo(), "A", null, null, categoria));
+                cargoLiquidacions.add(cargoLiquidacion = new CargoLiquidacion(null,
+                        legajoId,
+                        anho,
+                        mes,
+                        cargo.getDependenciaId(),
+                        Periodo.firstDay(anho, mes),
+                        Periodo.lastDay(anho, mes),
+                        categoria.getCategoriaId(),
+                        categoria.getNombre(),
+                        categoria.getBasico(),
+                        categoria.getEstadoDocente(),
+                        cargo.getHorasJornada(),
+                        cargo.getJornada(),
+                        cargo.getPresentismo(),
+                        "A",
+                        null,
+                        null,
+                        categoria));
                 log.debug("CargoLiquidacion -> {}", cargoLiquidacion);
             }
         }
@@ -847,6 +941,32 @@ public class MakeLiquidacionService {
             onlyETEC = true;
         }
         return onlyETEC;
+    }
+
+    private void logCargo(Cargo cargo) {
+        try {
+            log.debug("Cargo -> {}", JsonMapper
+                    .builder()
+                    .findAndAddModules()
+                    .build()
+                    .writerWithDefaultPrettyPrinter()
+                    .writeValueAsString(cargo));
+        } catch (JsonProcessingException e) {
+            log.debug("Cargo jsonify error -> {}", e.getMessage());
+        }
+    }
+
+    private void logCargoLiquidacions(List<CargoLiquidacion> cargoLiquidacions) {
+        try {
+            log.debug("CargoLiquidaciones -> {}", JsonMapper
+                    .builder()
+                    .findAndAddModules()
+                    .build()
+                    .writerWithDefaultPrettyPrinter()
+                    .writeValueAsString(cargoLiquidacions));
+        } catch (JsonProcessingException e) {
+            log.debug("CargoLiquidaciones jsonify error -> {}", e.getMessage());
+        }
     }
 
 }

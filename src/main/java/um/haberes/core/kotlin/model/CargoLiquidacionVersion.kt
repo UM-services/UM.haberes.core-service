@@ -19,6 +19,7 @@ data class CargoLiquidacionVersion(
     var dependenciaId: Int? = null,
     var categoriaId: Int? = null,
     var basico: BigDecimal = BigDecimal.ZERO,
+    var estadoDocente: BigDecimal = BigDecimal.ZERO,
     var horasJornada: BigDecimal = BigDecimal.ZERO,
     var jornada: Int = 0,
     var presentismo: Int = 0,

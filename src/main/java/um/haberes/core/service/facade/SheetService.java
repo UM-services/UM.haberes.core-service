@@ -175,7 +175,7 @@ public class SheetService {
         style_bold.setFont(font_bold);
 
         Sheet sheet = book.createSheet("Categorias");
-        Row row = null;
+        Row row;
         int fila = 0;
         row = sheet.createRow(fila);
         this.setCellString(row, 0, "categoria_id", style_bold);
@@ -184,6 +184,7 @@ public class SheetService {
         this.setCellString(row, 3, "docente", style_bold);
         this.setCellString(row, 4, "no_docente", style_bold);
         this.setCellString(row, 5, "liquida_por_hora", style_bold);
+        this.setCellString(row, 6, "estado_docente", style_bold);
 
         for (Categoria categoria : categoriaService.findAll()) {
             row = sheet.createRow(++fila);
@@ -193,6 +194,7 @@ public class SheetService {
             this.setCellByte(row, 3, categoria.getDocente(), style_normal);
             this.setCellByte(row, 4, categoria.getNoDocente(), style_normal);
             this.setCellByte(row, 5, categoria.getLiquidaPorHora(), style_normal);
+            this.setCellBigDecimal(row, 6, categoria.getEstadoDocente(), style_normal);
         }
 
         for (int column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)
@@ -207,7 +209,7 @@ public class SheetService {
             log.debug(file.getAbsolutePath());
             book.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.debug("Error generando la planilla {}", e.getMessage());
         }
         return filename;
     }
@@ -234,7 +236,7 @@ public class SheetService {
         style_bold.setFont(font_bold);
 
         Sheet sheet = book.createSheet("Cargos");
-        Row row = null;
+        Row row;
         int fila = 0;
         row = sheet.createRow(fila);
         this.setCellString(row, 0, "Legajo", style_bold);
@@ -282,7 +284,7 @@ public class SheetService {
             log.debug(file.getAbsolutePath());
             book.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.debug("Error generando la planilla {}", e.getMessage());
         }
         return filename;
     }
@@ -350,7 +352,7 @@ public class SheetService {
             log.debug(file.getAbsolutePath());
             book.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.debug("Error generando la planilla {}", e.getMessage());
         }
         return filename;
     }
@@ -405,7 +407,7 @@ public class SheetService {
             log.debug(file.getAbsolutePath());
             book.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.debug("Error generando la planilla {}", e.getMessage());
         }
         return filename;
     }
@@ -460,7 +462,7 @@ public class SheetService {
             log.debug(file.getAbsolutePath());
             book.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.debug("Error generando la planilla {}", e.getMessage());
         }
         return filename;
     }
@@ -521,7 +523,7 @@ public class SheetService {
             log.debug(file.getAbsolutePath());
             book.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.debug("Error generando la planilla {}", e.getMessage());
         }
         return filename;
     }
@@ -557,6 +559,7 @@ public class SheetService {
         if (semestre == 2)
             meses = List.of("Julio", "Agosto", "Setiembre", "Octubre", "Noviembre", "Diciembre");
         int columna = 1;
+        assert meses != null;
         for (String mes : meses) {
             this.setCellString(row, ++columna, mes, style_normal);
             if (columna == 7 && simulaUltimo) {
@@ -672,7 +675,7 @@ public class SheetService {
             log.debug(file.getAbsolutePath());
             book.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.debug("Error generando la planilla {}", e.getMessage());
         }
         return filename;
     }
@@ -870,7 +873,7 @@ public class SheetService {
             log.debug(file.getAbsolutePath());
             book.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.debug("Error generando la planilla {}", e.getMessage());
         }
         return filename;
     }
@@ -961,7 +964,7 @@ public class SheetService {
             log.debug(file.getAbsolutePath());
             book.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.debug("Error generando la planilla {}", e.getMessage());
         }
         return filename;
     }
@@ -1089,7 +1092,7 @@ public class SheetService {
             log.debug(file.getAbsolutePath());
             book.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.debug("Error generando la planilla {}", e.getMessage());
         }
         return filename;
     }
@@ -1228,7 +1231,7 @@ public class SheetService {
             log.debug(file.getAbsolutePath());
             book.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.debug("Error generando la planilla {}", e.getMessage());
         }
         return filename;
     }
@@ -1323,7 +1326,7 @@ public class SheetService {
             log.debug(file.getAbsolutePath());
             book.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.debug("Error generando la planilla {}", e.getMessage());
         }
         return filename;
     }
@@ -1468,7 +1471,7 @@ public class SheetService {
             log.debug(file.getAbsolutePath());
             book.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.debug("Error generando la planilla {}", e.getMessage());
         }
         return filename;
     }

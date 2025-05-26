@@ -7,7 +7,6 @@ import java.util.List;
 
 import jakarta.transaction.Transactional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.CategoriaPeriodoException;
@@ -21,8 +20,11 @@ import um.haberes.core.repository.ICategoriaPeriodoRepository;
 @Service
 public class CategoriaPeriodoService {
 
-	@Autowired
-	private ICategoriaPeriodoRepository repository;
+	private final ICategoriaPeriodoRepository repository;
+
+	public CategoriaPeriodoService(ICategoriaPeriodoRepository repository) {
+		this.repository = repository;
+	}
 
 	public List<CategoriaPeriodo> findAllByAnhoAndMes(Integer anho, Integer mes) {
 		return repository.findAllByAnhoAndMes(anho, mes);
@@ -43,7 +45,7 @@ public class CategoriaPeriodoService {
 			categoriaPeriodo = new CategoriaPeriodo(categoriaPeriodoId, newCategoriaPeriodo.getCategoriaId(),
 					newCategoriaPeriodo.getAnho(), newCategoriaPeriodo.getMes(), newCategoriaPeriodo.getNombre(),
 					newCategoriaPeriodo.getBasico(), newCategoriaPeriodo.getDocente(),
-					newCategoriaPeriodo.getNoDocente(), newCategoriaPeriodo.getLiquidaPorHora());
+					newCategoriaPeriodo.getNoDocente(), newCategoriaPeriodo.getLiquidaPorHora(), newCategoriaPeriodo.getEstadoDocente());
 			categoriaPeriodo = repository.save(categoriaPeriodo);
 			return categoriaPeriodo;
 		}).orElseThrow(() -> new CategoriaPeriodoException(categoriaPeriodoId));

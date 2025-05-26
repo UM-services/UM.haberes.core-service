@@ -1,164 +1,171 @@
 # UM.haberes.core-service
 
-## Estado del CI
-
-[![UM.tesoreria.haberes-service CI](https://github.com/UM-services/UM.haberes.core-service/actions/workflows/maven.yml/badge.svg)](https://github.com/UM-services/UM.haberes.core-service/actions/workflows/maven.yml)
-
-## Descripción
-
-Servicio core para la gestión de haberes de la Universidad de Mendoza. Este microservicio forma parte de la arquitectura de Tesorería y se encarga de la gestión, cálculo y procesamiento de haberes para el personal. El servicio está diseñado para manejar liquidaciones, acreditaciones, legajos y toda la lógica relacionada con el procesamiento de haberes.
+Servicio core del sistema de Haberes de la Universidad de Mendoza, diseñado para manejar liquidaciones, acreditaciones y gestión de personal docente y no docente.
 
 ## Características Principales
 
-- Gestión completa del ciclo de haberes
-- Cálculo automático de liquidaciones
-- Integración con otros servicios de Tesorería
-- Generación de reportes en múltiples formatos (PDF, Excel)
-- Caché implementado con Caffeine para optimizar rendimiento
-- Documentación automática con OpenAPI/Swagger
-- Gestión de legajos y personas
+- Gestión completa de liquidaciones de haberes
+- Manejo de designaciones docentes y no docentes
 - Procesamiento de acreditaciones
-- Integración con AFIP
-- Manejo de facultades y dependencias
-- Sistema de auditoría automática
-- Soporte para múltiples formatos de salida
+- Integración con AFIP para reportes fiscales
+- Generación de reportes en múltiples formatos (PDF, Excel)
+- Sistema de caché para optimización de rendimiento
+- Auditoría automática de operaciones
+- API REST documentada con OpenAPI/Swagger
 
 ## Tecnologías
 
-- Java 21
+- Java 17
+- Kotlin 2.1.20
 - Spring Boot 3.4.4
 - Spring Cloud 2024.0.1
-- Kotlin 2.1.20
-- MySQL
-- Maven
-- Log4j2 para logging
-- Caffeine para caché
-- Apache POI para Excel
-- LibrePDF para PDF
-- SpringDoc OpenAPI 2.8.6
-- Eureka para service discovery
-- Feign para clientes HTTP
+- Spring Data JPA
+- Spring Security
+- Spring Cloud Netflix (Eureka, Feign)
+- Apache POI (para reportes Excel)
+- LibrePDF (para reportes PDF)
+- Log4j2
+- Caffeine Cache
+- Jackson
+- PostgreSQL
+- Docker
 
-## Documentación
+## Requisitos
 
-- [Documentación de la API](https://um-services.github.io/UM.haberes.core-service)
-- [Wiki del Proyecto](https://github.com/UM-services/UM.haberes.core-service/wiki)
-- [Documentación Técnica](https://um-services.github.io/UM.haberes.core-service/project-documentation)
+- JDK 17 o superior
+- Maven 3.8+
+- Docker (opcional)
+- PostgreSQL 15+
 
-## Configuración del Proyecto
+## Configuración
 
-### Requisitos Previos
+### Variables de Entorno
 
-- JDK 21
-- Maven 3.8.8+
-- MySQL 8+
-- Docker (opcional, para contenedorización)
+```yaml
+spring:
+  application:
+    name: um-haberes-core-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/haberes
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  cloud:
+    discovery:
+      enabled: true
 
-### Instalación
+server:
+  port: 8080
+  servlet:
+    context-path: /api/v1
 
-```bash
-git clone https://github.com/UM-services/UM.haberes.core-service.git
-cd UM.haberes.core-service
-mvn clean install
-```
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
 
-### Ejecución
-
-```bash
-mvn spring-boot:run
+logging:
+  level:
+    root: INFO
+    um.haberes.core: DEBUG
+  file:
+    name: logs/haberes-core.log
 ```
 
 ### Docker
 
 ```bash
 # Construir la imagen
-docker build -t um-haberes-service .
+docker build -t um-haberes-core-service .
 
 # Ejecutar el contenedor
-docker run -p 8093:8093 um-haberes-service
+docker run -d \
+  --name haberes-core \
+  -p 8080:8080 \
+  -e DB_USERNAME=haberes \
+  -e DB_PASSWORD=secret \
+  um-haberes-core-service
 ```
 
 ## Endpoints Principales
 
-El servicio expone sus endpoints a través de Swagger UI:
-- Local: http://localhost:8080/swagger-ui.html
-- Producción: https://api.tesoreria.um.edu.ar/haberes/swagger-ui.html
+### Liquidaciones
+- `POST /liquidaciones` - Generar nueva liquidación
+- `GET /liquidaciones/{id}` - Obtener liquidación
+- `PUT /liquidaciones/{id}` - Actualizar liquidación
+- `DELETE /liquidaciones/{id}` - Eliminar liquidación
 
-### Principales Endpoints
+### Cargos
+- `POST /cargos` - Crear nuevo cargo
+- `GET /cargos/{id}` - Obtener cargo
+- `PUT /cargos/{id}` - Actualizar cargo
+- `GET /cargos/docente/{legajoId}` - Obtener cargos docentes
+- `GET /cargos/no-docente/{legajoId}` - Obtener cargos no docentes
 
-- `/api/haberes/core/acreditacionpago` - Gestión de acreditaciones de pago
-- `/api/haberes/core/legajobanco` - Gestión de legajos bancarios
-- `/api/haberes/core/persona` - Gestión de personas
-- `/api/haberes/core/sheet` - Generación de hojas de cálculo
+### Categorías
+- `GET /categorias` - Listar categorías
+- `POST /categorias` - Crear categoría
+- `PUT /categorias/{id}` - Actualizar categoría
+- `GET /categorias/docente` - Listar categorías docentes
+- `GET /categorias/no-docente` - Listar categorías no docentes
 
-### Configuración
-
-El servicio se configura a través de:
-- `bootstrap.yml` - Configuración de Spring Cloud
-- `application.yml` - Configuración de la aplicación
-- Variables de entorno para valores sensibles
-
-### Logging
-
-El servicio utiliza Log4j2 con:
-- Rotación diaria de logs
-- Tamaño máximo de archivo: 10MB
-- Niveles de log configurables por paquete
-
-### Caché
-
-Implementado con Caffeine:
-- Tiempo de expiración: 60 minutos
-- Tamaño máximo: 100 entradas
-- Optimizado para consultas frecuentes
-
-## Integración Continua
-
-El proyecto utiliza GitHub Actions para:
-- Compilación y pruebas automáticas
-- Generación de documentación
-- Despliegue automático
-- Actualización de la wiki
-- Construcción de imágenes Docker
-- Pruebas de integración
+### Reportes
+- `GET /reportes/liquidacion/{id}` - Generar reporte de liquidación
+- `GET /reportes/cargos` - Generar reporte de cargos
+- `GET /reportes/categorias` - Generar reporte de categorías
 
 ## Arquitectura
 
-El servicio está estructurado en:
-- Controladores REST
-- Servicios de negocio
-- Repositorios JPA
-- Modelos en Kotlin
-- Clientes Feign para integración
-- Configuración centralizada
+El servicio sigue una arquitectura hexagonal con las siguientes capas:
+
+- **API Layer**: Controladores REST y DTOs
+- **Domain Layer**: Modelos de dominio y lógica de negocio
+- **Infrastructure Layer**: Repositorios, servicios externos y configuración
+
+### Patrones de Diseño
+
+- Repository Pattern
+- Service Layer Pattern
+- Factory Pattern
+- Strategy Pattern
+- Observer Pattern (para eventos de auditoría)
 
 ## Seguridad
 
-- Integración con Eureka para service discovery
-- Validación de datos con Spring Validation
-- Manejo seguro de credenciales
-- Logs auditables
+- Autenticación mediante JWT
+- Autorización basada en roles
+- Validación de datos de entrada
+- Sanitización de datos
+- Logs de auditoría
+- Cifrado de datos sensibles
 
 ## Monitoreo
 
-- Endpoints de Actuator
-- Métricas de caché
-- Estado de la aplicación
+- Métricas con Spring Boot Actuator
 - Health checks
+- Logs estructurados
+- Trazas distribuidas
+- Monitoreo de caché
 
 ## Contribución
 
-1. Fork del repositorio
-2. Crear una rama para la feature (`git checkout -b feature/nueva-caracteristica`)
-3. Commit de los cambios (`git commit -am 'Agrega nueva característica'`)
-4. Push a la rama (`git push origin feature/nueva-caracteristica`)
-5. Crear un Pull Request
+1. Fork el repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
 
 ## Licencia
 
-Este proyecto es propiedad de la Universidad de Mendoza. Todos los derechos reservados.
+Este proyecto es privado y confidencial. Todos los derechos reservados.
 
 ## Contacto
 
-- Equipo de Desarrollo de Tesorería UM
-- Email: desarrollo.tesoreria@um.edu.ar
+Universidad de Mendoza - Departamento de Sistemas
+- Email: sistemas@um.edu.ar
+- Web: https://www.um.edu.ar

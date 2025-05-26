@@ -18,16 +18,16 @@ import um.haberes.core.kotlin.model.Categoria;
 @Repository
 public interface ICategoriaRepository extends JpaRepository<Categoria, Integer> {
 
-	public List<Categoria> findAllByDocente(Byte docente, Sort sort);
+	List<Categoria> findAllByDocente(Byte docente, Sort sort);
 
-	public List<Categoria> findAllByNoDocente(Byte noDocente, Sort sort);
+	List<Categoria> findAllByNoDocente(Byte noDocente, Sort sort);
 
-	public List<Categoria> findAllByCategoriaIdIn(List<Integer> categoriaIds);
+	List<Categoria> findAllByCategoriaIdIn(List<Integer> categoriaIds);
 
-	public List<Categoria> findAllByCategoriaIdNotIn(List<Integer> categoriaIds);
+	List<Categoria> findAllByCategoriaIdNotIn(List<Integer> categoriaIds);
 
-	public Optional<Categoria> findByCategoriaId(Integer categoriaId);
+	Optional<Categoria> findByCategoriaId(Integer categoriaId);
 
-	public Optional<Categoria> findTopByOrderByCategoriaIdDesc();
+	Optional<Categoria> findTopByOrderByCategoriaIdDesc();
 
 }

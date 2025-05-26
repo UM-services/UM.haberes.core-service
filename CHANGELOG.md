@@ -2,61 +2,46 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.
 
-El formato está basado en [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.1-SNAPSHOT] - 2024-03-XX
+## [0.1.0] - 2024-03-25
 
-### Added
-- Implementación inicial del servicio de Haberes
-- Integración con Spring Boot 3.4.4
-- Soporte para Kotlin 2.1.20
-- Sistema de caché con Caffeine
-- Generación de reportes en PDF y Excel
-- Integración con Eureka para service discovery
-- Clientes Feign para comunicación entre servicios
-- Sistema de auditoría automática
-- Logging con Log4j2
-- Documentación con OpenAPI/Swagger
+### Agregado
+- Implementación de DocenteDesignacion para manejo de designaciones docentes
+- Nuevo campo `estadoDocente` en modelos de CargoLiquidacion y Categoria
+- Mejoras en la generación de reportes con Apache POI
+- Integración con Jackson para mejor serialización JSON
+- Logging mejorado con mensajes más descriptivos
 
-### Changed
-- Actualización a Spring Cloud 2024.0.1
-- Mejora en la configuración de caché
-- Optimización de consultas JPA
+### Cambiado
+- Actualización de Spring Boot a 3.4.4
+- Actualización de Spring Cloud a 2024.0.1
+- Actualización de SpringDoc OpenAPI
+- Optimización de código con mejores prácticas de Java/Kotlin
+- Mejora en el manejo de excepciones y errores
 
-### Deprecated
-- Ninguno en esta versión
+### Corregido
+- Manejo de nulos en operaciones con objetos
+- Mejora en la validación de datos
+- Corrección en el cálculo de liquidaciones
+- Optimización de consultas a base de datos
 
-### Removed
-- Ninguno en esta versión
+## [0.0.1] - 2024-02-15
 
-### Fixed
-- Ninguno en esta versión
-
-### Security
-- Implementación de validación de datos
-- Manejo seguro de credenciales
-- Logs auditables
-
-## [0.0.1-alpha] - 2024-02-XX
-
-### Added
+### Agregado
 - Estructura inicial del proyecto
 - Configuración básica de Spring Boot
-- Modelos base en Kotlin
-- Repositorios JPA básicos
+- Integración con Spring Cloud
+- Sistema de caché con Caffeine
+- Generación de reportes
+- Manejo de excepciones básico
+- Documentación inicial de API con OpenAPI
 
-### Changed
-- Ninguno en esta versión
+### Cambiado
+- Actualización de dependencias base
+- Mejora en la estructura del proyecto
 
-### Deprecated
-- Ninguno en esta versión
-
-### Removed
-- Ninguno en esta versión
-
-### Fixed
-- Ninguno en esta versión
-
-### Security
-- Ninguno en esta versión 
+### Corregido
+- Ajustes en la configuración de seguridad
+- Correcciones menores en el manejo de datos 
