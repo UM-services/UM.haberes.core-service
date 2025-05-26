@@ -22,6 +22,7 @@ data class CargoLiquidacion(
     var categoriaId: Int? = null,
     var categoriaNombre: String = "",
     var categoriaBasico: BigDecimal = BigDecimal.ZERO,
+    var estadoDocente: BigDecimal = BigDecimal.ZERO,
     var horasJornada: BigDecimal = BigDecimal.ZERO,
     var jornada: Int = 0,
     var presentismo: Int = 0,

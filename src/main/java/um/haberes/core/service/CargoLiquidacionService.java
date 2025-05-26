@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import um.haberes.core.exception.CargoLiquidacionException;
 import um.haberes.core.kotlin.model.CargoLiquidacion;
 import um.haberes.core.kotlin.model.CargoLiquidacionVersion;
+import um.haberes.core.kotlin.model.Categoria;
 import um.haberes.core.repository.ICargoLiquidacionRepository;
 
 /**
@@ -110,14 +111,24 @@ public class CargoLiquidacionService {
 
 	public CargoLiquidacion update(CargoLiquidacion newCargoLiquidacion, Long cargoLiquidacionId) {
 		return repository.findByCargoLiquidacionId(cargoLiquidacionId).map(cargoLiquidacion -> {
-			cargoLiquidacion = new CargoLiquidacion(null, newCargoLiquidacion.getLegajoId(),
-					newCargoLiquidacion.getAnho(), newCargoLiquidacion.getMes(), newCargoLiquidacion.getDependenciaId(),
-					newCargoLiquidacion.getFechaDesde(), newCargoLiquidacion.getFechaHasta(),
-					newCargoLiquidacion.getCategoriaId(), newCargoLiquidacion.getCategoriaNombre(),
-					newCargoLiquidacion.getCategoriaBasico(), newCargoLiquidacion.getHorasJornada(),
-					newCargoLiquidacion.getJornada(), newCargoLiquidacion.getPresentismo(),
-					newCargoLiquidacion.getSituacion(), newCargoLiquidacion.getPersona(),
-					newCargoLiquidacion.getDependencia(), newCargoLiquidacion.getCategoria());
+			cargoLiquidacion = new CargoLiquidacion(null,
+					newCargoLiquidacion.getLegajoId(),
+					newCargoLiquidacion.getAnho(),
+					newCargoLiquidacion.getMes(),
+					newCargoLiquidacion.getDependenciaId(),
+					newCargoLiquidacion.getFechaDesde(),
+					newCargoLiquidacion.getFechaHasta(),
+					newCargoLiquidacion.getCategoriaId(),
+					newCargoLiquidacion.getCategoriaNombre(),
+					newCargoLiquidacion.getCategoriaBasico(),
+					newCargoLiquidacion.getEstadoDocente(),
+					newCargoLiquidacion.getHorasJornada(),
+					newCargoLiquidacion.getJornada(),
+					newCargoLiquidacion.getPresentismo(),
+					newCargoLiquidacion.getSituacion(),
+					newCargoLiquidacion.getPersona(),
+					newCargoLiquidacion.getDependencia(),
+					newCargoLiquidacion.getCategoria());
 			cargoLiquidacion = repository.save(cargoLiquidacion);
 			return cargoLiquidacion;
 		}).orElseThrow(() -> new CargoLiquidacionException(cargoLiquidacionId));
@@ -130,12 +141,21 @@ public class CargoLiquidacionService {
 			List<CargoLiquidacionVersion> backups = new ArrayList<CargoLiquidacionVersion>();
 			for (CargoLiquidacion cargoLiquidacion : cargos) {
 				backups.add(
-						new CargoLiquidacionVersion(null, cargoLiquidacion.getLegajoId(), cargoLiquidacion.getAnho(),
-								cargoLiquidacion.getMes(), version, cargoLiquidacion.getDependenciaId(),
-								cargoLiquidacion.getCategoriaId(), cargoLiquidacion.getCategoriaBasico(),
-								cargoLiquidacion.getHorasJornada(), cargoLiquidacion.getJornada(),
-								cargoLiquidacion.getPresentismo(), cargoLiquidacion.getFechaDesde(),
-								cargoLiquidacion.getFechaHasta(), cargoLiquidacion.getSituacion()));
+						new CargoLiquidacionVersion(null,
+								cargoLiquidacion.getLegajoId(),
+								cargoLiquidacion.getAnho(),
+								cargoLiquidacion.getMes(),
+								version,
+								cargoLiquidacion.getDependenciaId(),
+								cargoLiquidacion.getCategoriaId(),
+								cargoLiquidacion.getCategoriaBasico(),
+								cargoLiquidacion.getEstadoDocente(),
+								cargoLiquidacion.getHorasJornada(),
+								cargoLiquidacion.getJornada(),
+								cargoLiquidacion.getPresentismo(),
+								cargoLiquidacion.getFechaDesde(),
+								cargoLiquidacion.getFechaHasta(),
+								cargoLiquidacion.getSituacion()));
 			}
 			backups = cargoLiquidacionVersionService.saveAll(backups);
 		}
@@ -154,14 +174,14 @@ public class CargoLiquidacionService {
 
 	@Transactional
 	public void deleteAllCargosDocentes(Long legajoId, Integer anho, Integer mes) {
-		List<Integer> categoriaIds = categoriaService.findAllDocentes().stream().map(c -> c.getCategoriaId())
+		List<Integer> categoriaIds = categoriaService.findAllDocentes().stream().map(Categoria::getCategoriaId)
 				.collect(Collectors.toList());
 		repository.deleteAllByLegajoIdAndAnhoAndMesAndSituacionAndCategoriaIdIn(legajoId, anho, mes, "A", categoriaIds);
 	}
 
 	@Transactional
 	public void deleteAllCargosNoDocentes(Long legajoId, Integer anho, Integer mes) {
-		List<Integer> categoriaIds = categoriaService.findAllNoDocentes().stream().map(c -> c.getCategoriaId())
+		List<Integer> categoriaIds = categoriaService.findAllNoDocentes().stream().map(Categoria::getCategoriaId)
 				.collect(Collectors.toList());
 		repository.deleteAllByLegajoIdAndAnhoAndMesAndSituacionAndCategoriaIdIn(legajoId, anho, mes, "A", categoriaIds);
 	}
