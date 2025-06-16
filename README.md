@@ -15,27 +15,27 @@ Servicio core del sistema de Haberes de la Universidad de Mendoza, diseñado par
 
 ## Tecnologías
 
-- Java 17
-- Kotlin 2.1.20
-- Spring Boot 3.4.4
-- Spring Cloud 2024.0.1
+- Java 21
+- Kotlin 2.1.21
+- Spring Boot 3.5.0
+- Spring Cloud 2025.0.0
 - Spring Data JPA
 - Spring Security
 - Spring Cloud Netflix (Eureka, Feign)
-- Apache POI (para reportes Excel)
-- LibrePDF (para reportes PDF)
+- Apache POI 5.4.1 (para reportes Excel)
+- LibrePDF 2.2.1 (para reportes PDF)
 - Log4j2
 - Caffeine Cache
 - Jackson
-- PostgreSQL
+- MySQL 9.3.0
 - Docker
 
 ## Requisitos
 
-- JDK 17 o superior
-- Maven 3.8+
+- JDK 21 o superior
+- Maven 3.8.8+
 - Docker (opcional)
-- PostgreSQL 15+
+- MySQL 8.0+
 
 ## Configuración
 
@@ -46,7 +46,7 @@ spring:
   application:
     name: um-haberes-core-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/haberes
+    url: jdbc:mysql://localhost:3306/haberes
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
   jpa:

@@ -1,6 +1,5 @@
 package um.haberes.core.controller.facade;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -22,7 +21,6 @@ public class ContratadoController {
 
     private final ContratadoService service;
 
-    @Autowired
     public ContratadoController(ContratadoService service) {
         this.service = service;
     }
