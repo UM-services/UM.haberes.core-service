@@ -145,7 +145,7 @@ public class ContratadoService {
             log.debug(file.getAbsolutePath());
             book.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.debug("Processing ContratadoService.generatePlanillaContratados error: " + e.getMessage());
         }
         return filename;
     }
