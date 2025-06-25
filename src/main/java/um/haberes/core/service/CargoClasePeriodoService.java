@@ -42,14 +42,25 @@ public class CargoClasePeriodoService {
 
 	public CargoClasePeriodo update(CargoClasePeriodo newCargoClasePeriodo, Long cargoClasePeriodoId) {
 		return repository.findByCargoClasePeriodoId(cargoClasePeriodoId).map(cargoClasePeriodo -> {
-			cargoClasePeriodo = new CargoClasePeriodo(cargoClasePeriodoId, newCargoClasePeriodo.getLegajoId(),
-					newCargoClasePeriodo.getCargoClaseId(), newCargoClasePeriodo.getDependenciaId(),
-					newCargoClasePeriodo.getFacultadId(), newCargoClasePeriodo.getGeograficaId(),
-					newCargoClasePeriodo.getPeriodoDesde(), newCargoClasePeriodo.getPeriodoHasta(),
-					newCargoClasePeriodo.getHoras(), newCargoClasePeriodo.getValorHora(),
-					newCargoClasePeriodo.getDescripcion(), newCargoClasePeriodo.getPersona(),
-					newCargoClasePeriodo.getCargoClase(), newCargoClasePeriodo.getDependencia(),
-					newCargoClasePeriodo.getFacultad(), newCargoClasePeriodo.getGeografica());
+			cargoClasePeriodo = new CargoClasePeriodo(
+					cargoClasePeriodoId,
+					newCargoClasePeriodo.getLegajoId(),
+					newCargoClasePeriodo.getCargoClaseId(),
+					newCargoClasePeriodo.getDependenciaId(),
+					newCargoClasePeriodo.getFacultadId(),
+					newCargoClasePeriodo.getGeograficaId(),
+					newCargoClasePeriodo.getPeriodoDesde(),
+					newCargoClasePeriodo.getPeriodoHasta(),
+					newCargoClasePeriodo.getHoras(),
+					newCargoClasePeriodo.getValorHora(),
+					newCargoClasePeriodo.getAplicaAdicional(),
+					newCargoClasePeriodo.getDescripcion(),
+					newCargoClasePeriodo.getPersona(),
+					newCargoClasePeriodo.getCargoClase(),
+					newCargoClasePeriodo.getDependencia(),
+					newCargoClasePeriodo.getFacultad(),
+					newCargoClasePeriodo.getGeografica()
+			);
 			repository.save(cargoClasePeriodo);
 			return cargoClasePeriodo;
 		}).orElseThrow(() -> new CargoClasePeriodoNotFoundException(cargoClasePeriodoId));

@@ -107,11 +107,28 @@ public class CargoClaseToolService {
 		// Agrega cada uno de los períodos
 		List<CargoClaseDetalle> detalles = new ArrayList<CargoClaseDetalle>();
 		for (Periodo periodo : periodos) {
-			detalles.add(new CargoClaseDetalle(null, cargoClasePeriodo.getLegajoId(), periodo.getAnho(),
-					periodo.getMes(), cargoClasePeriodo.getCargoClaseId(), cargoClasePeriodo.getDependenciaId(),
-					cargoClasePeriodo.getFacultadId(), cargoClasePeriodo.getGeograficaId(),
-					cargoClasePeriodo.getHoras(), clase.getValorHora(), cargoClasePeriodo.getCargoClasePeriodoId(),
-					(byte) 0, null, null, null, null, null, null));
+			detalles.add(new CargoClaseDetalle(
+					null,
+					cargoClasePeriodo.getLegajoId(),
+					periodo.getAnho(),
+					periodo.getMes(),
+					cargoClasePeriodo.getCargoClaseId(),
+					cargoClasePeriodo.getDependenciaId(),
+					cargoClasePeriodo.getFacultadId(),
+					cargoClasePeriodo.getGeograficaId(),
+					cargoClasePeriodo.getHoras(),
+					clase.getValorHora(),
+					cargoClasePeriodo.getAplicaAdicional(),
+					cargoClasePeriodo.getCargoClasePeriodoId(),
+					(byte) 0,
+					null,
+					null,
+					null,
+					null,
+					null,
+					null
+					)
+			);
 		}
 		detalles = cargoClaseDetalleService.saveAll(detalles);
 		return "Ok";
@@ -171,11 +188,28 @@ public class CargoClaseToolService {
 		// Agrega los períodos nuevos
 		detalles = new ArrayList<CargoClaseDetalle>();
 		for (Periodo periodo : nuevos) {
-			detalles.add(new CargoClaseDetalle(null, cargoClasePeriodo.getLegajoId(), periodo.getAnho(),
-					periodo.getMes(), cargoClasePeriodo.getCargoClaseId(), cargoClasePeriodo.getDependenciaId(),
-					cargoClasePeriodo.getFacultadId(), cargoClasePeriodo.getGeograficaId(),
-					cargoClasePeriodo.getHoras(), clase.getValorHora(), cargoClasePeriodoId, (byte) 0, null, null, null,
-					null, null, null));
+			detalles.add(new CargoClaseDetalle(
+					null,
+					cargoClasePeriodo.getLegajoId(),
+					periodo.getAnho(),
+					periodo.getMes(),
+					cargoClasePeriodo.getCargoClaseId(),
+					cargoClasePeriodo.getDependenciaId(),
+					cargoClasePeriodo.getFacultadId(),
+					cargoClasePeriodo.getGeograficaId(),
+					cargoClasePeriodo.getHoras(),
+					clase.getValorHora(),
+					cargoClasePeriodo.getAplicaAdicional(),
+					cargoClasePeriodoId,
+					(byte) 0,
+					null,
+					null,
+					null,
+					null,
+					null,
+					null
+			)
+			);
 		}
 		detalles = cargoClaseDetalleService.saveAll(detalles);
 

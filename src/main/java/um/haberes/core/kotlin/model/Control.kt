@@ -68,6 +68,7 @@ data class Control(
     var estadoDocenteTitular: BigDecimal = BigDecimal.ZERO,
     var estadoDocenteAdjunto: BigDecimal = BigDecimal.ZERO,
     var estadoDocenteAuxiliar: BigDecimal = BigDecimal.ZERO,
+    var adicionalHoraCargoClase: BigDecimal = BigDecimal.ZERO,
     var horaReferenciaEtec:BigDecimal = BigDecimal.ZERO,
     var modoLiquidacionId: Int? = null,
 
