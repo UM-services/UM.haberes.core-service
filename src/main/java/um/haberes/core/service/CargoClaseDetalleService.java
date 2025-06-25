@@ -61,15 +61,27 @@ public class CargoClaseDetalleService {
 
 	public CargoClaseDetalle update(CargoClaseDetalle newCargoClaseDetalle, Long cargoClaseDetalleId) {
 		return repository.findByCargoClaseDetalleId(cargoClaseDetalleId).map(cargoClaseDetalle -> {
-			cargoClaseDetalle = new CargoClaseDetalle(cargoClaseDetalleId, newCargoClaseDetalle.getLegajoId(),
-					newCargoClaseDetalle.getAnho(), newCargoClaseDetalle.getMes(),
-					newCargoClaseDetalle.getCargoClaseId(), newCargoClaseDetalle.getDependenciaId(),
-					newCargoClaseDetalle.getFacultadId(), newCargoClaseDetalle.getGeograficaId(),
-					newCargoClaseDetalle.getHoras(), newCargoClaseDetalle.getValorHora(),
-					newCargoClaseDetalle.getCargoClasePeriodoId(), newCargoClaseDetalle.getLiquidado(),
-					newCargoClaseDetalle.getPersona(), newCargoClaseDetalle.getCargoClase(),
-					newCargoClaseDetalle.getDependencia(), newCargoClaseDetalle.getFacultad(),
-					newCargoClaseDetalle.getGeografica(), newCargoClaseDetalle.getCargoClasePeriodo());
+			cargoClaseDetalle = new CargoClaseDetalle(
+					cargoClaseDetalleId,
+					newCargoClaseDetalle.getLegajoId(),
+					newCargoClaseDetalle.getAnho(),
+					newCargoClaseDetalle.getMes(),
+					newCargoClaseDetalle.getCargoClaseId(),
+					newCargoClaseDetalle.getDependenciaId(),
+					newCargoClaseDetalle.getFacultadId(),
+					newCargoClaseDetalle.getGeograficaId(),
+					newCargoClaseDetalle.getHoras(),
+					newCargoClaseDetalle.getValorHora(),
+					newCargoClaseDetalle.getAplicaAdicional(),
+					newCargoClaseDetalle.getCargoClasePeriodoId(),
+					newCargoClaseDetalle.getLiquidado(),
+					newCargoClaseDetalle.getPersona(),
+					newCargoClaseDetalle.getCargoClase(),
+					newCargoClaseDetalle.getDependencia(),
+					newCargoClaseDetalle.getFacultad(),
+					newCargoClaseDetalle.getGeografica(),
+					newCargoClaseDetalle.getCargoClasePeriodo()
+			);
 			cargoClaseDetalle = repository.save(cargoClaseDetalle);
 			return cargoClaseDetalle;
 		}).orElseThrow(() -> new CargoClaseDetalleException(cargoClaseDetalleId));

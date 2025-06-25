@@ -19,6 +19,7 @@ data class CargoClaseDetalle(
     var geograficaId: Int? = null,
     var horas: Int = 0,
     var valorHora: BigDecimal = BigDecimal.ZERO,
+    var aplicaAdicional: Byte = 0,
     var cargoClasePeriodoId: Long? = null,
     var liquidado: Byte = 0,
 

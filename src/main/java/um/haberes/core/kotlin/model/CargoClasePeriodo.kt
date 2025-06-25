@@ -20,6 +20,7 @@ data class CargoClasePeriodo(
     var periodoHasta: Long? = null,
     var horas: Int = 0,
     var valorHora: BigDecimal = BigDecimal.ZERO,
+    var aplicaAdicional: Byte = 0,
     var descripcion: String? = null,
 
     @OneToOne
