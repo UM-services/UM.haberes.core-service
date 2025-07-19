@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.ClaseException;
 import um.haberes.core.kotlin.model.Clase;
-import um.haberes.core.kotlin.repository.ClaseRepository;
+import um.haberes.core.repository.ClaseRepository;
 
 /**
  * @author daniel

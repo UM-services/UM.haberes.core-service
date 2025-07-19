@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.kotlin.model.Nivel;
-import um.haberes.core.repository.INivelRepository;
+import um.haberes.core.repository.NivelRepository;
 
 /**
  * @author daniel
@@ -19,7 +19,7 @@ import um.haberes.core.repository.INivelRepository;
 public class NivelService {
 	
 	@Autowired
-	private INivelRepository repository;
+	private NivelRepository repository;
 
 	public List<Nivel> findAll() {
 		return repository.findAll();

@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.kotlin.model.LiquidacionVersion;
-import um.haberes.core.repository.ILiquidacionVersionRepository;
+import um.haberes.core.repository.LiquidacionVersionRepository;
 
 /**
  * @author daniel
@@ -18,7 +18,7 @@ import um.haberes.core.repository.ILiquidacionVersionRepository;
 public class LiquidacionVersionService {
 
     @Autowired
-    private ILiquidacionVersionRepository repository;
+    private LiquidacionVersionRepository repository;
 
     public LiquidacionVersion add(LiquidacionVersion liquidacionVersion) {
         return repository.save(liquidacionVersion);

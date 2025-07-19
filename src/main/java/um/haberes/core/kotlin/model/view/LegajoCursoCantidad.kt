@@ -9,7 +9,6 @@ import org.hibernate.annotations.Immutable
 data class LegajoCursoCantidad(
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var uniqueId: String? = null,
 
     var anho: Int? = null,

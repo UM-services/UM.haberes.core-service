@@ -10,7 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.kotlin.model.view.CategoriaSearch;
-import um.haberes.core.repository.view.ICategoriaSearchRepository;
+import um.haberes.core.repository.view.CategoriaSearchRepository;
 
 /**
  * @author daniel
@@ -20,7 +20,7 @@ import um.haberes.core.repository.view.ICategoriaSearchRepository;
 public class CategoriaSearchService {
 	
 	@Autowired
-	private ICategoriaSearchRepository repository;
+	private CategoriaSearchRepository repository;
 
 	public List<CategoriaSearch> findTop50BySearchLike(String search, Sort sort) {
 		return repository.findTop50BySearchLike(search, sort);

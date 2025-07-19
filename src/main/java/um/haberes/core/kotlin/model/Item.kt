@@ -1,5 +1,7 @@
 package um.haberes.core.kotlin.model
 
+import com.fasterxml.jackson.core.JsonProcessingException
+import com.fasterxml.jackson.databind.json.JsonMapper
 import jakarta.persistence.*
 import java.math.BigDecimal
 
@@ -26,8 +28,22 @@ data class Item(
     var codigo: Codigo? = null,
 
 ) : Auditable() {
+
     fun legajoKey(): String {
         return this.legajoId.toString() + "." + this.anho + "." + this.mes + "." + this.codigoId
+    }
+
+    fun jsonify(): String {
+        try {
+            return JsonMapper
+                .builder()
+                .findAndAddModules()
+                .build()
+                .writerWithDefaultPrettyPrinter()
+                .writeValueAsString(this)
+        } catch (e: JsonProcessingException) {
+            return "jsonify error: ${e.message}"
+        }
     }
 
 }

@@ -1,0 +1,20 @@
+deploymentDiagram
+    actor "Administrador de Sistema" as Admin
+    
+    node "Servidor Cloud (ej. AWS, GCP)" {
+        node "Kubernetes Cluster" {
+            artifact "Docker Image" {
+                node "Contenedor" as Container {
+                    component "um.haberes.core-service.jar"
+                }
+            }
+        }
+        
+        node "Base de Datos (ej. PostgreSQL)" as DB
+    }
+    
+    node "Servicios Externos UM" as ExternalServices
+    
+    Admin -->> Kubernetes Cluster : "Gestiona despliegue"
+    Container -->> DB : "JDBC"
+    Container -->> ExternalServices : "API REST"

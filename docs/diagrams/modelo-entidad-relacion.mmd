@@ -1,0 +1,61 @@
+erDiagram
+    PERSONA ||--o{ CARGO : "tiene"
+    PERSONA ||--o{ LEGAJO_BANCO : "tiene"
+    FACULTAD ||--o{ DEPENDENCIA : "agrupa"
+    DEPENDENCIA ||--o{ CARGO : "pertenece a"
+    CARGO ||--o{ LIQUIDACION : "se liquida en"
+    CARGO ||--o{ NOVEDAD : "tiene"
+    CURSO ||--o{ CARGO : "asociado a"
+    
+    PERSONA {
+        int id
+        string nombre
+        string apellido
+        string cuil
+    }
+
+    CARGO {
+        int id
+        string descripcion
+        date fecha_alta
+        int persona_id
+        int dependencia_id
+    }
+
+    LIQUIDACION {
+        int id
+        date fecha
+        float monto
+        int cargo_id
+    }
+
+    NOVEDAD {
+        int id
+        string tipo
+        string descripcion
+        date fecha
+        int cargo_id
+    }
+
+    DEPENDENCIA {
+        int id
+        string nombre
+        int facultad_id
+    }
+
+    FACULTAD {
+        int id
+        string nombre
+    }
+
+    CURSO {
+        int id
+        string nombre
+    }
+
+    LEGAJO_BANCO {
+        int id
+        string cbu
+        string banco
+        int persona_id
+    }

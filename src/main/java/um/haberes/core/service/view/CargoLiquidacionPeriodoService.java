@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.kotlin.model.view.CargoLiquidacionPeriodo;
-import um.haberes.core.repository.view.ICargoLiquidacionPeriodoRepository;
+import um.haberes.core.repository.view.CargoLiquidacionPeriodoRepository;
 
 /**
  * @author daniel
@@ -19,7 +19,7 @@ import um.haberes.core.repository.view.ICargoLiquidacionPeriodoRepository;
 public class CargoLiquidacionPeriodoService {
 
 	@Autowired
-	private ICargoLiquidacionPeriodoRepository repository;
+	private CargoLiquidacionPeriodoRepository repository;
 
 	public List<CargoLiquidacionPeriodo> findAllRestoByLegajo(Long legajoId, Integer anho, Integer mes, Integer categoriaId) {
 		return repository.findAllByLegajoIdAndCategoriaIdAndPeriodoGreaterThanEqual(legajoId, categoriaId,

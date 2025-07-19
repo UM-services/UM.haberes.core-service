@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.LegajoControlException;
 import um.haberes.core.kotlin.model.LegajoControl;
-import um.haberes.core.repository.ILegajoControlRepository;
+import um.haberes.core.repository.LegajoControlRepository;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 public class LegajoControlService {
 
 	@Autowired
-	private ILegajoControlRepository repository;
+	private LegajoControlRepository repository;
 
 	public List<LegajoControl> findAllByPeriodo(Integer anho, Integer mes) {
 		return repository.findAllByAnhoAndMes(anho, mes);

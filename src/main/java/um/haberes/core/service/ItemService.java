@@ -22,8 +22,8 @@ import um.haberes.core.exception.ItemException;
 import um.haberes.core.kotlin.model.CodigoGrupo;
 import um.haberes.core.kotlin.model.Item;
 import um.haberes.core.kotlin.model.ItemVersion;
-import um.haberes.core.repository.IItemRepository;
-import um.haberes.core.repository.IItemVersionRepository;
+import um.haberes.core.repository.ItemRepository;
+import um.haberes.core.repository.ItemVersionRepository;
 
 /**
  * @author daniel
@@ -33,14 +33,14 @@ import um.haberes.core.repository.IItemVersionRepository;
 @Slf4j
 public class ItemService {
 
-    private final IItemRepository repository;
+    private final ItemRepository repository;
 
-    private final IItemVersionRepository itemVersionRepository;
+    private final ItemVersionRepository itemVersionRepository;
 
     private final CodigoGrupoService codigoGrupoService;
 
     @Autowired
-    public ItemService(IItemRepository repository, IItemVersionRepository itemVersionRepository, CodigoGrupoService codigoGrupoService) {
+    public ItemService(ItemRepository repository, ItemVersionRepository itemVersionRepository, CodigoGrupoService codigoGrupoService) {
         this.repository = repository;
         this.itemVersionRepository = itemVersionRepository;
         this.codigoGrupoService = codigoGrupoService;

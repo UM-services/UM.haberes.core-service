@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.AcreditacionPagoException;
 import um.haberes.core.kotlin.model.AcreditacionPago;
-import um.haberes.core.repository.IAcreditacionPagoRepository;
+import um.haberes.core.repository.AcreditacionPagoRepository;
 
 /**
  * @author daniel
@@ -20,7 +20,7 @@ import um.haberes.core.repository.IAcreditacionPagoRepository;
 public class AcreditacionPagoService {
 
 	@Autowired
-	private IAcreditacionPagoRepository repository;
+	private AcreditacionPagoRepository repository;
 
 	public AcreditacionPago findByUnique(Integer anho, Integer mes, OffsetDateTime fechaPago) {
 		return repository.findByAnhoAndMesAndFechaPago(anho, mes, fechaPago)

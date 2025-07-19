@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.view.ImputadoTotalNotFoundException;
 import um.haberes.core.kotlin.model.view.ImputadoTotal;
-import um.haberes.core.repository.view.IImputadoTotalRepository;
+import um.haberes.core.repository.view.ImputadoTotalRepository;
 
 /**
  * @author daniel
@@ -17,7 +17,7 @@ import um.haberes.core.repository.view.IImputadoTotalRepository;
 @Service
 public class ImputadoTotalService {
 	@Autowired
-	private IImputadoTotalRepository repository;
+	private ImputadoTotalRepository repository;
 
 	public ImputadoTotal findByPeriodo(Integer anho, Integer mes) {
 		return repository.findByAnhoAndMes(anho, mes).orElseThrow(() -> new ImputadoTotalNotFoundException(anho, mes));

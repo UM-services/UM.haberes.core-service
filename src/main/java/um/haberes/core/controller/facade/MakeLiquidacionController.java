@@ -6,7 +6,6 @@ package um.haberes.core.controller.facade;
 import java.io.IOException;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +29,6 @@ public class MakeLiquidacionController {
 
     private final MakeLiquidacionService service;
 
-    @Autowired
     public MakeLiquidacionController(MakeLiquidacionService service) {
         this.service = service;
     }

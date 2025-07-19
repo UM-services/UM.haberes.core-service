@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.LegajoContabilidadException;
 import um.haberes.core.kotlin.model.LegajoContabilidad;
-import um.haberes.core.repository.ILegajoContabilidadRepository;
+import um.haberes.core.repository.LegajoContabilidadRepository;
 
 /**
  * @author daniel
@@ -19,7 +19,7 @@ import um.haberes.core.repository.ILegajoContabilidadRepository;
 @Service
 public class LegajoContabilidadService {
 	@Autowired
-	private ILegajoContabilidadRepository repository;
+	private LegajoContabilidadRepository repository;
 
 	public List<LegajoContabilidad> findAllDiferenciaByPeriodo(Integer anho, Integer mes) {
 		return repository.findAllByAnhoAndMesAndDiferencia(anho, mes, (byte) 1);

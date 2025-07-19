@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 import um.haberes.core.exception.ContactoException;
 import um.haberes.core.exception.PersonaException;
 import um.haberes.core.kotlin.model.view.PersonaSearch;
-import um.haberes.core.repository.IPersonaRepository;
+import um.haberes.core.repository.PersonaRepository;
 import um.haberes.core.service.facade.ToolService;
 import um.haberes.core.service.view.PersonaSearchService;
 import um.haberes.core.util.Tool;
@@ -38,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PersonaService {
 
-    private final IPersonaRepository repository;
+    private final PersonaRepository repository;
 
     private final PersonaSearchService personaSearchService;
 
@@ -55,7 +55,7 @@ public class PersonaService {
     private final CursoService cursoService;
 
     @Autowired
-    public PersonaService(IPersonaRepository repository, PersonaSearchService personaSearchService, LiquidacionService liquidacionService,
+    public PersonaService(PersonaRepository repository, PersonaSearchService personaSearchService, LiquidacionService liquidacionService,
                           CategoriaService categoriaService, CargoLiquidacionService cargoLiquidacionService, CursoCargoService cursoCargoService,
                           ContactoService contactoService, CursoService cursoService) {
         this.repository = repository;

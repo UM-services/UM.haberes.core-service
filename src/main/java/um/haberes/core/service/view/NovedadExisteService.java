@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.kotlin.model.view.NovedadExiste;
-import um.haberes.core.repository.view.INovedadExisteRepository;
+import um.haberes.core.repository.view.NovedadExisteRepository;
 
 /**
  * @author daniel
@@ -19,7 +19,7 @@ import um.haberes.core.repository.view.INovedadExisteRepository;
 public class NovedadExisteService {
 
 	@Autowired
-	private INovedadExisteRepository repository;
+	private NovedadExisteRepository repository;
 
 	public List<NovedadExiste> findAllByPeriodo(Integer anho, Integer mes) {
 		return repository.findAllByAnhoAndMes(anho, mes);

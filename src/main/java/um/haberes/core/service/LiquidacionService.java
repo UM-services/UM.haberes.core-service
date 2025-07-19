@@ -18,7 +18,7 @@ import um.haberes.core.exception.LiquidacionException;
 import um.haberes.core.kotlin.model.Liquidacion;
 import um.haberes.core.kotlin.model.LiquidacionVersion;
 import um.haberes.core.kotlin.model.view.LiquidacionPeriodo;
-import um.haberes.core.repository.ILiquidacionRepository;
+import um.haberes.core.repository.LiquidacionRepository;
 import um.haberes.core.service.view.LiquidacionPeriodoService;
 import um.haberes.core.util.Periodo;
 
@@ -28,14 +28,14 @@ import um.haberes.core.util.Periodo;
 @Service
 public class LiquidacionService {
 
-    private final ILiquidacionRepository repository;
+    private final LiquidacionRepository repository;
 
     private final LiquidacionVersionService liquidacionVersionService;
 
     private final LiquidacionPeriodoService liquidacionPeriodoService;
 
     @Autowired
-    public LiquidacionService(ILiquidacionRepository repository, LiquidacionVersionService liquidacionVersionService, LiquidacionPeriodoService liquidacionPeriodoService) {
+    public LiquidacionService(LiquidacionRepository repository, LiquidacionVersionService liquidacionVersionService, LiquidacionPeriodoService liquidacionPeriodoService) {
         this.repository = repository;
         this.liquidacionVersionService = liquidacionVersionService;
         this.liquidacionPeriodoService = liquidacionPeriodoService;

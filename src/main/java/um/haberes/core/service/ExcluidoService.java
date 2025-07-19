@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.ExcluidoException;
 import um.haberes.core.kotlin.model.Excluido;
-import um.haberes.core.repository.IExcluidoRepository;
+import um.haberes.core.repository.ExcluidoRepository;
 
 /**
  * @author daniel
@@ -22,7 +22,7 @@ import um.haberes.core.repository.IExcluidoRepository;
 public class ExcluidoService {
 
 	@Autowired
-	private IExcluidoRepository repository;
+	private ExcluidoRepository repository;
 
 	public List<Excluido> findAllByPeriodo(Integer anho, Integer mes) {
 		return repository.findAllByAnhoAndMes(anho, mes);

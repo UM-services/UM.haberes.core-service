@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.kotlin.model.CargoLiquidacionVersion;
-import um.haberes.core.repository.ICargoLiquidacionVersionRepository;
+import um.haberes.core.repository.CargoLiquidacionVersionRepository;
 
 /**
  * @author daniel
@@ -19,7 +19,7 @@ import um.haberes.core.repository.ICargoLiquidacionVersionRepository;
 public class CargoLiquidacionVersionService {
 
 	@Autowired
-	private ICargoLiquidacionVersionRepository repository;
+	private CargoLiquidacionVersionRepository repository;
 
 	public List<CargoLiquidacionVersion> saveAll(List<CargoLiquidacionVersion> backups) {
 		backups = repository.saveAll(backups);

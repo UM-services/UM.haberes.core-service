@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import um.haberes.core.exception.CargoClaseDetalleException;
 import um.haberes.core.kotlin.model.CargoClaseDetalle;
-import um.haberes.core.repository.ICargoClaseDetalleRepository;
+import um.haberes.core.repository.CargoClaseDetalleRepository;
 
 /**
  * @author daniel
@@ -22,7 +22,7 @@ import um.haberes.core.repository.ICargoClaseDetalleRepository;
 public class CargoClaseDetalleService {
 
 	@Autowired
-	private ICargoClaseDetalleRepository repository;
+	private CargoClaseDetalleRepository repository;
 
 	public List<CargoClaseDetalle> findAllByLegajo(Long legajoId, Integer anho, Integer mes) {
 		return repository.findAllByLegajoIdAndAnhoAndMes(legajoId, anho, mes);

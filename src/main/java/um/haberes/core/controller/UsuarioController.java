@@ -3,7 +3,6 @@
  */
 package um.haberes.core.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +27,6 @@ public class UsuarioController {
 
     private final UsuarioService service;
 
-    @Autowired
     public UsuarioController(UsuarioService service) {
         this.service = service;
     }

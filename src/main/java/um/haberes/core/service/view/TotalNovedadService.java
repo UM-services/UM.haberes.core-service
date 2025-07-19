@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import um.haberes.core.exception.view.TotalNovedadNotFoundException;
 import um.haberes.core.kotlin.model.view.TotalNovedad;
-import um.haberes.core.repository.view.ITotalNovedadRepository;
+import um.haberes.core.repository.view.TotalNovedadRepository;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
 public class TotalNovedadService {
 
     @Autowired
-    private ITotalNovedadRepository repository;
+    private TotalNovedadRepository repository;
 
     public List<TotalNovedad> findAllByPeriodo(Integer anho, Integer mes) {
         return repository.findAllByAnhoAndMes(anho, mes);

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.AntiguedadLimiteException;
 import um.haberes.core.kotlin.model.AntiguedadLimite;
-import um.haberes.core.repository.IAntiguedadLimiteRepository;
+import um.haberes.core.repository.AntiguedadLimiteRepository;
 
 /**
  * @author daniel
@@ -17,10 +17,10 @@ import um.haberes.core.repository.IAntiguedadLimiteRepository;
 @Service
 public class AntiguedadLimiteService {
 
-	private final IAntiguedadLimiteRepository repository;
+	private final AntiguedadLimiteRepository repository;
 
 	@Autowired
-	public AntiguedadLimiteService(IAntiguedadLimiteRepository repository) {
+	public AntiguedadLimiteService(AntiguedadLimiteRepository repository) {
 		this.repository = repository;
 	}
 

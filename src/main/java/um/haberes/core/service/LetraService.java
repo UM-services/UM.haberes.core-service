@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.LetraException;
 import um.haberes.core.kotlin.model.Letra;
-import um.haberes.core.repository.ILetraRepository;
+import um.haberes.core.repository.LetraRepository;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 public class LetraService {
 
 	@Autowired
-	private ILetraRepository repository;
+	private LetraRepository repository;
 
 	public Letra findByUnique(Long legajoId, Integer anho, Integer mes) {
 		return repository.findByLegajoIdAndAnhoAndMes(legajoId, anho, mes)

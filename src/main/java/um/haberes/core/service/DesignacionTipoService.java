@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.DesignacionTipoException;
 import um.haberes.core.kotlin.model.DesignacionTipo;
-import um.haberes.core.repository.IDesignacionTipoRepository;
+import um.haberes.core.repository.DesignacionTipoRepository;
 
 /**
  * @author daniel
@@ -23,9 +23,9 @@ import um.haberes.core.repository.IDesignacionTipoRepository;
 @Slf4j
 public class DesignacionTipoService {
 
-	private final IDesignacionTipoRepository repository;
+	private final DesignacionTipoRepository repository;
 
-	public DesignacionTipoService(IDesignacionTipoRepository repository) {
+	public DesignacionTipoService(DesignacionTipoRepository repository) {
 		this.repository = repository;
 	}
 

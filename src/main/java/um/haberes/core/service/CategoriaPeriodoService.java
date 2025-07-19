@@ -11,7 +11,8 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.CategoriaPeriodoException;
 import um.haberes.core.kotlin.model.CategoriaPeriodo;
-import um.haberes.core.repository.ICategoriaPeriodoRepository;
+import java.util.Set;
+import um.haberes.core.repository.CategoriaPeriodoRepository;
 
 /**
  * @author daniel
@@ -20,14 +21,18 @@ import um.haberes.core.repository.ICategoriaPeriodoRepository;
 @Service
 public class CategoriaPeriodoService {
 
-	private final ICategoriaPeriodoRepository repository;
+	private final CategoriaPeriodoRepository repository;
 
-	public CategoriaPeriodoService(ICategoriaPeriodoRepository repository) {
+	public CategoriaPeriodoService(CategoriaPeriodoRepository repository) {
 		this.repository = repository;
 	}
 
 	public List<CategoriaPeriodo> findAllByAnhoAndMes(Integer anho, Integer mes) {
 		return repository.findAllByAnhoAndMes(anho, mes);
+	}
+
+	public List<CategoriaPeriodo> findAllByCategoriaIdsAndPeriodo(Set<Integer> categoriaIds, Integer anho, Integer mes) {
+		return repository.findAllByCategoriaIdInAndAnhoAndMes(categoriaIds, anho, mes);
 	}
 
 	public CategoriaPeriodo findByUnique(Integer categoriaId, Integer anho, Integer mes) {

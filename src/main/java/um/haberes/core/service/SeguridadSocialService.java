@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.SeguridadSocialException;
 import um.haberes.core.kotlin.model.SeguridadSocial;
-import um.haberes.core.repository.ISeguridadSocialRepository;
+import um.haberes.core.repository.SeguridadSocialRepository;
 
 /**
  * @author daniel
@@ -18,7 +18,7 @@ import um.haberes.core.repository.ISeguridadSocialRepository;
 public class SeguridadSocialService {
 
 	@Autowired
-	private ISeguridadSocialRepository repository;
+	private SeguridadSocialRepository repository;
 
 	public SeguridadSocial findByUnique(Integer anho, Integer mes) {
 		return repository.findByAnhoAndMes(anho, mes)

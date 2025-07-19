@@ -10,7 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.kotlin.model.view.LiquidacionPeriodo;
-import um.haberes.core.repository.view.ILiquidacionPeriodoRepository;
+import um.haberes.core.repository.view.LiquidacionPeriodoRepository;
 
 /**
  * @author daniel
@@ -20,7 +20,7 @@ import um.haberes.core.repository.view.ILiquidacionPeriodoRepository;
 public class LiquidacionPeriodoService {
 
 	@Autowired
-	private ILiquidacionPeriodoRepository repository;
+	private LiquidacionPeriodoRepository repository;
 
 	public List<LiquidacionPeriodo> findAllByLegajoIdForward(Long legajoId, Integer anho, Integer mes) {
 		Long periodo = anho * 100L + mes;

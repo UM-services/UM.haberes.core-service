@@ -1,11 +1,9 @@
 package um.haberes.core.service.view;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import um.haberes.core.exception.view.DocenteDesignacionNotFoundException;
 import um.haberes.core.kotlin.model.view.DocenteDesignacion;
-import um.haberes.core.repository.view.IDocenteDesignacionRepository;
+import um.haberes.core.repository.view.DocenteDesignacionRepository;
 
 import java.util.List;
 
@@ -13,7 +11,7 @@ import java.util.List;
 public class DocenteDesignacionService {
 
     @Autowired
-    private IDocenteDesignacionRepository repository;
+    private DocenteDesignacionRepository repository;
 
     public List<DocenteDesignacion> findAllByPeriodo(Integer anho, Integer mes) {
         return repository.findAllByAnhoAndMes(anho, mes);

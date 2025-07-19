@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.CargoClaseException;
 import um.haberes.core.kotlin.model.CargoClase;
-import um.haberes.core.repository.ICargoClaseRepository;
+import um.haberes.core.repository.CargoClaseRepository;
 
 /**
  * @author daniel
@@ -20,7 +20,7 @@ import um.haberes.core.repository.ICargoClaseRepository;
 public class CargoClaseService {
 
 	@Autowired
-	private ICargoClaseRepository repository;
+	private CargoClaseRepository repository;
 
 	public List<CargoClase> findAll() {
 		return repository.findAll();

@@ -12,8 +12,8 @@ import org.springframework.stereotype.Service;
 import um.haberes.core.exception.ActividadException;
 import um.haberes.core.kotlin.model.Actividad;
 import um.haberes.core.kotlin.model.view.ActividadPeriodo;
-import um.haberes.core.repository.IActividadRepository;
-import um.haberes.core.repository.view.IActividadPeriodoRepository;
+import um.haberes.core.repository.ActividadRepository;
+import um.haberes.core.repository.view.ActividadPeriodoRepository;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -25,10 +25,10 @@ import lombok.extern.slf4j.Slf4j;
 public class ActividadService {
 
 	@Autowired
-	private IActividadRepository repository;
+	private ActividadRepository repository;
 
 	@Autowired
-	private IActividadPeriodoRepository actividadperiodorepository;
+	private ActividadPeriodoRepository actividadperiodorepository;
 
 	public List<Actividad> findAllByLegajoId(Long legajoId) {
 		return repository.findAllByLegajoId(legajoId, Sort.by("anho", "mes").ascending());

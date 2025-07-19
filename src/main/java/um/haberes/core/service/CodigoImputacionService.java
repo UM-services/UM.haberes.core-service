@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.CodigoImputacionException;
 import um.haberes.core.kotlin.model.CodigoImputacion;
-import um.haberes.core.repository.ICodigoImputacionRepository;
+import um.haberes.core.repository.CodigoImputacionRepository;
 
 /**
  * @author daniel
@@ -20,7 +20,7 @@ import um.haberes.core.repository.ICodigoImputacionRepository;
 public class CodigoImputacionService {
 
 	@Autowired
-	private ICodigoImputacionRepository repository;
+	private CodigoImputacionRepository repository;
 
 	public List<CodigoImputacion> findAll() {
 		return repository.findAll();

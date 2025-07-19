@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.kotlin.model.CursoFusion;
-import um.haberes.core.repository.ICursoFusionRepository;
+import um.haberes.core.repository.CursoFusionRepository;
 
 /**
  * @author daniel
@@ -21,7 +21,7 @@ import um.haberes.core.repository.ICursoFusionRepository;
 public class CursoFusionService {
 
 	@Autowired
-	private ICursoFusionRepository repository;
+	private CursoFusionRepository repository;
 
 	public List<CursoFusion> findAllByLegajoId(Long legajoId, Integer anho, Integer mes) {
 		return repository.findAllByLegajoIdAndAnhoAndMes(legajoId, anho, mes);

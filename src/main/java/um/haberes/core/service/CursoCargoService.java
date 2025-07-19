@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.CursoCargoException;
 import um.haberes.core.kotlin.model.CursoCargo;
-import um.haberes.core.repository.ICursoCargoRepository;
+import um.haberes.core.repository.CursoCargoRepository;
 
 /**
  * @author daniel
@@ -26,10 +26,10 @@ import um.haberes.core.repository.ICursoCargoRepository;
 @Slf4j
 public class CursoCargoService {
 
-    private final ICursoCargoRepository repository;
+    private final CursoCargoRepository repository;
 
     @Autowired
-    public CursoCargoService(ICursoCargoRepository repository) {
+    public CursoCargoService(CursoCargoRepository repository) {
         this.repository = repository;
     }
 

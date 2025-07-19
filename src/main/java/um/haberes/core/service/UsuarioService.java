@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.UsuarioException;
 import um.haberes.core.kotlin.model.Usuario;
-import um.haberes.core.repository.IUsuarioRepository;
+import um.haberes.core.repository.UsuarioRepository;
 import um.haberes.core.util.Tool;
 
 /**
@@ -21,10 +21,10 @@ import um.haberes.core.util.Tool;
 @Service
 public class UsuarioService {
 
-	private final IUsuarioRepository repository;
+	private final UsuarioRepository repository;
 
 	@Autowired
-	public UsuarioService(IUsuarioRepository repository) {
+	public UsuarioService(UsuarioRepository repository) {
 		this.repository = repository;
 	}
 
