@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.AcreditacionException;
 import um.haberes.core.kotlin.model.Acreditacion;
-import um.haberes.core.repository.IAcreditacionRepository;
+import um.haberes.core.repository.AcreditacionRepository;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AcreditacionService {
 	@Autowired
-	private IAcreditacionRepository repository;
+	private AcreditacionRepository repository;
 
 	public List<Acreditacion> findAll() {
 		return repository.findAll();

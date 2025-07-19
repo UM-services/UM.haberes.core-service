@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.LiquidacionAdicionalException;
 import um.haberes.core.kotlin.model.LiquidacionAdicional;
-import um.haberes.core.repository.ILiquidacionAdicionalRepository;
+import um.haberes.core.repository.LiquidacionAdicionalRepository;
 
 /**
  * @author daniel
@@ -20,9 +20,9 @@ import um.haberes.core.repository.ILiquidacionAdicionalRepository;
 @Service
 public class LiquidacionAdicionalService {
 
-	private final ILiquidacionAdicionalRepository repository;
+	private final LiquidacionAdicionalRepository repository;
 
-	public LiquidacionAdicionalService(ILiquidacionAdicionalRepository repository) {
+	public LiquidacionAdicionalService(LiquidacionAdicionalRepository repository) {
 		this.repository = repository;
 	}
 

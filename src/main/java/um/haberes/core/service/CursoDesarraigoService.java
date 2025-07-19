@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import um.haberes.core.exception.AcreditacionException;
 import um.haberes.core.exception.CursoDesarraigoException;
 import um.haberes.core.kotlin.model.CursoDesarraigo;
-import um.haberes.core.repository.ICursoDesarraigoRepository;
+import um.haberes.core.repository.CursoDesarraigoRepository;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CursoDesarraigoService {
 	@Autowired
-	private ICursoDesarraigoRepository repository;
+	private CursoDesarraigoRepository repository;
 
 	public List<CursoDesarraigo> findAll() {
 		return repository.findAll();

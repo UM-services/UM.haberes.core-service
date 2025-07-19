@@ -7,9 +7,11 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import um.haberes.core.exception.CodigoGrupoException;
 import um.haberes.core.kotlin.model.CodigoGrupo;
-import um.haberes.core.repository.ICodigoGrupoRepository;
+import um.haberes.core.repository.CodigoGrupoRepository;
 
 /**
  * @author daniel
@@ -18,12 +20,13 @@ import um.haberes.core.repository.ICodigoGrupoRepository;
 @Service
 public class CodigoGrupoService {
 
-	private final ICodigoGrupoRepository repository;
+	private final CodigoGrupoRepository repository;
 
-	public CodigoGrupoService(ICodigoGrupoRepository repository) {
+	public CodigoGrupoService(CodigoGrupoRepository repository) {
 		this.repository = repository;
 	}
 
+	@Cacheable("codigos_grupos")
 	public List<CodigoGrupo> findAll() {
 		return repository.findAll();
 	}
@@ -44,11 +47,13 @@ public class CodigoGrupoService {
 		return repository.findByCodigoId(codigoId).orElseThrow(() -> new CodigoGrupoException(codigoId));
 	}
 
+	@CacheEvict(value = "codigos_grupos", allEntries = true)
 	public CodigoGrupo add(CodigoGrupo codigoGrupo) {
 		repository.save(codigoGrupo);
 		return codigoGrupo;
 	}
 
+	@CacheEvict(value = "codigos_grupos", allEntries = true)
 	public CodigoGrupo update(CodigoGrupo newCodigoGrupo, Integer codigoId) {
 		return repository.findById(codigoId).map(codigoGrupo -> {
 			codigoGrupo = new CodigoGrupo(codigoId, newCodigoGrupo.getRemunerativo(),

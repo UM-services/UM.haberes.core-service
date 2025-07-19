@@ -12,7 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.kotlin.model.NovedadUpload;
-import um.haberes.core.repository.INovedadUploadRepository;
+import um.haberes.core.repository.NovedadUploadRepository;
 
 /**
  * @author daniel
@@ -22,7 +22,7 @@ import um.haberes.core.repository.INovedadUploadRepository;
 public class NovedadUploadService {
 
 	@Autowired
-	private INovedadUploadRepository repository;
+	private NovedadUploadRepository repository;
 
 	public List<NovedadUpload> findAllByPendiente(Integer anho, Integer mes, Byte pendiente) {
 		return repository.findAllByAnhoAndMesAndPendiente(anho, mes, pendiente,

@@ -16,7 +16,7 @@ import um.haberes.core.exception.AntiguedadException;
 import um.haberes.core.kotlin.model.Antiguedad;
 import um.haberes.core.kotlin.model.Persona;
 import um.haberes.core.kotlin.model.view.AntiguedadPeriodo;
-import um.haberes.core.repository.IAntiguedadRepository;
+import um.haberes.core.repository.AntiguedadRepository;
 import um.haberes.core.service.view.AntiguedadPeriodoService;
 import um.haberes.core.util.Periodo;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AntiguedadService {
 
 	@Autowired
-	private IAntiguedadRepository repository;
+	private AntiguedadRepository repository;
 
 	@Autowired
 	private AntiguedadPeriodoService antiguedadPeriodoService;
@@ -82,14 +82,14 @@ public class AntiguedadService {
 		Integer mesesAdministrativos = 0;
 		if (persona.getAltaDocente() != null) {
 			OffsetDateTime alta = persona.getAltaDocente().plusHours(3);
-			ingresoDocente = new Periodo(alta.getYear(), alta.getMonthValue());
-			mesesDocentes = persona.getAjusteDocente() + Periodo.diffMonth(ingresoDocente, new Periodo(anho, mes));
+			ingresoDocente = Periodo.builder().anho(alta.getYear()).mes(alta.getMonthValue()).build();
+			mesesDocentes = persona.getAjusteDocente() + Periodo.diffMonth(ingresoDocente, Periodo.builder().anho(anho).mes(mes).build());
 		}
 		if (persona.getAltaAdministrativa() != null) {
 			OffsetDateTime alta = persona.getAltaDocente().plusHours(3);
-			ingresoAdministrativo = new Periodo(alta.getYear(), alta.getMonthValue());
+			ingresoAdministrativo = Periodo.builder().anho(alta.getYear()).mes(alta.getMonthValue()).build();
 			mesesAdministrativos = persona.getAjusteAdministrativo()
-					+ Periodo.diffMonth(ingresoAdministrativo, new Periodo(anho, mes));
+					+ Periodo.diffMonth(ingresoAdministrativo, Periodo.builder().anho(anho).mes(mes).build());
 		}
 		Long antiguedadId = null;
 		Antiguedad antiguedad = null;

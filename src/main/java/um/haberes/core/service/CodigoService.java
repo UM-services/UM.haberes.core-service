@@ -14,13 +14,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import um.haberes.core.exception.CodigoException;
 import um.haberes.core.kotlin.model.Codigo;
 import um.haberes.core.kotlin.model.view.CodigoPeriodo;
 import um.haberes.core.kotlin.model.view.CodigoSearch;
-import um.haberes.core.repository.ICodigoRepository;
-import um.haberes.core.repository.view.ICodigoPeriodoRepository;
-import um.haberes.core.repository.view.ICodigoSearchRepository;
+import um.haberes.core.repository.CodigoRepository;
+import um.haberes.core.repository.view.CodigoPeriodoRepository;
+import um.haberes.core.repository.view.CodigoSearchRepository;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -31,14 +33,15 @@ import lombok.extern.slf4j.Slf4j;
 public class CodigoService {
 
     @Autowired
-    private ICodigoRepository repository;
+    private CodigoRepository repository;
 
     @Autowired
-    private ICodigoPeriodoRepository codigoperiodorepository;
+    private CodigoPeriodoRepository codigoperiodorepository;
 
     @Autowired
-    private ICodigoSearchRepository codigosearchrepository;
+    private CodigoSearchRepository codigosearchrepository;
 
+    @Cacheable("codigos")
     public List<Codigo> findAll() {
         return repository.findAll(Sort.by("codigoId").ascending());
     }
@@ -75,16 +78,19 @@ public class CodigoService {
         return repository.findTopByOrderByCodigoId().orElseThrow(() -> new CodigoException());
     }
 
+    @CacheEvict(value = "codigos", allEntries = true)
     public void delete(Integer codigoId) {
         repository.deleteById(codigoId);
     }
 
+    @CacheEvict(value = "codigos", allEntries = true)
     public Codigo add(Codigo codigo) {
         repository.save(codigo);
         log.debug(codigo.toString());
         return codigo;
     }
 
+    @CacheEvict(value = "codigos", allEntries = true)
     public Codigo update(Codigo newCodigo, Integer codigoId) {
         return repository.findById(codigoId).map(codigo -> {
             codigo = new Codigo(codigoId, newCodigo.getNombre(), newCodigo.getDocente(), newCodigo.getNoDocente(),
@@ -96,6 +102,7 @@ public class CodigoService {
     }
 
     @Transactional
+    @CacheEvict(value = "codigos", allEntries = true)
     public List<Codigo> saveAll(List<Codigo> codigos) {
         repository.saveAll(codigos);
         log.debug(codigos.toString());

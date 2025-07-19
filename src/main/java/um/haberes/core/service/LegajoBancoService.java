@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.LegajoBancoException;
 import um.haberes.core.kotlin.model.LegajoBanco;
-import um.haberes.core.repository.ILegajoBancoRepository;
+import um.haberes.core.repository.LegajoBancoRepository;
 
 /**
  * @author daniel
@@ -24,7 +24,7 @@ import um.haberes.core.repository.ILegajoBancoRepository;
 public class LegajoBancoService {
 
 	@Autowired
-	private ILegajoBancoRepository repository;
+	private LegajoBancoRepository repository;
 
 	@Autowired
 	private ItemService itemService;

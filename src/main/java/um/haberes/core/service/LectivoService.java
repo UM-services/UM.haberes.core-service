@@ -11,7 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.LectivoException;
-import um.haberes.core.repository.ILectivoRepository;
+import um.haberes.core.repository.LectivoRepository;
 
 /**
  * @author daniel
@@ -21,7 +21,7 @@ import um.haberes.core.repository.ILectivoRepository;
 public class LectivoService {
 
 	@Autowired
-	private ILectivoRepository repository;
+	private LectivoRepository repository;
 
 	public List<Lectivo> findAll() {
 		return repository.findAll();

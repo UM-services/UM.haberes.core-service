@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.CursoCargoNovedadException;
 import um.haberes.core.kotlin.model.CursoCargoNovedad;
-import um.haberes.core.repository.ICursoCargoNovedadRepository;
+import um.haberes.core.repository.CursoCargoNovedadRepository;
 
 /**
  * @author daniel
@@ -29,7 +29,7 @@ import um.haberes.core.repository.ICursoCargoNovedadRepository;
 public class CursoCargoNovedadService {
 
 	@Autowired
-	private ICursoCargoNovedadRepository repository;
+	private CursoCargoNovedadRepository repository;
 
 	public List<CursoCargoNovedad> findAllPendientes(Integer anho, Integer mes) {
 		return repository.findAllByAnhoAndMesAndAutorizadoAndRechazado(anho, mes, (byte) 0, (byte) 0);

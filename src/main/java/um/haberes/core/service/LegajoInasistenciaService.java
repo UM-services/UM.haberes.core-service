@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import um.haberes.core.kotlin.model.LegajoInasistencia;
-import um.haberes.core.kotlin.repository.LegajoInasistenciaRepository;
+import um.haberes.core.repository.LegajoInasistenciaRepository;
 
 @Service
 @Slf4j

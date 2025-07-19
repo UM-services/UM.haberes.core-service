@@ -7,7 +7,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import um.haberes.core.exception.*;
 import um.haberes.core.kotlin.model.*;
@@ -30,57 +29,62 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MakeLiquidacionService {
 
+    // region Constantes de Códigos de Liquidación
+    private static final int CODIGO_BASICO = 1;
+    private static final int CODIGO_ANTIGUEDAD = 2;
+    private static final int CODIGO_AGUINALDO = 3;
+    private static final int CODIGO_ESTADO_DOCENTE = 4;
+    private static final int CODIGO_INCENTIVO_POSGRADO = 9;
+    private static final int CODIGO_PRESENTISMO = 16;
+    private static final int CODIGO_DESCUENTO_PRESENTISMO = 17;
+    private static final int CODIGO_INASISTENCIAS = 18;
+    private static final int CODIGO_HORAS_EXTRAS = 19;
+    private static final int CODIGO_DESARRAIGO = 21;
+    private static final int CODIGO_AGUINALDO_ETEC = 29;
+    private static final int CODIGO_LICENCIA_MATERNIDAD = 30;
+    private static final int CODIGO_AJUSTE_FAVOR_EMPLEADO = 45;
+    private static final int CODIGO_VACACIONES = 57;
+    private static final int CODIGO_JUBILACION = 61;
+    private static final int CODIGO_INSSJP = 62;
+    private static final int CODIGO_OBRA_SOCIAL = 63;
+    private static final int CODIGO_JUBILACION_SECUNDARIO = 70;
+    private static final int CODIGO_AJUSTE_FAVOR_EMPRESA = 75;
+    private static final int CODIGO_TOTAL_REMUNERATIVO = 96;
+    private static final int CODIGO_TOTAL_NO_REMUNERATIVO = 97;
+    private static final int CODIGO_TOTAL_DEDUCCIONES = 98;
+    private static final int CODIGO_NETO = 99;
+    private static final int CODIGO_NOVEDAD_AJUSTE_BASICO = 980;
+    // endregion
+
     private final int constLiquidarConFusion = 1;
     private final int constLiquidarSinFusion = 2;
 
     private final CargoLiquidacionService cargoLiquidacionService;
-
     private final DesignacionToolService designacionToolService;
-
     private final CargoClaseDetalleService cargoClaseDetalleService;
-
     private final ControlService controlService;
-
     private final PersonaService personaService;
-
     private final NovedadService novedadService;
-
     private final ItemService itemService;
-
     private final LegajoControlService legajoControlService;
-
     private final CodigoGrupoService codigoGrupoService;
-
     private final CursoDesarraigoService cursoDesarraigoService;
-
     private final CursoFusionService cursoFusionService;
-
     private final DependenciaService dependenciaService;
-
     private final CategoriaService categoriaService;
-
     private final AntiguedadService antiguedadService;
-
     private final LiquidacionService liquidacionService;
-
     private final ActividadService actividadService;
-
     private final LetraService letraService;
-
     private final CargoService cargoService;
-
     private final NovedadDuplicadaService novedadDuplicadaService;
-
     private final CursoCargoService cursoCargoService;
-
     private final CodigoService codigoService;
-
     private final AdicionalCursoTablaService adicionalCursoTablaService;
-
     private final CategoriaPeriodoService categoriaPeriodoService;
-
     private final LiquidacionAdicionalService liquidacionAdicionalService;
 
+    // State fields for a single liquidation run
     private Control control;
     private Persona persona;
     private List<BigDecimal> indices;
@@ -88,7 +92,6 @@ public class MakeLiquidacionService {
     private Map<Integer, Item> items;
     private Map<Integer, Novedad> novedades;
 
-    @Autowired
     public MakeLiquidacionService(CargoLiquidacionService cargoLiquidacionService, DesignacionToolService designacionToolService, CargoClaseDetalleService cargoClaseDetalleService, ControlService controlService,
                                   PersonaService personaService, NovedadService novedadService, ItemService itemService, LegajoControlService legajoControlService, CodigoGrupoService codigoGrupoService,
                                   CursoDesarraigoService cursoDesarraigoService, CursoFusionService cursoFusionService, DependenciaService dependenciaService, CategoriaService categoriaService,
@@ -127,15 +130,13 @@ public class MakeLiquidacionService {
         indices = designacionToolService.indiceAntiguedad(legajoId, anho, mes);
         persona = personaService.findByLegajoId(legajoId);
         control = controlService.findByPeriodo(anho, mes);
-        LegajoControl legajoControl;
         try {
             legajoControlService.findByUnique(legajoId, anho, mes);
         } catch (LegajoControlException e) {
-            legajoControl = new LegajoControl(null, legajoId, anho, mes, (byte) 0, (byte) 0, (byte) 0, null);
-            legajoControlService.add(legajoControl);
+            legajoControlService.add(new LegajoControl(null, legajoId, anho, mes, (byte) 0, (byte) 0, (byte) 0, null));
         }
         codigos = codigoService.findAll().stream().collect(Collectors.toMap(Codigo::getCodigoId, codigo -> codigo));
-        novedades = novedadService.findAllByLegajo(legajoId, anho, mes).stream().filter(novedad -> novedad.getCodigoId() != 980).collect(Collectors.toMap(Novedad::getCodigoId, novedad -> novedad));
+        novedades = novedadService.findAllByLegajo(legajoId, anho, mes).stream().filter(novedad -> !novedad.getCodigoId().equals(CODIGO_NOVEDAD_AJUSTE_BASICO)).collect(Collectors.toMap(Novedad::getCodigoId, novedad -> novedad));
         items = new HashMap<>();
     }
 
@@ -148,75 +149,97 @@ public class MakeLiquidacionService {
 
     @Transactional
     public void liquidacionByLegajoId(Long legajoId, Integer anho, Integer mes, Boolean force) {
-        // Verifica si ya fue acreditado el período para ver si se puede liquidar
+        if (!puedeLiquidar(legajoId, anho, mes, force)) {
+            return;
+        }
+
+        inicializarLiquidacion(legajoId, anho, mes);
+
+        List<CodigoGrupo> allCodigoGrupos = codigoGrupoService.findAll();
+        List<CodigoGrupo> remunerativosGrupos = allCodigoGrupos.stream().filter(c -> c.getRemunerativo() == 1).toList();
+        List<CodigoGrupo> noRemunerativosGrupos = allCodigoGrupos.stream().filter(c -> c.getNoRemunerativo() == 1).toList();
+        List<CodigoGrupo> deduccionGrupos = allCodigoGrupos.stream().filter(c -> c.getDeduccion() == 1).toList();
+
+        if (!esPeriodoLiquidable(legajoId, anho, mes)) {
+            return;
+        }
+
+        BigDecimal coeficienteLiquidacion = (mes == 6 || mes == 12) ? new BigDecimal("1.5") : BigDecimal.ONE;
+
+        // --- Start Calculation Flow ---
+        calculaBasicoAndAntiguedad(legajoId, anho, mes);
+        calcularConceptosGenerales(legajoId, anho, mes, remunerativosGrupos, noRemunerativosGrupos);
+        calcularTotalesParciales(legajoId, anho, mes, remunerativosGrupos, noRemunerativosGrupos);
+        calcularDescuentosPorAusencia(legajoId, anho, mes);
+        recalcularTotales(legajoId, anho, mes, remunerativosGrupos, noRemunerativosGrupos);
+        calcularAportes(legajoId, anho, mes, coeficienteLiquidacion);
+        calcularDeducciones(legajoId, anho, mes, deduccionGrupos);
+        aplicarAjusteNeto(legajoId, anho, mes);
+        calcularNetoFinal(legajoId, anho, mes);
+        // --- End Calculation Flow ---
+
+        persistirResultadosLiquidacion(legajoId, anho, mes);
+    }
+
+    private boolean puedeLiquidar(Long legajoId, Integer anho, Integer mes, Boolean force) {
         if (!force) {
             try {
                 Liquidacion liquidacion = liquidacionService.findByLegajoIdAndAnhoAndMes(legajoId, anho, mes);
                 if (liquidacion.getBloqueado() == (byte) 1) {
-                    return;
+                    return false;
                 }
             } catch (LiquidacionException e) {
-                log.debug("Nothing to do");
+                log.debug("No existing liquidation found, proceeding.");
             }
         }
 
         persona = personaService.findByLegajoId(legajoId);
-        // Verifica si el estado es 9/N no liquida
-        if (persona.getEstado() == 9 && persona.getLiquida().equals("N")) {
+        if (persona.getEstado() == 9 && "N".equals(persona.getLiquida())) {
             try {
-                Liquidacion liquidacion = liquidacionService.findByPeriodoAnterior(legajoId, anho, mes);
-                if (liquidacion.getEstado() == 1 && liquidacion.getLiquida().equals("S")) {
+                Liquidacion liquidacionAnterior = liquidacionService.findByPeriodoAnterior(legajoId, anho, mes);
+                if (liquidacionAnterior.getEstado() == 1 && "S".equals(liquidacionAnterior.getLiquida())) {
                     log.debug("SIN Liquidacion {}/{}/{}", legajoId, anho, mes);
-                    return;
+                    return false;
                 }
             } catch (LiquidacionException e) {
-                log.debug("Nothing to do");
-            }
-        }
-        // Verifica si el estado anterior era 9/S para pasarlo a 9/N
-        if (!(persona.getEstado() == 1 && persona.getLiquida().equals("S"))) {
-            try {
-                Liquidacion liquidacion = liquidacionService.findByPeriodoAnterior(legajoId, anho, mes);
-                if (liquidacion.getEstado() == 9 && liquidacion.getLiquida().equals("S")) {
-                    persona.setLiquida("N");
-                    persona = personaService.update(persona, legajoId);
-                    return;
-                }
-            } catch (LiquidacionException e) {
-                log.debug("Nothing to do");
+                log.debug("No previous liquidation found, proceeding.");
             }
         }
 
-        // Comienza la liquidación
+        if (!(persona.getEstado() == 1 && "S".equals(persona.getLiquida()))) {
+            try {
+                Liquidacion liquidacionAnterior = liquidacionService.findByPeriodoAnterior(legajoId, anho, mes);
+                if (liquidacionAnterior.getEstado() == 9 && "S".equals(liquidacionAnterior.getLiquida())) {
+                    persona.setLiquida("N");
+                    personaService.update(persona, legajoId);
+                    return false;
+                }
+            } catch (LiquidacionException e) {
+                log.debug("No previous liquidation found, proceeding.");
+            }
+        }
+        return true;
+    }
+
+    private void inicializarLiquidacion(Long legajoId, Integer anho, Integer mes) {
         makeContext(legajoId, anho, mes);
         antiguedadService.calculate(legajoId, anho, mes);
         liquidacionAdicionalService.deleteAllByLegajo(legajoId, anho, mes);
         itemService.deleteAllByLegajo(legajoId, anho, mes);
         liquidacionService.deleteByLegajo(legajoId, anho, mes);
+    }
 
-        List<CodigoGrupo> codigoGrupos = codigoGrupoService.findAll();
-
-        // Verifica si tiene cargoLiquidacions para liquidar o si tiene aguinaldo o
-        // vacaciones
-        if (!(novedades.containsKey(3) || novedades.containsKey(29) || novedades.containsKey(57))) {
-            // Verifica si se puede liquidar, para esto revisa si tiene cargos o cargos con
-            // clases
-            boolean liquidable = !cargoLiquidacionService.findAllActivosByLegajo(legajoId, anho, mes).isEmpty();
-            if (!cargoClaseDetalleService.findAllByLegajo(legajoId, anho, mes).isEmpty()) {
-                liquidable = true;
-            }
-            if (!liquidable) {
-                return;
-            }
+    private boolean esPeriodoLiquidable(Long legajoId, Integer anho, Integer mes) {
+        boolean tieneNovedadesEspeciales = novedades.containsKey(CODIGO_AGUINALDO) || novedades.containsKey(CODIGO_AGUINALDO_ETEC) || novedades.containsKey(CODIGO_VACACIONES);
+        if (tieneNovedadesEspeciales) {
+            return true;
         }
-        BigDecimal coeficienteLiquidacion = BigDecimal.ONE;
-        if (mes == 6 || mes == 12) {
-            coeficienteLiquidacion = new BigDecimal("1.5");
-        }
+        boolean tieneCargosActivos = !cargoLiquidacionService.findAllActivosByLegajo(legajoId, anho, mes).isEmpty();
+        boolean tieneCargosClase = !cargoClaseDetalleService.findAllByLegajo(legajoId, anho, mes).isEmpty();
+        return tieneCargosActivos || tieneCargosClase;
+    }
 
-        // Calcula basico y antiguedad sobre cargoLiquidacions
-        calculaBasicoAndAntiguedad(legajoId, anho, mes);
-
+    private void calcularConceptosGenerales(Long legajoId, Integer anho, Integer mes, List<CodigoGrupo> remunerativos, List<CodigoGrupo> noRemunerativos) {
         // Incentivo Posgrado
         BigDecimal incentivoPosgrado = switch (persona.getPosgrado()) {
             case 1 -> control.getDoctorado();
@@ -225,260 +248,188 @@ public class MakeLiquidacionService {
             default -> BigDecimal.ZERO;
         };
         if (incentivoPosgrado.compareTo(BigDecimal.ZERO) > 0) {
-            Integer codigoId = 9;
-            this.addItem(legajoId, anho, mes, codigoId, incentivoPosgrado);
+            addItem(legajoId, anho, mes, CODIGO_INCENTIVO_POSGRADO, incentivoPosgrado);
         }
 
-        // Remunerativos
-        for (CodigoGrupo codigoGrupo : codigoGrupos.stream().filter(c -> c.getRemunerativo() == 1).toList()) {
-            Integer codigoId = codigoGrupo.getCodigoId();
-            if (novedades.containsKey(codigoId)) {
-                BigDecimal value = novedades.get(codigoId).getImporte();
-                this.addItem(legajoId, anho, mes, codigoId, value);
+        // Carga de Novedades Remunerativas
+        for (CodigoGrupo codigoGrupo : remunerativos) {
+            if (novedades.containsKey(codigoGrupo.getCodigoId())) {
+                addItem(legajoId, anho, mes, codigoGrupo.getCodigoId(), novedades.get(codigoGrupo.getCodigoId()).getImporte());
             }
         }
 
         // Desarraigo
-        BigDecimal totalDesarraigo = BigDecimal.ZERO;
-        for (CursoDesarraigo desarraigo : cursoDesarraigoService.findAllByLegajoIdAndAnhoAndMes(legajoId, anho, mes)) {
-            totalDesarraigo = totalDesarraigo.add(desarraigo.getImporte());
-        }
+        BigDecimal totalDesarraigo = cursoDesarraigoService.findAllByLegajoIdAndAnhoAndMes(legajoId, anho, mes)
+                .stream()
+                .map(CursoDesarraigo::getImporte)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
         if (totalDesarraigo.compareTo(BigDecimal.ZERO) != 0) {
-            Integer codigoId = 21;
-            if (!items.containsKey(codigoId)) {
-                items.put(codigoId, new Item(null, legajoId, anho, mes, codigoId, codigos.get(codigoId).getNombre(), BigDecimal.ZERO, null, null));
-            }
-            Item item = items.get(codigoId);
-            item.setImporte(item.getImporte().add(totalDesarraigo).setScale(2, RoundingMode.HALF_UP));
+            addItem(legajoId, anho, mes, CODIGO_DESARRAIGO, totalDesarraigo);
         }
 
-        // Calcula basico y antiguedad sobre cargos con clase
+        // Cargos con clase
         for (CargoClaseDetalle detalle : cargoClaseDetalleService.findAllByLegajo(legajoId, anho, mes)) {
             BigDecimal basico = detalle.getValorHora().multiply(new BigDecimal(detalle.getHoras())).setScale(2, RoundingMode.HALF_UP);
-            int codigoId = 1;
-            this.addItem(legajoId, anho, mes, codigoId, basico);
+            addItem(legajoId, anho, mes, CODIGO_BASICO, basico);
 
             BigDecimal antiguedad = basico.multiply(indices.get(0)).setScale(2, RoundingMode.HALF_UP);
-            codigoId = 2;
-            this.addItem(legajoId, anho, mes, codigoId, antiguedad);
-        }
-
-        // Aguinaldo
-        BigDecimal aguinaldo = BigDecimal.ZERO;
-        if (novedades.containsKey(3)) {
-            aguinaldo = novedades.get(3).getImporte();
+            addItem(legajoId, anho, mes, CODIGO_ANTIGUEDAD, antiguedad);
         }
 
         // Carga de Novedades No Remunerativas
-        for (CodigoGrupo codigoGrupo : codigoGrupos.stream().filter(c -> c.getNoRemunerativo() == 1).toList()) {
-            Integer codigoId = codigoGrupo.getCodigoId();
-            if (novedades.containsKey(codigoId)) {
-                BigDecimal value = novedades.get(codigoId).getImporte();
-                this.addItem(legajoId, anho, mes, codigoId, value);
+        for (CodigoGrupo codigoGrupo : noRemunerativos) {
+            if (novedades.containsKey(codigoGrupo.getCodigoId())) {
+                addItem(legajoId, anho, mes, codigoGrupo.getCodigoId(), novedades.get(codigoGrupo.getCodigoId()).getImporte());
             }
         }
+    }
 
-        // Remunerativos
-        BigDecimal totalRemunerativo = BigDecimal.ZERO;
-        Integer codigoId = 96;
-        if (!items.containsKey(codigoId)) {
-            items.put(codigoId, new Item(null, legajoId, anho, mes, codigoId, codigos.get(codigoId).getNombre(), BigDecimal.ZERO, null, null));
-        }
-        BigDecimal value = BigDecimal.ZERO;
-        for (CodigoGrupo codigoGrupo : codigoGrupos.stream().filter(c -> c.getRemunerativo() == 1).toList()) {
-            if (codigoGrupo.getCodigoId() != 18) {
-                if (items.containsKey(codigoGrupo.getCodigoId())) {
-                    Item item = items.get(codigoGrupo.getCodigoId());
-                    log.debug("Item Remunerativo -> {}", item);
-                    value = value.add(item.getImporte()).setScale(2, RoundingMode.HALF_UP);
-                }
-            }
-        }
-        Item item = items.get(codigoId);
-        item.setImporte(value);
-        log.debug("Item Total Remunerativo -> {}", item);
-        totalRemunerativo = value.setScale(2, RoundingMode.HALF_UP);
+    private void calcularTotalesParciales(Long legajoId, Integer anho, Integer mes, List<CodigoGrupo> remunerativos, List<CodigoGrupo> noRemunerativos) {
+        // Total Remunerativo Parcial
+        BigDecimal totalRemunerativo = sumarItemsPorGrupo(remunerativos, Set.of(CODIGO_INASISTENCIAS));
+        setItem(legajoId, anho, mes, CODIGO_TOTAL_REMUNERATIVO, totalRemunerativo);
 
-        // No remunerativos
-        codigoId = 97;
-        this.calculateNoRemunerativos(legajoId, anho, mes, codigoId, codigoGrupos);
+        // Total No Remunerativo Parcial
+        BigDecimal totalNoRemunerativo = sumarItemsPorGrupo(noRemunerativos, Collections.emptySet());
+        setItem(legajoId, anho, mes, CODIGO_TOTAL_NO_REMUNERATIVO, totalNoRemunerativo);
+    }
 
-        // Inasistencias
-        log.debug("Total Remunerativo -> {}", totalRemunerativo);
-        aguinaldo = BigDecimal.ZERO;
-        codigoId = 3;
-        if (items.containsKey(codigoId)) {
-            item = items.get(codigoId);
-            aguinaldo = item.getImporte();
-        }
-        log.debug("Aguinaldo -> {}", aguinaldo);
+    private void calcularDescuentosPorAusencia(Long legajoId, Integer anho, Integer mes) {
+        BigDecimal aguinaldo = getItemValue(CODIGO_AGUINALDO);
+        BigDecimal totalRemunerativo = getItemValue(CODIGO_TOTAL_REMUNERATIVO);
         BigDecimal valorMes = totalRemunerativo.subtract(aguinaldo).setScale(2, RoundingMode.HALF_UP);
         BigDecimal valorDia = valorMes.divide(new BigDecimal(30), 5, RoundingMode.HALF_UP);
-        log.debug("Valor Día -> {}", valorDia);
-        int diasInasistencia = 0;
-        if (novedades.containsKey(18)) {
-            diasInasistencia = novedades.get(18).getImporte().intValue();
+
+        // Inasistencias
+        if (novedades.containsKey(CODIGO_INASISTENCIAS)) {
+            int diasInasistencia = novedades.get(CODIGO_INASISTENCIAS).getImporte().intValue();
             BigDecimal inasistencias = new BigDecimal(-1).multiply(new BigDecimal(diasInasistencia).multiply(valorDia)).setScale(2, RoundingMode.HALF_UP);
-            log.debug("Descuento Inasistencias -> {}", inasistencias);
-            codigoId = 18;
-            if (!items.containsKey(codigoId)) {
-                items.put(codigoId, new Item(null, legajoId, anho, mes, codigoId, codigos.get(codigoId).getNombre(), BigDecimal.ZERO, null, null));
-            }
-            item = items.get(codigoId);
-            item.setImporte(inasistencias.setScale(2, RoundingMode.HALF_UP));
+            addItem(legajoId, anho, mes, CODIGO_INASISTENCIAS, inasistencias);
         }
 
-        // Licencia maternidad
-        if (novedades.containsKey(30)) {
-            diasInasistencia = novedades.get(30).getImporte().intValue();
-            log.debug("Días Inasistencia -> {}", diasInasistencia);
-            if (persona.getEstado() == 4 && diasInasistencia > 0) {
-                BigDecimal licenciaMaternidad = new BigDecimal(-1).multiply(new BigDecimal(diasInasistencia).multiply(valorDia)).setScale(2, RoundingMode.HALF_UP);
-                codigoId = 30;
-                this.addItem(legajoId, anho, mes, codigoId, licenciaMaternidad);
+        // Licencia por Maternidad
+        if (novedades.containsKey(CODIGO_LICENCIA_MATERNIDAD)) {
+            int diasLicencia = novedades.get(CODIGO_LICENCIA_MATERNIDAD).getImporte().intValue();
+            if (persona.getEstado() == 4 && diasLicencia > 0) {
+                BigDecimal licenciaMaternidad = new BigDecimal(-1).multiply(new BigDecimal(diasLicencia).multiply(valorDia)).setScale(2, RoundingMode.HALF_UP);
+                addItem(legajoId, anho, mes, CODIGO_LICENCIA_MATERNIDAD, licenciaMaternidad);
             }
         }
+    }
 
-        // Remunerativos
-        codigoId = 96;
-        if (!items.containsKey(codigoId)) {
-            items.put(codigoId, new Item(null, legajoId, anho, mes, codigoId, codigos.get(codigoId).getNombre(), BigDecimal.ZERO, null, null));
-        }
-        value = BigDecimal.ZERO;
-        for (CodigoGrupo codigoGrupo : codigoGrupos.stream().filter(c -> c.getRemunerativo() == 1).toList()) {
-            if (items.containsKey(codigoGrupo.getCodigoId())) {
-                value = value.add(items.get(codigoGrupo.getCodigoId()).getImporte()).setScale(2, RoundingMode.HALF_UP);
-            }
-        }
-        item = items.get(codigoId);
-        item.setImporte(value.setScale(2, RoundingMode.HALF_UP));
+    private void recalcularTotales(Long legajoId, Integer anho, Integer mes, List<CodigoGrupo> remunerativos, List<CodigoGrupo> noRemunerativos) {
+        // Recalcular Total Remunerativo
+        BigDecimal totalRemunerativo = sumarItemsPorGrupo(remunerativos, Collections.emptySet());
+        setItem(legajoId, anho, mes, CODIGO_TOTAL_REMUNERATIVO, totalRemunerativo);
 
-        // No remunerativos
-        codigoId = 97;
-        this.calculateNoRemunerativos(legajoId, anho, mes, codigoId, codigoGrupos);
+        // Recalcular Total No Remunerativo
+        BigDecimal totalNoRemunerativo = sumarItemsPorGrupo(noRemunerativos, Collections.emptySet());
+        setItem(legajoId, anho, mes, CODIGO_TOTAL_NO_REMUNERATIVO, totalNoRemunerativo);
+    }
 
-        // Jubilacion
-        BigDecimal conAportes = items.get(96).getImporte();
-        BigDecimal coeficiente = control.getJubilaem().divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
+    private void calcularAportes(Long legajoId, Integer anho, Integer mes, BigDecimal coeficienteLiquidacion) {
+        BigDecimal conAportes = getItemValue(CODIGO_TOTAL_REMUNERATIVO);
+
+        // Jubilación
+        BigDecimal jubilacion;
+        BigDecimal coeficienteJubilacion = control.getJubilaem().divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
         if (conAportes.compareTo(coeficienteLiquidacion.multiply(control.getMaximo1sijp())) <= 0) {
-            value = conAportes.multiply(coeficiente).setScale(2, RoundingMode.HALF_UP);
+            jubilacion = conAportes.multiply(coeficienteJubilacion).setScale(2, RoundingMode.HALF_UP);
         } else {
-            value = coeficienteLiquidacion.multiply(coeficiente).multiply(control.getMaximo1sijp()).setScale(2, RoundingMode.HALF_UP);
+            jubilacion = coeficienteLiquidacion.multiply(coeficienteJubilacion).multiply(control.getMaximo1sijp()).setScale(2, RoundingMode.HALF_UP);
+        }
+        if (jubilacion.compareTo(BigDecimal.ZERO) != 0) {
+            addItem(legajoId, anho, mes, CODIGO_JUBILACION, jubilacion);
         }
 
-        if (value.compareTo(BigDecimal.ZERO) != 0) {
-            codigoId = 61;
-            this.addItem(legajoId, anho, mes, codigoId, value);
-        }
-
-        // Jubilacion Secundario
-        boolean onlyETEC = this.evaluateOnlyETEC(items);
-
-        if (onlyETEC) {
-            conAportes = items.get(96).getImporte();
-            coeficiente = new BigDecimal("0.02");
-            value = conAportes.multiply(coeficiente).setScale(2, RoundingMode.HALF_UP);
-
-            if (value.compareTo(BigDecimal.ZERO) != 0) {
-                codigoId = 70;
-                this.addItem(legajoId, anho, mes, codigoId, value);
+        // Jubilación Secundario (ETEC)
+        if (evaluateOnlyETEC(items)) {
+            BigDecimal jubilacionEtec = conAportes.multiply(new BigDecimal("0.02")).setScale(2, RoundingMode.HALF_UP);
+            if (jubilacionEtec.compareTo(BigDecimal.ZERO) != 0) {
+                addItem(legajoId, anho, mes, CODIGO_JUBILACION_SECUNDARIO, jubilacionEtec);
             }
         }
 
         // INSSJP
-        coeficiente = control.getInssjpem().divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
+        BigDecimal inssjp;
+        BigDecimal coeficienteInssjp = control.getInssjpem().divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
         if (conAportes.compareTo(coeficienteLiquidacion.multiply(control.getMaximo5sijp())) <= 0) {
-            value = conAportes.multiply(coeficiente).setScale(2, RoundingMode.HALF_UP);
+            inssjp = conAportes.multiply(coeficienteInssjp).setScale(2, RoundingMode.HALF_UP);
         } else {
-            value = coeficienteLiquidacion.multiply(coeficiente).multiply(control.getMaximo5sijp()).setScale(2, RoundingMode.HALF_UP);
+            inssjp = coeficienteLiquidacion.multiply(coeficienteInssjp).multiply(control.getMaximo5sijp()).setScale(2, RoundingMode.HALF_UP);
         }
         if (persona.getEstadoAfip() == 2) {
-            value = BigDecimal.ZERO;
+            inssjp = BigDecimal.ZERO;
         }
-
-        if (value.compareTo(BigDecimal.ZERO) != 0) {
-            codigoId = 62;
-            this.addItem(legajoId, anho, mes, codigoId, value);
+        if (inssjp.compareTo(BigDecimal.ZERO) != 0) {
+            addItem(legajoId, anho, mes, CODIGO_INSSJP, inssjp);
         }
 
         // Obra Social
-//        coeficiente = control.getOsociaem().divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
-//        if (conAportes.compareTo(coeficienteLiquidacion.multiply(control.getMinimoAporte())) < 0) {
-//            value = coeficiente.multiply(coeficienteLiquidacion.multiply(control.getMinimoAporte())).setScale(2, RoundingMode.HALF_UP);
-//        }
-//        if (conAportes.compareTo(coeficienteLiquidacion.multiply(control.getMinimoAporte())) >= 0 && conAportes.compareTo(coeficienteLiquidacion.multiply(control.getMaximoAporte())) <= 0) {
-//            value = coeficiente.multiply(conAportes).setScale(2, RoundingMode.HALF_UP);
-//        }
-//        if (conAportes.compareTo(coeficienteLiquidacion.multiply(control.getMaximoAporte())) > 0) {
-//            value = coeficiente.multiply(coeficienteLiquidacion.multiply(control.getMaximoAporte())).setScale(2, RoundingMode.HALF_UP);
-//        }
-        if (persona.getEstadoAfip() == 2 || conAportes.compareTo(BigDecimal.ZERO) == 0) {
-            value = BigDecimal.ZERO;
+        BigDecimal obraSocial = BigDecimal.ZERO;
+        if (persona.getEstadoAfip() != 2 && conAportes.compareTo(BigDecimal.ZERO) != 0) {
+            // La lógica original estaba comentada, se mantiene así.
+            // Si se necesita, se debe implementar aquí.
         }
-
-        if (value.compareTo(BigDecimal.ZERO) != 0) {
-            codigoId = 63;
-            this.addItem(legajoId, anho, mes, codigoId, value);
+        if (obraSocial.compareTo(BigDecimal.ZERO) != 0) {
+            addItem(legajoId, anho, mes, CODIGO_OBRA_SOCIAL, obraSocial);
         }
+    }
 
-        // Deducciones
-        for (CodigoGrupo codigoGrupo : codigoGrupos.stream().filter(c -> c.getDeduccion() == 1).toList()) {
-            codigoId = codigoGrupo.getCodigoId();
-            if (novedades.containsKey(codigoId)) {
-                value = novedades.get(codigoId).getImporte();
+    private void calcularDeducciones(Long legajoId, Integer anho, Integer mes, List<CodigoGrupo> deduccionGrupos) {
+        // Cargar Novedades de Deducción
+        for (CodigoGrupo codigoGrupo : deduccionGrupos) {
+            if (novedades.containsKey(codigoGrupo.getCodigoId())) {
+                BigDecimal value = novedades.get(codigoGrupo.getCodigoId()).getImporte();
                 if (value.compareTo(BigDecimal.ZERO) != 0) {
-                    this.addItem(legajoId, anho, mes, codigoId, value);
+                    addItem(legajoId, anho, mes, codigoGrupo.getCodigoId(), value);
                 }
             }
         }
 
-        // Total deducciones
-        codigoId = 98;
-        if (!items.containsKey(codigoId)) {
-            items.put(codigoId, new Item(null, legajoId, anho, mes, codigoId, codigos.get(codigoId).getNombre(), BigDecimal.ZERO, null, null));
-        }
-        value = BigDecimal.ZERO;
-        for (CodigoGrupo codigoGrupo : codigoGrupos.stream().filter(c -> c.getDeduccion() == 1).toList()) {
-            if (items.containsKey(codigoGrupo.getCodigoId())) {
-                value = value.add(items.get(codigoGrupo.getCodigoId()).getImporte()).setScale(2, RoundingMode.HALF_UP);
-            }
-        }
-        item = items.get(codigoId);
-        item.setImporte(item.getImporte().add(value).setScale(2, RoundingMode.HALF_UP));
+        // Calcular Total Deducciones
+        BigDecimal totalDeducciones = sumarItemsPorGrupo(deduccionGrupos, Collections.emptySet());
+        setItem(legajoId, anho, mes, CODIGO_TOTAL_DEDUCCIONES, totalDeducciones);
+    }
 
-        // Ajuste
-        BigDecimal neto = items.get(96).getImporte().add(items.get(97).getImporte()).subtract(items.get(98).getImporte());
+    private void aplicarAjusteNeto(Long legajoId, Integer anho, Integer mes) {
+        BigDecimal rem = getItemValue(CODIGO_TOTAL_REMUNERATIVO);
+        BigDecimal noRem = getItemValue(CODIGO_TOTAL_NO_REMUNERATIVO);
+        BigDecimal ded = getItemValue(CODIGO_TOTAL_DEDUCCIONES);
+        BigDecimal neto = rem.add(noRem).subtract(ded);
         BigDecimal centavos = neto.subtract(neto.setScale(0, RoundingMode.HALF_UP));
+
         if (centavos.compareTo(BigDecimal.ZERO) > 0) {
-            value = centavos.abs();
-            codigoId = 75;
-            this.addItem(legajoId, anho, mes, codigoId, value);
-            codigoId = 98;
-            this.addItem(legajoId, anho, mes, codigoId, value);
+            BigDecimal value = centavos.abs();
+            addItem(legajoId, anho, mes, CODIGO_AJUSTE_FAVOR_EMPRESA, value);
+            addItem(legajoId, anho, mes, CODIGO_TOTAL_DEDUCCIONES, value);
         }
         if (centavos.compareTo(BigDecimal.ZERO) < 0) {
-            value = centavos.abs();
-            codigoId = 45;
-            this.addItem(legajoId, anho, mes, codigoId, value);
-            codigoId = 97;
-            this.addItem(legajoId, anho, mes, codigoId, value);
+            BigDecimal value = centavos.abs();
+            addItem(legajoId, anho, mes, CODIGO_AJUSTE_FAVOR_EMPLEADO, value);
+            addItem(legajoId, anho, mes, CODIGO_TOTAL_NO_REMUNERATIVO, value);
         }
+    }
 
-        // Neto
-        value = items.get(96).getImporte().add(items.get(97).getImporte()).subtract(items.get(98).getImporte());
-        codigoId = 99;
-        if (!items.containsKey(codigoId)) {
-            items.put(codigoId, new Item(null, legajoId, anho, mes, codigoId, codigos.get(codigoId).getNombre(), BigDecimal.ZERO, null, null));
-        }
-        item = items.get(codigoId);
-        item.setImporte(item.getImporte().add(value));
+    private void calcularNetoFinal(Long legajoId, Integer anho, Integer mes) {
+        BigDecimal rem = getItemValue(CODIGO_TOTAL_REMUNERATIVO);
+        BigDecimal noRem = getItemValue(CODIGO_TOTAL_NO_REMUNERATIVO);
+        BigDecimal ded = getItemValue(CODIGO_TOTAL_DEDUCCIONES);
+        BigDecimal neto = rem.add(noRem).subtract(ded);
+        setItem(legajoId, anho, mes, CODIGO_NETO, neto);
+    }
 
-        // Eliminar después de detectar la duplicación
-        itemService.deleteAllByLegajo(legajoId, anho, mes);
-        //
+    private void persistirResultadosLiquidacion(Long legajoId, Integer anho, Integer mes) {
         itemService.saveAll(new ArrayList<>(items.values()));
 
-        liquidacionService.add(new Liquidacion(null, legajoId, anho, mes, Tool.dateAbsoluteArgentina(), null, persona.getDependenciaId(), persona.getSalida(), items.get(96).getImporte(), items.get(97).getImporte(), items.get(98).getImporte(), items.get(99).getImporte(), (byte) 0, persona.getEstado(), persona.getLiquida(), null, null));
+        Liquidacion liquidacion = new Liquidacion(null, legajoId, anho, mes, Tool.dateAbsoluteArgentina(), null,
+                persona.getDependenciaId(), persona.getSalida(),
+                getItemValue(CODIGO_TOTAL_REMUNERATIVO),
+                getItemValue(CODIGO_TOTAL_NO_REMUNERATIVO),
+                getItemValue(CODIGO_TOTAL_DEDUCCIONES),
+                getItemValue(CODIGO_NETO),
+                (byte) 0, persona.getEstado(), persona.getLiquida(), null, null);
+        liquidacionService.add(liquidacion);
 
         try {
             actividadService.findByUnique(legajoId, anho, mes);
@@ -495,12 +446,10 @@ public class MakeLiquidacionService {
         LegajoControl legajoControl = legajoControlService.findByUnique(legajoId, anho, mes);
         legajoControl.setLiquidado((byte) 1);
         legajoControlService.update(legajoControl, legajoControl.getLegajoControlId());
-
     }
 
     @Transactional
     public void deleteLiquidacionByLegajoId(Long legajoId, Integer anho, Integer mes, Boolean force) {
-        // Verifica si ya fue acreditado el período para ver si se puede liquidar
         if (!force) {
             try {
                 Liquidacion liquidacion = liquidacionService.findByLegajoIdAndAnhoAndMes(legajoId, anho, mes);
@@ -516,7 +465,6 @@ public class MakeLiquidacionService {
         letraService.deleteByUnique(legajoId, anho, mes);
         itemService.deleteAllByLegajo(legajoId, anho, mes);
         liquidacionService.deleteByLegajo(legajoId, anho, mes);
-        // Poner liquidado y bloqueado en legajoControl en 0
         LegajoControl legajoControl = legajoControlService.findByUnique(legajoId, anho, mes);
         legajoControl.setLiquidado((byte) 0);
         legajoControlService.update(legajoControl, legajoControl.getLegajoControlId());
@@ -524,169 +472,129 @@ public class MakeLiquidacionService {
 
     @Transactional
     public void calculaBasicoAndAntiguedad(Long legajoId, Integer anho, Integer mes) {
-        // Calcula sobre Cursos (Adicional)
-        // cantidad de horas por dependencia
+        Map<String, Dependencia> dependenciasBySede = dependenciaService.findAll().stream()
+                .collect(Collectors.toMap(Dependencia::getSedeKey, Function.identity(), (d1, d2) -> d1));
+
         Map<Integer, Integer> horasDependencia = new HashMap<>();
-        for (CursoCargo cursoCargo : cursoCargoService.findAllByLegajoWithAdicional(legajoId, anho, mes)) {
-            Dependencia dependencia = dependenciaService.findFirstByFacultadIdAndGeograficaId(Objects.requireNonNull(cursoCargo.getCurso()).getFacultadId(), cursoCargo.getCurso().getGeograficaId());
-            if (!horasDependencia.containsKey(dependencia.getDependenciaId())) {
-                horasDependencia.put(dependencia.getDependenciaId(), 0);
+        List<CursoCargo> cursosCargoConAdicional = cursoCargoService.findAllByLegajoWithAdicional(legajoId, anho, mes);
+        for (CursoCargo cursoCargo : cursosCargoConAdicional) {
+            Curso curso = cursoCargo.getCurso();
+            if (curso == null) continue;
+            String sedeKey = curso.getFacultadId() + "." + curso.getGeograficaId();
+            Dependencia dependencia = dependenciasBySede.get(sedeKey);
+            if (dependencia == null) continue;
+            horasDependencia.compute(dependencia.getDependenciaId(), (k, v) -> (v == null ? 0 : v) + cursoCargo.getHorasSemanales().intValue());
+        }
+
+        Map<Integer, BigDecimal> totalDependencia = (control.getModoLiquidacionId() == constLiquidarConFusion)
+                ? calculateTotalDependenciaFusionado(legajoId, anho, mes, dependenciasBySede)
+                : calculateTotalDependenciaSinFusion(legajoId, anho, mes, dependenciasBySede);
+
+        if (totalDependencia != null && !totalDependencia.isEmpty()) {
+            calcularAdicionalesPorDependencia(legajoId, anho, mes, totalDependencia, horasDependencia);
+        }
+
+        for (CargoLiquidacion cargoLiquidacion : cargoLiquidacionService.findAllByLegajo(legajoId, anho, mes)) {
+            calcularConceptosPorCargo(legajoId, anho, mes, cargoLiquidacion);
+        }
+    }
+
+    private void calcularAdicionalesPorDependencia(Long legajoId, Integer anho, Integer mes, Map<Integer, BigDecimal> totalDependencia, Map<Integer, Integer> horasDependencia) {
+        Map<Integer, Dependencia> dependenciasById = dependenciaService.findAllByIds(totalDependencia.keySet()).stream()
+                .collect(Collectors.toMap(Dependencia::getDependenciaId, Function.identity()));
+        Set<Integer> facultadIds = dependenciasById.values().stream().map(Dependencia::getFacultadId).collect(Collectors.toSet());
+        List<AdicionalCursoTabla> tablasAdicionales = adicionalCursoTablaService.findAllByFacultadesAndPeriodo(facultadIds, anho, mes);
+        Map<Integer, AdicionalCursoTabla> tablaPorFacultad = new HashMap<>();
+        Map<String, AdicionalCursoTabla> tablaPorFacultadYGeografica = new HashMap<>();
+        for (AdicionalCursoTabla tabla : tablasAdicionales) {
+            if (tabla.getGeograficaId() == null) {
+                tablaPorFacultad.put(tabla.getFacultadId(), tabla);
+            } else {
+                tablaPorFacultadYGeografica.put(tabla.getFacultadId() + "." + tabla.getGeograficaId(), tabla);
             }
-            horasDependencia.replace(dependencia.getDependenciaId(), horasDependencia.get(dependencia.getDependenciaId()) + cursoCargo.getHorasSemanales().intValue());
         }
-        log.debug("Horas Dependencia -> {}", horasDependencia);
 
-        // calcula con fusión o sin fusión, depende la configuración del mes
-        Map<Integer, BigDecimal> totalDependencia = null;
-        if (control.getModoLiquidacionId() == constLiquidarConFusion) {
-            // sumatoria de cursoFusion para cada dependencia
-            totalDependencia = this.calculateTotalDependenciaFusionado(legajoId, anho, mes);
-        }
-        if (control.getModoLiquidacionId() == constLiquidarSinFusion) {
-            // sumatoria de cursoCargo para cada dependencia
-            totalDependencia = this.calculateTotalDependenciaSinFusion(legajoId, anho, mes);
-        }
-        log.debug("Total Dependencia -> {}", totalDependencia);
-
-        // Calcula basico y antiguedad para cada dependencia considerando adicionales
-        assert totalDependencia != null;
         for (Integer dependenciaId : totalDependencia.keySet()) {
-            Dependencia dependencia = dependenciaService.findByDependenciaId(dependenciaId);
-            AdicionalCursoTabla adicionalCursoTabla = null;
-            try {
-                adicionalCursoTabla = adicionalCursoTablaService.findByFacultadIdAndPeriodo(dependencia.getFacultadId(), anho, mes);
-            } catch (AdicionalCursoTablaException e) {
-                log.debug("Sin Tabla Adicional de Facultad");
-                // Busco por facultad y geografica
-                try {
-                    adicionalCursoTabla = adicionalCursoTablaService.findByFacultadIdAndGeograficaIdAndPeriodo(dependencia.getFacultadId(), dependencia.getGeograficaId(), anho, mes);
-                } catch (AdicionalCursoTablaException e1) {
-                    log.debug("Sin Tabla Adicional de Facultad y Geografica");
-                }
+            Dependencia dependencia = dependenciasById.get(dependenciaId);
+            if (dependencia == null) continue;
+
+            AdicionalCursoTabla adicionalCursoTabla = tablaPorFacultadYGeografica.get(dependencia.getFacultadId() + "." + dependencia.getGeograficaId());
+            if (adicionalCursoTabla == null) {
+                adicionalCursoTabla = tablaPorFacultad.get(dependencia.getFacultadId());
             }
 
             if (adicionalCursoTabla != null) {
-                Integer horas = horasDependencia.get(dependenciaId);
+                Integer horas = horasDependencia.getOrDefault(dependenciaId, 0);
                 BigDecimal totalCategoria = totalDependencia.get(dependenciaId);
                 BigDecimal porcentaje = BigDecimal.ZERO;
                 for (AdicionalCursoRango adicionalCursoRango : Objects.requireNonNull(adicionalCursoTabla.getAdicionalCursoRangos())) {
                     if (horas >= adicionalCursoRango.getHorasDesde() && horas <= adicionalCursoRango.getHorasHasta()) {
                         porcentaje = adicionalCursoRango.getPorcentaje();
+                        break;
                     }
                 }
-                log.debug("Horas -> {} - Total -> {} - Porcentaje -> {}", horas, totalCategoria, porcentaje);
-                BigDecimal adicional = totalCategoria.multiply(porcentaje).divide(new BigDecimal(100), RoundingMode.HALF_UP);
+                BigDecimal adicional = totalCategoria.multiply(porcentaje).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
                 if (adicional.compareTo(BigDecimal.ZERO) > 0) {
-                    LiquidacionAdicional liquidacionAdicional = new LiquidacionAdicional(null, legajoId, anho, mes, dependenciaId, adicional, null, null);
-                    liquidacionAdicionalService.add(liquidacionAdicional);
-                    // Basico
-                    int codigoId = 1;
-                    this.addItem(legajoId, anho, mes, codigoId, adicional);
-
-                    // Antigüedad
-                    BigDecimal antiguedad = BigDecimal.ZERO;
-                    antiguedad = adicional.multiply(indices.get(0)).setScale(2, RoundingMode.HALF_UP);
-                    codigoId = 2;
+                    liquidacionAdicionalService.add(new LiquidacionAdicional(null, legajoId, anho, mes, dependenciaId, adicional, null, null));
+                    addItem(legajoId, anho, mes, CODIGO_BASICO, adicional);
+                    BigDecimal antiguedad = adicional.multiply(indices.get(0)).setScale(2, RoundingMode.HALF_UP);
                     if (antiguedad.compareTo(BigDecimal.ZERO) != 0) {
-                        this.addItem(legajoId, anho, mes, codigoId, antiguedad);
+                        addItem(legajoId, anho, mes, CODIGO_ANTIGUEDAD, antiguedad);
                     }
-
                 }
             }
         }
+    }
 
-        // Calcula sobre Cargos
-        for (CargoLiquidacion cargoLiquidacion : cargoLiquidacionService.findAllByLegajo(legajoId, anho, mes)) {
-            BigDecimal valorMes = BigDecimal.ZERO;
+    private void calcularConceptosPorCargo(Long legajoId, Integer anho, Integer mes, CargoLiquidacion cargoLiquidacion) {
+        BigDecimal valorMes = BigDecimal.ZERO;
+        Categoria categoria = cargoLiquidacion.getCategoria();
+        assert categoria != null;
 
-            // Basico
-            BigDecimal basico = cargoLiquidacion.getCategoriaBasico().multiply(new BigDecimal(cargoLiquidacion.getJornada())).setScale(2, RoundingMode.HALF_UP);
-            BigDecimal horas = BigDecimal.ONE;
-            BigDecimal estadoDocenteNuevo;
-            if (cargoLiquidacion.getHorasJornada().compareTo(BigDecimal.ZERO) > 0) {
-                horas = cargoLiquidacion.getHorasJornada();
-            }
-            basico = basico.multiply(horas).setScale(2, RoundingMode.HALF_UP);
-            Categoria categoria = cargoLiquidacion.getCategoria();
-            assert categoria != null;
-            estadoDocenteNuevo = categoria.getEstadoDocente();
-            if (estadoDocenteNuevo.compareTo(BigDecimal.ZERO) != 0) {
-                int codigoId = 4;
-                this.addItem(legajoId, anho, mes, codigoId, estadoDocenteNuevo);
-            }
+        BigDecimal basico = cargoLiquidacion.getCategoriaBasico().multiply(new BigDecimal(cargoLiquidacion.getJornada()));
+        if (cargoLiquidacion.getHorasJornada().compareTo(BigDecimal.ZERO) > 0) {
+            basico = basico.multiply(cargoLiquidacion.getHorasJornada());
+        }
+        if (categoria.getBasico().compareTo(basico) > 0) {
+            basico = categoria.getBasico();
+        }
+        basico = basico.setScale(2, RoundingMode.HALF_UP);
+        valorMes = valorMes.add(basico);
+        addItem(legajoId, anho, mes, CODIGO_BASICO, basico);
 
-            if (categoria.getBasico().compareTo(basico) > 0) {
-                basico = categoria.getBasico();
-            }
-            valorMes = valorMes.add(basico).setScale(2, RoundingMode.HALF_UP);
-            valorMes = valorMes.add(estadoDocenteNuevo).setScale(2, RoundingMode.HALF_UP);
-            int codigoId = 1;
-            Item item;
-            if (basico.compareTo(BigDecimal.ZERO) != 0) {
-                if (!items.containsKey(codigoId)) {
-                    items.put(codigoId, new Item(null, legajoId, anho, mes, codigoId, codigos.get(codigoId).getNombre(), BigDecimal.ZERO, null, null));
-                }
-                item = items.get(codigoId);
-                item.setImporte(item.getImporte().add(basico).setScale(2, RoundingMode.HALF_UP));
-            }
+        BigDecimal estadoDocente = categoria.getEstadoDocente();
+        if (estadoDocente.compareTo(BigDecimal.ZERO) != 0) {
+            addItem(legajoId, anho, mes, CODIGO_ESTADO_DOCENTE, estadoDocente);
+            valorMes = valorMes.add(estadoDocente);
+        }
 
-            // Antigüedad
-            BigDecimal antiguedad = BigDecimal.ZERO;
-            if (cargoLiquidacion.getCategoria().getNoDocente() == 1) {
-                antiguedad = basico.multiply(indices.get(1).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
-            }
-            if (cargoLiquidacion.getCategoria().getDocente() == 1) {
-                antiguedad = basico.multiply(indices.getFirst()).setScale(2, RoundingMode.HALF_UP);
-            }
-            valorMes = valorMes.add(antiguedad).setScale(2, RoundingMode.HALF_UP);
-            codigoId = 2;
-            if (antiguedad.compareTo(BigDecimal.ZERO) != 0) {
-                this.addItem(legajoId, anho, mes, codigoId, antiguedad);
-            }
+        BigDecimal antiguedad = BigDecimal.ZERO;
+        if (categoria.getNoDocente() == 1) {
+            antiguedad = basico.multiply(indices.get(1).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
+        } else if (categoria.getDocente() == 1) {
+            antiguedad = basico.multiply(indices.getFirst()).setScale(2, RoundingMode.HALF_UP);
+        }
+        if (antiguedad.compareTo(BigDecimal.ZERO) != 0) {
+            valorMes = valorMes.add(antiguedad);
+            addItem(legajoId, anho, mes, CODIGO_ANTIGUEDAD, antiguedad);
+        }
 
-            // Calcula estado docente
-            BigDecimal estadoDocente = BigDecimal.ZERO;
-            if (cargoLiquidacion.getCategoriaId() != null) {
-                estadoDocente = this.calculateEstadoDocente(cargoLiquidacion.getCategoriaId());
+        if (categoria.getNoDocente() == 1) {
+            BigDecimal presentismo = basico.multiply(new BigDecimal(cargoLiquidacion.getPresentismo()).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP)).setScale(2, RoundingMode.HALF_UP);
+            addItem(legajoId, anho, mes, CODIGO_PRESENTISMO, presentismo);
+            valorMes = valorMes.add(presentismo);
+
+            if (novedades.containsKey(CODIGO_PRESENTISMO) && "N".equals(novedades.get(CODIGO_PRESENTISMO).getValue())) {
+                BigDecimal descuentoPresentismo = presentismo.negate();
+                addItem(legajoId, anho, mes, CODIGO_DESCUENTO_PRESENTISMO, descuentoPresentismo);
             }
+        }
 
-            if (basico.compareTo(BigDecimal.ZERO) == 0) estadoDocente = basico;
-
-            valorMes = valorMes.add(estadoDocente).setScale(2, RoundingMode.HALF_UP);
-
-            if (estadoDocente.compareTo(BigDecimal.ZERO) != 0) {
-                codigoId = 4;
-                this.addItem(legajoId, anho, mes, codigoId, estadoDocente);
-            }
-
-            // Presentismo
-            BigDecimal presentismoSi = BigDecimal.ZERO;
-            BigDecimal presentismoNo = BigDecimal.ZERO;
-
-            if (cargoLiquidacion.getCategoria().getNoDocente() == 1) {
-                presentismoSi = basico.multiply(new BigDecimal(cargoLiquidacion.getPresentismo()).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP)).setScale(2, RoundingMode.HALF_UP);
-                codigoId = 16;
-                this.addItem(legajoId, anho, mes, codigoId, presentismoSi);
-            }
-            valorMes = valorMes.add(presentismoSi);
-
-            codigoId = 16;
-            if (novedades.containsKey(codigoId)) {
-                if (novedades.get(codigoId).getValue().equals("N")) {
-                    presentismoNo = basico.multiply(new BigDecimal(cargoLiquidacion.getPresentismo()).divide(new BigDecimal(-100), 2, RoundingMode.HALF_UP)).setScale(2, RoundingMode.HALF_UP);
-                    codigoId = 17;
-                    this.addItem(legajoId, anho, mes, codigoId, presentismoNo);
-                }
-            }
-
-            // Horas extras
-            codigoId = 19;
-            if (novedades.containsKey(codigoId)) {
-                int totalHoras = cargoLiquidacion.getJornada() == 1 ? 100 : 180;
-                BigDecimal unaHoraTrabajada = valorMes.divide(new BigDecimal(totalHoras), 2, RoundingMode.HALF_UP);
-                BigDecimal horasExtras = unaHoraTrabajada.multiply(novedades.get(codigoId).getImporte()).setScale(2, RoundingMode.HALF_UP);
-                this.addItem(legajoId, anho, mes, codigoId, horasExtras);
-            }
+        if (novedades.containsKey(CODIGO_HORAS_EXTRAS)) {
+            int totalHoras = cargoLiquidacion.getJornada() == 1 ? 100 : 180;
+            BigDecimal valorHora = valorMes.divide(new BigDecimal(totalHoras), 2, RoundingMode.HALF_UP);
+            BigDecimal horasExtras = valorHora.multiply(novedades.get(CODIGO_HORAS_EXTRAS).getImporte()).setScale(2, RoundingMode.HALF_UP);
+            addItem(legajoId, anho, mes, CODIGO_HORAS_EXTRAS, horasExtras);
         }
     }
 
@@ -698,24 +606,8 @@ public class MakeLiquidacionService {
         for (Cargo cargo : cargoService.findAllDocenteByPeriodo(legajoId, anho, mes)) {
             logCargo(cargo);
             Categoria categoria = cargo.getCategoria();
-            if (categoria.getCategoriaId() != 980) {
-                cargoLiquidacions.add(new CargoLiquidacion(null,
-                        legajoId,
-                        anho, mes,
-                        cargo.getDependenciaId(),
-                        Periodo.firstDay(anho, mes),
-                        Periodo.lastDay(anho, mes),
-                        categoria.getCategoriaId(),
-                        categoria.getNombre(),
-                        categoria.getBasico(),
-                        categoria.getEstadoDocente(),
-                        cargo.getHorasJornada(),
-                        cargo.getJornada(),
-                        cargo.getPresentismo(),
-                        "A",
-                        null,
-                        null,
-                        categoria));
+            if (categoria.getCategoriaId() != CODIGO_NOVEDAD_AJUSTE_BASICO) {
+                cargoLiquidacions.add(new CargoLiquidacion(null, legajoId, anho, mes, cargo.getDependenciaId(), Periodo.firstDay(anho, mes), Periodo.lastDay(anho, mes), categoria.getCategoriaId(), categoria.getNombre(), categoria.getBasico(), categoria.getEstadoDocente(), cargo.getHorasJornada(), cargo.getJornada(), cargo.getPresentismo(), "A", null, null, categoria));
             }
         }
         control = controlService.findByPeriodo(anho, mes);
@@ -723,24 +615,7 @@ public class MakeLiquidacionService {
             for (CursoFusion cursoFusion : cursoFusionService.findAllByLegajoId(legajoId, anho, mes)) {
                 Dependencia dependencia = dependencias.get(cursoFusion.getFacultadId() + "." + cursoFusion.getGeograficaId());
                 Categoria categoria = cursoFusion.getCategoria();
-                cargoLiquidacions.add(new CargoLiquidacion(null,
-                        legajoId,
-                        anho,
-                        mes,
-                        dependencia.getDependenciaId(),
-                        Periodo.firstDay(anho, mes),
-                        Periodo.lastDay(anho, mes),
-                        categoria.getCategoriaId(),
-                        categoria.getNombre(),
-                        categoria.getBasico(),
-                        categoria.getEstadoDocente(),
-                        BigDecimal.ZERO,
-                        1,
-                        0,
-                        "A",
-                        null,
-                        dependencia,
-                        categoria));
+                cargoLiquidacions.add(new CargoLiquidacion(null, legajoId, anho, mes, dependencia.getDependenciaId(), Periodo.firstDay(anho, mes), Periodo.lastDay(anho, mes), categoria.getCategoriaId(), categoria.getNombre(), categoria.getBasico(), categoria.getEstadoDocente(), BigDecimal.ZERO, 1, 0, "A", null, dependencia, categoria));
             }
         }
         if (control.getModoLiquidacionId() == constLiquidarSinFusion) {
@@ -748,47 +623,13 @@ public class MakeLiquidacionService {
                 if (cursoCargo.getCategoriaId() != null) {
                     Dependencia dependencia = dependencias.get(Objects.requireNonNull(cursoCargo.getCurso()).getFacultadId() + "." + cursoCargo.getCurso().getGeograficaId());
                     Categoria categoria = cursoCargo.getCategoria();
-                    cargoLiquidacions.add(new CargoLiquidacion(null,
-                            legajoId,
-                            anho,
-                            mes,
-                            dependencia.getDependenciaId(),
-                            Periodo.firstDay(anho, mes),
-                            Periodo.lastDay(anho, mes),
-                            categoria.getCategoriaId(),
-                            categoria.getNombre(),
-                            categoria.getBasico(),
-                            categoria.getEstadoDocente(),
-                            BigDecimal.ZERO,
-                            1,
-                            0,
-                            "A",
-                            null,
-                            dependencia,
-                            categoria));
+                    cargoLiquidacions.add(new CargoLiquidacion(null, legajoId, anho, mes, dependencia.getDependenciaId(), Periodo.firstDay(anho, mes), Periodo.lastDay(anho, mes), categoria.getCategoriaId(), categoria.getNombre(), categoria.getBasico(), categoria.getEstadoDocente(), BigDecimal.ZERO, 1, 0, "A", null, dependencia, categoria));
                 }
             }
         }
-        Categoria categoria = categoriaService.findByCategoriaId(980);
-        for (Novedad novedad : novedadService.findAllByLegajoAndCodigo(legajoId, anho, mes, 980)) {
-            cargoLiquidacions.add(new CargoLiquidacion(null,
-                    legajoId,
-                    anho,
-                    mes,
-                    novedad.getDependenciaId(),
-                    Periodo.firstDay(anho, mes),
-                    Periodo.lastDay(anho, mes),
-                    categoria.getCategoriaId(),
-                    categoria.getNombre(),
-                    novedad.getImporte(),
-                    BigDecimal.ZERO,
-                    BigDecimal.ZERO,
-                    1,
-                    0,
-                    "A",
-                    null,
-                    novedad.getDependencia(),
-                    categoria));
+        Categoria categoria = categoriaService.findByCategoriaId(CODIGO_NOVEDAD_AJUSTE_BASICO);
+        for (Novedad novedad : novedadService.findAllByLegajoAndCodigo(legajoId, anho, mes, CODIGO_NOVEDAD_AJUSTE_BASICO)) {
+            cargoLiquidacions.add(new CargoLiquidacion(null, legajoId, anho, mes, novedad.getDependenciaId(), Periodo.firstDay(anho, mes), Periodo.lastDay(anho, mes), categoria.getCategoriaId(), categoria.getNombre(), novedad.getImporte(), BigDecimal.ZERO, BigDecimal.ZERO, 1, 0, "A", null, novedad.getDependencia(), categoria));
         }
         cargoLiquidacions = cargoLiquidacionService.saveAll(cargoLiquidacions, mes, false);
         logCargoLiquidacions(cargoLiquidacions);
@@ -801,27 +642,8 @@ public class MakeLiquidacionService {
         for (Cargo cargo : cargoService.findAllNoDocenteByPeriodo(legajoId, anho, mes)) {
             log.debug("Cargo -> {}", cargo);
             Categoria categoria = cargo.getCategoria();
-            if (categoria.getCategoriaId() != 980) {
-                CargoLiquidacion cargoLiquidacion;
-                cargoLiquidacions.add(cargoLiquidacion = new CargoLiquidacion(null,
-                        legajoId,
-                        anho,
-                        mes,
-                        cargo.getDependenciaId(),
-                        Periodo.firstDay(anho, mes),
-                        Periodo.lastDay(anho, mes),
-                        categoria.getCategoriaId(),
-                        categoria.getNombre(),
-                        categoria.getBasico(),
-                        categoria.getEstadoDocente(),
-                        cargo.getHorasJornada(),
-                        cargo.getJornada(),
-                        cargo.getPresentismo(),
-                        "A",
-                        null,
-                        null,
-                        categoria));
-                log.debug("CargoLiquidacion -> {}", cargoLiquidacion);
+            if (categoria.getCategoriaId() != CODIGO_NOVEDAD_AJUSTE_BASICO) {
+                cargoLiquidacions.add(new CargoLiquidacion(null, legajoId, anho, mes, cargo.getDependenciaId(), Periodo.firstDay(anho, mes), Periodo.lastDay(anho, mes), categoria.getCategoriaId(), categoria.getNombre(), categoria.getBasico(), categoria.getEstadoDocente(), cargo.getHorasJornada(), cargo.getJornada(), cargo.getPresentismo(), "A", null, null, categoria));
             }
         }
         cargoLiquidacionService.saveAll(cargoLiquidacions, mes, false);
@@ -830,14 +652,8 @@ public class MakeLiquidacionService {
     @Transactional
     public void deleteNovedadDuplicada(Integer anho, Integer mes) {
         for (NovedadDuplicada novedadDuplicada : novedadDuplicadaService.findAllByPeriodo(anho, mes)) {
-            boolean first = true;
-            for (Novedad novedad : novedadService.findAllByLegajoAndCodigo(novedadDuplicada.getLegajoId(), anho, mes, novedadDuplicada.getCodigoId())) {
-                if (first) {
-                    first = false;
-                } else {
-                    novedadService.deleteByNovedadId(novedad.getNovedadId());
-                }
-            }
+            novedadService.findAllByLegajoAndCodigo(novedadDuplicada.getLegajoId(), anho, mes, novedadDuplicada.getCodigoId())
+                    .stream().skip(1).forEach(novedad -> novedadService.deleteByNovedadId(novedad.getNovedadId()));
         }
     }
 
@@ -855,102 +671,92 @@ public class MakeLiquidacionService {
     }
 
     private BigDecimal calculateEstadoDocente(Integer categoriaId) {
-        BigDecimal estadoDocente = BigDecimal.ZERO;
         if ((categoriaId > 100 && categoriaId < 201) || (categoriaId > 205 && categoriaId < 210) || (categoriaId > 214 && categoriaId < 218) || (categoriaId > 500 && categoriaId < 701) || (categoriaId > 900 && categoriaId < 980))
-            estadoDocente = control.getEstadoDocenteTitular();
-
+            return control.getEstadoDocenteTitular();
         if ((categoriaId > 200 && categoriaId < 206) || (categoriaId > 209 && categoriaId < 215) || (categoriaId > 216 && categoriaId < 301))
-            estadoDocente = control.getEstadoDocenteAdjunto();
-
+            return control.getEstadoDocenteAdjunto();
         if ((categoriaId > 300 && categoriaId < 501))
-            estadoDocente = control.getEstadoDocenteAuxiliar();
-        return estadoDocente;
+            return control.getEstadoDocenteAuxiliar();
+        return BigDecimal.ZERO;
     }
 
     private void addItem(Long legajoId, Integer anho, Integer mes, Integer codigoId, BigDecimal importe) {
-        if (!items.containsKey(codigoId)) {
-            items.put(codigoId, new Item(null, legajoId, anho, mes, codigoId, codigos.get(codigoId).getNombre(), BigDecimal.ZERO, null, null));
-        }
-        Item item = items.get(codigoId);
+        Item item = items.computeIfAbsent(codigoId, k -> new Item(null, legajoId, anho, mes, k, codigos.get(k).getNombre(), BigDecimal.ZERO, null, null));
         item.setImporte(item.getImporte().add(importe));
     }
 
-    private void calculateNoRemunerativos(Long legajoId, Integer anho, Integer mes, Integer codigoId, List<CodigoGrupo> codigoGrupos) {
-        if (!items.containsKey(codigoId)) {
-            items.put(codigoId, new Item(null, legajoId, anho, mes, codigoId, codigos.get(codigoId).getNombre(), BigDecimal.ZERO, null, null));
-        }
-        BigDecimal value = BigDecimal.ZERO;
-        for (CodigoGrupo codigoGrupo : codigoGrupos.stream().filter(c -> c.getNoRemunerativo() == 1).toList()) {
-            if (items.containsKey(codigoGrupo.getCodigoId())) {
-                value = value.add(items.get(codigoGrupo.getCodigoId()).getImporte()).setScale(2, RoundingMode.HALF_UP);
-            }
-        }
-        Item item = items.get(codigoId);
-        item.setImporte(value.setScale(2, RoundingMode.HALF_UP));
+    private void setItem(Long legajoId, Integer anho, Integer mes, Integer codigoId, BigDecimal importe) {
+        Item item = items.computeIfAbsent(codigoId, k -> new Item(null, legajoId, anho, mes, k, codigos.get(k).getNombre(), BigDecimal.ZERO, null, null));
+        item.setImporte(importe.setScale(2, RoundingMode.HALF_UP));
     }
 
-    private Map<Integer, BigDecimal> calculateTotalDependenciaFusionado(Long legajoId, Integer anho, Integer mes) {
+    private BigDecimal getItemValue(Integer codigoId) {
+        return Optional.ofNullable(items.get(codigoId)).map(Item::getImporte).orElse(BigDecimal.ZERO);
+    }
+
+    private BigDecimal sumarItemsPorGrupo(List<CodigoGrupo> grupo, Set<Integer> codigosExcluidos) {
+        return grupo.stream()
+                .map(CodigoGrupo::getCodigoId)
+                .filter(id -> !codigosExcluidos.contains(id))
+                .map(this::getItemValue)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private Map<Integer, BigDecimal> calculateTotalDependenciaFusionado(Long legajoId, Integer anho, Integer mes, Map<String, Dependencia> dependenciasBySede) {
         Map<Integer, BigDecimal> totalDependencia = new HashMap<>();
-        for (CursoFusion cursoFusion : cursoFusionService.findAllByLegajoId(legajoId, anho, mes)) {
-            this.processCategoria(totalDependencia, cursoFusion.getFacultadId(), cursoFusion.getGeograficaId(), cursoFusion.getCategoriaId(), anho, mes);
+        List<CursoFusion> cursoFusions = cursoFusionService.findAllByLegajoId(legajoId, anho, mes);
+        if (cursoFusions.isEmpty()) return totalDependencia;
+
+        Set<Integer> categoriaIds = cursoFusions.stream().map(CursoFusion::getCategoriaId).collect(Collectors.toSet());
+        Map<Integer, CategoriaPeriodo> categoriaPeriodos = categoriaPeriodoService.findAllByCategoriaIdsAndPeriodo(categoriaIds, anho, mes).stream().collect(Collectors.toMap(CategoriaPeriodo::getCategoriaId, Function.identity()));
+        Map<Integer, Categoria> categorias = categoriaService.findAllByIds(categoriaIds).stream().collect(Collectors.toMap(Categoria::getCategoriaId, Function.identity()));
+
+        for (CursoFusion cursoFusion : cursoFusions) {
+            Dependencia dependencia = dependenciasBySede.get(cursoFusion.getFacultadId() + "." + cursoFusion.getGeograficaId());
+            if (dependencia == null) continue;
+            BigDecimal basico = Optional.ofNullable(categoriaPeriodos.get(cursoFusion.getCategoriaId())).map(CategoriaPeriodo::getBasico)
+                    .orElseGet(() -> Optional.ofNullable(categorias.get(cursoFusion.getCategoriaId())).map(Categoria::getBasico).orElse(BigDecimal.ZERO));
+            totalDependencia.compute(dependencia.getDependenciaId(), (k, v) -> (v == null) ? basico : v.add(basico));
         }
+        totalDependencia.replaceAll((k, v) -> v.setScale(2, RoundingMode.HALF_UP));
         return totalDependencia;
     }
 
-    private Map<Integer, BigDecimal> calculateTotalDependenciaSinFusion(Long legajoId, Integer anho, Integer mes) {
+    private Map<Integer, BigDecimal> calculateTotalDependenciaSinFusion(Long legajoId, Integer anho, Integer mes, Map<String, Dependencia> dependenciasBySede) {
         Map<Integer, BigDecimal> totalDependencia = new HashMap<>();
-        for (CursoCargo cursoCargo : cursoCargoService.findAllByLegajo(legajoId, anho, mes)) {
+        List<CursoCargo> cursoCargos = cursoCargoService.findAllByLegajo(legajoId, anho, mes);
+        if (cursoCargos.isEmpty()) return totalDependencia;
+
+        Set<Integer> categoriaIds = cursoCargos.stream().map(CursoCargo::getCategoriaId).filter(Objects::nonNull).collect(Collectors.toSet());
+        if (categoriaIds.isEmpty()) return totalDependencia;
+
+        Map<Integer, CategoriaPeriodo> categoriaPeriodos = categoriaPeriodoService.findAllByCategoriaIdsAndPeriodo(categoriaIds, anho, mes).stream().collect(Collectors.toMap(CategoriaPeriodo::getCategoriaId, Function.identity()));
+        Map<Integer, Categoria> categorias = categoriaService.findAllByIds(categoriaIds).stream().collect(Collectors.toMap(Categoria::getCategoriaId, Function.identity()));
+
+        for (CursoCargo cursoCargo : cursoCargos) {
             if (cursoCargo.getCategoriaId() != null) {
-                this.processCategoria(totalDependencia, cursoCargo.getCurso().getFacultadId(), cursoCargo.getCurso().getGeograficaId(), cursoCargo.getCategoriaId(), anho, mes);
+                Curso curso = cursoCargo.getCurso();
+                if (curso == null) continue;
+                Dependencia dependencia = dependenciasBySede.get(curso.getFacultadId() + "." + curso.getGeograficaId());
+                if (dependencia == null) continue;
+                BigDecimal basico = Optional.ofNullable(categoriaPeriodos.get(cursoCargo.getCategoriaId())).map(CategoriaPeriodo::getBasico)
+                        .orElseGet(() -> Optional.ofNullable(categorias.get(cursoCargo.getCategoriaId())).map(Categoria::getBasico).orElse(BigDecimal.ZERO));
+                totalDependencia.compute(dependencia.getDependenciaId(), (k, v) -> (v == null) ? basico : v.add(basico));
             }
         }
+        totalDependencia.replaceAll((k, v) -> v.setScale(2, RoundingMode.HALF_UP));
         return totalDependencia;
-    }
-
-    private void processCategoria(Map<Integer, BigDecimal> totalDependencia, Integer facultadId, Integer geograficaId, Integer categoriaId, Integer anho, Integer mes) {
-        Dependencia dependencia = dependenciaService.findFirstByFacultadIdAndGeograficaId(facultadId, geograficaId);
-        if (!totalDependencia.containsKey(dependencia.getDependenciaId())) {
-            totalDependencia.put(dependencia.getDependenciaId(), BigDecimal.ZERO);
-        }
-        try {
-            CategoriaPeriodo categoriaPeriodo = categoriaPeriodoService.findByUnique(categoriaId, anho, mes);
-            totalDependencia.put(dependencia.getDependenciaId(), totalDependencia.get(dependencia.getDependenciaId()).add(categoriaPeriodo.getBasico()).setScale(2, RoundingMode.HALF_UP));
-        } catch (CategoriaPeriodoException e) {
-            Categoria categoria = categoriaService.findByCategoriaId(categoriaId);
-            totalDependencia.put(dependencia.getDependenciaId(), totalDependencia.get(dependencia.getDependenciaId()).add(categoria.getBasico()).setScale(2, RoundingMode.HALF_UP));
-        }
     }
 
     public boolean evaluateOnlyETEC(Map<Integer, Item> items) {
-        boolean onlyETEC = false;
-        boolean hasETEC = false;
-        boolean hasBasico = false;
-        int codigoId = 1;
-        if (items.containsKey(codigoId)) {
-            if (items.get(codigoId).getImporte().compareTo(BigDecimal.ZERO) != 0) {
-                hasBasico = true;
-            }
-        }
-        codigoId = 29;
-        if (items.containsKey(codigoId)) {
-            if (items.get(codigoId).getImporte().compareTo(BigDecimal.ZERO) != 0) {
-                hasETEC = true;
-            }
-        }
-        if (hasETEC && !hasBasico) {
-            onlyETEC = true;
-        }
-        return onlyETEC;
+        boolean hasBasico = items.containsKey(CODIGO_BASICO) && items.get(CODIGO_BASICO).getImporte().compareTo(BigDecimal.ZERO) != 0;
+        boolean hasETEC = items.containsKey(CODIGO_AGUINALDO_ETEC) && items.get(CODIGO_AGUINALDO_ETEC).getImporte().compareTo(BigDecimal.ZERO) != 0;
+        return hasETEC && !hasBasico;
     }
 
     private void logCargo(Cargo cargo) {
         try {
-            log.debug("Cargo -> {}", JsonMapper
-                    .builder()
-                    .findAndAddModules()
-                    .build()
-                    .writerWithDefaultPrettyPrinter()
-                    .writeValueAsString(cargo));
+            log.debug("Cargo -> {}", JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(cargo));
         } catch (JsonProcessingException e) {
             log.debug("Cargo jsonify error -> {}", e.getMessage());
         }
@@ -958,15 +764,9 @@ public class MakeLiquidacionService {
 
     private void logCargoLiquidacions(List<CargoLiquidacion> cargoLiquidacions) {
         try {
-            log.debug("CargoLiquidaciones -> {}", JsonMapper
-                    .builder()
-                    .findAndAddModules()
-                    .build()
-                    .writerWithDefaultPrettyPrinter()
-                    .writeValueAsString(cargoLiquidacions));
+            log.debug("CargoLiquidaciones -> {}", JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(cargoLiquidacions));
         } catch (JsonProcessingException e) {
             log.debug("CargoLiquidaciones jsonify error -> {}", e.getMessage());
         }
     }
-
 }

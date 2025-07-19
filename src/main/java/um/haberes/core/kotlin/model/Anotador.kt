@@ -15,6 +15,7 @@ data class Anotador(
     var anotacion: String? = null,
     var visado: Byte = 0,
     var ipVisado: String? = null,
+    @Column(name = "`user`")
     var user: String? = null,
     var respuesta: String? = null,
     var autorizado: Byte = 0,

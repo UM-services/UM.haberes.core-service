@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.kotlin.model.PersonaFacultad;
-import um.haberes.core.repository.IPersonaFacultadRepository;
+import um.haberes.core.repository.PersonaFacultadRepository;
 
 /**
  * @author daniel
@@ -21,7 +21,7 @@ import um.haberes.core.repository.IPersonaFacultadRepository;
 public class PersonaFacultadService {
 
 	@Autowired
-	private IPersonaFacultadRepository repository;
+	private PersonaFacultadRepository repository;
 
 	public List<PersonaFacultad> findAllByFacultad(Integer facultadId) {
 		return repository.findAllByFacultadId(facultadId);

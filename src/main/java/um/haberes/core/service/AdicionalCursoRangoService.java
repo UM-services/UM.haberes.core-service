@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.AdicionalCursoRangoException;
 import um.haberes.core.kotlin.model.AdicionalCursoRango;
-import um.haberes.core.repository.IAdicionalCursoRangoRepository;
+import um.haberes.core.repository.AdicionalCursoRangoRepository;
 
 /**
  * @author daniel
@@ -22,7 +22,7 @@ import um.haberes.core.repository.IAdicionalCursoRangoRepository;
 public class AdicionalCursoRangoService {
 
 	@Autowired
-	private IAdicionalCursoRangoRepository repository;
+	private AdicionalCursoRangoRepository repository;
 
 	public List<AdicionalCursoRango> findAllByAdicionalCursoTabla(Long adicionalCursoTablaId) {
 		return repository.findAllByAdicionalCursoTablaIdOrderByHorasDesde(adicionalCursoTablaId);

@@ -4,17 +4,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import um.haberes.core.exception.ModoLiquidacionException;
 import um.haberes.core.kotlin.model.ModoLiquidacion;
-import um.haberes.core.repository.IModoLiquidacionRepository;
+import um.haberes.core.repository.ModoLiquidacionRepository;
 
 import java.util.List;
 
 @Service
 public class ModoLiquidacionService {
 
-    private final IModoLiquidacionRepository repository;
+    private final ModoLiquidacionRepository repository;
 
     @Autowired
-    public ModoLiquidacionService(IModoLiquidacionRepository repository) {
+    public ModoLiquidacionService(ModoLiquidacionRepository repository) {
         this.repository = repository;
     }
 

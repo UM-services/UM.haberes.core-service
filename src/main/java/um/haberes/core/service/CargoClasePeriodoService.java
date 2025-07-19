@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.view.CargoClasePeriodoNotFoundException;
 import um.haberes.core.kotlin.model.CargoClasePeriodo;
-import um.haberes.core.repository.ICargoClasePeriodoRepository;
+import um.haberes.core.repository.CargoClasePeriodoRepository;
 
 /**
  * @author daniel
@@ -20,7 +20,7 @@ import um.haberes.core.repository.ICargoClasePeriodoRepository;
 public class CargoClasePeriodoService {
 
 	@Autowired
-	private ICargoClasePeriodoRepository repository;
+	private CargoClasePeriodoRepository repository;
 
 	public List<CargoClasePeriodo> findAllByFacultad(Integer facultadId) {
 		return repository.findAllByFacultadIdOrderByLegajoId(facultadId);

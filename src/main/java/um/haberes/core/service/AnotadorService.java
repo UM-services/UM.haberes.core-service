@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import um.haberes.core.exception.AnotadorException;
 import um.haberes.core.kotlin.model.Anotador;
 import um.haberes.core.kotlin.model.Persona;
-import um.haberes.core.repository.IAnotadorRepository;
+import um.haberes.core.repository.AnotadorRepository;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -22,10 +22,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AnotadorService {
 
-	private final IAnotadorRepository repository;
+	private final AnotadorRepository repository;
 	private final PersonaService personaservice;
 
-	public AnotadorService(IAnotadorRepository repository,
+	public AnotadorService(AnotadorRepository repository,
 						   PersonaService personaservice) {
 		this.repository = repository;
 		this.personaservice = personaservice;

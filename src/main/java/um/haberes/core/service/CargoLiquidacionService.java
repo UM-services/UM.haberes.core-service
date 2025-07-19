@@ -18,7 +18,7 @@ import um.haberes.core.exception.CargoLiquidacionException;
 import um.haberes.core.kotlin.model.CargoLiquidacion;
 import um.haberes.core.kotlin.model.CargoLiquidacionVersion;
 import um.haberes.core.kotlin.model.Categoria;
-import um.haberes.core.repository.ICargoLiquidacionRepository;
+import um.haberes.core.repository.CargoLiquidacionRepository;
 
 /**
  * @author daniel
@@ -28,7 +28,7 @@ import um.haberes.core.repository.ICargoLiquidacionRepository;
 public class CargoLiquidacionService {
 
 	@Autowired
-	private ICargoLiquidacionRepository repository;
+	private CargoLiquidacionRepository repository;
 
 	@Autowired
 	private CategoriaService categoriaService;

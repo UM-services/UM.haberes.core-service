@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.kotlin.model.ConversionLog;
-import um.haberes.core.repository.IConversionLogRepository;
+import um.haberes.core.repository.ConversionLogRepository;
 
 /**
  * @author daniel
@@ -19,7 +19,7 @@ import um.haberes.core.repository.IConversionLogRepository;
 public class ConversionLogService {
 	
 	@Autowired
-	private IConversionLogRepository repository;
+	private ConversionLogRepository repository;
 
 	public List<ConversionLog> findAll() {
 		return repository.findAll();

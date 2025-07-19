@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.CargoLiquidacionException;
 import um.haberes.core.kotlin.model.Cargo;
-import um.haberes.core.repository.ICargoRepository;
+import um.haberes.core.repository.CargoRepository;
 import um.haberes.core.util.Periodo;
 
 /**
@@ -25,7 +25,7 @@ import um.haberes.core.util.Periodo;
 public class CargoService {
 
 	@Autowired
-	private ICargoRepository repository;
+	private CargoRepository repository;
 
 	public List<Cargo> findAllByLegajoId(Long legajoId) {
 		return repository.findAllByLegajoIdOrderByCargoIdDesc(legajoId);

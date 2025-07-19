@@ -10,7 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.kotlin.model.view.AsignadoClase;
-import um.haberes.core.repository.view.IAsignadoClaseRepository;
+import um.haberes.core.repository.view.AsignadoClaseRepository;
 
 /**
  * @author daniel
@@ -20,7 +20,7 @@ import um.haberes.core.repository.view.IAsignadoClaseRepository;
 public class AsignadoClaseService {
 
 	@Autowired
-	private IAsignadoClaseRepository repository;
+	private AsignadoClaseRepository repository;
 
 	public List<AsignadoClase> findAllAsignados(Integer dependenciaId, Long cargoClaseId) {
 		return repository.findAllByDependenciaIdAndCargoClaseId(dependenciaId, cargoClaseId,

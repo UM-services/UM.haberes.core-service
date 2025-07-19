@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.SituacionException;
 import um.haberes.core.kotlin.model.Situacion;
-import um.haberes.core.repository.ISituacionRepository;
+import um.haberes.core.repository.SituacionRepository;
 
 /**
  * @author daniel
@@ -19,7 +19,7 @@ import um.haberes.core.repository.ISituacionRepository;
 @Service
 public class SituacionService {
 	@Autowired
-	private ISituacionRepository repository;
+	private SituacionRepository repository;
 
 	public List<Situacion> findAll() {
 		return repository.findAll();

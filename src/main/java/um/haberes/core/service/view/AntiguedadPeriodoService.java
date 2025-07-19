@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.view.AntiguedadPeriodoNotFoundException;
 import um.haberes.core.kotlin.model.view.AntiguedadPeriodo;
-import um.haberes.core.repository.view.IAntiguedadPeriodoRepository;
+import um.haberes.core.repository.view.AntiguedadPeriodoRepository;
 
 /**
  * @author daniel
@@ -18,7 +18,7 @@ import um.haberes.core.repository.view.IAntiguedadPeriodoRepository;
 public class AntiguedadPeriodoService {
 
 	@Autowired
-	private IAntiguedadPeriodoRepository repository;
+	private AntiguedadPeriodoRepository repository;
 
 	public AntiguedadPeriodo findLastByUnique(Long legajoId, Integer anho, Integer mes) {
 		return repository.findTopByLegajoIdAndPeriodoLessThanEqualOrderByPeriodoDesc(legajoId, anho * 100L + mes)

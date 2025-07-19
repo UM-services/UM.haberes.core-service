@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.view.TotalMensualNotFoundException;
 import um.haberes.core.kotlin.model.view.TotalMensual;
-import um.haberes.core.repository.view.ITotalMensualRepository;
+import um.haberes.core.repository.view.TotalMensualRepository;
 
 /**
  * @author daniel
@@ -20,7 +20,7 @@ import um.haberes.core.repository.view.ITotalMensualRepository;
 public class TotalMensualService {
 
 	@Autowired
-	private ITotalMensualRepository repository;
+	private TotalMensualRepository repository;
 
 	public List<TotalMensual> findAllByPeriodo(Integer anho, Integer mes) {
 		return repository.findAllByAnhoAndMes(anho, mes);

@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.kotlin.model.view.PersonaSearch;
-import um.haberes.core.repository.view.IPersonaSearchRepository;
+import um.haberes.core.repository.view.PersonaSearchRepository;
 
 /**
  * @author daniel
@@ -19,7 +19,7 @@ import um.haberes.core.repository.view.IPersonaSearchRepository;
 public class PersonaSearchService {
 
 	@Autowired
-	private IPersonaSearchRepository repository;
+	private PersonaSearchRepository repository;
 
 	public List<PersonaSearch> findAllByStrings(List<String> conditions) {
 		return repository.findAllByStrings(conditions);

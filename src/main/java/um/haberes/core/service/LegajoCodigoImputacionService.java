@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.kotlin.model.LegajoCodigoImputacion;
-import um.haberes.core.repository.ILegajoCodigoImputacionRepository;
+import um.haberes.core.repository.LegajoCodigoImputacionRepository;
 
 /**
  * @author daniel
@@ -21,7 +21,7 @@ import um.haberes.core.repository.ILegajoCodigoImputacionRepository;
 public class LegajoCodigoImputacionService {
 
 	@Autowired
-	private ILegajoCodigoImputacionRepository repository;
+	private LegajoCodigoImputacionRepository repository;
 
 	public List<LegajoCodigoImputacion> findAllByLegajo(Long legajoId, Integer anho, Integer mes) {
 		return repository.findAllByLegajoIdAndAnhoAndMes(legajoId, anho, mes);

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.NovedadException;
 import um.haberes.core.kotlin.model.Novedad;
-import um.haberes.core.repository.INovedadRepository;
+import um.haberes.core.repository.NovedadRepository;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 public class NovedadService {
 
     @Autowired
-    private INovedadRepository repository;
+    private NovedadRepository repository;
 
     public List<Novedad> findAllByLegajo(Long legajoId, Integer anho, Integer mes) {
         return repository.findAllByLegajoIdAndAnhoAndMes(legajoId, anho, mes);

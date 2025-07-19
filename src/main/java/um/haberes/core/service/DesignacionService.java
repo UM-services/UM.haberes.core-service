@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.DesignacionException;
 import um.haberes.core.kotlin.model.Designacion;
-import um.haberes.core.repository.IDesignacionRepository;
+import um.haberes.core.repository.DesignacionRepository;
 
 /**
  * @author daniel
@@ -20,7 +20,7 @@ import um.haberes.core.repository.IDesignacionRepository;
 public class DesignacionService {
 
 	@Autowired
-	private IDesignacionRepository repository;
+	private DesignacionRepository repository;
 
 	public List<Designacion> findAllAsignables() {
 		return repository.findAllByCategoriaIdNotNull();

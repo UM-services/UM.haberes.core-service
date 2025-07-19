@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.CargoClaseImputacionException;
 import um.haberes.core.kotlin.model.CargoClaseImputacion;
-import um.haberes.core.repository.ICargoClaseImputacionRepository;
+import um.haberes.core.repository.CargoClaseImputacionRepository;
 
 /**
  * @author daniel
@@ -20,7 +20,7 @@ import um.haberes.core.repository.ICargoClaseImputacionRepository;
 public class CargoClaseImputacionService {
 
 	@Autowired
-	private ICargoClaseImputacionRepository repository;
+	private CargoClaseImputacionRepository repository;
 
 	public List<CargoClaseImputacion> findAll() {
 		return repository.findAll();

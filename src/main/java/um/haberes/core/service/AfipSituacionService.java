@@ -4,17 +4,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import um.haberes.core.exception.AfipSituacionException;
 import um.haberes.core.kotlin.model.AfipSituacion;
-import um.haberes.core.repository.IAfipSituacionRepository;
+import um.haberes.core.repository.AfipSituacionRepository;
 
 import java.util.List;
 
 @Service
 public class AfipSituacionService {
 
-    private final IAfipSituacionRepository repository;
+    private final AfipSituacionRepository repository;
 
     @Autowired
-    public AfipSituacionService(IAfipSituacionRepository repository) {
+    public AfipSituacionService(AfipSituacionRepository repository) {
         this.repository = repository;
     }
 

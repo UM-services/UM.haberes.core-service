@@ -16,6 +16,7 @@ data class Novedad(
     var codigoId: Int? = null,
     var dependenciaId: Int? = null,
     var importe: BigDecimal = BigDecimal.ZERO,
+    @Column(name = "`value`")
     var value: String = "",
     var observaciones: String? = null,
     var importado: Byte = 0,

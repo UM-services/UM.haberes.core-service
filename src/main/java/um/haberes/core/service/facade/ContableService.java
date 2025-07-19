@@ -173,8 +173,7 @@ public class ContableService {
                     + dependencia.getGeograficaId() + "." + docente;
             // Proporción General
             if (!proporciones.containsKey(key)) {
-                proporciones.put(key, new Proporcion(dependencia.getDependenciaId(), dependencia.getFacultadId(),
-                        dependencia.getGeograficaId(), docente, BigDecimal.ZERO, BigDecimal.ZERO));
+                proporciones.put(key, Proporcion.builder().dependenciaId(dependencia.getDependenciaId()).facultadId(dependencia.getFacultadId()).geograficaId(dependencia.getGeograficaId()).docente(docente).total(BigDecimal.ZERO).porcentaje(BigDecimal.ZERO).build());
             }
             proporcion = proporciones.get(key);
 
@@ -182,8 +181,7 @@ public class ContableService {
             if (docente == 1) {
                 if (!proporcionesDocente.containsKey(key)) {
                     proporcionesDocente.put(key,
-                            new Proporcion(dependencia.getDependenciaId(), dependencia.getFacultadId(),
-                                    dependencia.getGeograficaId(), docente, BigDecimal.ZERO, BigDecimal.ZERO));
+                            Proporcion.builder().dependenciaId(dependencia.getDependenciaId()).facultadId(dependencia.getFacultadId()).geograficaId(dependencia.getGeograficaId()).docente(docente).total(BigDecimal.ZERO).porcentaje(BigDecimal.ZERO).build());
                 }
                 proporcionDocente = proporcionesDocente.get(key);
             }
@@ -191,8 +189,7 @@ public class ContableService {
             if (docente == 0) {
                 if (!proporcionesAdministrativo.containsKey(key)) {
                     proporcionesAdministrativo.put(key,
-                            new Proporcion(dependencia.getDependenciaId(), dependencia.getFacultadId(),
-                                    dependencia.getGeograficaId(), docente, BigDecimal.ZERO, BigDecimal.ZERO));
+                            Proporcion.builder().dependenciaId(dependencia.getDependenciaId()).facultadId(dependencia.getFacultadId()).geograficaId(dependencia.getGeograficaId()).docente(docente).total(BigDecimal.ZERO).porcentaje(BigDecimal.ZERO).build());
                 }
                 proporcionAdministrativo = proporcionesAdministrativo.get(key);
             }
@@ -226,7 +223,7 @@ public class ContableService {
                     basico = basico.add(liquidacionAdicional.getAdicional()).setScale(2, RoundingMode.HALF_UP);
                     imputacion.setBasico(basico);
                     BigDecimal antiguedadAdicional = BigDecimal.ZERO;
-                    antiguedadAdicional = liquidacionAdicional.getAdicional().multiply(indices.getFirst()).setScale(2, RoundingMode.HALF_UP);
+                    antiguedadAdicional = liquidacionAdicional.getAdicional().multiply(indices.get(0)).setScale(2, RoundingMode.HALF_UP);
                     imputacion.setAntiguedad(imputacion.getAntiguedad().add(antiguedadAdicional).setScale(2, RoundingMode.HALF_UP));
                 }
             } catch (LiquidacionAdicionalException e) {
@@ -275,15 +272,13 @@ public class ContableService {
                     + docente;
             // Proporción General
             if (!proporciones.containsKey(key)) {
-                proporciones.put(key, new Proporcion(detalle.getDependenciaId(), detalle.getFacultadId(),
-                        detalle.getGeograficaId(), docente, BigDecimal.ZERO, BigDecimal.ZERO));
+                proporciones.put(key, Proporcion.builder().dependenciaId(detalle.getDependenciaId()).facultadId(detalle.getFacultadId()).geograficaId(detalle.getGeograficaId()).docente(docente).total(BigDecimal.ZERO).porcentaje(BigDecimal.ZERO).build());
             }
             proporcion = proporciones.get(key);
 
             // Proporción Docente
             if (!proporcionesDocente.containsKey(key)) {
-                proporcionesDocente.put(key, new Proporcion(detalle.getDependenciaId(), detalle.getFacultadId(),
-                        detalle.getGeograficaId(), docente, BigDecimal.ZERO, BigDecimal.ZERO));
+                proporcionesDocente.put(key, Proporcion.builder().dependenciaId(detalle.getDependenciaId()).facultadId(detalle.getFacultadId()).geograficaId(detalle.getGeograficaId()).docente(docente).total(BigDecimal.ZERO).porcentaje(BigDecimal.ZERO).build());
             }
             proporcionDocente = proporcionesDocente.get(key);
 
@@ -317,15 +312,12 @@ public class ContableService {
             if (dependencia.getFacultadId() > 0) {
                 String key = dependencia.getDependenciaId() + "." + dependencia.getFacultadId() + "."
                         + dependencia.getGeograficaId() + ".0";
-                proporciones.put(key, new Proporcion(dependencia.getDependenciaId(), dependencia.getFacultadId(),
-                        dependencia.getGeograficaId(), (byte) 0, BigDecimal.ZERO, BigDecimal.ZERO));
+                proporciones.put(key, Proporcion.builder().dependenciaId(dependencia.getDependenciaId()).facultadId(dependencia.getFacultadId()).geograficaId(dependencia.getGeograficaId()).docente((byte) 0).total(BigDecimal.ZERO).porcentaje(BigDecimal.ZERO).build());
                 proporcionesAdministrativo.put(key,
-                        new Proporcion(dependencia.getDependenciaId(), dependencia.getFacultadId(),
-                                dependencia.getGeograficaId(), (byte) 0, BigDecimal.ZERO, BigDecimal.ZERO));
+                        Proporcion.builder().dependenciaId(dependencia.getDependenciaId()).facultadId(dependencia.getFacultadId()).geograficaId(dependencia.getGeograficaId()).docente((byte) 0).total(BigDecimal.ZERO).porcentaje(BigDecimal.ZERO).build());
                 key = dependencia.getDependenciaId() + "." + dependencia.getFacultadId() + "."
                         + dependencia.getGeograficaId() + ".1";
-                proporcionesDocente.put(key, new Proporcion(dependencia.getDependenciaId(), dependencia.getFacultadId(),
-                        dependencia.getGeograficaId(), (byte) 1, BigDecimal.ZERO, BigDecimal.ZERO));
+                proporcionesDocente.put(key, Proporcion.builder().dependenciaId(dependencia.getDependenciaId()).facultadId(dependencia.getFacultadId()).geograficaId(dependencia.getGeograficaId()).docente((byte) 1).total(BigDecimal.ZERO).porcentaje(BigDecimal.ZERO).build());
             }
             sinBasico = false;
         }

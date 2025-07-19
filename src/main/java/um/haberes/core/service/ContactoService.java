@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.ContactoException;
-import um.haberes.core.repository.IContactoRepository;
+import um.haberes.core.repository.ContactoRepository;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ContactoService {
 	
 	@Autowired
-	private IContactoRepository repository;
+	private ContactoRepository repository;
 
 	public List<Contacto> findAll() {
 		return repository.findAll();

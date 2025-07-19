@@ -11,8 +11,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.kotlin.model.view.CategoriaByPeriodo;
-import um.haberes.core.repository.ICategoriaRepository;
-import um.haberes.core.repository.view.ICategoriaByPeriodoRepository;
+import um.haberes.core.repository.CategoriaRepository;
+import um.haberes.core.repository.view.CategoriaByPeriodoRepository;
 
 /**
  * @author daniel
@@ -22,10 +22,10 @@ import um.haberes.core.repository.view.ICategoriaByPeriodoRepository;
 public class CategoriaByPeriodoService {
 
 	@Autowired
-	private ICategoriaByPeriodoRepository repository;
+	private CategoriaByPeriodoRepository repository;
 
 	@Autowired
-	private ICategoriaRepository categoriaRepository;
+	private CategoriaRepository categoriaRepository;
 
 	public List<CategoriaByPeriodo> findAllNoDocente(Integer anho, Integer mes) {
 		return repository.findAllByAnhoAndMesAndCategoriaIdIn(anho, mes,

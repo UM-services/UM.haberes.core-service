@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.GeograficaException;
 import um.haberes.core.kotlin.model.Geografica;
-import um.haberes.core.repository.IGeograficaRepository;
+import um.haberes.core.repository.GeograficaRepository;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -24,10 +24,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class GeograficaService {
 
-    private final IGeograficaRepository repository;
+    private final GeograficaRepository repository;
 
     @Autowired
-    public GeograficaService(IGeograficaRepository repository) {
+    public GeograficaService(GeograficaRepository repository) {
         this.repository = repository;
     }
 

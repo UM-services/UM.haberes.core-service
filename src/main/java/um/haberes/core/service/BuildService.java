@@ -10,7 +10,7 @@ import um.haberes.core.kotlin.model.Build;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.BuildException;
-import um.haberes.core.repository.IBuildRepository;
+import um.haberes.core.repository.BuildRepository;
 
 /**
  * @author daniel
@@ -20,9 +20,9 @@ import um.haberes.core.repository.IBuildRepository;
 @Slf4j
 public class BuildService {
 
-	private final IBuildRepository repository;
+	private final BuildRepository repository;
 
-	public BuildService(IBuildRepository repository) {
+	public BuildService(BuildRepository repository) {
 		this.repository = repository;
 	}
 

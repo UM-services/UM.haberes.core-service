@@ -145,13 +145,13 @@ public class CargoClaseToolService {
 		// Retengo el periodo hasta
 		Long periodoHastaSaved = cargoClasePeriodo.getPeriodoHasta();
 		List<Periodo> nuevos = Periodo.makePeriodos(Periodo.nextPeriodo(periodoHastaSaved).toLong(),
-				new Periodo(anhoHasta, mesHasta).toLong());
+				Periodo.builder().anho(anhoHasta).mes(mesHasta).build().toLong());
 		// Verifica si se puede modificar el periodo
 		Long periodoDesde2Delete = Periodo.nextMonth(anhoHasta, mesHasta).toLong();
 		List<CargoClaseDetalle> detalles = cargoClaseDetalleService.findAllByCargoClasePeriodo(cargoClasePeriodoId);
 		for (CargoClaseDetalle detalle : detalles) {
 			// Verifico si el periodo es borrable
-			Long periodo = new Periodo(detalle.getAnho(), detalle.getMes()).toLong();
+			Long periodo = Periodo.builder().anho(detalle.getAnho()).mes(detalle.getMes()).build().toLong();
 			if (periodoDesde2Delete <= periodo && periodoHastaSaved >= periodo) {
 				try {
 					Acreditacion acreditacion = acreditacionService.findByPeriodo(detalle.getAnho(), detalle.getMes());
@@ -173,14 +173,14 @@ public class CargoClaseToolService {
 			}
 		}
 		// Pongo el nuevo periodo hasta
-		cargoClasePeriodo.setPeriodoHasta(new Periodo(anhoHasta, mesHasta).toLong());
+		cargoClasePeriodo.setPeriodoHasta(Periodo.builder().anho(anhoHasta).mes(mesHasta).build().toLong());
 		cargoClasePeriodo = cargoClasePeriodoService.update(cargoClasePeriodo, cargoClasePeriodoId);
 		CargoClase cargoClase = cargoClaseService.findByCargoClaseId(cargoClasePeriodo.getCargoClaseId());
 		Clase clase = claseService.findByClaseId(cargoClase.getClaseId());
 		// Elimina los periodos borrables
 		for (CargoClaseDetalle detalle : detalles) {
 			// Verifico si el periodo es borrable
-			Long periodo = new Periodo(detalle.getAnho(), detalle.getMes()).toLong();
+			Long periodo = Periodo.builder().anho(detalle.getAnho()).mes(detalle.getMes()).build().toLong();
 			if (periodoDesde2Delete <= periodo && periodoHastaSaved >= periodo) {
 				cargoClaseDetalleService.delete(detalle.getCargoClaseDetalleId());
 			}

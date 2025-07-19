@@ -4,7 +4,7 @@ import jakarta.persistence.*
 import java.math.BigDecimal
 
 @Entity
-@Table(uniqueConstraints = [UniqueConstraint(columnNames = ["dependenciaId", "facultadId", "geograficaId", "cargoClaseid"])])
+@Table(uniqueConstraints = [UniqueConstraint(columnNames = ["dependenciaId", "facultadId", "geograficaId", "cargoClaseId"])])
 data class CargoClaseImputacion(
 
     @Id

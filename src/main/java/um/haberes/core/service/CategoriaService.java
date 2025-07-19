@@ -33,11 +33,12 @@ import um.haberes.core.kotlin.model.CategoriaPeriodo;
 import um.haberes.core.kotlin.model.Designacion;
 import um.haberes.core.kotlin.model.view.CategoriaByPeriodo;
 import um.haberes.core.kotlin.model.view.CategoriaSearch;
-import um.haberes.core.repository.ICargoLiquidacionRepository;
-import um.haberes.core.repository.ICategoriaRepository;
+import um.haberes.core.repository.CargoLiquidacionRepository;
+import um.haberes.core.repository.CategoriaRepository;
 import um.haberes.core.service.view.CategoriaByPeriodoService;
 import um.haberes.core.service.view.CategoriaSearchService;
 import um.haberes.core.util.Tool;
+import java.util.Set;
 import um.haberes.core.util.transfer.FileInfo;
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,15 +49,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CategoriaService {
 
-    private final ICategoriaRepository repository;
-    private final ICargoLiquidacionRepository cargoLiquidacionRepository;
+    private final CategoriaRepository repository;
+    private final CargoLiquidacionRepository cargoLiquidacionRepository;
     private final CategoriaPeriodoService categoriaPeriodoService;
     private final CategoriaSearchService categoriaSearchService;
     private final CategoriaByPeriodoService categoriaByPeriodoService;
     private final DesignacionService designacionService;
 
-    public CategoriaService(ICategoriaRepository repository,
-                            ICargoLiquidacionRepository cargoLiquidacionRepository,
+    public CategoriaService(CategoriaRepository repository,
+                            CargoLiquidacionRepository cargoLiquidacionRepository,
                             CategoriaPeriodoService categoriaPeriodoService,
                             CategoriaSearchService categoriaSearchService,
                             CategoriaByPeriodoService categoriaByPeriodoService,
@@ -71,6 +72,10 @@ public class CategoriaService {
 
     public List<Categoria> findAll() {
         return repository.findAll();
+    }
+
+    public List<Categoria> findAllByIds(Set<Integer> categoriaIds) {
+        return repository.findAllByCategoriaIdIn(categoriaIds);
     }
 
     public List<CategoriaSearch> findAllSearch(String chain) {

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.FacultadException;
 import um.haberes.core.kotlin.model.Facultad;
-import um.haberes.core.repository.IFacultadRepository;
+import um.haberes.core.repository.FacultadRepository;
 
 /**
  * @author daniel
@@ -22,9 +22,9 @@ import um.haberes.core.repository.IFacultadRepository;
 @Slf4j
 public class FacultadService {
 
-	private final IFacultadRepository repository;
+	private final FacultadRepository repository;
 
-	public FacultadService(IFacultadRepository repository) {
+	public FacultadService(FacultadRepository repository) {
 		this.repository = repository;
 	}
 
