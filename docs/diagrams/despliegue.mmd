@@ -1,20 +1,16 @@
-deploymentDiagram
-    actor "Administrador de Sistema" as Admin
-    
-    node "Servidor Cloud (ej. AWS, GCP)" {
-        node "Kubernetes Cluster" {
-            artifact "Docker Image" {
-                node "Contenedor" as Container {
-                    component "um.haberes.core-service.jar"
-                }
-            }
-        }
-        
-        node "Base de Datos (ej. PostgreSQL)" as DB
-    }
-    
-    node "Servicios Externos UM" as ExternalServices
-    
-    Admin -->> Kubernetes Cluster : "Gestiona despliegue"
-    Container -->> DB : "JDBC"
-    Container -->> ExternalServices : "API REST"
+flowchart TD
+    Admin([Administrador de Sistema])
+    Cloud["Servidor Cloud (ej. AWS, GCP)"]
+    K8s["Kubernetes Cluster"]
+    Docker["Docker Image"]
+    Container["Contenedor: um.haberes.core-service.jar"]
+    DB["Base de Datos (ej. PostgreSQL)"]
+    ExternalServices["Servicios Externos UM"]
+
+    Admin -- "Gestiona despliegue" --> K8s
+    Cloud --> K8s
+    K8s --> Docker
+    Docker --> Container
+    K8s --> DB
+    Container -- "JDBC" --> DB
+    Container -- "API REST" --> ExternalServices
