@@ -19,6 +19,10 @@
         <kotlin.version>2.2.0</kotlin.version>
         <spring-cloud.version>2025.0.0</spring-cloud.version>
         <lombok.version>1.18.38</lombok.version>
+        <sonar.organization>um-services</sonar.organization>
+        <sonar.projectKey>UM-services_UM.haberes.core-service</sonar.projectKey>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
     <dependencies>
         <dependency>
