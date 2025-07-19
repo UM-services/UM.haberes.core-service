@@ -1,5 +1,7 @@
 package um.haberes.core.kotlin.model
 
+import com.fasterxml.jackson.core.JsonProcessingException
+import com.fasterxml.jackson.databind.json.JsonMapper
 import jakarta.persistence.*
 import java.math.BigDecimal
 
@@ -47,4 +49,19 @@ data class CargoClaseDetalle(
     @JoinColumn(name = "cargoClasePeriodoId", insertable = false, updatable = false)
     var cargoClasePeriodo: CargoClasePeriodo? = null
 
-) : Auditable()
+) : Auditable() {
+
+    fun jsonify(): String {
+        try {
+            return JsonMapper
+                .builder()
+                .findAndAddModules()
+                .build()
+                .writerWithDefaultPrettyPrinter()
+                .writeValueAsString(this)
+        } catch (e: JsonProcessingException) {
+            return "jsonify error: ${e.message}"
+        }
+    }
+
+}

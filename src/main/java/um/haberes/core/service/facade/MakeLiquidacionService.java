@@ -42,6 +42,7 @@ public class MakeLiquidacionService {
     private static final int CODIGO_DESARRAIGO = 21;
     private static final int CODIGO_AGUINALDO_ETEC = 29;
     private static final int CODIGO_LICENCIA_MATERNIDAD = 30;
+    private static final int CODIGO_ADICIONAL_CARGO_CLASE = 38;
     private static final int CODIGO_AJUSTE_FAVOR_EMPLEADO = 45;
     private static final int CODIGO_VACACIONES = 57;
     private static final int CODIGO_JUBILACION = 61;
@@ -92,12 +93,31 @@ public class MakeLiquidacionService {
     private Map<Integer, Item> items;
     private Map<Integer, Novedad> novedades;
 
-    public MakeLiquidacionService(CargoLiquidacionService cargoLiquidacionService, DesignacionToolService designacionToolService, CargoClaseDetalleService cargoClaseDetalleService, ControlService controlService,
-                                  PersonaService personaService, NovedadService novedadService, ItemService itemService, LegajoControlService legajoControlService, CodigoGrupoService codigoGrupoService,
-                                  CursoDesarraigoService cursoDesarraigoService, CursoFusionService cursoFusionService, DependenciaService dependenciaService, CategoriaService categoriaService,
-                                  AntiguedadService antiguedadService, LiquidacionService liquidacionService, ActividadService actividadService, LetraService letraService, CargoService cargoService,
-                                  NovedadDuplicadaService novedadDuplicadaService, CursoCargoService cursoCargoService, CodigoService codigoService, AdicionalCursoTablaService adicionalCursoTablaService,
-                                  CategoriaPeriodoService categoriaPeriodoService, LiquidacionAdicionalService liquidacionAdicionalService) {
+    public MakeLiquidacionService(CargoLiquidacionService cargoLiquidacionService,
+                                  DesignacionToolService designacionToolService,
+                                  CargoClaseDetalleService cargoClaseDetalleService,
+                                  ControlService controlService,
+                                  PersonaService personaService,
+                                  NovedadService novedadService,
+                                  ItemService itemService,
+                                  LegajoControlService legajoControlService,
+                                  CodigoGrupoService codigoGrupoService,
+                                  CursoDesarraigoService cursoDesarraigoService,
+                                  CursoFusionService cursoFusionService,
+                                  DependenciaService dependenciaService,
+                                  CategoriaService categoriaService,
+                                  AntiguedadService antiguedadService,
+                                  LiquidacionService liquidacionService,
+                                  ActividadService actividadService,
+                                  LetraService letraService,
+                                  CargoService cargoService,
+                                  NovedadDuplicadaService novedadDuplicadaService,
+                                  CursoCargoService cursoCargoService,
+                                  CodigoService codigoService,
+                                  AdicionalCursoTablaService adicionalCursoTablaService,
+                                  CategoriaPeriodoService categoriaPeriodoService,
+                                  LiquidacionAdicionalService liquidacionAdicionalService)
+    {
         this.cargoLiquidacionService = cargoLiquidacionService;
         this.designacionToolService = designacionToolService;
         this.cargoClaseDetalleService = cargoClaseDetalleService;
@@ -136,7 +156,7 @@ public class MakeLiquidacionService {
             legajoControlService.add(new LegajoControl(null, legajoId, anho, mes, (byte) 0, (byte) 0, (byte) 0, null));
         }
         codigos = codigoService.findAll().stream().collect(Collectors.toMap(Codigo::getCodigoId, codigo -> codigo));
-        novedades = novedadService.findAllByLegajo(legajoId, anho, mes).stream().filter(novedad -> !novedad.getCodigoId().equals(CODIGO_NOVEDAD_AJUSTE_BASICO)).collect(Collectors.toMap(Novedad::getCodigoId, novedad -> novedad));
+        novedades = novedadService.findAllByLegajo(legajoId, anho, mes).stream().filter(novedad -> !Objects.equals(novedad.getCodigoId(), CODIGO_NOVEDAD_AJUSTE_BASICO)).collect(Collectors.toMap(Novedad::getCodigoId, novedad -> novedad));
         items = new HashMap<>();
     }
 
@@ -268,13 +288,7 @@ public class MakeLiquidacionService {
         }
 
         // Cargos con clase
-        for (CargoClaseDetalle detalle : cargoClaseDetalleService.findAllByLegajo(legajoId, anho, mes)) {
-            BigDecimal basico = detalle.getValorHora().multiply(new BigDecimal(detalle.getHoras())).setScale(2, RoundingMode.HALF_UP);
-            addItem(legajoId, anho, mes, CODIGO_BASICO, basico);
-
-            BigDecimal antiguedad = basico.multiply(indices.get(0)).setScale(2, RoundingMode.HALF_UP);
-            addItem(legajoId, anho, mes, CODIGO_ANTIGUEDAD, antiguedad);
-        }
+        calcularCargosConClase(legajoId, anho, mes);
 
         // Carga de Novedades No Remunerativas
         for (CodigoGrupo codigoGrupo : noRemunerativos) {
@@ -282,6 +296,29 @@ public class MakeLiquidacionService {
                 addItem(legajoId, anho, mes, codigoGrupo.getCodigoId(), novedades.get(codigoGrupo.getCodigoId()).getImporte());
             }
         }
+    }
+
+    private void calcularCargosConClase(Long legajoId, Integer anho, Integer mes) {
+        log.debug("Processing MakeLiquidacionService.calcularCargosConClase");
+
+        for (CargoClaseDetalle detalle : cargoClaseDetalleService.findAllByLegajo(legajoId, anho, mes)) {
+            log.debug("CargoClaseDetalle -> {}", detalle.jsonify());
+            BigDecimal basico = detalle.getValorHora().multiply(new BigDecimal(detalle.getHoras())).setScale(2, RoundingMode.HALF_UP);
+            addItem(legajoId, anho, mes, CODIGO_BASICO, basico);
+
+            BigDecimal antiguedad = basico.multiply(indices.getFirst()).setScale(2, RoundingMode.HALF_UP);
+            addItem(legajoId, anho, mes, CODIGO_ANTIGUEDAD, antiguedad);
+
+            // Cálculo Adicional
+            if (detalle.getAplicaAdicional() == 1) {
+                var adicionalHora = control.getAdicionalHoraCargoClase();
+                if (adicionalHora.compareTo(BigDecimal.ZERO) != 0) {
+                    BigDecimal adicional = adicionalHora.multiply(new BigDecimal(detalle.getHoras())).setScale(2, RoundingMode.HALF_UP);
+                    addItem(legajoId, anho, mes, CODIGO_ADICIONAL_CARGO_CLASE, adicional);
+                }
+            }
+        }
+
     }
 
     private void calcularTotalesParciales(Long legajoId, Integer anho, Integer mes, List<CodigoGrupo> remunerativos, List<CodigoGrupo> noRemunerativos) {
@@ -490,7 +527,7 @@ public class MakeLiquidacionService {
                 ? calculateTotalDependenciaFusionado(legajoId, anho, mes, dependenciasBySede)
                 : calculateTotalDependenciaSinFusion(legajoId, anho, mes, dependenciasBySede);
 
-        if (totalDependencia != null && !totalDependencia.isEmpty()) {
+        if (!totalDependencia.isEmpty()) {
             calcularAdicionalesPorDependencia(legajoId, anho, mes, totalDependencia, horasDependencia);
         }
 
@@ -537,7 +574,7 @@ public class MakeLiquidacionService {
                 if (adicional.compareTo(BigDecimal.ZERO) > 0) {
                     liquidacionAdicionalService.add(new LiquidacionAdicional(null, legajoId, anho, mes, dependenciaId, adicional, null, null));
                     addItem(legajoId, anho, mes, CODIGO_BASICO, adicional);
-                    BigDecimal antiguedad = adicional.multiply(indices.get(0)).setScale(2, RoundingMode.HALF_UP);
+                    BigDecimal antiguedad = adicional.multiply(indices.getFirst()).setScale(2, RoundingMode.HALF_UP);
                     if (antiguedad.compareTo(BigDecimal.ZERO) != 0) {
                         addItem(legajoId, anho, mes, CODIGO_ANTIGUEDAD, antiguedad);
                     }
@@ -604,7 +641,6 @@ public class MakeLiquidacionService {
         Map<String, Dependencia> dependencias = dependenciaService.findAll().stream().collect(Collectors.toMap(Dependencia::getSedeKey, Function.identity(), (dependencia, replacement) -> dependencia));
         List<CargoLiquidacion> cargoLiquidacions = new ArrayList<>();
         for (Cargo cargo : cargoService.findAllDocenteByPeriodo(legajoId, anho, mes)) {
-            logCargo(cargo);
             Categoria categoria = cargo.getCategoria();
             if (categoria.getCategoriaId() != CODIGO_NOVEDAD_AJUSTE_BASICO) {
                 cargoLiquidacions.add(new CargoLiquidacion(null, legajoId, anho, mes, cargo.getDependenciaId(), Periodo.firstDay(anho, mes), Periodo.lastDay(anho, mes), categoria.getCategoriaId(), categoria.getNombre(), categoria.getBasico(), categoria.getEstadoDocente(), cargo.getHorasJornada(), cargo.getJornada(), cargo.getPresentismo(), "A", null, null, categoria));
@@ -632,7 +668,6 @@ public class MakeLiquidacionService {
             cargoLiquidacions.add(new CargoLiquidacion(null, legajoId, anho, mes, novedad.getDependenciaId(), Periodo.firstDay(anho, mes), Periodo.lastDay(anho, mes), categoria.getCategoriaId(), categoria.getNombre(), novedad.getImporte(), BigDecimal.ZERO, BigDecimal.ZERO, 1, 0, "A", null, novedad.getDependencia(), categoria));
         }
         cargoLiquidacions = cargoLiquidacionService.saveAll(cargoLiquidacions, mes, false);
-        logCargoLiquidacions(cargoLiquidacions);
     }
 
     @Transactional
@@ -670,24 +705,18 @@ public class MakeLiquidacionService {
         return null;
     }
 
-    private BigDecimal calculateEstadoDocente(Integer categoriaId) {
-        if ((categoriaId > 100 && categoriaId < 201) || (categoriaId > 205 && categoriaId < 210) || (categoriaId > 214 && categoriaId < 218) || (categoriaId > 500 && categoriaId < 701) || (categoriaId > 900 && categoriaId < 980))
-            return control.getEstadoDocenteTitular();
-        if ((categoriaId > 200 && categoriaId < 206) || (categoriaId > 209 && categoriaId < 215) || (categoriaId > 216 && categoriaId < 301))
-            return control.getEstadoDocenteAdjunto();
-        if ((categoriaId > 300 && categoriaId < 501))
-            return control.getEstadoDocenteAuxiliar();
-        return BigDecimal.ZERO;
-    }
-
     private void addItem(Long legajoId, Integer anho, Integer mes, Integer codigoId, BigDecimal importe) {
+        log.debug("Processing MakeLiquidacionService.addItem");
         Item item = items.computeIfAbsent(codigoId, k -> new Item(null, legajoId, anho, mes, k, codigos.get(k).getNombre(), BigDecimal.ZERO, null, null));
-        item.setImporte(item.getImporte().add(importe));
+        item.setImporte(item.getImporte().add(importe).setScale(2, RoundingMode.HALF_UP));
+        log.debug("Item -> {}", item.jsonify());
     }
 
     private void setItem(Long legajoId, Integer anho, Integer mes, Integer codigoId, BigDecimal importe) {
+        log.debug("Processing MakeLiquidacionService.setItem");
         Item item = items.computeIfAbsent(codigoId, k -> new Item(null, legajoId, anho, mes, k, codigos.get(k).getNombre(), BigDecimal.ZERO, null, null));
         item.setImporte(importe.setScale(2, RoundingMode.HALF_UP));
+        log.debug("Item -> {}", item.jsonify());
     }
 
     private BigDecimal getItemValue(Integer codigoId) {
@@ -754,19 +783,4 @@ public class MakeLiquidacionService {
         return hasETEC && !hasBasico;
     }
 
-    private void logCargo(Cargo cargo) {
-        try {
-            log.debug("Cargo -> {}", JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(cargo));
-        } catch (JsonProcessingException e) {
-            log.debug("Cargo jsonify error -> {}", e.getMessage());
-        }
-    }
-
-    private void logCargoLiquidacions(List<CargoLiquidacion> cargoLiquidacions) {
-        try {
-            log.debug("CargoLiquidaciones -> {}", JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(cargoLiquidacions));
-        } catch (JsonProcessingException e) {
-            log.debug("CargoLiquidaciones jsonify error -> {}", e.getMessage());
-        }
-    }
 }

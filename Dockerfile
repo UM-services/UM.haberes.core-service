@@ -21,6 +21,9 @@ RUN mvn clean package
 # Usamos una imagen solo con el JRE, que es más pequeña
 FROM eclipse-temurin:24-jre-alpine
 
+# Instalar curl en la imagen final
+RUN apk update && apk add curl
+
 # Creamos un usuario y grupo no privilegiados por seguridad
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 

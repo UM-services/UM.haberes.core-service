@@ -1,0 +1,30 @@
+graph TD
+    subgraph "Usuario Final"
+        A[Usuario]
+    end
+
+    subgraph "Frontend (Supuesto)"
+        B[Aplicación Web/UI]
+    end
+
+    subgraph "um.haberes.core-service"
+        C[Controllers]
+        D[Services]
+        E[Repositories]
+        F[Base de Datos]
+    end
+
+    subgraph "Servicios Externos"
+        G[Servicio de Personas]
+        H[Servicio de Cuentas]
+        I[Otros Servicios UM]
+    end
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    D --> G
+    D --> H
+    D --> I

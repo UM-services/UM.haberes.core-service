@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant Usuario
+    participant AcreditacionController
+    participant LiquidacionService
+    participant CargoRepository
+    participant PersonaClient
+    participant CuentaClient
+
+    Usuario->>AcreditacionController: POST /api/acreditaciones (iniciar liquidación)
+    AcreditacionController->>LiquidacionService: liquidarSueldos(parametros)
+    LiquidacionService->>CargoRepository: findCargosActivos()
+    CargoRepository-->>LiquidacionService: Lista de Cargos
+    loop por cada cargo
+        LiquidacionService->>PersonaClient: getPersona(cargo.personaId)
+        PersonaClient-->>LiquidacionService: Datos Persona
+        LiquidacionService->>LiquidacionService: calcularHaber(cargo, persona)
+        LiquidacionService->>CuentaClient: acreditarSueldo(persona.cbu, monto)
+        CuentaClient-->>LiquidacionService: Confirmación de Pago
+    end
+    LiquidacionService-->>AcreditacionController: ResultadoLiquidacion
+    AcreditacionController-->>Usuario: Liquidación completada

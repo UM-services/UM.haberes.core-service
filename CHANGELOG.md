@@ -1,3 +1,12 @@
+## [1.0.0] - 2025-07-19
+- refactor: Eliminación de prefijos 'I' en repositorios y migración de clases a `um.haberes.core`
+- feat: Implementación de adicional por hora para cargo clase en liquidaciones
+- feat: Nuevos servicios de vista: TotalItemService, TotalNovedadService, TotalMensualService, TotalSalidaService
+- feat: Nuevos tests de integración y unitarios para servicios y controladores
+- docs: Actualización y creación de diagramas Mermaid (arquitectura, flujo de liquidación, ERD, despliegue)
+- docs: Actualización del workflow de documentación automática y del portal de documentación
+- fix: Mejoras en logs y manejo de errores en servicios de liquidación
+- chore: Actualización de nombres de paquetes y limpieza de código legacy
 # Changelog
 
 Todos los cambios notables en este proyecto serán documentados en este archivo.

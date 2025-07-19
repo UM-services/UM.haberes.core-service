@@ -49,7 +49,7 @@ jobs:
           <head>
               <meta charset="UTF-8">
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>Eterea Import Service - Documentación del Proyecto</title>
+              <title>UM Haberes Core Service - Documentación del Proyecto</title>
               <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
               <style>
                   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 1200px; margin: 0 auto; padding: 20px; background-color: #f5f5f5; }
@@ -69,16 +69,14 @@ jobs:
           </head>
           <body>
               <div class="header">
-                  <h1>📋 Eterea Import Service - Documentación del Proyecto</h1>
-                  <p>Servicio de Importación de Datos desde WordPress y otras fuentes.</p>
+                  <h1>📋 UM Haberes Core Service - Documentación del Proyecto</h1>
+                  <p>Servicio central para la gestión de haberes y liquidaciones de la Universidad.</p>
                   <p>Última actualización: <span id="update-date"></span></p>
               </div>
               <div id="stats" class="stats"></div>
               <div id="architecture" class="section"></div>
               <div id="sequence-diagram" class="section"></div>
-              <div id="state-diagram" class="section"></div>
               <div id="erd-diagram" class="section"></div>
-              <div id="error-flow-diagram" class="section"></div>
               <div id="deployment-diagram" class="section"></div>
               <div id="dependencies" class="section">
                   <h2>🌳 Grafo de Dependencias</h2>
@@ -126,52 +124,34 @@ jobs:
               document.getElementById('stats').innerHTML = statsHTML;
 
               // --- Architecture Diagram ---
-              fetch('diagrams/arquitectura-import-service.mmd')
+              fetch('diagrams/arquitectura-general.mmd')
                   .then(response => response.text())
                   .then(data => {
                       const architectureContainer = document.getElementById('architecture');
-                      architectureContainer.innerHTML = '<h2>🏛️ Arquitectura del Servicio de Importación</h2><div class="mermaid">' + data + '</div>';
+                      architectureContainer.innerHTML = '<h2>🏛️ Arquitectura General del Servicio</h2><div class="mermaid">' + data + '</div>';
                       mermaid.init(undefined, architectureContainer.querySelector('.mermaid'));
                   });
 
               // --- Sequence Diagram ---
-              fetch('diagrams/flujo-importacion-wordpress.mmd')
+              fetch('diagrams/flujo-liquidacion-sueldos.mmd')
                   .then(response => response.text())
                   .then(data => {
                       const sequenceContainer = document.getElementById('sequence-diagram');
-                      sequenceContainer.innerHTML = '<h2>🔄 Diagrama de Secuencia: Importación de WordPress</h2><div class="mermaid">' + data + '</div>';
+                      sequenceContainer.innerHTML = '<h2>🔄 Diagrama de Secuencia: Liquidación de Sueldos</h2><div class="mermaid">' + data + '</div>';
                       mermaid.init(undefined, sequenceContainer.querySelector('.mermaid'));
                   });
 
-              // --- State Diagram ---
-              fetch('diagrams/ciclo-vida-ordernote.mmd')
-                  .then(response => response.text())
-                  .then(data => {
-                      const stateContainer = document.getElementById('state-diagram');
-                      stateContainer.innerHTML = '<h2>🚦 Diagrama de Estado: Ciclo de Vida de OrderNote</h2><div class="mermaid">' + data + '</div>';
-                      mermaid.init(undefined, stateContainer.querySelector('.mermaid'));
-                  });
-
               // --- ERD Diagram ---
-              fetch('diagrams/erd-database.mmd')
+              fetch('diagrams/modelo-entidad-relacion.mmd')
                   .then(response => response.text())
                   .then(data => {
                       const erdContainer = document.getElementById('erd-diagram');
-                      erdContainer.innerHTML = '<h2>🗃️ Diagrama de Entidad-Relación (Base de Datos)</h2><div class="mermaid">' + data + '</div>';
+                      erdContainer.innerHTML = '<h2>🗃️ Diagrama de Entidad-Relación (Simplificado)</h2><div class="mermaid">' + data + '</div>';
                       mermaid.init(undefined, erdContainer.querySelector('.mermaid'));
                   });
 
-              // --- Error Flow Diagram ---
-              fetch('diagrams/flujo-manejo-errores.mmd')
-                  .then(response => response.text())
-                  .then(data => {
-                      const errorContainer = document.getElementById('error-flow-diagram');
-                      errorContainer.innerHTML = '<h2>⚠️ Diagrama de Secuencia: Manejo de Errores</h2><div class="mermaid">' + data + '</div>';
-                      mermaid.init(undefined, errorContainer.querySelector('.mermaid'));
-                  });
-
               // --- Deployment Diagram ---
-              fetch('diagrams/despliegue-infraestructura.mmd')
+              fetch('diagrams/despliegue.mmd')
                   .then(response => response.text())
                   .then(data => {
                       const deploymentContainer = document.getElementById('deployment-diagram');
@@ -240,7 +220,7 @@ jobs:
           
           # Create a simple Home.md as a portal
           cat > Home.md << EOF
-          # 📋 Wiki del Proyecto Eterea Import Service
+          # 📋 Wiki del Proyecto UM Haberes Core Service
 
           Esta wiki sirve como un portal de acceso rápido a los recursos más importantes del proyecto.
 

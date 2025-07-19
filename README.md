@@ -1,3 +1,31 @@
+# UM Haberes Core Service
+
+Servicio core del sistema de Haberes de la Universidad de Mendoza, diseñado para manejar liquidaciones, acreditaciones y gestión de personal docente y no docente.
+
+## Versión
+
+**1.0.0** (2025-07-19)
+
+## Principales dependencias
+
+- Spring Boot: 3.5.3
+- Spring Cloud: 2025.0.0
+- Kotlin: 2.2.0
+- Java: 24
+
+## Diagramas principales
+
+- Arquitectura: `docs/diagrams/arquitectura-general.mmd`
+- Flujo de liquidación de sueldos: `docs/diagrams/flujo-liquidacion-sueldos.mmd`
+- Modelo entidad-relación: `docs/diagrams/modelo-entidad-relacion.mmd`
+- Despliegue: `docs/diagrams/despliegue.mmd`
+
+## Documentación automática
+
+La documentación y los diagramas se generan automáticamente en cada push a la rama principal mediante GitHub Actions.
+
+---
+
 # UM.haberes.core-service
 
 Servicio core del sistema de Haberes de la Universidad de Mendoza, diseñado para manejar liquidaciones, acreditaciones y gestión de personal docente y no docente.
