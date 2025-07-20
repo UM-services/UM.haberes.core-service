@@ -10,9 +10,9 @@
         <!-- lookup parent from repository -->
     </parent>
     <groupId>ar.edu</groupId>
-    <artifactId>um.tesoreria.haberes.service</artifactId>
+    <artifactId>um.haberes.core-service</artifactId>
     <version>1.0.0</version>
-    <name>um.tesoreria.haberes.service</name>
+    <name>UM.haberes.core-service</name>
     <description>Spring Boot Haberes</description>
     <properties>
         <java.version>24</java.version>
