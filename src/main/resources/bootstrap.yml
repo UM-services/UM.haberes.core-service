@@ -5,21 +5,15 @@ app:
   database: haberes
   user: root
   password: root
+  consul:
+    host: consul-service
+    port: 8500
   mail:
     username: uid
     password: pwd
 
 server:
   port: ${app.port}
-
-eureka:
-  instance:
-    prefer-ip-address: true
-  client:
-    fetch-registry: true
-    register-with-eureka: true
-    service-url:
-      defaultZone: http://eureka:@eureka-service:8761/eureka
 
 spring:
   cache:
@@ -32,6 +26,13 @@ spring:
       spec: initialCapacity=50,maximumSize=500,expireAfterAccess=600s
   application:
     name: haberes-core-service
+  cloud:
+    consul:
+      host: ${app.consul.host}
+      port: ${app.consul.port}
+      discovery:
+        prefer-ip-address: true
+        tags: haberes,core
   datasource:
     url: jdbc:mysql://${app.server}/${app.database}?useSSL=false&serverTimezone=UTC
     username: ${app.user}
