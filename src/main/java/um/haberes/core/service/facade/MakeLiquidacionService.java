@@ -331,16 +331,21 @@ public class MakeLiquidacionService {
     }
 
     private void calcularDescuentosPorAusencia(Long legajoId, Integer anho, Integer mes) {
+        log.debug("\n\n\nProcessing MakeLiquidacionService.calcularDescuentosPorAusencia\n\n\n");
         BigDecimal aguinaldo = getItemValue(CODIGO_AGUINALDO);
         BigDecimal totalRemunerativo = getItemValue(CODIGO_TOTAL_REMUNERATIVO);
+        log.debug("Total Remunerativo = {}", totalRemunerativo);
         BigDecimal valorMes = totalRemunerativo.subtract(aguinaldo).setScale(2, RoundingMode.HALF_UP);
+        log.debug("Valor Mes = {}", valorMes);
         BigDecimal valorDia = valorMes.divide(new BigDecimal(30), 5, RoundingMode.HALF_UP);
+        log.debug("Valor Dia = {}", valorDia);
 
         // Inasistencias
         if (novedades.containsKey(CODIGO_INASISTENCIAS)) {
             int diasInasistencia = novedades.get(CODIGO_INASISTENCIAS).getImporte().intValue();
             BigDecimal inasistencias = new BigDecimal(-1).multiply(new BigDecimal(diasInasistencia).multiply(valorDia)).setScale(2, RoundingMode.HALF_UP);
-            addItem(legajoId, anho, mes, CODIGO_INASISTENCIAS, inasistencias);
+            log.debug("Inasistencias = {}", inasistencias);
+            setItem(legajoId, anho, mes, CODIGO_INASISTENCIAS, inasistencias);
         }
 
         // Licencia por Maternidad
