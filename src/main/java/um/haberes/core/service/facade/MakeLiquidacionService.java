@@ -167,7 +167,6 @@ public class MakeLiquidacionService {
         return new ArrayList<>(items.values());
     }
 
-    @Transactional
     public void liquidacionByLegajoId(Long legajoId, Integer anho, Integer mes, Boolean force) {
         if (!puedeLiquidar(legajoId, anho, mes, force)) {
             return;
@@ -365,16 +364,20 @@ public class MakeLiquidacionService {
     }
 
     private void calcularAportes(Long legajoId, Integer anho, Integer mes, BigDecimal coeficienteLiquidacion) {
+        log.debug("\n\n\nProcessing MakeLiquidacionService.calcularAportes\n\n\n");
         BigDecimal conAportes = getItemValue(CODIGO_TOTAL_REMUNERATIVO);
 
         // Jubilación
         BigDecimal jubilacion;
         BigDecimal coeficienteJubilacion = control.getJubilaem().divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
+        log.debug("Calculo Jubilacion . . .");
+        log.debug("Coeficiente Jubilacion = {}", coeficienteJubilacion);
         if (conAportes.compareTo(coeficienteLiquidacion.multiply(control.getMaximo1sijp())) <= 0) {
             jubilacion = conAportes.multiply(coeficienteJubilacion).setScale(2, RoundingMode.HALF_UP);
         } else {
             jubilacion = coeficienteLiquidacion.multiply(coeficienteJubilacion).multiply(control.getMaximo1sijp()).setScale(2, RoundingMode.HALF_UP);
         }
+        log.debug("Jubilacion = {}", jubilacion);
         if (jubilacion.compareTo(BigDecimal.ZERO) != 0) {
             addItem(legajoId, anho, mes, CODIGO_JUBILACION, jubilacion);
         }
@@ -403,12 +406,14 @@ public class MakeLiquidacionService {
         }
 
         // Obra Social
-        BigDecimal obraSocial = BigDecimal.ZERO;
-        if (persona.getEstadoAfip() != 2 && conAportes.compareTo(BigDecimal.ZERO) != 0) {
-            // La lógica original estaba comentada, se mantiene así.
-            // Si se necesita, se debe implementar aquí.
+        log.debug("Calculo Obra Social . . .");
+        BigDecimal obraSocial = inssjp;
+        log.debug("Obra Social = {}", obraSocial);
+        if (persona.getEstadoAfip() == 2 || conAportes.compareTo(BigDecimal.ZERO) == 0) {
+            obraSocial = BigDecimal.ZERO;
         }
         if (obraSocial.compareTo(BigDecimal.ZERO) != 0) {
+            log.debug("Registrando Obra Social . . .");
             addItem(legajoId, anho, mes, CODIGO_OBRA_SOCIAL, obraSocial);
         }
     }
@@ -507,7 +512,6 @@ public class MakeLiquidacionService {
         legajoControlService.update(legajoControl, legajoControl.getLegajoControlId());
     }
 
-    @Transactional
     public void calculaBasicoAndAntiguedad(Long legajoId, Integer anho, Integer mes) {
         Map<String, Dependencia> dependenciasBySede = dependenciaService.findAll().stream()
                 .collect(Collectors.toMap(Dependencia::getSedeKey, Function.identity(), (d1, d2) -> d1));

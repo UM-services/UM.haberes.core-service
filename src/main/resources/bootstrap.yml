@@ -66,3 +66,8 @@ logging:
       hibernate:
         SQL: ${app.logging}
       springframework.cloud.config: ${app.logging}
+
+management:
+  health:
+    mail:
+      enabled: false
