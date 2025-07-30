@@ -38,6 +38,9 @@ COPY --from=build /app/target/um.haberes.core-service.jar ./um.haberes.core-serv
 COPY marca_um.png marca_um.png
 COPY firma.png firma.png
 
+# Damos permisos al usuario sobre el directorio de la aplicación
+RUN chown -R appuser:appgroup /app
+
 # Cambiamos al usuario no privilegiado
 USER appuser
 
