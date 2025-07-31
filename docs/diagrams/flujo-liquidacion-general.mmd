@@ -1,0 +1,14 @@
+flowchart TD
+    A[Inicio: Solicitud de liquidación general] --> B[MakeLiquidacionGeneralController]
+    B --> C[MakeLiquidacionGeneralService]
+    C --> D[Obtiene lista de personas liquidables]
+    D --> E[LiquidacionProcesoService.crearProceso]
+    E --> F[LiquidacionProcessor.procesarLiquidaciones]
+    F --> G{Por cada persona}
+    G -->|OK| H[MakeLiquidacionService.liquidacionByLegajoId]
+    H --> I[Actualiza progreso en LiquidacionProceso]
+    G -->|Error| J[Log de error y continúa]
+    I --> K{¿Todas procesadas?}
+    K -- Sí --> L[Marca proceso como COMPLETED]
+    K -- No --> G
+    L --> M[Fin]
