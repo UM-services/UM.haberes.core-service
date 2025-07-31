@@ -1,6 +1,3 @@
-/**
- *
- */
 package um.haberes.core.service.facade;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,6 +9,7 @@ import um.haberes.core.exception.*;
 import um.haberes.core.kotlin.model.*;
 import um.haberes.core.kotlin.model.view.NovedadDuplicada;
 import um.haberes.core.service.*;
+import um.haberes.core.service.facade.liquidaciones.LiquidacionState;
 import um.haberes.core.service.view.NovedadDuplicadaService;
 import um.haberes.core.util.Periodo;
 import um.haberes.core.util.Tool;
@@ -85,14 +83,6 @@ public class MakeLiquidacionService {
     private final CategoriaPeriodoService categoriaPeriodoService;
     private final LiquidacionAdicionalService liquidacionAdicionalService;
 
-    // State fields for a single liquidation run
-    private Control control;
-    private Persona persona;
-    private List<BigDecimal> indices;
-    private Map<Integer, Codigo> codigos;
-    private Map<Integer, Item> items;
-    private Map<Integer, Novedad> novedades;
-
     public MakeLiquidacionService(CargoLiquidacionService cargoLiquidacionService,
                                   DesignacionToolService designacionToolService,
                                   CargoClaseDetalleService cargoClaseDetalleService,
@@ -116,8 +106,7 @@ public class MakeLiquidacionService {
                                   CodigoService codigoService,
                                   AdicionalCursoTablaService adicionalCursoTablaService,
                                   CategoriaPeriodoService categoriaPeriodoService,
-                                  LiquidacionAdicionalService liquidacionAdicionalService)
-    {
+                                  LiquidacionAdicionalService liquidacionAdicionalService) {
         this.cargoLiquidacionService = cargoLiquidacionService;
         this.designacionToolService = designacionToolService;
         this.cargoClaseDetalleService = cargoClaseDetalleService;
@@ -145,62 +134,64 @@ public class MakeLiquidacionService {
     }
 
     @Transactional
-    public void makeContext(Long legajoId, Integer anho, Integer mes) {
+    public LiquidacionState makeContext(Long legajoId, Integer anho, Integer mes) {
         this.deleteNovedadDuplicada(anho, mes);
-        indices = designacionToolService.indiceAntiguedad(legajoId, anho, mes);
-        persona = personaService.findByLegajoId(legajoId);
-        control = controlService.findByPeriodo(anho, mes);
+        LiquidacionState state = new LiquidacionState();
+        state.setIndices(designacionToolService.indiceAntiguedad(legajoId, anho, mes));
+        state.setPersona(personaService.findByLegajoId(legajoId));
+        state.setControl(controlService.findByPeriodo(anho, mes));
         try {
             legajoControlService.findByUnique(legajoId, anho, mes);
         } catch (LegajoControlException e) {
             legajoControlService.add(new LegajoControl(null, legajoId, anho, mes, (byte) 0, (byte) 0, (byte) 0, null));
         }
-        codigos = codigoService.findAll().stream().collect(Collectors.toMap(Codigo::getCodigoId, codigo -> codigo));
-        novedades = novedadService.findAllByLegajo(legajoId, anho, mes).stream().filter(novedad -> !Objects.equals(novedad.getCodigoId(), CODIGO_NOVEDAD_AJUSTE_BASICO)).collect(Collectors.toMap(Novedad::getCodigoId, novedad -> novedad));
-        items = new HashMap<>();
+        state.setCodigos(codigoService.findAll().stream().collect(Collectors.toMap(Codigo::getCodigoId, codigo -> codigo)));
+        state.setNovedades(novedadService.findAllByLegajo(legajoId, anho, mes).stream().filter(novedad -> !Objects.equals(novedad.getCodigoId(), CODIGO_NOVEDAD_AJUSTE_BASICO)).collect(Collectors.toMap(Novedad::getCodigoId, novedad -> novedad)));
+        return state;
     }
 
     @Transactional
     public List<Item> basicoAndAntiguedad(Long legajoId, Integer anho, Integer mes) {
-        makeContext(legajoId, anho, mes);
-        calculaBasicoAndAntiguedad(legajoId, anho, mes);
-        return new ArrayList<>(items.values());
+        LiquidacionState state = makeContext(legajoId, anho, mes);
+        calculaBasicoAndAntiguedad(legajoId, anho, mes, state);
+        return new ArrayList<>(state.getItems().values());
     }
 
     public void liquidacionByLegajoId(Long legajoId, Integer anho, Integer mes, Boolean force) {
-        if (!puedeLiquidar(legajoId, anho, mes, force)) {
+        LiquidacionState state = new LiquidacionState();
+        if (!puedeLiquidar(legajoId, anho, mes, force, state)) {
             return;
         }
 
-        inicializarLiquidacion(legajoId, anho, mes);
+        inicializarLiquidacion(legajoId, anho, mes, state);
 
         List<CodigoGrupo> allCodigoGrupos = codigoGrupoService.findAll();
         List<CodigoGrupo> remunerativosGrupos = allCodigoGrupos.stream().filter(c -> c.getRemunerativo() == 1).toList();
         List<CodigoGrupo> noRemunerativosGrupos = allCodigoGrupos.stream().filter(c -> c.getNoRemunerativo() == 1).toList();
         List<CodigoGrupo> deduccionGrupos = allCodigoGrupos.stream().filter(c -> c.getDeduccion() == 1).toList();
 
-        if (!esPeriodoLiquidable(legajoId, anho, mes)) {
+        if (!esPeriodoLiquidable(legajoId, anho, mes, state)) {
             return;
         }
 
         BigDecimal coeficienteLiquidacion = (mes == 6 || mes == 12) ? new BigDecimal("1.5") : BigDecimal.ONE;
 
         // --- Start Calculation Flow ---
-        calculaBasicoAndAntiguedad(legajoId, anho, mes);
-        calcularConceptosGenerales(legajoId, anho, mes, remunerativosGrupos, noRemunerativosGrupos);
-        calcularTotalesParciales(legajoId, anho, mes, remunerativosGrupos, noRemunerativosGrupos);
-        calcularDescuentosPorAusencia(legajoId, anho, mes);
-        recalcularTotales(legajoId, anho, mes, remunerativosGrupos, noRemunerativosGrupos);
-        calcularAportes(legajoId, anho, mes, coeficienteLiquidacion);
-        calcularDeducciones(legajoId, anho, mes, deduccionGrupos);
-        aplicarAjusteNeto(legajoId, anho, mes);
-        calcularNetoFinal(legajoId, anho, mes);
+        calculaBasicoAndAntiguedad(legajoId, anho, mes, state);
+        calcularConceptosGenerales(legajoId, anho, mes, remunerativosGrupos, noRemunerativosGrupos, state);
+        calcularTotalesParciales(legajoId, anho, mes, remunerativosGrupos, noRemunerativosGrupos, state);
+        calcularDescuentosPorAusencia(legajoId, anho, mes, state);
+        recalcularTotales(legajoId, anho, mes, remunerativosGrupos, noRemunerativosGrupos, state);
+        calcularAportes(legajoId, anho, mes, coeficienteLiquidacion, state);
+        calcularDeducciones(legajoId, anho, mes, deduccionGrupos, state);
+        aplicarAjusteNeto(legajoId, anho, mes, state);
+        calcularNetoFinal(legajoId, anho, mes, state);
         // --- End Calculation Flow ---
 
-        persistirResultadosLiquidacion(legajoId, anho, mes);
+        persistirResultadosLiquidacion(legajoId, anho, mes, state);
     }
 
-    private boolean puedeLiquidar(Long legajoId, Integer anho, Integer mes, Boolean force) {
+    private boolean puedeLiquidar(Long legajoId, Integer anho, Integer mes, Boolean force, LiquidacionState state) {
         if (!force) {
             try {
                 Liquidacion liquidacion = liquidacionService.findByLegajoIdAndAnhoAndMes(legajoId, anho, mes);
@@ -212,8 +203,8 @@ public class MakeLiquidacionService {
             }
         }
 
-        persona = personaService.findByLegajoId(legajoId);
-        if (persona.getEstado() == 9 && "N".equals(persona.getLiquida())) {
+        state.setPersona(personaService.findByLegajoId(legajoId));
+        if (state.getPersona().getEstado() == 9 && "N".equals(state.getPersona().getLiquida())) {
             try {
                 Liquidacion liquidacionAnterior = liquidacionService.findByPeriodoAnterior(legajoId, anho, mes);
                 if (liquidacionAnterior.getEstado() == 1 && "S".equals(liquidacionAnterior.getLiquida())) {
@@ -225,12 +216,12 @@ public class MakeLiquidacionService {
             }
         }
 
-        if (!(persona.getEstado() == 1 && "S".equals(persona.getLiquida()))) {
+        if (!(state.getPersona().getEstado() == 1 && "S".equals(state.getPersona().getLiquida()))) {
             try {
                 Liquidacion liquidacionAnterior = liquidacionService.findByPeriodoAnterior(legajoId, anho, mes);
                 if (liquidacionAnterior.getEstado() == 9 && "S".equals(liquidacionAnterior.getLiquida())) {
-                    persona.setLiquida("N");
-                    personaService.update(persona, legajoId);
+                    state.getPersona().setLiquida("N");
+                    personaService.update(state.getPersona(), legajoId);
                     return false;
                 }
             } catch (LiquidacionException e) {
@@ -240,16 +231,22 @@ public class MakeLiquidacionService {
         return true;
     }
 
-    private void inicializarLiquidacion(Long legajoId, Integer anho, Integer mes) {
-        makeContext(legajoId, anho, mes);
+    private void inicializarLiquidacion(Long legajoId, Integer anho, Integer mes, LiquidacionState state) {
+        LiquidacionState freshState = makeContext(legajoId, anho, mes);
+        state.setControl(freshState.getControl());
+        state.setPersona(freshState.getPersona());
+        state.setIndices(freshState.getIndices());
+        state.setCodigos(freshState.getCodigos());
+        state.setNovedades(freshState.getNovedades());
+
         antiguedadService.calculate(legajoId, anho, mes);
         liquidacionAdicionalService.deleteAllByLegajo(legajoId, anho, mes);
         itemService.deleteAllByLegajo(legajoId, anho, mes);
         liquidacionService.deleteByLegajo(legajoId, anho, mes);
     }
 
-    private boolean esPeriodoLiquidable(Long legajoId, Integer anho, Integer mes) {
-        boolean tieneNovedadesEspeciales = novedades.containsKey(CODIGO_AGUINALDO) || novedades.containsKey(CODIGO_AGUINALDO_ETEC) || novedades.containsKey(CODIGO_VACACIONES);
+    private boolean esPeriodoLiquidable(Long legajoId, Integer anho, Integer mes, LiquidacionState state) {
+        boolean tieneNovedadesEspeciales = state.getNovedades().containsKey(CODIGO_AGUINALDO) || state.getNovedades().containsKey(CODIGO_AGUINALDO_ETEC) || state.getNovedades().containsKey(CODIGO_VACACIONES);
         if (tieneNovedadesEspeciales) {
             return true;
         }
@@ -258,22 +255,22 @@ public class MakeLiquidacionService {
         return tieneCargosActivos || tieneCargosClase;
     }
 
-    private void calcularConceptosGenerales(Long legajoId, Integer anho, Integer mes, List<CodigoGrupo> remunerativos, List<CodigoGrupo> noRemunerativos) {
+    private void calcularConceptosGenerales(Long legajoId, Integer anho, Integer mes, List<CodigoGrupo> remunerativos, List<CodigoGrupo> noRemunerativos, LiquidacionState state) {
         // Incentivo Posgrado
-        BigDecimal incentivoPosgrado = switch (persona.getPosgrado()) {
-            case 1 -> control.getDoctorado();
-            case 2 -> control.getMaestria();
-            case 3 -> control.getEspecializacion();
+        BigDecimal incentivoPosgrado = switch (state.getPersona().getPosgrado()) {
+            case 1 -> state.getControl().getDoctorado();
+            case 2 -> state.getControl().getMaestria();
+            case 3 -> state.getControl().getEspecializacion();
             default -> BigDecimal.ZERO;
         };
         if (incentivoPosgrado.compareTo(BigDecimal.ZERO) > 0) {
-            addItem(legajoId, anho, mes, CODIGO_INCENTIVO_POSGRADO, incentivoPosgrado);
+            addItem(legajoId, anho, mes, CODIGO_INCENTIVO_POSGRADO, incentivoPosgrado, state);
         }
 
         // Carga de Novedades Remunerativas
         for (CodigoGrupo codigoGrupo : remunerativos) {
-            if (novedades.containsKey(codigoGrupo.getCodigoId())) {
-                addItem(legajoId, anho, mes, codigoGrupo.getCodigoId(), novedades.get(codigoGrupo.getCodigoId()).getImporte());
+            if (state.getNovedades().containsKey(codigoGrupo.getCodigoId())) {
+                addItem(legajoId, anho, mes, codigoGrupo.getCodigoId(), state.getNovedades().get(codigoGrupo.getCodigoId()).getImporte(), state);
             }
         }
 
@@ -283,57 +280,57 @@ public class MakeLiquidacionService {
                 .map(CursoDesarraigo::getImporte)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         if (totalDesarraigo.compareTo(BigDecimal.ZERO) != 0) {
-            addItem(legajoId, anho, mes, CODIGO_DESARRAIGO, totalDesarraigo);
+            addItem(legajoId, anho, mes, CODIGO_DESARRAIGO, totalDesarraigo, state);
         }
 
         // Cargos con clase
-        calcularCargosConClase(legajoId, anho, mes);
+        calcularCargosConClase(legajoId, anho, mes, state);
 
         // Carga de Novedades No Remunerativas
         for (CodigoGrupo codigoGrupo : noRemunerativos) {
-            if (novedades.containsKey(codigoGrupo.getCodigoId())) {
-                addItem(legajoId, anho, mes, codigoGrupo.getCodigoId(), novedades.get(codigoGrupo.getCodigoId()).getImporte());
+            if (state.getNovedades().containsKey(codigoGrupo.getCodigoId())) {
+                addItem(legajoId, anho, mes, codigoGrupo.getCodigoId(), state.getNovedades().get(codigoGrupo.getCodigoId()).getImporte(), state);
             }
         }
     }
 
-    private void calcularCargosConClase(Long legajoId, Integer anho, Integer mes) {
+    private void calcularCargosConClase(Long legajoId, Integer anho, Integer mes, LiquidacionState state) {
         log.debug("Processing MakeLiquidacionService.calcularCargosConClase");
 
         for (CargoClaseDetalle detalle : cargoClaseDetalleService.findAllByLegajo(legajoId, anho, mes)) {
             log.debug("CargoClaseDetalle -> {}", detalle.jsonify());
             BigDecimal basico = detalle.getValorHora().multiply(new BigDecimal(detalle.getHoras())).setScale(2, RoundingMode.HALF_UP);
-            addItem(legajoId, anho, mes, CODIGO_BASICO, basico);
+            addItem(legajoId, anho, mes, CODIGO_BASICO, basico, state);
 
-            BigDecimal antiguedad = basico.multiply(indices.getFirst()).setScale(2, RoundingMode.HALF_UP);
-            addItem(legajoId, anho, mes, CODIGO_ANTIGUEDAD, antiguedad);
+            BigDecimal antiguedad = basico.multiply(state.getIndices().getFirst()).setScale(2, RoundingMode.HALF_UP);
+            addItem(legajoId, anho, mes, CODIGO_ANTIGUEDAD, antiguedad, state);
 
             // Cálculo Adicional
             if (detalle.getAplicaAdicional() == 1) {
-                var adicionalHora = control.getAdicionalHoraCargoClase();
+                var adicionalHora = state.getControl().getAdicionalHoraCargoClase();
                 if (adicionalHora.compareTo(BigDecimal.ZERO) != 0) {
                     BigDecimal adicional = adicionalHora.multiply(new BigDecimal(detalle.getHoras())).setScale(2, RoundingMode.HALF_UP);
-                    addItem(legajoId, anho, mes, CODIGO_ADICIONAL_CARGO_CLASE, adicional);
+                    addItem(legajoId, anho, mes, CODIGO_ADICIONAL_CARGO_CLASE, adicional, state);
                 }
             }
         }
 
     }
 
-    private void calcularTotalesParciales(Long legajoId, Integer anho, Integer mes, List<CodigoGrupo> remunerativos, List<CodigoGrupo> noRemunerativos) {
+    private void calcularTotalesParciales(Long legajoId, Integer anho, Integer mes, List<CodigoGrupo> remunerativos, List<CodigoGrupo> noRemunerativos, LiquidacionState state) {
         // Total Remunerativo Parcial
-        BigDecimal totalRemunerativo = sumarItemsPorGrupo(remunerativos, Set.of(CODIGO_INASISTENCIAS));
-        setItem(legajoId, anho, mes, CODIGO_TOTAL_REMUNERATIVO, totalRemunerativo);
+        BigDecimal totalRemunerativo = sumarItemsPorGrupo(remunerativos, Set.of(CODIGO_INASISTENCIAS), state);
+        setItem(legajoId, anho, mes, CODIGO_TOTAL_REMUNERATIVO, totalRemunerativo, state);
 
         // Total No Remunerativo Parcial
-        BigDecimal totalNoRemunerativo = sumarItemsPorGrupo(noRemunerativos, Collections.emptySet());
-        setItem(legajoId, anho, mes, CODIGO_TOTAL_NO_REMUNERATIVO, totalNoRemunerativo);
+        BigDecimal totalNoRemunerativo = sumarItemsPorGrupo(noRemunerativos, Collections.emptySet(), state);
+        setItem(legajoId, anho, mes, CODIGO_TOTAL_NO_REMUNERATIVO, totalNoRemunerativo, state);
     }
 
-    private void calcularDescuentosPorAusencia(Long legajoId, Integer anho, Integer mes) {
+    private void calcularDescuentosPorAusencia(Long legajoId, Integer anho, Integer mes, LiquidacionState state) {
         log.debug("\n\n\nProcessing MakeLiquidacionService.calcularDescuentosPorAusencia\n\n\n");
-        BigDecimal aguinaldo = getItemValue(CODIGO_AGUINALDO);
-        BigDecimal totalRemunerativo = getItemValue(CODIGO_TOTAL_REMUNERATIVO);
+        BigDecimal aguinaldo = getItemValue(CODIGO_AGUINALDO, state);
+        BigDecimal totalRemunerativo = getItemValue(CODIGO_TOTAL_REMUNERATIVO, state);
         log.debug("Total Remunerativo = {}", totalRemunerativo);
         BigDecimal valorMes = totalRemunerativo.subtract(aguinaldo).setScale(2, RoundingMode.HALF_UP);
         log.debug("Valor Mes = {}", valorMes);
@@ -341,141 +338,141 @@ public class MakeLiquidacionService {
         log.debug("Valor Dia = {}", valorDia);
 
         // Inasistencias
-        if (novedades.containsKey(CODIGO_INASISTENCIAS)) {
-            int diasInasistencia = novedades.get(CODIGO_INASISTENCIAS).getImporte().intValue();
+        if (state.getNovedades().containsKey(CODIGO_INASISTENCIAS)) {
+            int diasInasistencia = state.getNovedades().get(CODIGO_INASISTENCIAS).getImporte().intValue();
             BigDecimal inasistencias = new BigDecimal(-1).multiply(new BigDecimal(diasInasistencia).multiply(valorDia)).setScale(2, RoundingMode.HALF_UP);
             log.debug("Inasistencias = {}", inasistencias);
-            setItem(legajoId, anho, mes, CODIGO_INASISTENCIAS, inasistencias);
+            setItem(legajoId, anho, mes, CODIGO_INASISTENCIAS, inasistencias, state);
         }
 
         // Licencia por Maternidad
-        if (novedades.containsKey(CODIGO_LICENCIA_MATERNIDAD)) {
-            int diasLicencia = novedades.get(CODIGO_LICENCIA_MATERNIDAD).getImporte().intValue();
-            if (persona.getEstado() == 4 && diasLicencia > 0) {
+        if (state.getNovedades().containsKey(CODIGO_LICENCIA_MATERNIDAD)) {
+            int diasLicencia = state.getNovedades().get(CODIGO_LICENCIA_MATERNIDAD).getImporte().intValue();
+            if (state.getPersona().getEstado() == 4 && diasLicencia > 0) {
                 BigDecimal licenciaMaternidad = new BigDecimal(-1).multiply(new BigDecimal(diasLicencia).multiply(valorDia)).setScale(2, RoundingMode.HALF_UP);
-                addItem(legajoId, anho, mes, CODIGO_LICENCIA_MATERNIDAD, licenciaMaternidad);
+                addItem(legajoId, anho, mes, CODIGO_LICENCIA_MATERNIDAD, licenciaMaternidad, state);
             }
         }
     }
 
-    private void recalcularTotales(Long legajoId, Integer anho, Integer mes, List<CodigoGrupo> remunerativos, List<CodigoGrupo> noRemunerativos) {
+    private void recalcularTotales(Long legajoId, Integer anho, Integer mes, List<CodigoGrupo> remunerativos, List<CodigoGrupo> noRemunerativos, LiquidacionState state) {
         // Recalcular Total Remunerativo
-        BigDecimal totalRemunerativo = sumarItemsPorGrupo(remunerativos, Collections.emptySet());
-        setItem(legajoId, anho, mes, CODIGO_TOTAL_REMUNERATIVO, totalRemunerativo);
+        BigDecimal totalRemunerativo = sumarItemsPorGrupo(remunerativos, Collections.emptySet(), state);
+        setItem(legajoId, anho, mes, CODIGO_TOTAL_REMUNERATIVO, totalRemunerativo, state);
 
         // Recalcular Total No Remunerativo
-        BigDecimal totalNoRemunerativo = sumarItemsPorGrupo(noRemunerativos, Collections.emptySet());
-        setItem(legajoId, anho, mes, CODIGO_TOTAL_NO_REMUNERATIVO, totalNoRemunerativo);
+        BigDecimal totalNoRemunerativo = sumarItemsPorGrupo(noRemunerativos, Collections.emptySet(), state);
+        setItem(legajoId, anho, mes, CODIGO_TOTAL_NO_REMUNERATIVO, totalNoRemunerativo, state);
     }
 
-    private void calcularAportes(Long legajoId, Integer anho, Integer mes, BigDecimal coeficienteLiquidacion) {
+    private void calcularAportes(Long legajoId, Integer anho, Integer mes, BigDecimal coeficienteLiquidacion, LiquidacionState state) {
         log.debug("\n\n\nProcessing MakeLiquidacionService.calcularAportes\n\n\n");
-        BigDecimal conAportes = getItemValue(CODIGO_TOTAL_REMUNERATIVO);
+        BigDecimal conAportes = getItemValue(CODIGO_TOTAL_REMUNERATIVO, state);
 
         // Jubilación
         BigDecimal jubilacion;
-        BigDecimal coeficienteJubilacion = control.getJubilaem().divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
+        BigDecimal coeficienteJubilacion = state.getControl().getJubilaem().divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
         log.debug("Calculo Jubilacion . . .");
         log.debug("Coeficiente Jubilacion = {}", coeficienteJubilacion);
-        if (conAportes.compareTo(coeficienteLiquidacion.multiply(control.getMaximo1sijp())) <= 0) {
+        if (conAportes.compareTo(coeficienteLiquidacion.multiply(state.getControl().getMaximo1sijp())) <= 0) {
             jubilacion = conAportes.multiply(coeficienteJubilacion).setScale(2, RoundingMode.HALF_UP);
         } else {
-            jubilacion = coeficienteLiquidacion.multiply(coeficienteJubilacion).multiply(control.getMaximo1sijp()).setScale(2, RoundingMode.HALF_UP);
+            jubilacion = coeficienteLiquidacion.multiply(coeficienteJubilacion).multiply(state.getControl().getMaximo1sijp()).setScale(2, RoundingMode.HALF_UP);
         }
         log.debug("Jubilacion = {}", jubilacion);
         if (jubilacion.compareTo(BigDecimal.ZERO) != 0) {
-            addItem(legajoId, anho, mes, CODIGO_JUBILACION, jubilacion);
+            addItem(legajoId, anho, mes, CODIGO_JUBILACION, jubilacion, state);
         }
 
         // Jubilación Secundario (ETEC)
-        if (evaluateOnlyETEC(items)) {
+        if (evaluateOnlyETEC(state.getItems())) {
             BigDecimal jubilacionEtec = conAportes.multiply(new BigDecimal("0.02")).setScale(2, RoundingMode.HALF_UP);
             if (jubilacionEtec.compareTo(BigDecimal.ZERO) != 0) {
-                addItem(legajoId, anho, mes, CODIGO_JUBILACION_SECUNDARIO, jubilacionEtec);
+                addItem(legajoId, anho, mes, CODIGO_JUBILACION_SECUNDARIO, jubilacionEtec, state);
             }
         }
 
         // INSSJP
         BigDecimal inssjp;
-        BigDecimal coeficienteInssjp = control.getInssjpem().divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
-        if (conAportes.compareTo(coeficienteLiquidacion.multiply(control.getMaximo5sijp())) <= 0) {
+        BigDecimal coeficienteInssjp = state.getControl().getInssjpem().divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
+        if (conAportes.compareTo(coeficienteLiquidacion.multiply(state.getControl().getMaximo5sijp())) <= 0) {
             inssjp = conAportes.multiply(coeficienteInssjp).setScale(2, RoundingMode.HALF_UP);
         } else {
-            inssjp = coeficienteLiquidacion.multiply(coeficienteInssjp).multiply(control.getMaximo5sijp()).setScale(2, RoundingMode.HALF_UP);
+            inssjp = coeficienteLiquidacion.multiply(coeficienteInssjp).multiply(state.getControl().getMaximo5sijp()).setScale(2, RoundingMode.HALF_UP);
         }
-        if (persona.getEstadoAfip() == 2) {
+        if (state.getPersona().getEstadoAfip() == 2) {
             inssjp = BigDecimal.ZERO;
         }
         if (inssjp.compareTo(BigDecimal.ZERO) != 0) {
-            addItem(legajoId, anho, mes, CODIGO_INSSJP, inssjp);
+            addItem(legajoId, anho, mes, CODIGO_INSSJP, inssjp, state);
         }
 
         // Obra Social
         log.debug("Calculo Obra Social . . .");
         BigDecimal obraSocial = inssjp;
         log.debug("Obra Social = {}", obraSocial);
-        if (persona.getEstadoAfip() == 2 || conAportes.compareTo(BigDecimal.ZERO) == 0) {
+        if (state.getPersona().getEstadoAfip() == 2 || conAportes.compareTo(BigDecimal.ZERO) == 0) {
             obraSocial = BigDecimal.ZERO;
         }
         if (obraSocial.compareTo(BigDecimal.ZERO) != 0) {
             log.debug("Registrando Obra Social . . .");
-            addItem(legajoId, anho, mes, CODIGO_OBRA_SOCIAL, obraSocial);
+            addItem(legajoId, anho, mes, CODIGO_OBRA_SOCIAL, obraSocial, state);
         }
     }
 
-    private void calcularDeducciones(Long legajoId, Integer anho, Integer mes, List<CodigoGrupo> deduccionGrupos) {
+    private void calcularDeducciones(Long legajoId, Integer anho, Integer mes, List<CodigoGrupo> deduccionGrupos, LiquidacionState state) {
         // Cargar Novedades de Deducción
         for (CodigoGrupo codigoGrupo : deduccionGrupos) {
-            if (novedades.containsKey(codigoGrupo.getCodigoId())) {
-                BigDecimal value = novedades.get(codigoGrupo.getCodigoId()).getImporte();
+            if (state.getNovedades().containsKey(codigoGrupo.getCodigoId())) {
+                BigDecimal value = state.getNovedades().get(codigoGrupo.getCodigoId()).getImporte();
                 if (value.compareTo(BigDecimal.ZERO) != 0) {
-                    addItem(legajoId, anho, mes, codigoGrupo.getCodigoId(), value);
+                    addItem(legajoId, anho, mes, codigoGrupo.getCodigoId(), value, state);
                 }
             }
         }
 
         // Calcular Total Deducciones
-        BigDecimal totalDeducciones = sumarItemsPorGrupo(deduccionGrupos, Collections.emptySet());
-        setItem(legajoId, anho, mes, CODIGO_TOTAL_DEDUCCIONES, totalDeducciones);
+        BigDecimal totalDeducciones = sumarItemsPorGrupo(deduccionGrupos, Collections.emptySet(), state);
+        setItem(legajoId, anho, mes, CODIGO_TOTAL_DEDUCCIONES, totalDeducciones, state);
     }
 
-    private void aplicarAjusteNeto(Long legajoId, Integer anho, Integer mes) {
-        BigDecimal rem = getItemValue(CODIGO_TOTAL_REMUNERATIVO);
-        BigDecimal noRem = getItemValue(CODIGO_TOTAL_NO_REMUNERATIVO);
-        BigDecimal ded = getItemValue(CODIGO_TOTAL_DEDUCCIONES);
+    private void aplicarAjusteNeto(Long legajoId, Integer anho, Integer mes, LiquidacionState state) {
+        BigDecimal rem = getItemValue(CODIGO_TOTAL_REMUNERATIVO, state);
+        BigDecimal noRem = getItemValue(CODIGO_TOTAL_NO_REMUNERATIVO, state);
+        BigDecimal ded = getItemValue(CODIGO_TOTAL_DEDUCCIONES, state);
         BigDecimal neto = rem.add(noRem).subtract(ded);
         BigDecimal centavos = neto.subtract(neto.setScale(0, RoundingMode.HALF_UP));
 
         if (centavos.compareTo(BigDecimal.ZERO) > 0) {
             BigDecimal value = centavos.abs();
-            addItem(legajoId, anho, mes, CODIGO_AJUSTE_FAVOR_EMPRESA, value);
-            addItem(legajoId, anho, mes, CODIGO_TOTAL_DEDUCCIONES, value);
+            addItem(legajoId, anho, mes, CODIGO_AJUSTE_FAVOR_EMPRESA, value, state);
+            addItem(legajoId, anho, mes, CODIGO_TOTAL_DEDUCCIONES, value, state);
         }
         if (centavos.compareTo(BigDecimal.ZERO) < 0) {
             BigDecimal value = centavos.abs();
-            addItem(legajoId, anho, mes, CODIGO_AJUSTE_FAVOR_EMPLEADO, value);
-            addItem(legajoId, anho, mes, CODIGO_TOTAL_NO_REMUNERATIVO, value);
+            addItem(legajoId, anho, mes, CODIGO_AJUSTE_FAVOR_EMPLEADO, value, state);
+            addItem(legajoId, anho, mes, CODIGO_TOTAL_NO_REMUNERATIVO, value, state);
         }
     }
 
-    private void calcularNetoFinal(Long legajoId, Integer anho, Integer mes) {
-        BigDecimal rem = getItemValue(CODIGO_TOTAL_REMUNERATIVO);
-        BigDecimal noRem = getItemValue(CODIGO_TOTAL_NO_REMUNERATIVO);
-        BigDecimal ded = getItemValue(CODIGO_TOTAL_DEDUCCIONES);
+    private void calcularNetoFinal(Long legajoId, Integer anho, Integer mes, LiquidacionState state) {
+        BigDecimal rem = getItemValue(CODIGO_TOTAL_REMUNERATIVO, state);
+        BigDecimal noRem = getItemValue(CODIGO_TOTAL_NO_REMUNERATIVO, state);
+        BigDecimal ded = getItemValue(CODIGO_TOTAL_DEDUCCIONES, state);
         BigDecimal neto = rem.add(noRem).subtract(ded);
-        setItem(legajoId, anho, mes, CODIGO_NETO, neto);
+        setItem(legajoId, anho, mes, CODIGO_NETO, neto, state);
     }
 
-    private void persistirResultadosLiquidacion(Long legajoId, Integer anho, Integer mes) {
-        itemService.saveAll(new ArrayList<>(items.values()));
+    private void persistirResultadosLiquidacion(Long legajoId, Integer anho, Integer mes, LiquidacionState state) {
+        itemService.saveAll(new ArrayList<>(state.getItems().values()));
 
         Liquidacion liquidacion = new Liquidacion(null, legajoId, anho, mes, Tool.dateAbsoluteArgentina(), null,
-                persona.getDependenciaId(), persona.getSalida(),
-                getItemValue(CODIGO_TOTAL_REMUNERATIVO),
-                getItemValue(CODIGO_TOTAL_NO_REMUNERATIVO),
-                getItemValue(CODIGO_TOTAL_DEDUCCIONES),
-                getItemValue(CODIGO_NETO),
-                (byte) 0, persona.getEstado(), persona.getLiquida(), null, null);
+                state.getPersona().getDependenciaId(), state.getPersona().getSalida(),
+                getItemValue(CODIGO_TOTAL_REMUNERATIVO, state),
+                getItemValue(CODIGO_TOTAL_NO_REMUNERATIVO, state),
+                getItemValue(CODIGO_TOTAL_DEDUCCIONES, state),
+                getItemValue(CODIGO_NETO, state),
+                (byte) 0, state.getPersona().getEstado(), state.getPersona().getLiquida(), null, null);
         liquidacionService.add(liquidacion);
 
         try {
@@ -517,7 +514,7 @@ public class MakeLiquidacionService {
         legajoControlService.update(legajoControl, legajoControl.getLegajoControlId());
     }
 
-    public void calculaBasicoAndAntiguedad(Long legajoId, Integer anho, Integer mes) {
+    public void calculaBasicoAndAntiguedad(Long legajoId, Integer anho, Integer mes, LiquidacionState state) {
         Map<String, Dependencia> dependenciasBySede = dependenciaService.findAll().stream()
                 .collect(Collectors.toMap(Dependencia::getSedeKey, Function.identity(), (d1, d2) -> d1));
 
@@ -532,20 +529,20 @@ public class MakeLiquidacionService {
             horasDependencia.compute(dependencia.getDependenciaId(), (k, v) -> (v == null ? 0 : v) + cursoCargo.getHorasSemanales().intValue());
         }
 
-        Map<Integer, BigDecimal> totalDependencia = (control.getModoLiquidacionId() == constLiquidarConFusion)
+        Map<Integer, BigDecimal> totalDependencia = (state.getControl().getModoLiquidacionId() == constLiquidarConFusion)
                 ? calculateTotalDependenciaFusionado(legajoId, anho, mes, dependenciasBySede)
                 : calculateTotalDependenciaSinFusion(legajoId, anho, mes, dependenciasBySede);
 
         if (!totalDependencia.isEmpty()) {
-            calcularAdicionalesPorDependencia(legajoId, anho, mes, totalDependencia, horasDependencia);
+            calcularAdicionalesPorDependencia(legajoId, anho, mes, totalDependencia, horasDependencia, state);
         }
 
         for (CargoLiquidacion cargoLiquidacion : cargoLiquidacionService.findAllByLegajo(legajoId, anho, mes)) {
-            calcularConceptosPorCargo(legajoId, anho, mes, cargoLiquidacion);
+            calcularConceptosPorCargo(legajoId, anho, mes, cargoLiquidacion, state);
         }
     }
 
-    private void calcularAdicionalesPorDependencia(Long legajoId, Integer anho, Integer mes, Map<Integer, BigDecimal> totalDependencia, Map<Integer, Integer> horasDependencia) {
+    private void calcularAdicionalesPorDependencia(Long legajoId, Integer anho, Integer mes, Map<Integer, BigDecimal> totalDependencia, Map<Integer, Integer> horasDependencia, LiquidacionState state) {
         Map<Integer, Dependencia> dependenciasById = dependenciaService.findAllByIds(totalDependencia.keySet()).stream()
                 .collect(Collectors.toMap(Dependencia::getDependenciaId, Function.identity()));
         Set<Integer> facultadIds = dependenciasById.values().stream().map(Dependencia::getFacultadId).collect(Collectors.toSet());
@@ -582,17 +579,17 @@ public class MakeLiquidacionService {
                 BigDecimal adicional = totalCategoria.multiply(porcentaje).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
                 if (adicional.compareTo(BigDecimal.ZERO) > 0) {
                     liquidacionAdicionalService.add(new LiquidacionAdicional(null, legajoId, anho, mes, dependenciaId, adicional, null, null));
-                    addItem(legajoId, anho, mes, CODIGO_BASICO, adicional);
-                    BigDecimal antiguedad = adicional.multiply(indices.getFirst()).setScale(2, RoundingMode.HALF_UP);
+                    addItem(legajoId, anho, mes, CODIGO_BASICO, adicional, state);
+                    BigDecimal antiguedad = adicional.multiply(state.getIndices().getFirst()).setScale(2, RoundingMode.HALF_UP);
                     if (antiguedad.compareTo(BigDecimal.ZERO) != 0) {
-                        addItem(legajoId, anho, mes, CODIGO_ANTIGUEDAD, antiguedad);
+                        addItem(legajoId, anho, mes, CODIGO_ANTIGUEDAD, antiguedad, state);
                     }
                 }
             }
         }
     }
 
-    private void calcularConceptosPorCargo(Long legajoId, Integer anho, Integer mes, CargoLiquidacion cargoLiquidacion) {
+    private void calcularConceptosPorCargo(Long legajoId, Integer anho, Integer mes, CargoLiquidacion cargoLiquidacion, LiquidacionState state) {
         BigDecimal valorMes = BigDecimal.ZERO;
         Categoria categoria = cargoLiquidacion.getCategoria();
         assert categoria != null;
@@ -606,41 +603,41 @@ public class MakeLiquidacionService {
         }
         basico = basico.setScale(2, RoundingMode.HALF_UP);
         valorMes = valorMes.add(basico);
-        addItem(legajoId, anho, mes, CODIGO_BASICO, basico);
+        addItem(legajoId, anho, mes, CODIGO_BASICO, basico, state);
 
         BigDecimal estadoDocente = categoria.getEstadoDocente();
         if (estadoDocente.compareTo(BigDecimal.ZERO) != 0) {
-            addItem(legajoId, anho, mes, CODIGO_ESTADO_DOCENTE, estadoDocente);
+            addItem(legajoId, anho, mes, CODIGO_ESTADO_DOCENTE, estadoDocente, state);
             valorMes = valorMes.add(estadoDocente);
         }
 
         BigDecimal antiguedad = BigDecimal.ZERO;
         if (categoria.getNoDocente() == 1) {
-            antiguedad = basico.multiply(indices.get(1).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
+            antiguedad = basico.multiply(state.getIndices().get(1).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
         } else if (categoria.getDocente() == 1) {
-            antiguedad = basico.multiply(indices.getFirst()).setScale(2, RoundingMode.HALF_UP);
+            antiguedad = basico.multiply(state.getIndices().getFirst()).setScale(2, RoundingMode.HALF_UP);
         }
         if (antiguedad.compareTo(BigDecimal.ZERO) != 0) {
             valorMes = valorMes.add(antiguedad);
-            addItem(legajoId, anho, mes, CODIGO_ANTIGUEDAD, antiguedad);
+            addItem(legajoId, anho, mes, CODIGO_ANTIGUEDAD, antiguedad, state);
         }
 
         if (categoria.getNoDocente() == 1) {
             BigDecimal presentismo = basico.multiply(new BigDecimal(cargoLiquidacion.getPresentismo()).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP)).setScale(2, RoundingMode.HALF_UP);
-            addItem(legajoId, anho, mes, CODIGO_PRESENTISMO, presentismo);
+            addItem(legajoId, anho, mes, CODIGO_PRESENTISMO, presentismo, state);
             valorMes = valorMes.add(presentismo);
 
-            if (novedades.containsKey(CODIGO_PRESENTISMO) && "N".equals(novedades.get(CODIGO_PRESENTISMO).getValue())) {
+            if (state.getNovedades().containsKey(CODIGO_PRESENTISMO) && "N".equals(state.getNovedades().get(CODIGO_PRESENTISMO).getValue())) {
                 BigDecimal descuentoPresentismo = presentismo.negate();
-                addItem(legajoId, anho, mes, CODIGO_DESCUENTO_PRESENTISMO, descuentoPresentismo);
+                addItem(legajoId, anho, mes, CODIGO_DESCUENTO_PRESENTISMO, descuentoPresentismo, state);
             }
         }
 
-        if (novedades.containsKey(CODIGO_HORAS_EXTRAS)) {
+        if (state.getNovedades().containsKey(CODIGO_HORAS_EXTRAS)) {
             int totalHoras = cargoLiquidacion.getJornada() == 1 ? 100 : 180;
             BigDecimal valorHora = valorMes.divide(new BigDecimal(totalHoras), 2, RoundingMode.HALF_UP);
-            BigDecimal horasExtras = valorHora.multiply(novedades.get(CODIGO_HORAS_EXTRAS).getImporte()).setScale(2, RoundingMode.HALF_UP);
-            addItem(legajoId, anho, mes, CODIGO_HORAS_EXTRAS, horasExtras);
+            BigDecimal horasExtras = valorHora.multiply(state.getNovedades().get(CODIGO_HORAS_EXTRAS).getImporte()).setScale(2, RoundingMode.HALF_UP);
+            addItem(legajoId, anho, mes, CODIGO_HORAS_EXTRAS, horasExtras, state);
         }
     }
 
@@ -655,7 +652,7 @@ public class MakeLiquidacionService {
                 cargoLiquidacions.add(new CargoLiquidacion(null, legajoId, anho, mes, cargo.getDependenciaId(), Periodo.firstDay(anho, mes), Periodo.lastDay(anho, mes), categoria.getCategoriaId(), categoria.getNombre(), categoria.getBasico(), categoria.getEstadoDocente(), cargo.getHorasJornada(), cargo.getJornada(), cargo.getPresentismo(), "A", null, null, categoria));
             }
         }
-        control = controlService.findByPeriodo(anho, mes);
+        Control control = controlService.findByPeriodo(anho, mes);
         if (control.getModoLiquidacionId() == constLiquidarConFusion) {
             for (CursoFusion cursoFusion : cursoFusionService.findAllByLegajoId(legajoId, anho, mes)) {
                 Dependencia dependencia = dependencias.get(cursoFusion.getFacultadId() + "." + cursoFusion.getGeograficaId());
@@ -714,29 +711,29 @@ public class MakeLiquidacionService {
         return null;
     }
 
-    private void addItem(Long legajoId, Integer anho, Integer mes, Integer codigoId, BigDecimal importe) {
+    private void addItem(Long legajoId, Integer anho, Integer mes, Integer codigoId, BigDecimal importe, LiquidacionState state) {
         log.debug("Processing MakeLiquidacionService.addItem");
-        Item item = items.computeIfAbsent(codigoId, k -> new Item(null, legajoId, anho, mes, k, codigos.get(k).getNombre(), BigDecimal.ZERO, null, null));
+        Item item = state.getItems().computeIfAbsent(codigoId, k -> new Item(null, legajoId, anho, mes, k, state.getCodigos().get(k).getNombre(), BigDecimal.ZERO, null, null));
         item.setImporte(item.getImporte().add(importe).setScale(2, RoundingMode.HALF_UP));
         log.debug("Item -> {}", item.jsonify());
     }
 
-    private void setItem(Long legajoId, Integer anho, Integer mes, Integer codigoId, BigDecimal importe) {
+    private void setItem(Long legajoId, Integer anho, Integer mes, Integer codigoId, BigDecimal importe, LiquidacionState state) {
         log.debug("Processing MakeLiquidacionService.setItem");
-        Item item = items.computeIfAbsent(codigoId, k -> new Item(null, legajoId, anho, mes, k, codigos.get(k).getNombre(), BigDecimal.ZERO, null, null));
+        Item item = state.getItems().computeIfAbsent(codigoId, k -> new Item(null, legajoId, anho, mes, k, state.getCodigos().get(k).getNombre(), BigDecimal.ZERO, null, null));
         item.setImporte(importe.setScale(2, RoundingMode.HALF_UP));
         log.debug("Item -> {}", item.jsonify());
     }
 
-    private BigDecimal getItemValue(Integer codigoId) {
-        return Optional.ofNullable(items.get(codigoId)).map(Item::getImporte).orElse(BigDecimal.ZERO);
+    private BigDecimal getItemValue(Integer codigoId, LiquidacionState state) {
+        return Optional.ofNullable(state.getItems().get(codigoId)).map(Item::getImporte).orElse(BigDecimal.ZERO);
     }
 
-    private BigDecimal sumarItemsPorGrupo(List<CodigoGrupo> grupo, Set<Integer> codigosExcluidos) {
+    private BigDecimal sumarItemsPorGrupo(List<CodigoGrupo> grupo, Set<Integer> codigosExcluidos, LiquidacionState state) {
         return grupo.stream()
                 .map(CodigoGrupo::getCodigoId)
                 .filter(id -> !codigosExcluidos.contains(id))
-                .map(this::getItemValue)
+                .map(codigoId -> getItemValue(codigoId, state))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 

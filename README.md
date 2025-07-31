@@ -4,7 +4,7 @@ Servicio core del sistema de Haberes de la Universidad de Mendoza, diseñado par
 
 ## Versión
 
-**1.0.0** (2025-07-19)
+**1.1.0** (2025-07-31)
 
 ## Principales dependencias
 
@@ -19,6 +19,7 @@ Servicio core del sistema de Haberes de la Universidad de Mendoza, diseñado par
 - Flujo de liquidación de sueldos: `docs/diagrams/flujo-liquidacion-sueldos.mmd`
 - Modelo entidad-relación: `docs/diagrams/modelo-entidad-relacion.mmd`
 - Despliegue: `docs/diagrams/despliegue.mmd`
+- **Nuevo:** Flujo de liquidación general masiva: `docs/diagrams/flujo-liquidacion-general.mmd`
 
 ## Documentación automática
 
@@ -32,7 +33,7 @@ Servicio core del sistema de Haberes de la Universidad de Mendoza, diseñado par
 
 ## Características Principales
 
-- Gestión completa de liquidaciones de haberes
+- Gestión completa de liquidaciones de haberes (individual y general masiva)
 - Manejo de designaciones docentes y no docentes
 - Procesamiento de acreditaciones
 - Integración con AFIP para reportes fiscales
@@ -40,6 +41,8 @@ Servicio core del sistema de Haberes de la Universidad de Mendoza, diseñado par
 - Sistema de caché para optimización de rendimiento
 - Auditoría automática de operaciones
 - API REST documentada con OpenAPI/Swagger
+- **Nuevo:** Liquidación general masiva con seguimiento de progreso y endpoints dedicados
+- **Nuevo:** Procesamiento asíncrono de liquidaciones con arquitectura basada en procesos y estados
 
 ## Tecnologías
 

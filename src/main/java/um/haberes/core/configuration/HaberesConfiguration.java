@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import java.util.concurrent.TimeUnit;
 
@@ -20,6 +21,7 @@ import java.util.concurrent.TimeUnit;
  */
 
 @Configuration
+@EnableAsync
 @EnableJpaAuditing
 @EnableFeignClients(basePackages = "um.haberes.core.client")
 @PropertySource("classpath:config/haberes.properties")
