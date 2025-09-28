@@ -1,5 +1,6 @@
 package um.haberes.core.controller.facade;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -17,13 +18,10 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/haberes/core/contratado")
+@RequiredArgsConstructor
 public class ContratadoController {
 
     private final ContratadoService service;
-
-    public ContratadoController(ContratadoService service) {
-        this.service = service;
-    }
 
     @GetMapping("/planilla/{anho}/{mes}")
     public ResponseEntity<Resource> generatePlanillaContratados(@PathVariable Integer anho, @PathVariable Integer mes)

@@ -4,7 +4,7 @@ import java.math.BigDecimal
 
 data class ContratadoPersonaDto(
 
-    var contratadoId: Long? = null,
+    var uniqueId: String? = null,
     var personaId: BigDecimal? = null,
     var documentoId: Int? = null,
     var apellido: String? = null,

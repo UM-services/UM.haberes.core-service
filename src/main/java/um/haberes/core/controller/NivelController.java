@@ -5,6 +5,7 @@ package um.haberes.core.controller;
 
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,14 +22,14 @@ import um.haberes.core.service.NivelService;
  */
 @RestController
 @RequestMapping("/api/haberes/core/nivel")
+@RequiredArgsConstructor
 public class NivelController {
 	
-	@Autowired
-	private NivelService service;
+	private final NivelService service;
 	
 	@GetMapping("/")
 	public ResponseEntity<List<Nivel>> findAll() {
-		return new ResponseEntity<List<Nivel>>(service.findAll(), HttpStatus.OK);
+        return ResponseEntity.ok(service.findAll());
 	}
 	
 }

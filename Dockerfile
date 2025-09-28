@@ -37,6 +37,7 @@ WORKDIR /app
 COPY --from=build /app/target/um.haberes.core-service.jar ./um.haberes.core-service.jar
 COPY marca_um.png marca_um.png
 COPY firma.png firma.png
+COPY firma_new.png firma_new.png
 
 # Damos permisos al usuario sobre el directorio de la aplicación
 RUN chown -R appuser:appgroup /app

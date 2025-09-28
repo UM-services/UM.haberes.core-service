@@ -1,9 +1,9 @@
 package um.haberes.core.service.facade;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import um.haberes.core.client.ContratadoPersonaClient;
@@ -29,32 +29,16 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ContratadoService {
 
     private final Environment environment;
-
     private final ContratadoPersonaClient contratadoPersonaClient;
-
     private final CursoCargoContratadoClient cursoCargoContratadoClient;
-
     private final FacultadService facultadService;
-
     private final GeograficaService geograficaService;
-
     private final CursoService cursoService;
-
     private final CargoTipoService cargoTipoService;
-
-    @Autowired
-    public ContratadoService(Environment environment, ContratadoPersonaClient contratadoPersonaClient, CursoCargoContratadoClient cursoCargoContratadoClient, FacultadService facultadService, GeograficaService geograficaService, CursoService cursoService, CargoTipoService cargoTipoService) {
-        this.environment = environment;
-        this.contratadoPersonaClient = contratadoPersonaClient;
-        this.cursoCargoContratadoClient = cursoCargoContratadoClient;
-        this.facultadService = facultadService;
-        this.geograficaService = geograficaService;
-        this.cursoService = cursoService;
-        this.cargoTipoService = cargoTipoService;
-    }
 
     public String generatePlanillaContratados(Integer anho, Integer mes) {
         String path = environment.getProperty("path.files");
@@ -104,7 +88,7 @@ public class ContratadoService {
                 .collect(Collectors.toMap(CargoTipo::getCargoTipoId, cargoTipo -> cargoTipo));
 
         for (ContratadoPersonaDto contratadoPersona : contratadoPersonaClient.findAll()) {
-            for (CursoCargoContratadoDto cursoCargoContratado : cursoCargoContratadoClient.findAllByCursosContratado(contratadoPersona.getContratadoId(), anho, mes)) {
+            for (CursoCargoContratadoDto cursoCargoContratado : cursoCargoContratadoClient.findAllByPersona(contratadoPersona.getPersonaId(), contratadoPersona.getDocumentoId(), anho, mes)) {
                 Curso curso = cursos.get(cursoCargoContratado.getCursoId());
                 Facultad facultad = facultades.get(curso.getFacultadId());
                 Geografica geografica = geograficas.get(curso.getGeograficaId());

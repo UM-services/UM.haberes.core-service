@@ -5,6 +5,7 @@ package um.haberes.core.controller;
 
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,14 +23,15 @@ import um.haberes.core.service.NovedadUploadService;
  */
 @RestController
 @RequestMapping("/api/haberes/core/novedadupload")
+@RequiredArgsConstructor
 public class NovedadUploadController {
 
-	@Autowired
-	private NovedadUploadService service;
+	private final NovedadUploadService service;
 
 	@GetMapping("/pendiente/{anho}/{mes}/{pendiente}")
 	public ResponseEntity<List<NovedadUpload>> findAllByPendiente(@PathVariable Integer anho, @PathVariable Integer mes,
 																  @PathVariable Byte pendiente) {
-		return new ResponseEntity<>(service.findAllByPendiente(anho, mes, pendiente), HttpStatus.OK);
+        return ResponseEntity.ok(service.findAllByPendiente(anho, mes, pendiente));
 	}
+
 }

@@ -5,7 +5,7 @@ package um.haberes.core.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.SituacionException;
@@ -17,15 +17,16 @@ import um.haberes.core.repository.SituacionRepository;
  *
  */
 @Service
+@RequiredArgsConstructor
 public class SituacionService {
-	@Autowired
-	private SituacionRepository repository;
+
+	private final SituacionRepository repository;
 
 	public List<Situacion> findAll() {
 		return repository.findAll();
 	}
 
-	public Situacion findBySituacionID(Integer situacionID) {
-		return repository.findById(situacionID).orElseThrow(() -> new SituacionException(situacionID));
+	public Situacion findBySituacionId(Integer situacionId) {
+		return repository.findById(situacionId).orElseThrow(() -> new SituacionException(situacionId));
 	}
 }

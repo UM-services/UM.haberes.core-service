@@ -5,6 +5,7 @@ package um.haberes.core.controller;
 
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,30 +26,30 @@ import um.haberes.core.service.PersonaFacultadService;
  */
 @RestController
 @RequestMapping("/api/haberes/core/personaFacultad")
+@RequiredArgsConstructor
 public class PersonaFacultadController {
 
-	@Autowired
-	private PersonaFacultadService service;
+	private final PersonaFacultadService service;
 
 	@GetMapping("/facultad/{facultadId}")
 	public ResponseEntity<List<PersonaFacultad>> findAllByFacultad(@PathVariable Integer facultadId) {
-		return new ResponseEntity<>(service.findAllByFacultad(facultadId), HttpStatus.OK);
+        return ResponseEntity.ok(service.findAllByFacultad(facultadId));
 	}
 
 	@GetMapping("/persona/{legajoId}")
 	public ResponseEntity<List<PersonaFacultad>> findAllByPersona(@PathVariable Long legajoId) {
-		return new ResponseEntity<List<PersonaFacultad>>(service.findAllByPersona(legajoId), HttpStatus.OK);
+        return ResponseEntity.ok(service.findAllByPersona(legajoId));
 	}
 
 	@PostMapping("/")
 	public ResponseEntity<PersonaFacultad> add(@RequestBody PersonaFacultad personaFacultad) {
-		return new ResponseEntity<PersonaFacultad>(service.add(personaFacultad), HttpStatus.OK);
+        return ResponseEntity.ok(service.add(personaFacultad));
 	}
 
 	@DeleteMapping("/unique/{legajoId}/{facultadId}")
 	public ResponseEntity<Void> deleteByUnique(@PathVariable Long legajoId, @PathVariable Integer facultadId) {
 		service.deleteByUnique(legajoId, facultadId);
-		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.noContent().build();
 	}
 
 }

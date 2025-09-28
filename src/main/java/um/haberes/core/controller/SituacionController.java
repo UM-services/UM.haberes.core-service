@@ -5,7 +5,7 @@ package um.haberes.core.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,18 +22,18 @@ import um.haberes.core.service.SituacionService;
  */
 @RestController
 @RequestMapping("/api/haberes/core/situacion")
+@RequiredArgsConstructor
 public class SituacionController {
 	
-	@Autowired
-	private SituacionService service;
+	private final SituacionService service;
 
 	@GetMapping("/")
 	public ResponseEntity<List<Situacion>> findAll() {
-		return new ResponseEntity<List<Situacion>>(service.findAll(), HttpStatus.OK);
+        return ResponseEntity.ok(service.findAll());
 	}
 
-	@GetMapping("/{situacionID}")
-	public ResponseEntity<Situacion> findBySituacionID(@PathVariable Integer situacionID) {
-		return new ResponseEntity<Situacion>(service.findBySituacionID(situacionID), HttpStatus.OK);
+	@GetMapping("/{situacionId}")
+	public ResponseEntity<Situacion> findBySituacionID(@PathVariable Integer situacionId) {
+        return ResponseEntity.ok(service.findBySituacionId(situacionId));
 	}
 }

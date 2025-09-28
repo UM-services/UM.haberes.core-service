@@ -3,6 +3,7 @@
  */
 package um.haberes.core.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,15 +26,15 @@ import um.haberes.core.service.SeguridadSocialService;
  */
 @RestController
 @RequestMapping("/api/haberes/core/seguridadSocial")
+@RequiredArgsConstructor
 public class SeguridadSocialController {
 
-	@Autowired
-	private SeguridadSocialService service;
+	private final SeguridadSocialService service;
 
 	@GetMapping("/unique/{anho}/{mes}")
 	public ResponseEntity<SeguridadSocial> findByUnique(@PathVariable Integer anho, @PathVariable Integer mes) {
 		try {
-			return new ResponseEntity<>(service.findByUnique(anho, mes), HttpStatus.OK);
+            return ResponseEntity.ok(service.findByUnique(anho, mes));
 		} catch (SeguridadSocialException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
@@ -41,13 +42,13 @@ public class SeguridadSocialController {
 
 	@PostMapping("/")
 	public ResponseEntity<SeguridadSocial> add(@RequestBody SeguridadSocial seguridadSocial) {
-		return new ResponseEntity<>(service.add(seguridadSocial), HttpStatus.OK);
+        return ResponseEntity.ok(service.add(seguridadSocial));
 	}
 
 	@PutMapping("/{seguridadSocialId}")
 	public ResponseEntity<SeguridadSocial> update(@RequestBody SeguridadSocial seguridadSocial,
 			@PathVariable Long seguridadSocialId) {
-		return new ResponseEntity<>(service.update(seguridadSocial, seguridadSocialId), HttpStatus.OK);
+        return ResponseEntity.ok(service.update(seguridadSocial, seguridadSocialId));
 	}
 
 }
