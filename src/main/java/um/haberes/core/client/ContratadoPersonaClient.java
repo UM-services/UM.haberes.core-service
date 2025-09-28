@@ -6,7 +6,7 @@ import um.haberes.core.kotlin.model.extern.ContratadoPersonaDto;
 
 import java.util.List;
 
-@FeignClient(name = "tesoreria-core-service/contratadopersona")
+@FeignClient(name = "tesoreria-core-service", contextId = "contratadoPersonaClient", path = "/contratadopersona")
 public interface ContratadoPersonaClient {
 
     @GetMapping("/")

@@ -1,3 +1,14 @@
+## [1.2.0] - 2025-09-28
+- feat: Migración completa a Consul para descubrimiento de servicios (basado en commits c81019c y c6c440b)
+- refactor: Mejoras en controladores y servicios para usar inyección de constructor con @RequiredArgsConstructor y ResponseEntity.ok() (basado en análisis de git diff HEAD)
+- refactor: Extracción y centralización de estado y proceso de liquidación en facade/liquidaciones (basado en commits ecc6e59 y da765f5)
+- fix: Corrección en manejo de obra social (basado en commits 7fda3f9, 6006214, fad2ec5)
+- fix: Corrección en inasistencias (basado en commit 48bc981)
+- fix: Corrección en directorio de upload (basado en commits f2acc4e y c9b4988)
+- chore: Actualización de versiones de dependencias en README.md y agregado de firma_new.png en Dockerfile (basado en git diff HEAD)
+- docs: Agregado diagrama de flujo de liquidación general masiva en documentación automática (basado en cambios en .github/workflows/generate-docs.yml)
+- refactor: Cambio en ContratadoPersonaDto de contratadoId a uniqueId (basado en git diff HEAD)
+
 ## [1.0.0] - 2025-07-19
 ## [1.1.0] - 2025-07-31
 - feat: Implementación de liquidación general masiva con seguimiento de progreso y endpoints REST dedicados

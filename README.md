@@ -1,17 +1,29 @@
-# UM Haberes Core Service
 
-Servicio core del sistema de Haberes de la Universidad de Mendoza, diseñado para manejar liquidaciones, acreditaciones y gestión de personal docente y no docente.
+# UM.haberes.core-service
+
+Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permite la gestión integral de liquidaciones individuales y masivas, acreditaciones, reportes y administración de personal docente y no docente.
 
 ## Versión
 
-**1.1.0** (2025-07-31)
+**1.2.0** (2025-09-28)
+_La versión se corresponde con la declarada en `pom.xml`._
 
-## Principales dependencias
+## Tecnologías y dependencias principales
 
-- Spring Boot: 3.5.3
-- Spring Cloud: 2025.0.0
-- Kotlin: 2.2.0
-- Java: 24
+- Java 24
+- Kotlin 2.2.0
+- Spring Boot 3.5.3
+- Spring Cloud 2025.0.0 (OpenFeign, Consul)
+- Spring Data JPA
+- Spring Security
+- Apache POI 5.4.1 (Excel)
+- LibrePDF 2.2.4 (PDF)
+- Log4j2
+- Caffeine Cache
+- Jackson
+- MySQL Connector/J 9.3.0
+- Docker
+- Springdoc OpenAPI
 
 ## Diagramas principales
 
@@ -23,55 +35,35 @@ Servicio core del sistema de Haberes de la Universidad de Mendoza, diseñado par
 
 ## Documentación automática
 
-La documentación y los diagramas se generan automáticamente en cada push a la rama principal mediante GitHub Actions.
+La documentación y los diagramas se generan automáticamente en cada push a la rama principal mediante GitHub Actions y se publican en GitHub Pages.
 
 ---
 
-# UM.haberes.core-service
 
-Servicio core del sistema de Haberes de la Universidad de Mendoza, diseñado para manejar liquidaciones, acreditaciones y gestión de personal docente y no docente.
+## Funcionalidades principales
 
-## Características Principales
-
-- Gestión completa de liquidaciones de haberes (individual y general masiva)
-- Manejo de designaciones docentes y no docentes
+- Liquidación de haberes individual y general masiva (procesamiento asíncrono y seguimiento de progreso)
+- Gestión de designaciones y cargos docentes/no docentes
 - Procesamiento de acreditaciones
-- Integración con AFIP para reportes fiscales
-- Generación de reportes en múltiples formatos (PDF, Excel)
-- Sistema de caché para optimización de rendimiento
-- Auditoría automática de operaciones
-- API REST documentada con OpenAPI/Swagger
-- **Nuevo:** Liquidación general masiva con seguimiento de progreso y endpoints dedicados
-- **Nuevo:** Procesamiento asíncrono de liquidaciones con arquitectura basada en procesos y estados
+- Generación de reportes en PDF y Excel
+- API REST documentada con OpenAPI
+- Auditoría y logs de operaciones
+- Integración con Consul y OpenFeign para servicios distribuidos
 
-## Tecnologías
-
-- Java 21
-- Kotlin 2.1.21
-- Spring Boot 3.5.0
-- Spring Cloud 2025.0.0
-- Spring Data JPA
-- Spring Security
-- Spring Cloud Netflix (Eureka, Feign)
-- Apache POI 5.4.1 (para reportes Excel)
-- LibrePDF 2.2.1 (para reportes PDF)
-- Log4j2
-- Caffeine Cache
-- Jackson
-- MySQL 9.3.0
-- Docker
 
 ## Requisitos
 
-- JDK 21 o superior
+- JDK 24
 - Maven 3.8.8+
 - Docker (opcional)
 - MySQL 8.0+
 
-## Configuración
 
-### Variables de Entorno
+## Configuración básica
 
+### Variables de entorno recomendadas
+
+eureka:
 ```yaml
 spring:
   application:
@@ -87,18 +79,14 @@ spring:
   cloud:
     discovery:
       enabled: true
+    consul:
+      host: localhost
+      port: 8500
 
 server:
   port: 8080
   servlet:
     context-path: /api/v1
-
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
-  instance:
-    prefer-ip-address: true
 
 logging:
   level:
@@ -108,7 +96,8 @@ logging:
     name: logs/haberes-core.log
 ```
 
-### Docker
+
+## Docker
 
 ```bash
 # Construir la imagen
@@ -123,7 +112,8 @@ docker run -d \
   um-haberes-core-service
 ```
 
-## Endpoints Principales
+
+## Endpoints principales (ejemplo)
 
 ### Liquidaciones
 - `POST /liquidaciones` - Generar nueva liquidación
@@ -150,30 +140,33 @@ docker run -d \
 - `GET /reportes/cargos` - Generar reporte de cargos
 - `GET /reportes/categorias` - Generar reporte de categorías
 
+
 ## Arquitectura
 
-El servicio sigue una arquitectura hexagonal con las siguientes capas:
+El servicio sigue una arquitectura hexagonal:
 
 - **API Layer**: Controladores REST y DTOs
 - **Domain Layer**: Modelos de dominio y lógica de negocio
 - **Infrastructure Layer**: Repositorios, servicios externos y configuración
 
-### Patrones de Diseño
 
-- Repository Pattern
-- Service Layer Pattern
-- Factory Pattern
-- Strategy Pattern
-- Observer Pattern (para eventos de auditoría)
+### Patrones de diseño utilizados
+
+- Repository
+- Service Layer
+- Factory
+- Strategy
+- Observer (para eventos de auditoría)
+
 
 ## Seguridad
 
-- Autenticación mediante JWT
-- Autorización basada en roles
-- Validación de datos de entrada
-- Sanitización de datos
+- Autenticación JWT
+- Autorización por roles
+- Validación y sanitización de datos
 - Logs de auditoría
 - Cifrado de datos sensibles
+
 
 ## Monitoreo
 
@@ -183,17 +176,20 @@ El servicio sigue una arquitectura hexagonal con las siguientes capas:
 - Trazas distribuidas
 - Monitoreo de caché
 
+
 ## Contribución
 
-1. Fork el repositorio
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
+1. Haz fork del repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/mi-feature`)
+3. Realiza tus cambios y commitea (`git commit -m 'feat: agrega mi feature'`)
+4. Haz push a tu rama (`git push origin feature/mi-feature`)
 5. Abre un Pull Request
+
 
 ## Licencia
 
 Este proyecto es privado y confidencial. Todos los derechos reservados.
+
 
 ## Contacto
 

@@ -6,6 +6,7 @@ package um.haberes.core.controller;
 import java.math.BigDecimal;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,14 +31,11 @@ import lombok.extern.slf4j.Slf4j;
  */
 @RestController
 @RequestMapping("/api/haberes/core/persona")
+@RequiredArgsConstructor
 @Slf4j
 public class PersonaController {
 
 	private final PersonaService service;
-
-	public PersonaController(PersonaService service) {
-		this.service = service;
-	}
 
 	@GetMapping("/")
 	public ResponseEntity<List<Persona>> findAll() {
@@ -46,7 +44,7 @@ public class PersonaController {
 
 	@PostMapping("/legajos")
 	public ResponseEntity<List<Persona>> findAllLegajos(@RequestBody List<Long> legajos) {
-		return new ResponseEntity<>(service.findAllLegajos(legajos), HttpStatus.OK);
+        return ResponseEntity.ok(service.findAllLegajos(legajos));
 	}
 
 	// Legajos que tienen cargo en cursos para el período solicitado
@@ -82,7 +80,7 @@ public class PersonaController {
 
 	@PostMapping("/search")
 	public ResponseEntity<List<PersonaSearch>> findByStrings(@RequestBody List<String> conditions) {
-		return new ResponseEntity<>(service.findByStrings(conditions), HttpStatus.OK);
+        return ResponseEntity.ok(service.findByStrings(conditions));
 	}
 
 	@GetMapping("/{legajoId}")
@@ -105,7 +103,7 @@ public class PersonaController {
 
 	@PostMapping("/")
 	public ResponseEntity<Persona> add(@RequestBody Persona persona) {
-		return new ResponseEntity<>(service.add(persona), HttpStatus.OK);
+        return ResponseEntity.ok(service.add(persona));
 	}
 
 	@PutMapping("/{legajoId}")
@@ -114,8 +112,8 @@ public class PersonaController {
 	}
 
 	@PutMapping("/")
-	public ResponseEntity<List<Persona>> saveall(@RequestBody List<Persona> personas) {
-		return new ResponseEntity<>(service.saveall(personas), HttpStatus.OK);
+	public ResponseEntity<List<Persona>> saveAll(@RequestBody List<Persona> personas) {
+        return ResponseEntity.ok(service.saveall(personas));
 	}
 
 	@PostMapping("/upload")

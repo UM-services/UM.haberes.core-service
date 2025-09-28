@@ -3,6 +3,7 @@
  */
 package um.haberes.core.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,13 +24,10 @@ import um.haberes.core.service.UsuarioService;
  */
 @RestController
 @RequestMapping("/api/haberes/core/usuario")
+@RequiredArgsConstructor
 public class UsuarioController {
 
     private final UsuarioService service;
-
-    public UsuarioController(UsuarioService service) {
-        this.service = service;
-    }
 
     @GetMapping("/{legajoId}")
     public ResponseEntity<Usuario> findByLegajoId(@PathVariable Long legajoId) {
