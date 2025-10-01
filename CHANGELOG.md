@@ -1,3 +1,8 @@
+## [1.3.0] - 2025-10-01
+- refactor: Reemplazo de @Autowired con Lombok @RequiredArgsConstructor en CursoCargoContratadoController y CursoCargoContratadoService (basado en análisis de git diff HEAD)
+- feat: Actualización de CursoCargoContratadoDto: agregado personaId y documentoId, removido contratadoId (basado en análisis de git diff HEAD)
+- feat: Nueva clase utilitaria Jsonifier para serialización JSON en logging (basado en análisis de git diff HEAD)
+
 ## [1.2.0] - 2025-09-28
 - feat: Migración completa a Consul para descubrimiento de servicios (basado en commits c81019c y c6c440b)
 - refactor: Mejoras en controladores y servicios para usar inyección de constructor con @RequiredArgsConstructor y ResponseEntity.ok() (basado en análisis de git diff HEAD)
