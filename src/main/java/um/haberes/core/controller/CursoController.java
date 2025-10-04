@@ -7,8 +7,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,16 +31,11 @@ import um.haberes.core.service.CursoService;
 @RestController
 @RequestMapping("/api/haberes/core/curso")
 @Slf4j
+@RequiredArgsConstructor
 public class CursoController {
 
 	private final CursoService service;
 	private final CursoCargoService cursoCargoService;
-
-	@Autowired
-	public CursoController(CursoService service, CursoCargoService cursoCargoService) {
-		this.service = service;
-		this.cursoCargoService = cursoCargoService;
-	}
 
 	@GetMapping("/")
 	public ResponseEntity<List<Curso>> findAll() {
@@ -67,7 +62,7 @@ public class CursoController {
 	}
 
 
-		@GetMapping("/{cursoId}")
+    @GetMapping("/{cursoId}")
 	public ResponseEntity<Curso> findByCursoId(@PathVariable Long cursoId) {
 		Curso curso = service.findByCursoId(cursoId);
         try {
