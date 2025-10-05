@@ -1,3 +1,10 @@
+## [1.5.0] - 2025-10-05
+- refactor: Mejoras en CursoCargoContratadoClient: cambio de nombres de parámetros para consistencia (basado en git diff HEAD)
+- refactor: Reemplazo de @Autowired con Lombok @RequiredArgsConstructor en CursoCargoController y CursoCargoService (basado en git diff HEAD)
+- refactor: Simplificación de ResponseEntity en controladores usando ResponseEntity.ok() (basado en git diff HEAD)
+- refactor: Agregado de verificaciones de nulidad con Objects.requireNonNull en CursoCargoService (basado en git diff HEAD)
+- refactor: Uso de Jsonifier para logging mejorado en CursoCargoService (basado en git diff HEAD)
+
 ## [1.4.0] - 2025-10-04
 - refactor: Mejoras en controladores CargoTipoController, CursoController y DesignacionTipoController: uso de @RequiredArgsConstructor, simplificación de ResponseEntity y agregado de manejo de excepciones (basado en git diff HEAD)
 
