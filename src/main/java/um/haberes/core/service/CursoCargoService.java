@@ -4,43 +4,41 @@
 package um.haberes.core.service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import jakarta.transaction.Transactional;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.CursoCargoException;
 import um.haberes.core.kotlin.model.CursoCargo;
 import um.haberes.core.repository.CursoCargoRepository;
+import um.haberes.core.util.Jsonifier;
 
 /**
  * @author daniel
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class CursoCargoService {
 
     private final CursoCargoRepository repository;
 
-    @Autowired
-    public CursoCargoService(CursoCargoRepository repository) {
-        this.repository = repository;
-    }
-
     public List<CursoCargo> findAllByLegajoAndNivel(Long legajoId, Integer anho, Integer mes, Integer nivelId) {
         List<CursoCargo> cursoCargos = this.findAllByLegajo(legajoId, anho, mes);
-        return cursoCargos.stream().filter(c -> c.getCurso().getNivelId().equals(nivelId)).collect(Collectors.toList());
+        return cursoCargos.stream().filter(c -> Objects.equals(Objects.requireNonNull(c.getCurso()).getNivelId(), nivelId)).collect(Collectors.toList());
     }
 
     public List<CursoCargo> findAllByLegajoAndNivelIds(Long legajoId, Integer anho, Integer mes, List<Integer> nivelIds) {
         List<CursoCargo> cursoCargos = this.findAllByLegajo(legajoId, anho, mes);
-        return cursoCargos.stream().filter(c -> nivelIds.contains(c.getCurso().getNivelId())).collect(Collectors.toList());
+        return cursoCargos.stream().filter(c -> nivelIds.contains(Objects.requireNonNull(c.getCurso()).getNivelId())).collect(Collectors.toList());
     }
 
     public List<CursoCargo> findAllByLegajo(Long legajoId, Integer anho, Integer mes) {
@@ -58,8 +56,11 @@ public class CursoCargoService {
     }
 
     public List<CursoCargo> findAllByCurso(Long cursoId, Integer anho, Integer mes) {
-        return repository.findAllByCursoIdAndAnhoAndMes(cursoId, anho, mes,
+        log.debug("Processing CursoCargoService.findAllByCurso({}, {}, {})", cursoId, anho, mes);
+        var cargos = repository.findAllByCursoIdAndAnhoAndMes(cursoId, anho, mes,
                 Sort.by("cargoTipo.aCargo").descending().and(Sort.by("cargoTipoId").ascending()));
+        log.debug("CursoCargos -> {}", Jsonifier.builder(cargos).build());
+        return cargos;
     }
 
     public List<CursoCargo> findAllByFacultad(Long legajoId, Integer anho, Integer mes, Integer facultadId) {
@@ -71,8 +72,8 @@ public class CursoCargoService {
     public List<CursoCargo> findAllByCargoTipo(Long legajoId, Integer anho, Integer mes, Integer facultadId,
                                                Integer geograficaId, Byte anual, Byte semestre1, Byte semestre2, Integer cargoTipoId) {
         return repository.findAllByLegajoIdAndAnhoAndMesAndCargoTipoId(legajoId, anho, mes, cargoTipoId).stream()
-                .filter(c -> c.getCurso().getFacultadId().equals(facultadId)
-                        && c.getCurso().getGeograficaId().equals(geograficaId) && c.getCurso().getAnual() == anual
+                .filter(c -> Objects.equals(Objects.requireNonNull(c.getCurso()).getFacultadId(), facultadId)
+                        && Objects.equals(c.getCurso().getGeograficaId(), geograficaId) && c.getCurso().getAnual() == anual
                         && c.getCurso().getSemestre1() == semestre1 && c.getCurso().getSemestre2() == semestre2)
                 .collect(Collectors.toList());
     }
@@ -91,7 +92,7 @@ public class CursoCargoService {
 
     public List<CursoCargo> findAllByLegajoWithAdicional(Long legajoId, Integer anho, Integer mes) {
         return repository.findAllByLegajoIdAndAnhoAndMes(legajoId, anho, mes, Sort.by("cursoCargoId")).stream()
-                .filter(cursoCargo -> cursoCargo.getCurso().getAdicionalCargaHoraria() == 1)
+                .filter(cursoCargo -> Objects.requireNonNull(cursoCargo.getCurso()).getAdicionalCargaHoraria() == 1)
                 .collect(Collectors.toList());
     }
 

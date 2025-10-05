@@ -7,8 +7,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,13 +32,10 @@ import um.haberes.core.service.CursoCargoService;
 @RestController
 @RequestMapping("/api/haberes/core/cursoCargo")
 @Slf4j
+@RequiredArgsConstructor
 public class CursoCargoController {
 
 	private final CursoCargoService service;
-
-	public CursoCargoController(CursoCargoService service) {
-		this.service = service;
-	}
 
 	@GetMapping("/legajo/{legajoId}/{anho}/{mes}")
 	public ResponseEntity<List<CursoCargo>> findAllByLegajo(@PathVariable Long legajoId, @PathVariable Integer anho,
@@ -63,13 +60,7 @@ public class CursoCargoController {
 	@GetMapping("/curso/{cursoId}/{anho}/{mes}")
 	public ResponseEntity<List<CursoCargo>> findAllByCurso(@PathVariable Long cursoId, @PathVariable Integer anho,
 			@PathVariable Integer mes) {
-		var cursoCargos = this.service.findAllByCurso(cursoId, anho, mes);
-        try {
-            log.debug("CursoCargos -> {}", JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(cursoCargos));
-        } catch (JsonProcessingException e) {
-            log.debug("CursoCargos -> null");
-        }
-        return new ResponseEntity<>(cursoCargos, HttpStatus.OK);
+        return ResponseEntity.ok(service.findAllByCurso(cursoId, anho, mes));
 	}
 
 	@GetMapping("/facultad/{legajoId}/{anho}/{mes}/{facultadId}")

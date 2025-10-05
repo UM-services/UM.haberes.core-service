@@ -30,11 +30,11 @@ public interface CursoCargoContratadoClient {
                                                  @PathVariable Integer anho,
                                                  @PathVariable Integer mes);
 
-    @GetMapping("/{cursocargocontratadoId}")
-    CursoCargoContratadoDto findByCursoCargo(@PathVariable Long cursocargocontratadoId);
+    @GetMapping("/{cursoCargoContratadoId}")
+    CursoCargoContratadoDto findByCursoCargo(@PathVariable Long cursoCargoContratadoId);
 
     @PostMapping("/")
-    CursoCargoContratadoDto add(@RequestBody CursoCargoContratadoDto cursocargocontratado);
+    CursoCargoContratadoDto add(@RequestBody CursoCargoContratadoDto cursoCargoContratado);
 
     @PutMapping("/{cursoCargoContratadoId}")
     CursoCargoContratadoDto update(@RequestBody CursoCargoContratadoDto cursoCargoContratado,
