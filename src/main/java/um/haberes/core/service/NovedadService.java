@@ -15,6 +15,7 @@ import um.haberes.core.exception.NovedadException;
 import um.haberes.core.kotlin.model.Novedad;
 import um.haberes.core.repository.NovedadRepository;
 import lombok.extern.slf4j.Slf4j;
+import um.haberes.core.util.Jsonifier;
 
 /**
  * @author daniel
@@ -31,7 +32,10 @@ public class NovedadService {
     }
 
     public List<Novedad> findAllByCodigo(Integer codigoId, Integer anho, Integer mes) {
-        return repository.findAllByCodigoIdAndAnhoAndMes(codigoId, anho, mes, Sort.by("legajoId").ascending());
+        log.debug("Processing NovedadService.findAllByCodigo({}, {}, {})", codigoId, anho, mes);
+        var novedades = repository.findAllByCodigoIdAndAnhoAndMes(codigoId, anho, mes, Sort.by("legajoId").ascending());
+        log.debug("Novedades -> {}", Jsonifier.builder(novedades).build());
+        return novedades;
     }
 
     public List<Novedad> findAllByImportado(Byte importado, Integer anho, Integer mes) {

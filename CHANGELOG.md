@@ -1,3 +1,11 @@
+## [1.6.0] - 2025-10-08
+- feat: Nuevos endpoints en LegajoBancoController para filtrar por código: `findAllSantanderConCodigo` y `findAllOtrosBancosConCodigo` (basado en análisis de git diff HEAD)
+- refactor: Mejoras en LegajoBancoService: agregado de métodos `findAllSantanderConCodigo` y `findAllOtrosBancosConCodigo`, uso de `Objects.equals` para verificaciones de nulidad, conversión de `collect(Collectors.toList())` a `toList()`, y logging mejorado con Jsonifier (basado en análisis de git diff HEAD)
+- refactor: Reemplazo de `@Autowired` con Lombok `@RequiredArgsConstructor` en LegajoBancoController y LegajoBancoService (basado en análisis de git diff HEAD)
+- refactor: Simplificación de ResponseEntity en LegajoBancoController usando `ResponseEntity.ok()` en lugar de `new ResponseEntity<>(..., HttpStatus.OK)` (basado en análisis de git diff HEAD)
+- refactor: Agregado de logging en `NovedadService.findAllByCodigo` para mejor trazabilidad (basado en análisis de git diff HEAD)
+- docs: Agregado diagrama de secuencia para flujo de LegajoBanco con filtro por código (`docs/diagrams/flujo-legajobanco-filtro-codigo.mmd`) y actualizado pipeline de documentación automática (`.github/workflows/generate-docs.yml`) para incluirlo (basado en cambios en git diff HEAD)
+
 ## [1.5.0] - 2025-10-05
 - refactor: Mejoras en CursoCargoContratadoClient: cambio de nombres de parámetros para consistencia (basado en git diff HEAD)
 - refactor: Reemplazo de @Autowired con Lombok @RequiredArgsConstructor en CursoCargoController y CursoCargoService (basado en git diff HEAD)
