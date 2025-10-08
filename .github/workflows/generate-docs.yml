@@ -77,6 +77,7 @@ jobs:
               <div id="architecture" class="section"></div>
               <div id="sequence-diagram" class="section"></div>
               <div id="general-massive-diagram" class="section"></div>
+              <div id="legajobanco-filter-diagram" class="section"></div>
               <div id="erd-diagram" class="section"></div>
               <div id="deployment-diagram" class="section"></div>
               <div id="dependencies" class="section">
@@ -150,6 +151,15 @@ jobs:
                       const generalMassiveContainer = document.getElementById('general-massive-diagram');
                       generalMassiveContainer.innerHTML = '<h2>🔄 Diagrama de Secuencia: Liquidación General Masiva</h2><div class="mermaid">' + data + '</div>';
                       mermaid.init(undefined, generalMassiveContainer.querySelector('.mermaid'));
+                  });
+
+              // --- LegajoBanco Filter Diagram ---
+              fetch('diagrams/flujo-legajobanco-filtro-codigo.mmd')
+                  .then(response => response.text())
+                  .then(data => {
+                      const legajobancoFilterContainer = document.getElementById('legajobanco-filter-diagram');
+                      legajobancoFilterContainer.innerHTML = '<h2>🔄 Diagrama de Secuencia: LegajoBanco con Filtro por Código</h2><div class="mermaid">' + data + '</div>';
+                      mermaid.init(undefined, legajobancoFilterContainer.querySelector('.mermaid'));
                   });
 
               // --- ERD Diagram ---
