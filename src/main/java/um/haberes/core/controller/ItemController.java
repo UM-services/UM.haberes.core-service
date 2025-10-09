@@ -5,6 +5,7 @@ package um.haberes.core.controller;
 
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,14 +29,10 @@ import um.haberes.core.service.ItemService;
  */
 @RestController
 @RequestMapping("/api/haberes/core/item")
+@RequiredArgsConstructor
 public class ItemController {
 
 	private final ItemService service;
-
-	@Autowired
-	public ItemController(ItemService service) {
-		this.service = service;
-	}
 
 	@GetMapping("/legajo/{legajoId}/{anho}/{mes}")
 	public ResponseEntity<List<Item>> findAllByLegajo(@PathVariable Long legajoId, @PathVariable Integer anho, @PathVariable Integer mes) {
