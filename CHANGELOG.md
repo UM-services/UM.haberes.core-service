@@ -1,3 +1,9 @@
+## [1.7.0] - 2025-10-09
+- refactor: Reemplazo de @Autowired con Lombok @RequiredArgsConstructor en ItemController y ItemService (basado en análisis de git diff HEAD)
+- refactor: Cambio de visibilidad de métodos en ItemRepository de public a package-private para encapsulación interna (basado en análisis de git diff HEAD)
+- feat: Nuevo método deleteAllByLegajoIdAndAnhoAndMesAndImporteAndCodigoIdGreaterThan en ItemRepository y llamado correspondiente en ItemService.deleteAllByZero para eliminar items con importe >0 y codigoId >100 (basado en análisis de git diff HEAD)
+- fix: Agregado Objects.requireNonNull en ItemService para prevenir NullPointerException en verificación de incluidoEtec (basado en análisis de git diff HEAD)
+
 ## [1.6.0] - 2025-10-08
 - feat: Nuevos endpoints en LegajoBancoController para filtrar por código: `findAllSantanderConCodigo` y `findAllOtrosBancosConCodigo` (basado en análisis de git diff HEAD)
 - refactor: Mejoras en LegajoBancoService: agregado de métodos `findAllSantanderConCodigo` y `findAllOtrosBancosConCodigo`, uso de `Objects.equals` para verificaciones de nulidad, conversión de `collect(Collectors.toList())` a `toList()`, y logging mejorado con Jsonifier (basado en análisis de git diff HEAD)

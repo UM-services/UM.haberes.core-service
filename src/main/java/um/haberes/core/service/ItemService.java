@@ -6,6 +6,7 @@ package um.haberes.core.service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -13,6 +14,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import jakarta.transaction.Transactional;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -31,20 +33,12 @@ import um.haberes.core.repository.ItemVersionRepository;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ItemService {
 
     private final ItemRepository repository;
-
     private final ItemVersionRepository itemVersionRepository;
-
     private final CodigoGrupoService codigoGrupoService;
-
-    @Autowired
-    public ItemService(ItemRepository repository, ItemVersionRepository itemVersionRepository, CodigoGrupoService codigoGrupoService) {
-        this.repository = repository;
-        this.itemVersionRepository = itemVersionRepository;
-        this.codigoGrupoService = codigoGrupoService;
-    }
 
     public List<Item> findAllByCodigo(Integer codigoId, Integer anho, Integer mes) {
         return repository.findAllByCodigoIdAndAnhoAndMes(codigoId, anho, mes);
@@ -111,6 +105,7 @@ public class ItemService {
     public void deleteAllByZero(Long legajoId, Integer anho, Integer mes) {
         repository.deleteAllByLegajoIdAndAnhoAndMesAndImporteAndCodigoIdLessThan(legajoId, anho, mes, BigDecimal.ZERO,
                 96);
+        repository.deleteAllByLegajoIdAndAnhoAndMesAndImporteAndCodigoIdGreaterThan(legajoId, anho, mes, BigDecimal.ZERO, 100);
     }
 
     @Transactional
@@ -131,7 +126,7 @@ public class ItemService {
         List<Integer> codigoIds = codigoGrupoService.findAllByRemunerativo((byte) 1).stream().map(CodigoGrupo::getCodigoId).collect(Collectors.toList());
         log.debug(codigoIds.toString());
         List<Item> items = repository.findAllByLegajoIdAndAnhoAndMesAndCodigoIdIn(legajoId, anho, mes, codigoIds).stream().peek(item -> {
-            if (item.getCodigo().getIncluidoEtec() == 0) {
+            if (Objects.requireNonNull(item.getCodigo()).getIncluidoEtec() == 0) {
                 result.set(false);
             }
         }).collect(Collectors.toList());

@@ -20,34 +20,36 @@ import um.haberes.core.kotlin.model.Item;
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
-	public List<Item> findAllByCodigoIdAndAnhoAndMes(Integer codigoId, Integer anho, Integer mes);
+	List<Item> findAllByCodigoIdAndAnhoAndMes(Integer codigoId, Integer anho, Integer mes);
 
-	public List<Item> findAllByCodigoIdAndAnhoAndMesAndLegajoId(Integer codigoId, Integer anho, Integer mes,
+	List<Item> findAllByCodigoIdAndAnhoAndMesAndLegajoId(Integer codigoId, Integer anho, Integer mes,
 			Long legajoId);
 
-	public List<Item> findAllByAnhoAndMes(Integer anho, Integer mes, Pageable pageable);
+	List<Item> findAllByAnhoAndMes(Integer anho, Integer mes, Pageable pageable);
 
-	public List<Item> findAllByAnhoAndMesAndLegajoId(Integer anho, Integer mes, Long legajoId, Pageable pageable);
+	List<Item> findAllByAnhoAndMesAndLegajoId(Integer anho, Integer mes, Long legajoId, Pageable pageable);
 
-	public List<Item> findAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
+	List<Item> findAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
 
-	public List<Item> findAllByLegajoIdAndAnhoAndMesAndCodigoIdIn(Long legajoId, Integer anho, Integer mes,
+	List<Item> findAllByLegajoIdAndAnhoAndMesAndCodigoIdIn(Long legajoId, Integer anho, Integer mes,
 			List<Integer> codigoIds);
 
-	public List<Item> findAllByAnhoAndMesAndCodigoIdAndImporteGreaterThan(Integer anho, Integer mes, Integer codigoId,
+	List<Item> findAllByAnhoAndMesAndCodigoIdAndImporteGreaterThan(Integer anho, Integer mes, Integer codigoId,
 			BigDecimal importe);
 
-	public Optional<Item> findByLegajoIdAndAnhoAndMesAndCodigoId(Long legajoId, Integer anho, Integer mes,
+	Optional<Item> findByLegajoIdAndAnhoAndMesAndCodigoId(Long legajoId, Integer anho, Integer mes,
 			Integer codigoId);
 
 	@Modifying
-	public void deleteAllByAnhoAndMes(Integer anho, Integer mes);
+    void deleteAllByAnhoAndMes(Integer anho, Integer mes);
 
 	@Modifying
-	public void deleteAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
+	void deleteAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
 
 	@Modifying
-	public void deleteAllByLegajoIdAndAnhoAndMesAndImporteAndCodigoIdLessThan(Long legajoId, Integer anho, Integer mes,
+	void deleteAllByLegajoIdAndAnhoAndMesAndImporteAndCodigoIdLessThan(Long legajoId, Integer anho, Integer mes,
 			BigDecimal importe, Integer codigoId);
 
+    @Modifying
+    void deleteAllByLegajoIdAndAnhoAndMesAndImporteAndCodigoIdGreaterThan(Long legajoId, Integer anho, Integer mes, BigDecimal importe, Integer codigoId);
 }
