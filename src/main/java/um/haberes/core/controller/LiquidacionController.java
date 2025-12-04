@@ -6,6 +6,7 @@ package um.haberes.core.controller;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
@@ -32,14 +33,10 @@ import um.haberes.core.service.LiquidacionService;
  */
 @RestController
 @RequestMapping("/api/haberes/core/liquidacion")
+@RequiredArgsConstructor
 public class LiquidacionController {
 
 	private final LiquidacionService service;
-
-	@Autowired
-	public LiquidacionController(LiquidacionService service) {
-		this.service = service;
-	}
 
 	@GetMapping("/periodo/{anho}/{mes}/{limit}")
 	public ResponseEntity<List<Liquidacion>> findAllByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes,

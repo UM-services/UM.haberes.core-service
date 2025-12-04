@@ -8,7 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.core.exception.view.CargoClasePeriodoNotFoundException;
+import um.haberes.core.exception.view.CargoClasePeriodoException;
 import um.haberes.core.kotlin.model.CargoClasePeriodo;
 import um.haberes.core.repository.CargoClasePeriodoRepository;
 
@@ -32,7 +32,7 @@ public class CargoClasePeriodoService {
 
 	public CargoClasePeriodo findByCargoClasePeriodoId(Long cargoClasePeriodoId) {
 		return repository.findByCargoClasePeriodoId(cargoClasePeriodoId)
-				.orElseThrow(() -> new CargoClasePeriodoNotFoundException(cargoClasePeriodoId));
+				.orElseThrow(() -> new CargoClasePeriodoException(cargoClasePeriodoId));
 	}
 
 	public CargoClasePeriodo add(CargoClasePeriodo cargoClasePeriodo) {
@@ -63,7 +63,7 @@ public class CargoClasePeriodoService {
 			);
 			repository.save(cargoClasePeriodo);
 			return cargoClasePeriodo;
-		}).orElseThrow(() -> new CargoClasePeriodoNotFoundException(cargoClasePeriodoId));
+		}).orElseThrow(() -> new CargoClasePeriodoException(cargoClasePeriodoId));
 	}
 
 	public void delete(Long cargoClasePeriodoId) {

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import um.haberes.core.exception.view.TotalSalidaNotFoundException;
+import um.haberes.core.exception.view.TotalSalidaException;
 import um.haberes.core.kotlin.model.view.TotalSalida;
 import um.haberes.core.service.view.TotalSalidaService;
 
@@ -31,7 +31,7 @@ public class TotalSalidaController {
 	public ResponseEntity<TotalSalida> findAByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes) {
 		try {
 			return new ResponseEntity<>(service.findByPeriodo(anho, mes), HttpStatus.OK);
-		} catch (TotalSalidaNotFoundException e) {
+		} catch (TotalSalidaException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}

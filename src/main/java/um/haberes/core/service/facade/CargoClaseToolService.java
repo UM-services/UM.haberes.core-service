@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import um.haberes.core.exception.AcreditacionException;
-import um.haberes.core.exception.view.CargoClasePeriodoNotFoundException;
+import um.haberes.core.exception.view.CargoClasePeriodoException;
 import um.haberes.core.kotlin.model.*;
 import um.haberes.core.service.AcreditacionService;
 import um.haberes.core.service.CargoClaseDetalleService;
@@ -139,7 +139,7 @@ public class CargoClaseToolService {
 		CargoClasePeriodo cargoClasePeriodo = null;
 		try {
 			cargoClasePeriodo = cargoClasePeriodoService.findByCargoClasePeriodoId(cargoClasePeriodoId);
-		} catch (CargoClasePeriodoNotFoundException e) {
+		} catch (CargoClasePeriodoException e) {
 			return "ERROR: No EXISTE el Cargo . . .";
 		}
 		// Retengo el periodo hasta
