@@ -29,9 +29,7 @@ import um.haberes.core.util.Periodo;
 public class LiquidacionService {
 
     private final LiquidacionRepository repository;
-
     private final LiquidacionVersionService liquidacionVersionService;
-
     private final LiquidacionPeriodoService liquidacionPeriodoService;
 
     @Autowired

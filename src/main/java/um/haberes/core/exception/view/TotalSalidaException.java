@@ -7,18 +7,18 @@ package um.haberes.core.exception.view;
  * @author daniel
  *
  */
-public class TotalSalidaNotFoundException extends RuntimeException {
+public class TotalSalidaException extends RuntimeException {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 4982296773847324000L;
 
-	public TotalSalidaNotFoundException () {
+	public TotalSalidaException() {
 		super("Cannot find TotalSalida");
 	}
 
-	public TotalSalidaNotFoundException (Integer anho, Integer mes) {
+	public TotalSalidaException(Integer anho, Integer mes) {
 		super("Cannot find TotalSalida " + mes + "/" + anho);
 	}
 }

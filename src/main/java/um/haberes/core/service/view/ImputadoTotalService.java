@@ -3,10 +3,11 @@
  */
 package um.haberes.core.service.view;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.core.exception.view.ImputadoTotalNotFoundException;
+import um.haberes.core.exception.view.ImputadoTotalException;
 import um.haberes.core.kotlin.model.view.ImputadoTotal;
 import um.haberes.core.repository.view.ImputadoTotalRepository;
 
@@ -15,12 +16,13 @@ import um.haberes.core.repository.view.ImputadoTotalRepository;
  *
  */
 @Service
+@RequiredArgsConstructor
 public class ImputadoTotalService {
-	@Autowired
-	private ImputadoTotalRepository repository;
+
+	private final ImputadoTotalRepository repository;
 
 	public ImputadoTotal findByPeriodo(Integer anho, Integer mes) {
-		return repository.findByAnhoAndMes(anho, mes).orElseThrow(() -> new ImputadoTotalNotFoundException(anho, mes));
+		return repository.findByAnhoAndMes(anho, mes).orElseThrow(() -> new ImputadoTotalException(anho, mes));
 	}
 
 }
