@@ -1,5 +1,6 @@
 package um.haberes.core.service.internal;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import um.haberes.core.exception.NovedadException;
@@ -8,30 +9,26 @@ import um.haberes.core.kotlin.model.Control;
 import um.haberes.core.kotlin.model.Item;
 import um.haberes.core.kotlin.model.Liquidacion;
 import um.haberes.core.kotlin.model.Novedad;
+import um.haberes.core.service.CargoClaseDetalleService;
 import um.haberes.core.service.ItemService;
 import um.haberes.core.service.NovedadService;
 import um.haberes.core.service.facade.MakeLiquidacionService;
+import um.haberes.core.service.facade.liquidaciones.LiquidacionState;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class AfipContextService {
 
     private final ItemService itemService;
-
     private final NovedadService novedadService;
-
     private final MakeLiquidacionService makeLiquidacionService;
-
-    @Autowired
-    public AfipContextService(ItemService itemService, NovedadService novedadService, MakeLiquidacionService makeLiquidacionService) {
-        this.itemService = itemService;
-        this.novedadService = novedadService;
-        this.makeLiquidacionService = makeLiquidacionService;
-    }
+    private final CargoClaseDetalleService cargoClaseDetalleService;
 
     public AfipContext makeByLegajo(Liquidacion liquidacion, Control control) {
 
@@ -96,18 +93,25 @@ public class AfipContextService {
         minimoObraSocial = control.getMinimoAporte();
         porcentajeObraSocialEmpleado = control.getOsociaem();
         porcentajeObraSocialPatronal = control.getOsocipat();
-        int mesLiquidacion = control.getFechaHasta().getMonthValue();
+        int mesLiquidacion = Objects.requireNonNull(control.getFechaHasta()).getMonthValue();
 
         coeficiente = BigDecimal.ONE;
         if (mesLiquidacion == 6 || mesLiquidacion == 12) {
             coeficiente = new BigDecimal("1.5");
         }
 
-        Long legajoId = liquidacion.getPersona().getLegajoId();
+        Long legajoId = Objects.requireNonNull(liquidacion.getPersona()).getLegajoId();
         Integer anho = liquidacion.getAnho();
         Integer mes = liquidacion.getMes();
 
-        Map<Integer, Item> items = itemService.findAllByLegajo(legajoId, anho, mes).stream().collect(Collectors.toMap(Item::getCodigoId, item -> item));
+        LiquidacionState state = LiquidacionState.builder()
+                .persona(liquidacion.getPersona())
+                .control(control)
+                .items(itemService.findAllByLegajo(legajoId, anho, mes).stream().collect(Collectors.toMap(Item::getCodigoId, item -> item)))
+                .cargoClases(cargoClaseDetalleService.findAllByLegajo(legajoId, anho, mes))
+                .build();
+
+        Map<Integer, Item> items = state.getItems();
 
         // Calcula Bruto
         if (items.containsKey(96)) {
@@ -208,7 +212,7 @@ public class AfipContextService {
         afipTipoEmpleado = 1;
 
         afipTipoEmpresa = 1;
-        if (makeLiquidacionService.evaluateOnlyETEC(items)) {
+        if (makeLiquidacionService.evaluateOnlyETEC(state)) {
             afipTipoEmpresa = 7;
         }
 

@@ -3,6 +3,7 @@ package um.haberes.core.service.facade;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import um.haberes.core.exception.*;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class MakeLiquidacionService {
 
     // region Constantes de Códigos de Liquidación
@@ -82,56 +84,6 @@ public class MakeLiquidacionService {
     private final AdicionalCursoTablaService adicionalCursoTablaService;
     private final CategoriaPeriodoService categoriaPeriodoService;
     private final LiquidacionAdicionalService liquidacionAdicionalService;
-
-    public MakeLiquidacionService(CargoLiquidacionService cargoLiquidacionService,
-                                  DesignacionToolService designacionToolService,
-                                  CargoClaseDetalleService cargoClaseDetalleService,
-                                  ControlService controlService,
-                                  PersonaService personaService,
-                                  NovedadService novedadService,
-                                  ItemService itemService,
-                                  LegajoControlService legajoControlService,
-                                  CodigoGrupoService codigoGrupoService,
-                                  CursoDesarraigoService cursoDesarraigoService,
-                                  CursoFusionService cursoFusionService,
-                                  DependenciaService dependenciaService,
-                                  CategoriaService categoriaService,
-                                  AntiguedadService antiguedadService,
-                                  LiquidacionService liquidacionService,
-                                  ActividadService actividadService,
-                                  LetraService letraService,
-                                  CargoService cargoService,
-                                  NovedadDuplicadaService novedadDuplicadaService,
-                                  CursoCargoService cursoCargoService,
-                                  CodigoService codigoService,
-                                  AdicionalCursoTablaService adicionalCursoTablaService,
-                                  CategoriaPeriodoService categoriaPeriodoService,
-                                  LiquidacionAdicionalService liquidacionAdicionalService) {
-        this.cargoLiquidacionService = cargoLiquidacionService;
-        this.designacionToolService = designacionToolService;
-        this.cargoClaseDetalleService = cargoClaseDetalleService;
-        this.controlService = controlService;
-        this.personaService = personaService;
-        this.novedadService = novedadService;
-        this.itemService = itemService;
-        this.legajoControlService = legajoControlService;
-        this.codigoGrupoService = codigoGrupoService;
-        this.cursoDesarraigoService = cursoDesarraigoService;
-        this.cursoFusionService = cursoFusionService;
-        this.dependenciaService = dependenciaService;
-        this.categoriaService = categoriaService;
-        this.antiguedadService = antiguedadService;
-        this.liquidacionService = liquidacionService;
-        this.actividadService = actividadService;
-        this.letraService = letraService;
-        this.cargoService = cargoService;
-        this.novedadDuplicadaService = novedadDuplicadaService;
-        this.cursoCargoService = cursoCargoService;
-        this.codigoService = codigoService;
-        this.adicionalCursoTablaService = adicionalCursoTablaService;
-        this.categoriaPeriodoService = categoriaPeriodoService;
-        this.liquidacionAdicionalService = liquidacionAdicionalService;
-    }
 
     @Transactional
     public LiquidacionState makeContext(Long legajoId, Integer anho, Integer mes) {
@@ -297,7 +249,9 @@ public class MakeLiquidacionService {
     private void calcularCargosConClase(Long legajoId, Integer anho, Integer mes, LiquidacionState state) {
         log.debug("Processing MakeLiquidacionService.calcularCargosConClase");
 
-        for (CargoClaseDetalle detalle : cargoClaseDetalleService.findAllByLegajo(legajoId, anho, mes)) {
+        state.setCargoClases(cargoClaseDetalleService.findAllByLegajo(legajoId, anho, mes));
+
+        for (CargoClaseDetalle detalle : state.getCargoClases()) {
             log.debug("CargoClaseDetalle -> {}", detalle.jsonify());
             BigDecimal basico = detalle.getValorHora().multiply(new BigDecimal(detalle.getHoras())).setScale(2, RoundingMode.HALF_UP);
             addItem(legajoId, anho, mes, CODIGO_BASICO, basico, state);
@@ -385,7 +339,7 @@ public class MakeLiquidacionService {
         }
 
         // Jubilación Secundario (ETEC)
-        if (evaluateOnlyETEC(state.getItems())) {
+        if (evaluateOnlyETEC(state)) {
             BigDecimal jubilacionEtec = conAportes.multiply(new BigDecimal("0.02")).setScale(2, RoundingMode.HALF_UP);
             if (jubilacionEtec.compareTo(BigDecimal.ZERO) != 0) {
                 addItem(legajoId, anho, mes, CODIGO_JUBILACION_SECUNDARIO, jubilacionEtec, state);
@@ -783,8 +737,15 @@ public class MakeLiquidacionService {
         return totalDependencia;
     }
 
-    public boolean evaluateOnlyETEC(Map<Integer, Item> items) {
-        boolean hasBasico = items.containsKey(CODIGO_BASICO) && items.get(CODIGO_BASICO).getImporte().compareTo(BigDecimal.ZERO) != 0;
+    public boolean evaluateOnlyETEC(LiquidacionState state) {
+        boolean hasCargoClaseInFacultades = false;
+        for (CargoClaseDetalle detalle : state.getCargoClases()) {
+            if (detalle.getFacultadId() != 6) {
+                hasCargoClaseInFacultades = true;
+            }
+        }
+        Map<Integer, Item> items = state.getItems();
+        boolean hasBasico = hasCargoClaseInFacultades && items.containsKey(CODIGO_BASICO) && items.get(CODIGO_BASICO).getImporte().compareTo(BigDecimal.ZERO) != 0;
         boolean hasETEC = items.containsKey(CODIGO_AGUINALDO_ETEC) && items.get(CODIGO_AGUINALDO_ETEC).getImporte().compareTo(BigDecimal.ZERO) != 0;
         return hasETEC && !hasBasico;
     }

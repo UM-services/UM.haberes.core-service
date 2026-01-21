@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.8</version>
+        <version>4.0.1</version>
         <relativePath/>
         <!-- lookup parent from repository -->
     </parent>
@@ -15,9 +15,9 @@
     <name>UM.haberes.core-service</name>
     <description>Spring Boot Haberes</description>
     <properties>
-        <java.version>24</java.version>
-        <kotlin.version>2.2.21</kotlin.version>
-        <spring-cloud.version>2025.0.0</spring-cloud.version>
+        <java.version>25</java.version>
+        <kotlin.version>2.3.0</kotlin.version>
+        <spring-cloud.version>2025.1.0</spring-cloud.version>
         <lombok.version>1.18.38</lombok.version>
         <sonar.organization>um-services</sonar.organization>
         <sonar.projectKey>UM-services_UM.haberes.core-service</sonar.projectKey>
@@ -58,7 +58,7 @@
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
-            <version>9.4.0</version>
+            <version>9.5.0</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -79,12 +79,12 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>5.4.1</version>
+            <version>5.5.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>5.4.1</version>
+            <version>5.5.1</version>
         </dependency>
         <dependency>
             <groupId>com.github.librepdf</groupId>
@@ -98,7 +98,7 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.8.10</version>
+            <version>3.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -155,7 +155,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.18.0</version>
+                <version>3.20.0</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>

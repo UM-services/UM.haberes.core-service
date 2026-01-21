@@ -9,7 +9,7 @@ import java.util.List;
 
 import jakarta.transaction.Transactional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -26,18 +26,12 @@ import um.haberes.core.util.Periodo;
  * @author daniel
  */
 @Service
+@RequiredArgsConstructor
 public class LiquidacionService {
 
     private final LiquidacionRepository repository;
     private final LiquidacionVersionService liquidacionVersionService;
     private final LiquidacionPeriodoService liquidacionPeriodoService;
-
-    @Autowired
-    public LiquidacionService(LiquidacionRepository repository, LiquidacionVersionService liquidacionVersionService, LiquidacionPeriodoService liquidacionPeriodoService) {
-        this.repository = repository;
-        this.liquidacionVersionService = liquidacionVersionService;
-        this.liquidacionPeriodoService = liquidacionPeriodoService;
-    }
 
     public List<Liquidacion> findAllByPeriodo(Integer anho, Integer mes, Integer limit) {
         if (limit == 0)
