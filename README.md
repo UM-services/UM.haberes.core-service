@@ -5,22 +5,22 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**1.7.0** (2025-10-09)
+**1.8.0** (2026-02-02)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
 
-- Java 24
-- Kotlin 2.2.20
-- Spring Boot 3.5.6
-- Spring Cloud 2025.0.0 (OpenFeign, Consul)
+- Java 25
+- Kotlin 2.3.0
+- Spring Boot 4.0.2
+- Spring Cloud 2025.1.0 (OpenFeign, Consul)
 - Spring Data JPA
-- Apache POI 5.4.1 (Excel)
+- Apache POI 5.5.1 (Excel)
 - OpenPDF 3.0.0 (PDF)
 - Log4j2
 - Caffeine Cache
 - Jackson
-- MySQL Connector/J 9.4.0
+- MySQL Connector/J 9.6.0
 - Docker
 - Springdoc OpenAPI
 
