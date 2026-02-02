@@ -12,6 +12,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
+import lombok.RequiredArgsConstructor;
 import um.haberes.core.kotlin.model.view.PersonaSearch;
 import um.haberes.core.repository.view.PersonaSearchRepositoryCustom;
 
@@ -19,13 +20,10 @@ import um.haberes.core.repository.view.PersonaSearchRepositoryCustom;
  * @author daniel
  *
  */
+@RequiredArgsConstructor
 public class PersonaSearchRepositoryCustomImpl implements PersonaSearchRepositoryCustom {
 
 	private final EntityManager entityManager;
-
-	public PersonaSearchRepositoryCustomImpl(EntityManager entityManager) {
-		this.entityManager = entityManager;
-	}
 
 	@Override
 	public List<PersonaSearch> findAllByStrings(List<String> conditions) {

@@ -13,6 +13,6 @@ import java.util.List;
  */
 public interface PersonaSearchRepositoryCustom {
 
-	public List<PersonaSearch> findAllByStrings(List<String> conditions);
+	List<PersonaSearch> findAllByStrings(List<String> conditions);
 
 }

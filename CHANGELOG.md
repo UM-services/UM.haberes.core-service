@@ -1,3 +1,10 @@
+## [1.8.0] - 2026-02-02
+- chore: Actualización de Spring Boot de 4.0.1 a 4.0.2 (basado en análisis de git diff HEAD y pom.xml)
+- chore: Actualización de MySQL Connector/J de 9.5.0 a 9.6.0 (basado en análisis de git diff HEAD y pom.xml)
+- refactor: Mejoras en PersonaSearchRepositoryCustom: cambio de visibilidad de método de public a package-private para encapsulación interna (basado en análisis de git diff HEAD)
+- refactor: Reemplazo de constructor explícito con Lombok @RequiredArgsConstructor en PersonaSearchRepositoryCustomImpl (basado en análisis de git diff HEAD)
+- refactor: Reemplazo de @Autowired con Lombok @RequiredArgsConstructor en PersonaSearchService (basado en análisis de git diff HEAD)
+
 ## [1.7.0] - 2025-10-09
 - refactor: Reemplazo de @Autowired con Lombok @RequiredArgsConstructor en ItemController y ItemService (basado en análisis de git diff HEAD)
 - refactor: Cambio de visibilidad de métodos en ItemRepository de public a package-private para encapsulación interna (basado en análisis de git diff HEAD)
