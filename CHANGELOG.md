@@ -1,3 +1,14 @@
+## [1.9.0] - 2026-04-04
+- chore: Actualización de Spring Boot de 4.0.2 a 4.0.5 (basado en análisis de git diff HEAD y pom.xml)
+- chore: Actualización de Kotlin de 2.3.0 a 2.3.20 (basado en análisis de git diff HEAD y pom.xml)
+- chore: Actualización de OpenPDF de 3.0.0 a 3.0.3 (basado en análisis de git diff HEAD y pom.xml)
+- chore: Actualización de springdoc-openapi de 3.0.1 a 3.0.2 (basado en análisis de git diff HEAD y pom.xml)
+- chore: Agregado de commons-fileupload 1.6.0 en dependencyManagement (basado en análisis de git diff HEAD y pom.xml)
+- chore: Actualización de GitHub Actions: actions/checkout@v4→v6, actions/setup-java@v4→v5, actions/cache@v4→v5, actions/upload-pages-artifact@v3→v4, actions/deploy-pages@v4→v5 (basado en análisis de git diff HEAD)
+- chore: Actualización de Docker Actions: docker/login-action@v3→v4, docker/metadata-action@v5→v6, docker/setup-buildx-action@v3→v4, docker/build-push-action@v6→v7 (basado en análisis de git diff HEAD)
+- chore: Actualización de JDK de 24 a 25 en workflows (basado en análisis de git diff HEAD)
+- refactor: Actualización de lombok.version de 1.18.36 a 1.18.38 (basado en análisis de git diff HEAD y pom.xml)
+
 ## [1.8.0] - 2026-02-02
 - chore: Actualización de Spring Boot de 4.0.1 a 4.0.2 (basado en análisis de git diff HEAD y pom.xml)
 - chore: Actualización de MySQL Connector/J de 9.5.0 a 9.6.0 (basado en análisis de git diff HEAD y pom.xml)
