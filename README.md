@@ -5,18 +5,18 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**1.9.0** (2026-04-04)
+**1.10.0** (2026-05-11)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
 
 - Java 25
-- Kotlin 2.3.20
-- Spring Boot 4.0.5
+- Kotlin 2.3.21
+- Spring Boot 4.0.6
 - Spring Cloud 2025.1.0 (OpenFeign, Consul)
 - Spring Data JPA
 - Apache POI 5.5.1 (Excel)
-- OpenPDF 3.0.0 (PDF)
+- OpenPDF 3.0.3 (PDF)
 - Log4j2
 - Caffeine Cache
 - Jackson
@@ -53,7 +53,7 @@ La documentación y los diagramas se generan automáticamente en cada push a la 
 
 ## Requisitos
 
-- JDK 24
+- JDK 25
 - Maven 3.8.8+
 - Docker (opcional)
 - MySQL 8.0+
@@ -63,7 +63,6 @@ La documentación y los diagramas se generan automáticamente en cada push a la 
 
 ### Variables de entorno recomendadas
 
-eureka:
 ```yaml
 spring:
   application:
@@ -141,20 +140,20 @@ docker run -d \
 
 ## Arquitectura
 
-El servicio sigue una arquitectura hexagonal:
+El servicio sigue una arquitectura hexagonal (puertos y adaptadores):
 
-- **API Layer**: Controladores REST y DTOs
-- **Domain Layer**: Modelos de dominio y lógica de negocio
-- **Infrastructure Layer**: Repositorios, servicios externos y configuración
+- **Domain Layer**: Modelos de dominio, puertos de entrada (Use Cases) y puertos de salida (Repositories)
+- **Application Layer**: Servicios de aplicación e implementaciones de casos de uso
+- **Infrastructure Layer**: Adaptadores JPA, controladores REST, DTOs, mappers y configuración
 
 
 ### Patrones de diseño utilizados
 
+- Hexagonal Architecture (Ports & Adapters)
 - Repository
 - Service Layer
-- Factory
-- Strategy
-- Observer (para eventos de auditoría)
+- Use Case / Interactor
+- Mapper (Entity-DTO, Entity-Domain)
 
 
 ## Seguridad

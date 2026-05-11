@@ -14,14 +14,15 @@ import java.util.stream.Collectors;
 
 import jakarta.transaction.Transactional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import um.haberes.core.exception.AntiguedadLimiteException;
-import um.haberes.core.exception.AntiguedadException;
-import um.haberes.core.exception.CursoDesarraigoException;
-import um.haberes.core.exception.DesignacionException;
-import um.haberes.core.exception.LegajoControlException;
+import um.haberes.core.exception.*;
+import um.haberes.core.hexagonal.facultad.infrastructure.persistence.entity.FacultadEntity;
+import um.haberes.core.hexagonal.geografica.application.service.GeograficaService;
+import um.haberes.core.hexagonal.geografica.domain.model.Geografica;
+import um.haberes.core.hexagonal.geografica.infrastructure.persistence.entity.GeograficaEntity;
+import um.haberes.core.hexagonal.geografica.infrastructure.persistence.mapper.GeograficaMapper;
 import um.haberes.core.kotlin.model.*;
 import um.haberes.core.service.AntiguedadLimiteService;
 import um.haberes.core.service.AntiguedadService;
@@ -31,7 +32,6 @@ import um.haberes.core.service.CursoFusionService;
 import um.haberes.core.service.CursoService;
 import um.haberes.core.service.DesignacionService;
 import um.haberes.core.service.DesignacionTipoService;
-import um.haberes.core.service.GeograficaService;
 import um.haberes.core.service.LegajoControlService;
 import um.haberes.core.service.PersonaService;
 import um.haberes.core.util.Periodo;
@@ -43,6 +43,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class DesignacionToolService {
 
     static final List<Integer> excepcionales = List.of(3, 5);
@@ -57,43 +58,17 @@ public class DesignacionToolService {
     static final Integer const_Nivel_Tecnicatura = 3;
 
     private final CursoCargoService cursoCargoService;
-
     private final DesignacionTipoService designacionTipoService;
-
     private final CursoService cursoService;
-
     private final DesignacionService designacionService;
-
     private final LegajoControlService legajoControlService;
-
     private final CursoFusionService cursoFusionService;
-
     private final AntiguedadService antiguedadService;
-
     private final AntiguedadLimiteService antiguedadLimiteService;
-
     private final CursoDesarraigoService cursoDesarraigoService;
-
     private final PersonaService personaService;
-
     private final GeograficaService geograficaService;
-
-    @Autowired
-    public DesignacionToolService(CursoCargoService cursoCargoService, DesignacionTipoService designacionTipoService, CursoService cursoService, DesignacionService designacionService,
-                                  LegajoControlService legajoControlService, CursoFusionService cursoFusionService, AntiguedadService antiguedadService, AntiguedadLimiteService antiguedadLimiteService,
-                                  CursoDesarraigoService cursoDesarraigoService, PersonaService personaService, GeograficaService geograficaService) {
-        this.cursoCargoService = cursoCargoService;
-        this.designacionTipoService = designacionTipoService;
-        this.cursoService = cursoService;
-        this.designacionService = designacionService;
-        this.legajoControlService = legajoControlService;
-        this.cursoFusionService = cursoFusionService;
-        this.antiguedadService = antiguedadService;
-        this.antiguedadLimiteService = antiguedadLimiteService;
-        this.cursoDesarraigoService = cursoDesarraigoService;
-        this.personaService = personaService;
-        this.geograficaService = geograficaService;
-    }
+    private final GeograficaMapper geograficaMapper;
 
     @Transactional
     public void convertirGradoByLegajo(Long legajoId, Integer anho, Integer mes, Boolean aplicaExcepcion) {
@@ -121,7 +96,7 @@ public class DesignacionToolService {
             if (cursoCargo.getCategoriaId() != null) {
                 cursoCargo = cursoCargoService.update(cursoCargo, cursoCargo.getCursoCargoId());
             } else {
-                Facultad facultad = cursoCargo.getCurso().getFacultad();
+                FacultadEntity facultad = cursoCargo.getCurso().getFacultad();
                 CargoTipo cargoTipo = cursoCargo.getCargoTipo();
                 String periodo = "";
                 if (curso.getAnual() == 1)
@@ -159,16 +134,16 @@ public class DesignacionToolService {
         cursoFusionService.deleteAllByLegajoIdAndPeriodo(legajoId, anho, mes);
 
         // Toma las facultades de acuerdo a los cargos
-        for (Facultad facultad : cursoCargos.stream().map(cursoCargo -> cursoCargo.getCurso().getFacultad())
-                .collect(Collectors.toMap(Facultad::getFacultadId, Function.identity(),
+        for (FacultadEntity facultad : cursoCargos.stream().map(cursoCargo -> cursoCargo.getCurso().getFacultad())
+                .collect(Collectors.toMap(FacultadEntity::getFacultadId, Function.identity(),
                         (facultad, replacement) -> facultad))
                 .values().stream().toList()) {
             log.debug("Fusionar Grado Facultad -> {}", facultad);
             // Toma las sedes de acuerdo a los cargos
-            for (Geografica geografica : cursoCargos.stream()
+            for (GeograficaEntity geografica : cursoCargos.stream()
                     .filter(cursoCargo -> cursoCargo.getCurso().getFacultadId() == facultad.getFacultadId())
                     .map(cursoCargo -> cursoCargo.getCurso().getGeografica())
-                    .collect(Collectors.toMap(Geografica::getGeograficaId, Function.identity(),
+                    .collect(Collectors.toMap(GeograficaEntity::getGeograficaId, Function.identity(),
                             (geografica, replacement) -> geografica))
                     .values().stream().toList()) {
 //				cursoFusionService.deleteAllByLegajoIdAndAnhoAndMesAndFacultadIdAndGeograficaId(legajoId, anho, mes,
@@ -344,9 +319,9 @@ public class DesignacionToolService {
         List<CursoDesarraigo> desarraigosNew = new ArrayList<>();
         for (CursoCargo cursoCargo : cursoCargos) {
             Curso curso = cursos.get(cursoCargo.getCursoId());
-            Geografica geografica = curso.getGeografica();
+            Geografica geografica = geograficaMapper.toDomainModel(curso.getGeografica());
             if (persona.getReemplazoDesarraigo() == 1) {
-                geografica = geograficaService.findByGeograficaId(geografica.getGeograficaIdReemplazo());
+                geografica = geograficaService.getGeograficaById(geografica.getGeograficaIdReemplazo());
             }
             BigDecimal desarraigo = geografica.getDesarraigo();
             if (persona.getMitadDesarraigo() == 1) {
@@ -366,7 +341,7 @@ public class DesignacionToolService {
             BigDecimal factor = porcentajeDocente.add(BigDecimal.ONE);
             desarraigo = desarraigo.multiply(factor).setScale(0, RoundingMode.DOWN);
             desarraigosNew.add(new CursoDesarraigo(cursoDesarraigoId, legajoId, anho, mes, cursoCargo.getCursoId(),
-                    curso.getGeograficaId(), desarraigo, 1, curso, persona, geografica));
+                    curso.getGeograficaId(), desarraigo, 1, curso, persona, geograficaMapper.toEntity(geografica)));
         }
         cursoDesarraigoService.saveAll(desarraigosNew);
     }

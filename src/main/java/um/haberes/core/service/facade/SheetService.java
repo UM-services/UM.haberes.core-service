@@ -14,8 +14,14 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
 import um.haberes.core.client.CuentaMovimientoClient;
 import um.haberes.core.exception.ContactoException;
+import um.haberes.core.hexagonal.facultad.application.service.FacultadService;
+import um.haberes.core.hexagonal.facultad.domain.model.Facultad;
+import um.haberes.core.hexagonal.geografica.application.service.GeograficaService;
+import um.haberes.core.hexagonal.geografica.domain.model.Geografica;
+import um.haberes.core.hexagonal.geografica.infrastructure.persistence.entity.GeograficaEntity;
 import um.haberes.core.kotlin.model.*;
 import um.haberes.core.kotlin.model.extern.CuentaDto;
 import um.haberes.core.kotlin.model.extern.CuentaMovimientoDto;
@@ -28,7 +34,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
@@ -46,13 +51,13 @@ import um.haberes.core.service.*;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class SheetService {
 
     private final CargoLiquidacionService cargoLiquidacionService;
     private final PersonaService personaService;
     private final FacultadService facultadService;
     private final CategoriaService categoriaService;
-    private final GeograficaService geograficaService;
     private final DependenciaService dependenciaService;
     private final LiquidacionService liquidacionService;
     private final CodigoService codigoService;
@@ -71,38 +76,7 @@ public class SheetService {
     private final CodigoGrupoService codigoGrupoService;
     private final LegajoCodigoImputacionService legajoCodigoImputacionService;
     private final CuentaMovimientoClient cuentaMovimientoClient;
-
-    @Autowired
-    public SheetService(PersonaService personaService, FacultadService facultadService, CategoriaService categoriaService, GeograficaService geograficaService,
-                        DependenciaService dependenciaService, LiquidacionService liquidacionService, CodigoService codigoService, ItemService itemService,
-                        NovedadAcumuladoService novedadAcumuladoService, NovedadService novedadService, AcreditacionService acreditacionService, LegajoCursoCantidadService legajoCursoCantidadService,
-                        CargoLiquidacionService cargoLiquidacionService, CargoClaseDetalleService cargoClaseDetalleService, LiquidacionAdicionalService liquidacionAdicionalService, LegajoBancoService legajoBancoService,
-                        ContactoService contactoService, Environment environment, LegajoCategoriaImputacionService legajoCategoriaImputacionService,
-                        LegajoCargoClaseImputacionService legajoCargoClaseImputacionService, CodigoGrupoService codigoGrupoService, LegajoCodigoImputacionService legajoCodigoImputacionService, CuentaMovimientoClient cuentaMovimientoClient) {
-        this.personaService = personaService;
-        this.facultadService = facultadService;
-        this.categoriaService = categoriaService;
-        this.geograficaService = geograficaService;
-        this.dependenciaService = dependenciaService;
-        this.liquidacionService = liquidacionService;
-        this.codigoService = codigoService;
-        this.itemService = itemService;
-        this.novedadAcumuladoService = novedadAcumuladoService;
-        this.novedadService = novedadService;
-        this.acreditacionService = acreditacionService;
-        this.legajoCursoCantidadService = legajoCursoCantidadService;
-        this.cargoLiquidacionService = cargoLiquidacionService;
-        this.cargoClaseDetalleService = cargoClaseDetalleService;
-        this.liquidacionAdicionalService = liquidacionAdicionalService;
-        this.legajoBancoService = legajoBancoService;
-        this.contactoService = contactoService;
-        this.environment = environment;
-        this.legajoCategoriaImputacionService = legajoCategoriaImputacionService;
-        this.legajoCargoClaseImputacionService = legajoCargoClaseImputacionService;
-        this.codigoGrupoService = codigoGrupoService;
-        this.legajoCodigoImputacionService = legajoCodigoImputacionService;
-        this.cuentaMovimientoClient = cuentaMovimientoClient;
-    }
+    private final GeograficaService geograficaService;
 
     public String generateLiquidables() {
         String path = environment.getProperty("path.files");
@@ -835,9 +809,9 @@ public class SheetService {
         this.setCellString(row, 6, "Semestre 2", style_bold);
         this.setCellString(row, 7, "Bruto", style_bold);
 
-        Map<Integer, Facultad> facultades = facultadService.findAll().stream()
+        Map<Integer, Facultad> facultades = facultadService.getAllFacultades().stream()
                 .collect(Collectors.toMap(Facultad::getFacultadId, facultad -> facultad));
-        Map<Integer, Geografica> geograficas = geograficaService.findAll().stream()
+        Map<Integer, Geografica> geograficas = geograficaService.getAllGeograficas().stream()
                 .collect(Collectors.toMap(Geografica::getGeograficaId, geografica -> geografica));
         List<LegajoCursoCantidad> legajoCursos = legajoCursoCantidadService.findAllByPeriodo(anho, mes);
         List<Long> legajoIds = legajoCursos.stream().map(LegajoCursoCantidad::getLegajoId)

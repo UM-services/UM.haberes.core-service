@@ -1,30 +1,49 @@
 graph TD
-    subgraph "Usuario Final"
-        A[Usuario]
+    subgraph "Cliente"
+        A[Cliente/UI]
     end
 
-    subgraph "Frontend (Supuesto)"
-        B[Aplicación Web/UI]
+    subgraph "API Layer (Infrastructure - Web)"
+        B[Controladores REST]
+        C[DTOs / Mappers]
     end
 
-    subgraph "um.haberes.core-service"
-        C[Controllers]
-        D[Services]
-        E[Repositories]
-        F[Base de Datos]
+    subgraph "Application Layer"
+        D[Services / Use Cases]
+    end
+
+    subgraph "Domain Layer"
+        E[Domain Models]
+        F[Puertos de Entrada]
+        G[Puertos de Salida]
+    end
+
+    subgraph "Infrastructure - Persistence"
+        H[Repository Adapters]
+        I[JPA Repositories]
+        J[Entities / Mappers]
     end
 
     subgraph "Servicios Externos"
-        G[Servicio de Personas]
-        H[Servicio de Cuentas]
-        I[Otros Servicios UM]
+        K[Servicio de Personas]
+        L[Servicio de Cuentas]
+        M[Otros Servicios UM]
+    end
+
+    subgraph "Base de Datos"
+        N[(MySQL)]
     end
 
     A --> B
     B --> C
     C --> D
-    D --> E
-    E --> F
-    D --> G
-    D --> H
-    D --> I
+    D --> F
+    F --> E
+    F --> G
+    G --> H
+    H --> I
+    I --> J
+    J --> N
+    D --> K
+    D --> L
+    D --> M
