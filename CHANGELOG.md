@@ -1,3 +1,11 @@
+## [1.10.0] - 2026-05-11
+- chore: Actualización de Spring Boot de 4.0.5 a 4.0.6 (basado en análisis de git diff HEAD y pom.xml)
+- chore: Actualización de Kotlin de 2.3.20 a 2.3.21 (basado en análisis de git diff HEAD y pom.xml)
+- refactor: Migración de Facultad y Geográfica a arquitectura hexagonal con dominio, casos de uso, adaptadores JPA y controladores independientes (basado en análisis de git diff HEAD)
+- refactor: Eliminación de modelos Kotlin obsoletos Facultad.kt y Geografica.kt; migración de referencias a FacultadEntity/GeograficaEntity en todas las entidades (basado en análisis de git diff HEAD)
+- refactor: Reemplazo de @Autowired con Lombok @RequiredArgsConstructor en FormularioAsignacionCargoService, DesignacionToolService y SheetService (basado en análisis de git diff HEAD)
+- refactor: Actualización de imports y llamadas a métodos en ContratadoService, DesignacionToolService y SheetService para usar nuevos servicios hexagonales (basado en análisis de git diff HEAD)
+
 ## [1.9.0] - 2026-04-04
 - chore: Actualización de Spring Boot de 4.0.2 a 4.0.5 (basado en análisis de git diff HEAD y pom.xml)
 - chore: Actualización de Kotlin de 2.3.0 a 2.3.20 (basado en análisis de git diff HEAD y pom.xml)

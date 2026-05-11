@@ -1,6 +1,7 @@
 package um.haberes.core.kotlin.model
 
 import jakarta.persistence.*
+import um.haberes.core.hexagonal.facultad.infrastructure.persistence.entity.FacultadEntity
 
 @Entity
 data class Anotador(
@@ -29,6 +30,6 @@ data class Anotador(
 
     @OneToOne
     @JoinColumn(name = "facultadId", insertable = false, updatable = false)
-    var facultad: Facultad? = null
+    var facultad: FacultadEntity? = null
 
 ) : Auditable()

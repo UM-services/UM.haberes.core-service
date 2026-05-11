@@ -1,6 +1,8 @@
 package um.haberes.core.kotlin.model
 
 import jakarta.persistence.*
+import um.haberes.core.hexagonal.facultad.infrastructure.persistence.entity.FacultadEntity
+import um.haberes.core.hexagonal.geografica.infrastructure.persistence.entity.GeograficaEntity
 
 @Entity
 @Table
@@ -16,11 +18,11 @@ data class AdicionalCursoTabla(
 
     @OneToOne
     @JoinColumn(name = "facultadId", insertable = false, updatable = false)
-    var facultad: Facultad? = null,
+    var facultad: FacultadEntity? = null,
 
     @OneToOne
     @JoinColumn(name = "geograficaId", insertable = false, updatable = false)
-    var geografica: Geografica? = null,
+    var geografica: GeograficaEntity? = null,
 
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "adicionalCursoTablaId", insertable = false, updatable = false)

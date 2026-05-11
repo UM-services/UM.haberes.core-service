@@ -1,6 +1,8 @@
 package um.haberes.core.kotlin.model
 
 import jakarta.persistence.*
+import um.haberes.core.hexagonal.facultad.infrastructure.persistence.entity.FacultadEntity
+import um.haberes.core.hexagonal.geografica.infrastructure.persistence.entity.GeograficaEntity
 
 @Entity
 @Table
@@ -25,11 +27,11 @@ data class CursoFusion(
 
     @OneToOne(optional = true)
     @JoinColumn(name = "facultadId", insertable = false, updatable = false)
-    var facultad: Facultad? = null,
+    var facultad: FacultadEntity? = null,
 
     @OneToOne(optional = true)
     @JoinColumn(name = "geograficaId", insertable = false, updatable = false)
-    var geografica: Geografica? = null,
+    var geografica: GeograficaEntity? = null,
 
     @OneToOne(optional = true)
     @JoinColumn(name = "cargoTipoId", insertable = false, updatable = false)

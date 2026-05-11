@@ -1,6 +1,8 @@
 package um.haberes.core.kotlin.model
 
 import jakarta.persistence.*
+import um.haberes.core.hexagonal.geografica.domain.model.Geografica
+import um.haberes.core.hexagonal.geografica.infrastructure.persistence.entity.GeograficaEntity
 import java.math.BigDecimal
 
 @Entity
@@ -29,6 +31,6 @@ data class CursoDesarraigo(
 
     @OneToOne
     @JoinColumn(name = "geograficaId", insertable = false, updatable = false)
-    var geografica: Geografica? = null
+    var geografica: GeograficaEntity? = null
 
 ) : Auditable()

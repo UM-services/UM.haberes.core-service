@@ -8,16 +8,17 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import um.haberes.core.client.ContratadoPersonaClient;
 import um.haberes.core.client.CursoCargoContratadoClient;
+import um.haberes.core.hexagonal.facultad.domain.model.Facultad;
+import um.haberes.core.hexagonal.geografica.application.service.GeograficaService;
+import um.haberes.core.hexagonal.geografica.domain.model.Geografica;
+import um.haberes.core.hexagonal.geografica.infrastructure.persistence.entity.GeograficaEntity;
 import um.haberes.core.kotlin.model.CargoTipo;
 import um.haberes.core.kotlin.model.Curso;
-import um.haberes.core.kotlin.model.Facultad;
-import um.haberes.core.kotlin.model.Geografica;
 import um.haberes.core.kotlin.model.extern.ContratadoPersonaDto;
 import um.haberes.core.kotlin.model.extern.CursoCargoContratadoDto;
 import um.haberes.core.service.CargoTipoService;
 import um.haberes.core.service.CursoService;
-import um.haberes.core.service.FacultadService;
-import um.haberes.core.service.GeograficaService;
+import um.haberes.core.hexagonal.facultad.application.service.FacultadService;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -75,10 +76,10 @@ public class ContratadoService {
         this.setCellString(row, 11, "Horas", styleBold);
         this.setCellString(row, 12, "Dictado", styleBold);
 
-        Map<Integer, Facultad> facultades = facultadService.findAll().stream()
+        Map<Integer, Facultad> facultades = facultadService.getAllFacultades().stream()
                 .collect(Collectors.toMap(Facultad::getFacultadId, facultad -> facultad));
 
-        Map<Integer, Geografica> geograficas = geograficaService.findAll().stream()
+        Map<Integer, Geografica> geograficas = geograficaService.getAllGeograficas().stream()
                 .collect(Collectors.toMap(Geografica::getGeograficaId, geografica -> geografica));
 
         Map<Long, Curso> cursos = cursoService.findAll().stream()
