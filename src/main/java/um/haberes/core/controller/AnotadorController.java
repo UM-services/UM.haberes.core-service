@@ -5,6 +5,7 @@ package um.haberes.core.controller;
 
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,10 +28,10 @@ import um.haberes.core.service.AnotadorService;
  */
 @RestController
 @RequestMapping("/api/haberes/core/anotador")
+@RequiredArgsConstructor
 public class AnotadorController {
 
-	@Autowired
-	private AnotadorService service;
+	private final AnotadorService service;
 
 	@GetMapping("/legajo/{legajoId}")
 	public ResponseEntity<List<Anotador>> findAllByLegajo(@PathVariable Long legajoId) {
