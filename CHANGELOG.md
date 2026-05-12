@@ -1,3 +1,7 @@
+## [1.10.1] - 2026-05-12
+- refactor: Reemplazo de @Autowired con Lombok @RequiredArgsConstructor en AnotadorController (basado en análisis de git diff HEAD)
+- fix: Agregadas verificaciones de nulidad para ipVisado y respuesta en AnotadorService.add() para prevenir NullPointerException (basado en análisis de git diff HEAD)
+
 ## [1.10.0] - 2026-05-11
 - chore: Actualización de Spring Boot de 4.0.5 a 4.0.6 (basado en análisis de git diff HEAD y pom.xml)
 - chore: Actualización de Kotlin de 2.3.20 a 2.3.21 (basado en análisis de git diff HEAD y pom.xml)

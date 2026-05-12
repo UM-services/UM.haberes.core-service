@@ -90,6 +90,12 @@ public class AnotadorService {
 	}
 
 	public Anotador add(Anotador anotador) {
+		if (anotador.getIpVisado() == null) {
+			anotador.setIpVisado("");
+		}
+		if (anotador.getRespuesta() == null) {
+			anotador.setRespuesta("");
+		}
 		repository.save(anotador);
 		return anotador;
 	}
