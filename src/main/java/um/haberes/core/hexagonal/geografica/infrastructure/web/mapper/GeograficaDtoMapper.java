@@ -1,9 +1,9 @@
 package um.haberes.core.hexagonal.geografica.infrastructure.web.mapper;
 
-import org.springframework.stereotype.Component;
 import um.haberes.core.hexagonal.geografica.domain.model.Geografica;
 import um.haberes.core.hexagonal.geografica.infrastructure.web.dto.GeograficaRequest;
 import um.haberes.core.hexagonal.geografica.infrastructure.web.dto.GeograficaResponse;
+import org.springframework.stereotype.Component;
 
 @Component
 public class GeograficaDtoMapper {

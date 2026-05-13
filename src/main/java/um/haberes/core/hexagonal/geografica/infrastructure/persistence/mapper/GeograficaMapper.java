@@ -1,8 +1,8 @@
 package um.haberes.core.hexagonal.geografica.infrastructure.persistence.mapper;
 
-import org.springframework.stereotype.Component;
 import um.haberes.core.hexagonal.geografica.domain.model.Geografica;
 import um.haberes.core.hexagonal.geografica.infrastructure.persistence.entity.GeograficaEntity;
+import org.springframework.stereotype.Component;
 
 @Component
 public class GeograficaMapper {

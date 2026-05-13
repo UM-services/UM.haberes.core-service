@@ -1,29 +1,38 @@
 package um.haberes.core.hexagonal.geografica.application.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import um.haberes.core.hexagonal.geografica.domain.model.Geografica;
 import um.haberes.core.hexagonal.geografica.domain.ports.in.*;
+import um.haberes.core.hexagonal.geografica.domain.ports.out.GeograficaRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class GeograficaService {
 
-    private final GetGeograficaByIdUseCase getGeograficaByIdUseCase;
+    private final GeograficaRepository geograficaRepository;
+
     private final GetAllGeograficasUseCase getAllGeograficasUseCase;
+    private final GetGeograficaByIdUseCase getGeograficaByIdUseCase;
+    private final GetGeograficasByIdsUseCase getGeograficasByIdsUseCase;
     private final UpdateGeograficaUseCase updateGeograficaUseCase;
 
-    public Geografica getGeograficaById(Integer id) {
-        return getGeograficaByIdUseCase.getById(id);
-    }
-
     public List<Geografica> getAllGeograficas() {
-        return getAllGeograficasUseCase.getAll();
+        return getAllGeograficasUseCase.getAllGeograficas();
     }
 
-    public Geografica updateGeografica(Integer id, Geografica geografica) {
-        return updateGeograficaUseCase.update(id, geografica);
+    public Optional<Geografica> getGeograficaById(Integer id) {
+        return getGeograficaByIdUseCase.getGeograficaById(id);
+    }
+
+    public List<Geografica> getGeograficasByIds(List<Integer> ids) {
+        return getGeograficasByIdsUseCase.getGeograficasByIds(ids);
+    }
+
+    public Optional<Geografica> updateGeografica(Integer id, Geografica geografica) {
+        return updateGeograficaUseCase.updateGeografica(id, geografica);
     }
 }

@@ -1,7 +1,15 @@
 package um.haberes.core.hexagonal.geografica.infrastructure.web.dto;
+
+import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.math.BigDecimal;
-@Data
+
+@Getter
+@Setter
+@Builder
 public class GeograficaRequest {
     private String nombre;
     private String reducido;

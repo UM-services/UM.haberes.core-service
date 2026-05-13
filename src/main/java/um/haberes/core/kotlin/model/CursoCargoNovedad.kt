@@ -1,6 +1,7 @@
 package um.haberes.core.kotlin.model
 
 import jakarta.persistence.*
+import um.haberes.core.util.Jsonifier
 import java.math.BigDecimal
 
 @Entity
@@ -39,4 +40,8 @@ data class CursoCargoNovedad(
     @JoinColumn(name = "legajoId", insertable = false, updatable = false)
     var persona: Persona? = null
 
-) : Auditable()
+) : Auditable() {
+    fun jsonify(): String {
+        return Jsonifier.builder(this).build();
+    }
+}

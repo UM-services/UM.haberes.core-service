@@ -1,8 +1,8 @@
 package um.haberes.core.hexagonal.geografica.domain.ports.in;
 
 import um.haberes.core.hexagonal.geografica.domain.model.Geografica;
-import java.util.Optional;
+import java.util.List;
 
-public interface GetGeograficaByIdUseCase {
-    Optional<Geografica> getGeograficaById(Integer id);
+public interface GetGeograficasByIdsUseCase {
+    List<Geografica> getGeograficasByIds(List<Integer> ids);
 }

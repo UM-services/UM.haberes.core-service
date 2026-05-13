@@ -6,9 +6,9 @@ import java.util.Optional;
 
 public interface GeograficaRepository {
     Geografica create(Geografica geografica);
-    Geografica findById(Integer id);
+    Optional<Geografica> findById(Integer id);
     List<Geografica> findAll();
     List<Geografica> findAllIn(List<Integer> ids);
-    Geografica update(Integer id, Geografica geografica);
+    Optional<Geografica> update(Integer id, Geografica geografica);
     boolean deleteById(Integer id);
 }

@@ -167,7 +167,7 @@ public class CursoCargoNovedadController {
 
 	@PostMapping("/")
 	public ResponseEntity<CursoCargoNovedad> add(@RequestBody CursoCargoNovedad cursoCargoNovedad) {
-		return new ResponseEntity<>(service.add(cursoCargoNovedad), HttpStatus.OK);
+		return ResponseEntity.ok(service.add(cursoCargoNovedad));
 	}
 
 	@PutMapping("/{cursoCargoNovedadId}")

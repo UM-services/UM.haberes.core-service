@@ -3,6 +3,7 @@
  */
 package um.haberes.core.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import um.haberes.core.exception.CursoCargoNovedadException;
 import um.haberes.core.kotlin.model.CursoCargoNovedad;
 import um.haberes.core.repository.CursoCargoNovedadRepository;
+import um.haberes.core.util.Jsonifier;
 
 /**
  * @author daniel
@@ -41,11 +43,7 @@ public class CursoCargoNovedadService {
 						Sort.by("persona.apellido").ascending().and(Sort.by("persona.nombre").ascending())
 								.and(Sort.by("cargoTipo.aCargo").descending()).and(Sort.by("cargoTipoId").ascending()))
 				.stream().filter(cargo -> cargo.getAlta() == 1 || cargo.getCambio() == 1).collect(Collectors.toList());
-        try {
-            log.debug("PendientesAlta: {}", JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(pendientesAlta));
-        } catch (JsonProcessingException e) {
-            log.debug("PendientesAlta: {}", e.getMessage());
-        }
+		log.debug("pendientesAlta -> {}", Jsonifier.builder(pendientesAlta).build());
         return pendientesAlta;
 	}
 
@@ -82,11 +80,7 @@ public class CursoCargoNovedadService {
 		var pendientesBaja = repository.findAllByAnhoAndMesAndBajaAndAutorizadoAndRechazado(anho, mes, (byte) 1, (byte) 0, (byte) 0,
 				Sort.by("persona.apellido").ascending().and(Sort.by("persona.nombre").ascending())
 						.and(Sort.by("cargoTipo.aCargo").descending()).and(Sort.by("cargoTipoId").ascending()));
-        try {
-            log.debug("PendientesBaja: {}", JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(pendientesBaja));
-        } catch (JsonProcessingException e) {
-            log.debug("PendientesBaja: {}", e.getMessage());
-        }
+		log.debug("pendientesBaja -> {}",  Jsonifier.builder(pendientesBaja).build());
         return pendientesBaja;
 	}
 
@@ -118,11 +112,7 @@ public class CursoCargoNovedadService {
 	public List<CursoCargoNovedad> findAllPendientesLegajo(Long legajoId, Long cursoId, Integer anho, Integer mes) {
 		var pendientesLegajo = repository.findAllByCursoIdAndAnhoAndMesAndAutorizadoAndRechazadoAndLegajoId(cursoId, anho, mes,
 				(byte) 0, (byte) 0, legajoId);
-        try {
-            log.debug("PendientesLegajo: {}", JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(pendientesLegajo));
-        } catch (JsonProcessingException e) {
-            log.debug("PendientesLegajo: {}", e.getMessage());
-        }
+		log.debug("pendientesLegajo -> {}", Jsonifier.builder(pendientesLegajo).build());
         return pendientesLegajo;
 	}
 
@@ -145,48 +135,31 @@ public class CursoCargoNovedadService {
 	public CursoCargoNovedad findByCursoCargoNovedadId(Long cursoCargoNovedadId) {
 		var cursoCargoNovedad = repository.findByCursoCargoNovedadId(cursoCargoNovedadId)
 				.orElseThrow(() -> new CursoCargoNovedadException(cursoCargoNovedadId));
-        try {
-            log.debug("CursoCargoNovedad -> " + JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(cursoCargoNovedad));
-        } catch (JsonProcessingException e) {
-            log.debug("CursoCargoNovedad -> null {}", e.getMessage());
-        }
+		log.debug("CursoCargoNovedad -> {}",  cursoCargoNovedad.jsonify());
         return cursoCargoNovedad;
 	}
 
 	public CursoCargoNovedad findByLegajo(Long legajoId, Long cursoId, Integer anho, Integer mes) {
 		var cursoCargoNovedad = repository.findByLegajoIdAndCursoIdAndAnhoAndMes(legajoId, cursoId, anho, mes)
 				.orElseThrow(() -> new CursoCargoNovedadException(legajoId, cursoId, anho, mes));
-        try {
-            log.debug("CursoCargoNovedad -> " + JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(cursoCargoNovedad));
-        } catch (JsonProcessingException e) {
-            log.debug("CursoCargoNovedad -> null {}", e.getMessage());
-        }
+		log.debug("CursoCargoNovedad -> {}",  cursoCargoNovedad.jsonify());
         return cursoCargoNovedad;
 	}
 
 	public CursoCargoNovedad findByUnique(Long cursoId, Integer anho, Integer mes, Integer cargoTipoId, Long legajoId) {
 		var cursoCargoNovedad = repository.findByCursoIdAndAnhoAndMesAndCargoTipoIdAndLegajoId(cursoId, anho, mes, cargoTipoId, legajoId)
 				.orElseThrow(() -> new CursoCargoNovedadException(cursoId, anho, mes, cargoTipoId, legajoId));
-        try {
-            log.debug("CursoCargoNovedad -> " + JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(cursoCargoNovedad));
-        } catch (JsonProcessingException e) {
-            log.debug("CursoCargoNovedad -> null {}", e.getMessage());
-        }
+		log.debug("CursoCargoNovedad -> {}",  cursoCargoNovedad.jsonify());
         return cursoCargoNovedad;
 	}
 
 	public CursoCargoNovedad add(CursoCargoNovedad cursoCargoNovedad) {
-        try {
-            log.debug("CursoCargoNovedad (before) -> " + JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(cursoCargoNovedad));
-        } catch (JsonProcessingException e) {
-            log.debug("CursoCargoNovedad (before) -> null {}", e.getMessage());
-        }
+		if (cursoCargoNovedad.getRespuesta() == null) {
+			cursoCargoNovedad.setRespuesta("");
+		}
+		log.debug("CursoCargoNovedad (before) -> {}",  cursoCargoNovedad.jsonify());
         cursoCargoNovedad = repository.save(cursoCargoNovedad);
-        try {
-            log.debug("CursoCargoNovedad (after) -> " + JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(cursoCargoNovedad));
-        } catch (JsonProcessingException e) {
-            log.debug("CursoCargoNovedad (after) -> null {}", e.getMessage());
-        }
+		log.debug("CursoCargoNovedad (after) -> {}",  cursoCargoNovedad.jsonify());
 		return cursoCargoNovedad;
 	}
 
