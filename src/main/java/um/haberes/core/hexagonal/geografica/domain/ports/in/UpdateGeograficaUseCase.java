@@ -4,5 +4,5 @@ import um.haberes.core.hexagonal.geografica.domain.model.Geografica;
 import java.util.Optional;
 
 public interface UpdateGeograficaUseCase {
-    Geografica update(Integer id, Geografica geografica);
+    Optional<Geografica> updateGeografica(Integer id, Geografica geografica);
 }

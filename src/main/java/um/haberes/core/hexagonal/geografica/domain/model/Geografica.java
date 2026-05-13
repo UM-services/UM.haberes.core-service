@@ -1,12 +1,12 @@
 package um.haberes.core.hexagonal.geografica.domain.model;
 
-import lombok.*;
-
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
-@Setter
+import lombok.*;
+
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

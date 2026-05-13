@@ -1,3 +1,19 @@
+## [1.11.0] - 2026-05-13
+- feat: Nuevo endpoint `POST /api/geograficas/ids` en GeograficaController para consulta batch de geográficas por IDs múltiples (basado en análisis de `git diff HEAD`)
+- feat: Nuevo use case `GetGeograficasByIdsUseCase` con implementación para búsqueda masiva vía `findAllIn` en GeograficaRepository (basado en análisis de `git diff HEAD`)
+- refactor: Renombrados métodos en módulo hexagonal Geografica (`getAll`→`getAllGeograficas`, `getById`→`getGeograficaById`, `update`→`updateGeografica`) para consistencia de API (basado en análisis de `git diff HEAD`)
+- refactor: Cambiados tipos de retorno a `Optional<Geografica>` en repositorio, casos de uso, servicio y adaptador de Geografica para manejo null-safe (basado en análisis de `git diff HEAD`)
+- refactor: Reemplazados lanzamientos de `GeograficaException` con `Optional.empty()` en `JpaGeograficaRepositoryAdapter.findById` y `update` (basado en análisis de `git diff HEAD`)
+- refactor: Reemplazados bloques `JsonMapper` try-catch con `Jsonifier` en `CursoCargoNovedadService` para logging de serialización más limpio (basado en análisis de `git diff HEAD`)
+- refactor: Agregado método `jsonify()` al modelo Kotlin `CursoCargoNovedad` (basado en análisis de `git diff HEAD`)
+- refactor: Agregada guarda de nulidad para campo `respuesta` en `CursoCargoNovedadService.add()` (basado en análisis de `git diff HEAD`)
+- refactor: Actualizado `MakeLiquidacionService.evaluateOnlyETEC` para usar `LiquidacionState` con contexto de cargos clase, corrigiendo evaluación ETEC-only basada en facultad (basado en análisis de `git diff HEAD`)
+- refactor: Agregado campo `cargoClases` a `LiquidacionState` y actualizadas referencias en `AfipContextService` (basado en análisis de `git diff HEAD`)
+- refactor: Reemplazado `@Autowired` con Lombok `@RequiredArgsConstructor` en `LiquidacionService`, `MakeLiquidacionService`, `DesignacionToolService`, `SheetService`, `AfipContextService` (basado en análisis de `git diff HEAD`)
+- refactor: Actualizado `DesignacionToolService` para usar `GeograficaService` hexagonal y `GeograficaMapper` en lugar de modelos Kotlin deprecados (basado en análisis de `git diff HEAD`)
+- refactor: Actualizados `ContratadoService` y `SheetService` para usar nuevos nombres de métodos del servicio hexagonal (basado en análisis de `git diff HEAD`)
+- refactor: Simplificado `ResponseEntity` en `CursoCargoNovedadController` usando `ResponseEntity.ok()` (basado en análisis de `git diff HEAD`)
+
 ## [1.10.1] - 2026-05-12
 - refactor: Reemplazo de @Autowired con Lombok @RequiredArgsConstructor en AnotadorController (basado en análisis de git diff HEAD)
 - fix: Agregadas verificaciones de nulidad para ipVisado y respuesta en AnotadorService.add() para prevenir NullPointerException (basado en análisis de git diff HEAD)

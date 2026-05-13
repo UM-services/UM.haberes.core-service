@@ -1,12 +1,15 @@
 package um.haberes.core.hexagonal.geografica.infrastructure.web.dto;
-import lombok.*;
+
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
+
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class GeograficaResponse {
     private Integer geograficaId;
     private String nombre;

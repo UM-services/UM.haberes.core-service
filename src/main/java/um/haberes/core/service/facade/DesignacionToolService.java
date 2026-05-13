@@ -321,7 +321,9 @@ public class DesignacionToolService {
             Curso curso = cursos.get(cursoCargo.getCursoId());
             Geografica geografica = geograficaMapper.toDomainModel(curso.getGeografica());
             if (persona.getReemplazoDesarraigo() == 1) {
-                geografica = geograficaService.getGeograficaById(geografica.getGeograficaIdReemplazo());
+                var geograficaId = geografica.getGeograficaIdReemplazo();
+                geografica = geograficaService.getGeograficaById(geograficaId)
+                        .orElseThrow(() -> new GeograficaException(geograficaId));
             }
             BigDecimal desarraigo = geografica.getDesarraigo();
             if (persona.getMitadDesarraigo() == 1) {

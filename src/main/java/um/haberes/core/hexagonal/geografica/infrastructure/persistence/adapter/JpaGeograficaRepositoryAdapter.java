@@ -1,13 +1,12 @@
 package um.haberes.core.hexagonal.geografica.infrastructure.persistence.adapter;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import um.haberes.core.exception.GeograficaException;
 import um.haberes.core.hexagonal.geografica.domain.model.Geografica;
 import um.haberes.core.hexagonal.geografica.domain.ports.out.GeograficaRepository;
 import um.haberes.core.hexagonal.geografica.infrastructure.persistence.entity.GeograficaEntity;
 import um.haberes.core.hexagonal.geografica.infrastructure.persistence.mapper.GeograficaMapper;
 import um.haberes.core.hexagonal.geografica.infrastructure.persistence.repository.JpaGeograficaRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,10 +27,9 @@ public class JpaGeograficaRepositoryAdapter implements GeograficaRepository {
     }
 
     @Override
-    public Geografica findById(Integer id) {
+    public Optional<Geografica> findById(Integer id) {
         return jpaGeograficaRepository.findById(id)
-                .map(geograficaMapper::toDomainModel)
-                .orElseThrow(() -> new GeograficaException(id));
+                .map(geograficaMapper::toDomainModel);
     }
 
     @Override
@@ -49,14 +47,14 @@ public class JpaGeograficaRepositoryAdapter implements GeograficaRepository {
     }
 
     @Override
-    public Geografica update(Integer id, Geografica geografica) {
+    public Optional<Geografica> update(Integer id, Geografica geografica) {
         if (jpaGeograficaRepository.existsById(id)) {
             GeograficaEntity entity = geograficaMapper.toEntity(geografica);
             entity.setGeograficaId(id); // Ensure the ID is set for update
             GeograficaEntity updatedEntity = jpaGeograficaRepository.save(entity);
-            return geograficaMapper.toDomainModel(updatedEntity);
+            return Optional.of(geograficaMapper.toDomainModel(updatedEntity));
         }
-        throw new GeograficaException(id);
+        return Optional.empty();
     }
 
     @Override
