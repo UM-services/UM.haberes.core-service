@@ -5,24 +5,24 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**1.11.0** (2026-05-13)
+**1.11.1** (2026-06-19)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
 
 - Java 25
-- Kotlin 2.3.21
-- Spring Boot 4.0.6
-- Spring Cloud 2025.1.0 (OpenFeign, Consul)
+- Kotlin 2.4.0
+- Spring Boot 4.1.0
+- Spring Cloud 2025.1.2 (OpenFeign, Consul)
 - Spring Data JPA
 - Apache POI 5.5.1 (Excel)
-- OpenPDF 3.0.3 (PDF)
+- OpenPDF 3.0.5 (PDF)
 - Log4j2
 - Caffeine Cache
 - Jackson
-- MySQL Connector/J 9.6.0
+- MySQL Connector/J 9.7.0
 - Docker
-- Springdoc OpenAPI
+- Springdoc OpenAPI 3.0.3
 
 ## Diagramas principales
 
@@ -30,8 +30,8 @@ _La versión se corresponde con la declarada en `pom.xml`._
 - Flujo de liquidación de sueldos: `docs/diagrams/flujo-liquidacion-sueldos.mmd`
 - Modelo entidad-relación: `docs/diagrams/modelo-entidad-relacion.mmd`
 - Despliegue: `docs/diagrams/despliegue.mmd`
-- **Nuevo:** Flujo de liquidación general masiva: `docs/diagrams/flujo-liquidacion-general.mmd`
-- **Nuevo:** Flujo de LegajoBanco con filtro por código: `docs/diagrams/flujo-legajobanco-filtro-codigo.mmd`
+- Flujo de liquidación general masiva: `docs/diagrams/flujo-liquidacion-general.mmd`
+- Flujo de LegajoBanco con filtro por código: `docs/diagrams/flujo-legajobanco-filtro-codigo.mmd`
 
 ## Documentación automática
 
