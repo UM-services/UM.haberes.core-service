@@ -11,7 +11,7 @@ data class Usuario(
     var legajoId: Long? = null,
     var password: String = "",
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ", timezone = "UTC")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXX", timezone = "UTC")
     var lastLog: OffsetDateTime? = null,
 
     var build: Long? = null,

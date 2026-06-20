@@ -75,11 +75,11 @@ public class NovedadFileService {
         try {
             InputStream input = new FileInputStream(file);
             Workbook workbook = new XSSFWorkbook(input);
-            Integer sheetCount = workbook.getNumberOfSheets();
-            for (Integer counter = 0; counter < sheetCount; counter++) {
+            int sheetCount = workbook.getNumberOfSheets();
+            for (int counter = 0; counter < sheetCount; counter++) {
                 Sheet sheet = workbook.getSheetAt(counter);
                 log.debug("Sheet -> " + sheet.getSheetName());
-                Integer rows = sheet.getLastRowNum();
+                int rows = sheet.getLastRowNum();
                 Integer cols = (int) sheet.getRow(0).getLastCellNum();
                 Row row = sheet.getRow(0);
                 String columnName = null;
@@ -123,7 +123,7 @@ public class NovedadFileService {
                 }
                 if (columnLegajoId == null || columnCodigoId == null || columnImporte == null)
                     continue;
-                for (Integer rowNumber = 1; rowNumber <= rows; rowNumber++) {
+                for (int rowNumber = 1; rowNumber <= rows; rowNumber++) {
                     Double cellLegajoId = null;
                     Double cellCodigoId = null;
                     Double cellImporte = null;
@@ -143,7 +143,7 @@ public class NovedadFileService {
                     if (columnCodigoId != null)
                         cellCodigoId = row.getCell(columnCodigoId).getNumericCellValue();
                     if (columnImporte != null) {
-                        Boolean testString = true;
+                        boolean testString = true;
                         try {
                             cellImporte = row.getCell(columnImporte).getNumericCellValue();
                             log.debug("Sheet -> " + sheet.getSheetName() + " - Importe -> {}", cellImporte);

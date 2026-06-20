@@ -11,10 +11,10 @@ data class ProveedorMovimientoDto(
     var nombreBeneficiario: String = "",
     var comprobanteId: Int? = null,
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ", timezone = "UTC")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXX", timezone = "UTC")
     var fechaComprobante: OffsetDateTime? = null,
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ", timezone = "UTC")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXX", timezone = "UTC")
     var fechaVencimiento: OffsetDateTime? = null,
     var prefijo: Int = 0,
     var numeroComprobante: Long = 0L,
@@ -24,12 +24,12 @@ data class ProveedorMovimientoDto(
     var importe: BigDecimal = BigDecimal.ZERO,
     var cancelado: BigDecimal = BigDecimal.ZERO,
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ", timezone = "UTC")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXX", timezone = "UTC")
     var fechaContable: OffsetDateTime? = null,
     var ordenContable: Int? = null,
     var concepto: String? = null,
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ", timezone = "UTC")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXX", timezone = "UTC")
     var fechaAnulacion: OffsetDateTime? = null,
     var conCargo: Byte = 0,
     var solicitaFactura: Byte = 0,

@@ -8,7 +8,7 @@ data class OrdenPagoRequest(
 
     var anho: Int? = null,
     var mes: Int? = null,
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ", timezone = "UTC")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXX", timezone = "UTC")
     var fechaPago: OffsetDateTime? = null,
     var totalSantander: BigDecimal? = null,
     var totalOtrosBancos: BigDecimal? = null,

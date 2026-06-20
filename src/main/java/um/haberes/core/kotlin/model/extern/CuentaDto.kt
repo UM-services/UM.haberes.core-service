@@ -15,7 +15,7 @@ data class CuentaDto(
     var grado3: BigDecimal? = null,
     var grado4: BigDecimal? = null,
     var geograficaId: Int? = null,
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ", timezone = "UTC")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXX", timezone = "UTC")
     var fechaBloqueo: OffsetDateTime? = null,
     var visible: Byte = 0,
     var cuentaContableId: Long? = null

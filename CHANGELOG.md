@@ -1,3 +1,13 @@
+## [1.11.1] - 2026-06-19
+- chore: Actualización de Spring Boot de 4.0.6 a 4.1.0 (basado en `git diff HEAD` y `pom.xml`)
+- chore: Actualización de Kotlin de 2.3.21 a 2.4.0 (basado en `git diff HEAD` y `pom.xml`)
+- chore: Actualización de Spring Cloud de 2025.1.0 a 2025.1.2 (basado en `git diff HEAD` y `pom.xml`)
+- chore: Actualización de MySQL Connector/J de 9.6.0 a 9.7.0 (basado en `git diff HEAD` y `pom.xml`)
+- chore: Actualización de OpenPDF de 3.0.3 a 3.0.5 (basado en `git diff HEAD` y `pom.xml`)
+- chore: Actualización de springdoc-openapi de 3.0.2 a 3.0.3 (basado en `git diff HEAD` y `pom.xml`)
+- fix: Corregido patrón `@JsonFormat` de `Z` a `XX` en todas las entidades Kotlin con campos `OffsetDateTime` para compatibilidad con Java 25 (basado en `git diff HEAD` en 21 modelos)
+- refactor: Unboxing de `Integer`→`int` y `Boolean`→`boolean` en `NovedadFileService` para eliminar auto-boxing innecesario (basado en `git diff HEAD`)
+
 ## [1.11.0] - 2026-05-13
 - feat: Nuevo endpoint `POST /api/geograficas/ids` en GeograficaController para consulta batch de geográficas por IDs múltiples (basado en análisis de `git diff HEAD`)
 - feat: Nuevo use case `GetGeograficasByIdsUseCase` con implementación para búsqueda masiva vía `findAllIn` en GeograficaRepository (basado en análisis de `git diff HEAD`)
