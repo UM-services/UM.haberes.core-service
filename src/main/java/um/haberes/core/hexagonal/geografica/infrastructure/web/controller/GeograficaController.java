@@ -1,14 +1,17 @@
 package um.haberes.core.hexagonal.geografica.infrastructure.web.controller;
 
+import um.haberes.core.hexagonal.geografica.application.exception.GeograficaException;
 import um.haberes.core.hexagonal.geografica.application.service.GeograficaService;
 import um.haberes.core.hexagonal.geografica.domain.model.Geografica;
 import um.haberes.core.hexagonal.geografica.infrastructure.web.dto.GeograficaRequest;
 import um.haberes.core.hexagonal.geografica.infrastructure.web.dto.GeograficaResponse;
 import um.haberes.core.hexagonal.geografica.infrastructure.web.mapper.GeograficaDtoMapper;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,11 +24,21 @@ public class GeograficaController {
     private final GeograficaService geograficaService;
     private final GeograficaDtoMapper geograficaDtoMapper;
 
+    @PostMapping
+    public ResponseEntity<GeograficaResponse> createGeografica(@Valid @RequestBody GeograficaRequest request) {
+        Geografica domain = geograficaDtoMapper.toDomain(request);
+        Geografica created = geograficaService.createGeografica(domain);
+        return new ResponseEntity<>(geograficaDtoMapper.toResponse(created), HttpStatus.CREATED);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<GeograficaResponse> getGeograficaById(@PathVariable Integer id) {
-        return geograficaService.getGeograficaById(id)
-                .map(geografica -> new ResponseEntity<>(geograficaDtoMapper.toResponse(geografica), HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        try {
+            Geografica geografica = geograficaService.getGeograficaById(id);
+            return ResponseEntity.ok(geograficaDtoMapper.toResponse(geografica));
+        } catch (GeograficaException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("/")
@@ -33,7 +46,7 @@ public class GeograficaController {
         List<GeograficaResponse> responses = geograficaService.getAllGeograficas().stream()
                 .map(geograficaDtoMapper::toResponse)
                 .collect(Collectors.toList());
-        return new ResponseEntity<>(responses, HttpStatus.OK);
+        return ResponseEntity.ok(responses);
     }
 
     @PostMapping("/ids")
@@ -41,14 +54,23 @@ public class GeograficaController {
         List<GeograficaResponse> responses = geograficaService.getGeograficasByIds(ids).stream()
                 .map(geograficaDtoMapper::toResponse)
                 .collect(Collectors.toList());
-        return new ResponseEntity<>(responses, HttpStatus.OK);
+        return ResponseEntity.ok(responses);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<GeograficaResponse> updateGeografica(@PathVariable Integer id, @RequestBody GeograficaRequest request) {
+    public ResponseEntity<GeograficaResponse> updateGeografica(@PathVariable Integer id, @Valid @RequestBody GeograficaRequest request) {
         Geografica domain = geograficaDtoMapper.toDomain(request);
-        return geograficaService.updateGeografica(id, domain)
-                .map(updated -> new ResponseEntity<>(geograficaDtoMapper.toResponse(updated), HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        try {
+            Geografica updated = geograficaService.updateGeografica(id, domain);
+            return ResponseEntity.ok(geograficaDtoMapper.toResponse(updated));
+        } catch (GeograficaException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteGeografica(@PathVariable Integer id) {
+        geograficaService.deleteGeografica(id);
+        return ResponseEntity.noContent().build();
     }
 }
