@@ -1,3 +1,17 @@
+## [1.12.0] - 2026-07-29
+- feat: Nuevos endpoints `POST /api/geograficas` (create) y `DELETE /api/geograficas/{id}` en GeograficaController con validación `@Valid`/`@NotBlank` (basado en `git diff HEAD`)
+- feat: Nuevos casos de uso `CreateGeograficaUseCase` y `DeleteGeograficaUseCase` con implementaciones en hexagonal (basado en `git diff HEAD`)
+- feat: Agregados `@NoArgsConstructor` y `@AllArgsConstructor` a `GeograficaRequest` para compatibilidad con serialización (basado en `git diff HEAD`)
+- refactor: `GetFacultadByIdUseCase.getById()` y `FacultadRepository.findById()/update()` cambian retorno a `Optional<T>` para manejo null-safe centralizado (basado en `git diff HEAD`)
+- refactor: `FacultadException` migrada de `um.haberes.core.exception` a `um.haberes.core.hexagonal.facultad.application.exception` (basado en `git diff HEAD`)
+- refactor: `FacultadResponse` migrada de `@Data` a `@Getter`/`@Setter` y `FacultadDtoMapper.toResponse()` a builder pattern (basado en `git diff HEAD`)
+- refactor: `GeograficaService` expone métodos sin `Optional`; las excepciones se manejan internamente con `GeograficaException` (basado en `git diff HEAD`)
+- refactor: `GeograficaController` usa `try-catch` + `ResponseStatusException` en lugar de `orElse` con `HttpStatus.NOT_FOUND` (basado en `git diff HEAD`)
+- refactor: `DesignacionToolService` simplificado al eliminar manejo de `Optional` en llamada a `getGeograficaById` (basado en `git diff HEAD`)
+- chore: Actualización de Kotlin de 2.4.0 a 2.4.10 (basado en `git diff HEAD` y `pom.xml`)
+- chore: Eliminado argumento del compilador Kotlin `-Xannotation-default-target=param-property` (basado en `git diff HEAD` y `pom.xml`)
+- docs: Corregida sintaxis de nodos con caracteres especiales en diagramas `arquitectura-general.mmd` y `flujo-liquidacion-general.mmd` (basado en validación con mermaid-diagram-generator skill)
+
 ## [1.11.1] - 2026-06-19
 - chore: Actualización de Spring Boot de 4.0.6 a 4.1.0 (basado en `git diff HEAD` y `pom.xml`)
 - chore: Actualización de Kotlin de 2.3.21 a 2.4.0 (basado en `git diff HEAD` y `pom.xml`)
