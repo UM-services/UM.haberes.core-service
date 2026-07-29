@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import um.haberes.core.exception.FacultadException;
+import um.haberes.core.hexagonal.facultad.application.exception.FacultadException;
 import um.haberes.core.hexagonal.facultad.application.service.FacultadService;
 import um.haberes.core.hexagonal.facultad.infrastructure.web.dto.FacultadResponse;
 import um.haberes.core.hexagonal.facultad.infrastructure.web.mapper.FacultadDtoMapper;

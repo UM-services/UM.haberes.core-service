@@ -2,7 +2,6 @@ package um.haberes.core.hexagonal.facultad.infrastructure.persistence.adapter;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import um.haberes.core.exception.FacultadException;
 import um.haberes.core.hexagonal.facultad.domain.model.Facultad;
 import um.haberes.core.hexagonal.facultad.domain.ports.out.FacultadRepository;
 import um.haberes.core.hexagonal.facultad.infrastructure.persistence.entity.FacultadEntity;
@@ -28,10 +27,9 @@ public class JpaFacultadRepositoryAdapter implements FacultadRepository {
     }
 
     @Override
-    public Facultad findById(Integer id) {
+    public Optional<Facultad> findById(Integer id) {
         return jpaFacultadRepository.findByFacultadId(id)
-                .map(facultadMapper::toDomainModel)
-                .orElseThrow(() -> new FacultadException(id));
+                .map(facultadMapper::toDomainModel);
     }
 
     @Override
@@ -49,14 +47,14 @@ public class JpaFacultadRepositoryAdapter implements FacultadRepository {
     }
 
     @Override
-    public Facultad update(Integer id, Facultad facultad) {
+    public Optional<Facultad> update(Integer id, Facultad facultad) {
         if (jpaFacultadRepository.existsById(id)) {
             FacultadEntity entity = facultadMapper.toEntity(facultad);
             entity.setFacultadId(id); // Ensure the ID is set for update
             FacultadEntity updatedEntity = jpaFacultadRepository.save(entity);
-            return facultadMapper.toDomainModel(updatedEntity);
+            return Optional.of(facultadMapper.toDomainModel(updatedEntity));
         }
-        throw new FacultadException(id);
+        return Optional.empty();
     }
 
     @Override

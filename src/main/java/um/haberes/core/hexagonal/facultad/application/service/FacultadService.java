@@ -2,6 +2,7 @@ package um.haberes.core.hexagonal.facultad.application.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import um.haberes.core.hexagonal.facultad.application.exception.FacultadException;
 import um.haberes.core.hexagonal.facultad.domain.model.Facultad;
 import um.haberes.core.hexagonal.facultad.domain.ports.in.*;
 
@@ -16,7 +17,8 @@ public class FacultadService {
     private final GetFacultadesFiltradasUseCase getFacultadesFiltradasUseCase;
 
     public Facultad getFacultadById(Integer id) {
-        return getFacultadByIdUseCase.getById(id);
+        return getFacultadByIdUseCase.getById(id)
+                .orElseThrow(() -> new FacultadException(id));
     }
 
     public List<Facultad> getAllFacultades() {

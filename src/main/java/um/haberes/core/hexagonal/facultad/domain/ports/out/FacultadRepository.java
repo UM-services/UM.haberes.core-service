@@ -6,9 +6,9 @@ import java.util.Optional;
 
 public interface FacultadRepository {
     Facultad create(Facultad facultad);
-    Facultad findById(Integer id);
+    Optional<Facultad> findById(Integer id);
     List<Facultad> findAll();
     List<Facultad> findAllIn(List<Integer> ids);
-    Facultad update(Integer id, Facultad facultad);
+    Optional<Facultad> update(Integer id, Facultad facultad);
     boolean deleteById(Integer id);
 }
