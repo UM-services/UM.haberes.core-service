@@ -2,8 +2,6 @@ package um.haberes.core.hexagonal.facultad.domain.model;
 
 import lombok.*;
 
-import java.time.OffsetDateTime;
-
 @Getter
 @Setter
 @Builder

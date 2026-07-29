@@ -11,15 +11,15 @@ public class FacultadDtoMapper {
         if (domain == null) {
             return null;
         }
-        FacultadResponse response = new FacultadResponse();
-        response.setFacultadId(domain.getFacultadId());
-        response.setNombre(domain.getNombre());
-        response.setReducido(domain.getReducido());
-        response.setServer(domain.getServer());
-        response.setBackendServer(domain.getBackendServer());
-        response.setBackendPort(domain.getBackendPort());
-        response.setDbName(domain.getDbName());
-        response.setDsn(domain.getDsn());
-        return response;
+        return FacultadResponse.builder()
+                .facultadId(domain.getFacultadId())
+                .nombre(domain.getNombre())
+                .reducido(domain.getReducido())
+                .server(domain.getServer())
+                .backendServer(domain.getBackendServer())
+                .backendPort(domain.getBackendPort())
+                .dbName(domain.getDbName())
+                .dsn(domain.getDsn())
+                .build();
     }
 }
