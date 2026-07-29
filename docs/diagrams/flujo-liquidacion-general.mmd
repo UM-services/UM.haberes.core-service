@@ -7,7 +7,7 @@ flowchart TD
     F --> G{Por cada persona}
     G -->|OK| H[MakeLiquidacionService.liquidacionByLegajoId]
     H --> I[Actualiza progreso en LiquidacionProceso]
-    G -->|Error| J[Log de error y continúa]
+    G -->|Error| J["Log de error y continúa"]
     I --> K{¿Todas procesadas?}
     K -- Sí --> L[Marca proceso como COMPLETED]
     K -- No --> G

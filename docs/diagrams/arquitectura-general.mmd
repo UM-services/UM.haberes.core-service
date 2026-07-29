@@ -1,15 +1,15 @@
 graph TD
     subgraph "Cliente"
-        A[Cliente/UI]
+        A["Cliente/UI"]
     end
 
     subgraph "API Layer (Infrastructure - Web)"
         B[Controladores REST]
-        C[DTOs / Mappers]
+        C["DTOs / Mappers"]
     end
 
     subgraph "Application Layer"
-        D[Services / Use Cases]
+        D["Services / Use Cases"]
     end
 
     subgraph "Domain Layer"
@@ -21,7 +21,7 @@ graph TD
     subgraph "Infrastructure - Persistence"
         H[Repository Adapters]
         I[JPA Repositories]
-        J[Entities / Mappers]
+        J["Entities / Mappers"]
     end
 
     subgraph "Servicios Externos"
