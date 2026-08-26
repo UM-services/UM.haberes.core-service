@@ -1,3 +1,9 @@
+## [1.13.0] - 2026-08-26
+- chore: Actualización de MySQL Connector/J de 9.7.0 a 26.7.0 (nuevo esquema de versionado) (basado en `git diff HEAD` y `pom.xml`)
+- chore: Actualización de springdoc-openapi de 3.0.3 a 3.1.0 (basado en `git diff HEAD` y `pom.xml`)
+- ci: Agregados workflows de despliegue continuo para ramas `develop` y `staging` con verificación Maven, build/push de imagen Docker y deploy automático (basado en `git diff HEAD`)
+- chore: Simplificación del ASCII art en `banner.txt` (basado en `git diff HEAD`)
+
 ## [1.12.0] - 2026-07-29
 - feat: Nuevos endpoints `POST /api/geograficas` (create) y `DELETE /api/geograficas/{id}` en GeograficaController con validación `@Valid`/`@NotBlank` (basado en `git diff HEAD`)
 - feat: Nuevos casos de uso `CreateGeograficaUseCase` y `DeleteGeograficaUseCase` con implementaciones en hexagonal (basado en `git diff HEAD`)

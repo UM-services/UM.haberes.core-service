@@ -5,7 +5,7 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**1.12.0** (2026-07-29)
+**1.13.0** (2026-08-26)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
@@ -20,9 +20,9 @@ _La versión se corresponde con la declarada en `pom.xml`._
 - Log4j2
 - Caffeine Cache
 - Jackson
-- MySQL Connector/J 9.7.0
+- MySQL Connector/J 26.7.0
 - Docker
-- Springdoc OpenAPI 3.0.3
+- Springdoc OpenAPI 3.1.0
 
 ## Diagramas principales
 
