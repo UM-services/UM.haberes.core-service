@@ -8,8 +8,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.core.kotlin.model.view.NovedadAcumulado;
-import um.haberes.core.repository.view.NovedadAcumuladoRepository;
+import um.haberes.core.model.view.NovedadAcumulado;
+import um.haberes.core.repository.view.JpaNovedadAcumuladoRepository;
 
 /**
  * @author daniel
@@ -19,7 +19,7 @@ import um.haberes.core.repository.view.NovedadAcumuladoRepository;
 public class NovedadAcumuladoService {
 
 	@Autowired
-	private NovedadAcumuladoRepository repository;
+	private JpaNovedadAcumuladoRepository repository;
 
 	public List<NovedadAcumulado> findAllByCodigo(Integer codigoId, Integer anho, Integer mes) {
 		return repository.findAllByCodigoIdAndAnhoAndMes(codigoId, anho, mes);

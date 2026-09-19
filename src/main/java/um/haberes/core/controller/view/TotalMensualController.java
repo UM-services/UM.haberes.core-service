@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.web.server.ResponseStatusException;
 import um.haberes.core.exception.view.TotalMensualException;
-import um.haberes.core.kotlin.model.view.TotalMensual;
+import um.haberes.core.model.view.TotalMensual;
 import um.haberes.core.service.view.TotalMensualService;
 
 /**

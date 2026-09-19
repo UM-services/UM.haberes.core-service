@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import um.haberes.core.exception.CargoClaseDetalleException;
-import um.haberes.core.kotlin.model.CargoClaseDetalle;
-import um.haberes.core.repository.CargoClaseDetalleRepository;
+import um.haberes.core.model.CargoClaseDetalleEntity;
+import um.haberes.core.repository.JpaCargoClaseDetalleRepository;
 
 /**
  * @author daniel
@@ -22,46 +22,46 @@ import um.haberes.core.repository.CargoClaseDetalleRepository;
 public class CargoClaseDetalleService {
 
 	@Autowired
-	private CargoClaseDetalleRepository repository;
+	private JpaCargoClaseDetalleRepository repository;
 
-	public List<CargoClaseDetalle> findAllByLegajo(Long legajoId, Integer anho, Integer mes) {
+	public List<CargoClaseDetalleEntity> findAllByLegajo(Long legajoId, Integer anho, Integer mes) {
 		return repository.findAllByLegajoIdAndAnhoAndMes(legajoId, anho, mes);
 	}
 
-	public List<CargoClaseDetalle> findAllByLegajoAndFacultad(Long legajoId, Integer anho, Integer mes, Integer facultadId) {
+	public List<CargoClaseDetalleEntity> findAllByLegajoAndFacultad(Long legajoId, Integer anho, Integer mes, Integer facultadId) {
 		return repository.findAllByLegajoIdAndAnhoAndMesAndFacultadId(legajoId, anho, mes, facultadId);
 	}
 
-	public List<CargoClaseDetalle> findAllByFacultad(Integer facultadId, Integer anho, Integer mes) {
+	public List<CargoClaseDetalleEntity> findAllByFacultad(Integer facultadId, Integer anho, Integer mes) {
 		return repository.findAllByFacultadIdAndAnhoAndMes(facultadId, anho, mes,
 				Sort.by("geograficaId").ascending().and(Sort.by("legajoId").ascending()));
 	}
 
-	public List<CargoClaseDetalle> findAllByCargoClaseDetalleIdIn(List<Long> cargoClaseDetalleIds) {
+	public List<CargoClaseDetalleEntity> findAllByCargoClaseDetalleIdIn(List<Long> cargoClaseDetalleIds) {
 		return repository.findAllByCargoClaseDetalleIdIn(cargoClaseDetalleIds);
 	}
 
-	public List<CargoClaseDetalle> findAllByCargoClasePeriodo(Long cargoClasePeriodoId) {
+	public List<CargoClaseDetalleEntity> findAllByCargoClasePeriodo(Long cargoClasePeriodoId) {
 		return repository.findAllByCargoClasePeriodoIdOrderByCargoClaseDetalleId(cargoClasePeriodoId);
 	}
 
-	public List<CargoClaseDetalle> findAllByCargoClase(Long cargoClaseId, Integer anho, Integer mes) {
+	public List<CargoClaseDetalleEntity> findAllByCargoClase(Long cargoClaseId, Integer anho, Integer mes) {
 		return repository.findAllByCargoClaseIdAndAnhoAndMesOrderByLegajoId(cargoClaseId, anho, mes);
 	}
 
-	public List<CargoClaseDetalle> saveAll(List<CargoClaseDetalle> detalles) {
+	public List<CargoClaseDetalleEntity> saveAll(List<CargoClaseDetalleEntity> detalles) {
 		repository.saveAll(detalles);
 		return detalles;
 	}
 
-	public CargoClaseDetalle add(CargoClaseDetalle cargoClaseDetalle) {
+	public CargoClaseDetalleEntity add(CargoClaseDetalleEntity cargoClaseDetalle) {
 		repository.save(cargoClaseDetalle);
 		return cargoClaseDetalle;
 	}
 
-	public CargoClaseDetalle update(CargoClaseDetalle newCargoClaseDetalle, Long cargoClaseDetalleId) {
+	public CargoClaseDetalleEntity update(CargoClaseDetalleEntity newCargoClaseDetalle, Long cargoClaseDetalleId) {
 		return repository.findByCargoClaseDetalleId(cargoClaseDetalleId).map(cargoClaseDetalle -> {
-			cargoClaseDetalle = new CargoClaseDetalle(
+			cargoClaseDetalle = new CargoClaseDetalleEntity(
 					cargoClaseDetalleId,
 					newCargoClaseDetalle.getLegajoId(),
 					newCargoClaseDetalle.getAnho(),

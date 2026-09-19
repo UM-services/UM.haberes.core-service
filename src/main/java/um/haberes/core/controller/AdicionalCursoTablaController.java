@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.core.exception.AdicionalCursoTablaException;
-import um.haberes.core.kotlin.model.AdicionalCursoTabla;
+import um.haberes.core.model.AdicionalCursoTablaEntity;
 import um.haberes.core.service.AdicionalCursoTablaService;
 
 /**
@@ -30,12 +30,12 @@ public class AdicionalCursoTablaController {
 	private AdicionalCursoTablaService service;
 	
 	@GetMapping("/")
-	public ResponseEntity<List<AdicionalCursoTabla>> findAll() {
+	public ResponseEntity<List<AdicionalCursoTablaEntity>> findAll() {
 		return new ResponseEntity<>(service.findAll(), HttpStatus.OK);
 	}
 
 	@GetMapping("/{adicionalCursoTablaId}")
-	public ResponseEntity<AdicionalCursoTabla> findByAdicionalCursoTablaId(@PathVariable Long adicionalCursoTablaId) {
+	public ResponseEntity<AdicionalCursoTablaEntity> findByAdicionalCursoTablaId(@PathVariable Long adicionalCursoTablaId) {
 		try {
 			return new ResponseEntity<>(service.findByAdicionalCursoTablaId(adicionalCursoTablaId),
 					HttpStatus.OK);

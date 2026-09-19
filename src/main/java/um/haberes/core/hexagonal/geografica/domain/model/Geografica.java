@@ -1,7 +1,6 @@
 package um.haberes.core.hexagonal.geografica.domain.model;
 
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
 
 import lombok.*;
 

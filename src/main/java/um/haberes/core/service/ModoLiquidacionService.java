@@ -3,26 +3,26 @@ package um.haberes.core.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import um.haberes.core.exception.ModoLiquidacionException;
-import um.haberes.core.kotlin.model.ModoLiquidacion;
-import um.haberes.core.repository.ModoLiquidacionRepository;
+import um.haberes.core.model.ModoLiquidacionEntity;
+import um.haberes.core.repository.JpaModoLiquidacionRepository;
 
 import java.util.List;
 
 @Service
 public class ModoLiquidacionService {
 
-    private final ModoLiquidacionRepository repository;
+    private final JpaModoLiquidacionRepository repository;
 
     @Autowired
-    public ModoLiquidacionService(ModoLiquidacionRepository repository) {
+    public ModoLiquidacionService(JpaModoLiquidacionRepository repository) {
         this.repository = repository;
     }
 
-    public List<ModoLiquidacion> findAll() {
+    public List<ModoLiquidacionEntity> findAll() {
         return repository.findAll();
     }
 
-    public ModoLiquidacion findByModoLiquidacionId(Integer modoLiquidacionId) {
+    public ModoLiquidacionEntity findByModoLiquidacionId(Integer modoLiquidacionId) {
         return repository.findByModoLiquidacionId(modoLiquidacionId).orElseThrow(() -> new ModoLiquidacionException(modoLiquidacionId));
     }
 

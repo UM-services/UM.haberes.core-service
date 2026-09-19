@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.DesignacionException;
-import um.haberes.core.kotlin.model.Designacion;
-import um.haberes.core.repository.DesignacionRepository;
+import um.haberes.core.model.DesignacionEntity;
+import um.haberes.core.repository.JpaDesignacionRepository;
 
 /**
  * @author daniel
@@ -20,13 +20,13 @@ import um.haberes.core.repository.DesignacionRepository;
 public class DesignacionService {
 
 	@Autowired
-	private DesignacionRepository repository;
+	private JpaDesignacionRepository repository;
 
-	public List<Designacion> findAllAsignables() {
+	public List<DesignacionEntity> findAllAsignables() {
 		return repository.findAllByCategoriaIdNotNull();
 	}
 
-	public Designacion findByDesignacionTipoIdAndCargoTipoIdAndAnualAndSemestral(Integer designacionTipoId,
+	public DesignacionEntity findByDesignacionTipoIdAndCargoTipoIdAndAnualAndSemestral(Integer designacionTipoId,
 			Integer cargoTipoId, Byte anual, Byte semestral) {
 		return repository
 				.findByDesignacionTipoIdAndCargoTipoIdAndAnualAndSemestral(designacionTipoId, cargoTipoId, anual,

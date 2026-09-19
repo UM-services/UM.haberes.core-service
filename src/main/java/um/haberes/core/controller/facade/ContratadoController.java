@@ -31,7 +31,7 @@ public class ContratadoController {
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=contratados.xlsx");
-        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.add("Cache-ControlEntity", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
         return ResponseEntity.ok().headers(headers).contentLength(file.length())

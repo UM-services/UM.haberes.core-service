@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.view.CargoClasePeriodoException;
-import um.haberes.core.kotlin.model.CargoClasePeriodo;
-import um.haberes.core.repository.CargoClasePeriodoRepository;
+import um.haberes.core.model.CargoClasePeriodoEntity;
+import um.haberes.core.repository.JpaCargoClasePeriodoRepository;
 
 /**
  * @author daniel
@@ -20,29 +20,29 @@ import um.haberes.core.repository.CargoClasePeriodoRepository;
 public class CargoClasePeriodoService {
 
 	@Autowired
-	private CargoClasePeriodoRepository repository;
+	private JpaCargoClasePeriodoRepository repository;
 
-	public List<CargoClasePeriodo> findAllByFacultad(Integer facultadId) {
+	public List<CargoClasePeriodoEntity> findAllByFacultad(Integer facultadId) {
 		return repository.findAllByFacultadIdOrderByLegajoId(facultadId);
 	}
 
-	public List<CargoClasePeriodo> findAllByLegajo(Long legajoId) {
+	public List<CargoClasePeriodoEntity> findAllByLegajo(Long legajoId) {
 		return repository.findAllByLegajoIdOrderByCargoClasePeriodoIdDesc(legajoId);
 	}
 
-	public CargoClasePeriodo findByCargoClasePeriodoId(Long cargoClasePeriodoId) {
+	public CargoClasePeriodoEntity findByCargoClasePeriodoId(Long cargoClasePeriodoId) {
 		return repository.findByCargoClasePeriodoId(cargoClasePeriodoId)
 				.orElseThrow(() -> new CargoClasePeriodoException(cargoClasePeriodoId));
 	}
 
-	public CargoClasePeriodo add(CargoClasePeriodo cargoClasePeriodo) {
+	public CargoClasePeriodoEntity add(CargoClasePeriodoEntity cargoClasePeriodo) {
 		repository.save(cargoClasePeriodo);
 		return cargoClasePeriodo;
 	}
 
-	public CargoClasePeriodo update(CargoClasePeriodo newCargoClasePeriodo, Long cargoClasePeriodoId) {
+	public CargoClasePeriodoEntity update(CargoClasePeriodoEntity newCargoClasePeriodo, Long cargoClasePeriodoId) {
 		return repository.findByCargoClasePeriodoId(cargoClasePeriodoId).map(cargoClasePeriodo -> {
-			cargoClasePeriodo = new CargoClasePeriodo(
+			cargoClasePeriodo = new CargoClasePeriodoEntity(
 					cargoClasePeriodoId,
 					newCargoClasePeriodo.getLegajoId(),
 					newCargoClasePeriodo.getCargoClaseId(),

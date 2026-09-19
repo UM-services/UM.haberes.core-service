@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import um.haberes.core.exception.CodigoGrupoException;
-import um.haberes.core.kotlin.model.CodigoGrupo;
-import um.haberes.core.repository.CodigoGrupoRepository;
+import um.haberes.core.model.CodigoGrupoEntity;
+import um.haberes.core.repository.JpaCodigoGrupoRepository;
 
 /**
  * @author daniel
@@ -20,43 +20,43 @@ import um.haberes.core.repository.CodigoGrupoRepository;
 @Service
 public class CodigoGrupoService {
 
-	private final CodigoGrupoRepository repository;
+	private final JpaCodigoGrupoRepository repository;
 
-	public CodigoGrupoService(CodigoGrupoRepository repository) {
+	public CodigoGrupoService(JpaCodigoGrupoRepository repository) {
 		this.repository = repository;
 	}
 
 	@Cacheable("codigos_grupos")
-	public List<CodigoGrupo> findAll() {
+	public List<CodigoGrupoEntity> findAll() {
 		return repository.findAll();
 	}
 
-	public List<CodigoGrupo> findAllByNoRemunerativo(Byte noRemunerativo) {
+	public List<CodigoGrupoEntity> findAllByNoRemunerativo(Byte noRemunerativo) {
 		return repository.findAllByNoRemunerativoOrderByCodigoId(noRemunerativo);
 	}
 
-	public List<CodigoGrupo> findAllByRemunerativo(Byte remunerativo) {
+	public List<CodigoGrupoEntity> findAllByRemunerativo(Byte remunerativo) {
 		return repository.findAllByRemunerativoOrderByCodigoId(remunerativo);
 	}
 
-	public List<CodigoGrupo> findAllByDeduccion(Byte deduccion) {
+	public List<CodigoGrupoEntity> findAllByDeduccion(Byte deduccion) {
 		return repository.findAllByDeduccionOrderByCodigoId(deduccion);
 	}
 
-	public CodigoGrupo findByCodigoId(Integer codigoId) {
+	public CodigoGrupoEntity findByCodigoId(Integer codigoId) {
 		return repository.findByCodigoId(codigoId).orElseThrow(() -> new CodigoGrupoException(codigoId));
 	}
 
 	@CacheEvict(value = "codigos_grupos", allEntries = true)
-	public CodigoGrupo add(CodigoGrupo codigoGrupo) {
+	public CodigoGrupoEntity add(CodigoGrupoEntity codigoGrupo) {
 		repository.save(codigoGrupo);
 		return codigoGrupo;
 	}
 
 	@CacheEvict(value = "codigos_grupos", allEntries = true)
-	public CodigoGrupo update(CodigoGrupo newCodigoGrupo, Integer codigoId) {
+	public CodigoGrupoEntity update(CodigoGrupoEntity newCodigoGrupo, Integer codigoId) {
 		return repository.findById(codigoId).map(codigoGrupo -> {
-			codigoGrupo = new CodigoGrupo(codigoId, newCodigoGrupo.getRemunerativo(),
+			codigoGrupo = new CodigoGrupoEntity(codigoId, newCodigoGrupo.getRemunerativo(),
 					newCodigoGrupo.getNoRemunerativo(), newCodigoGrupo.getDeduccion(), newCodigoGrupo.getTotal(),
 					newCodigoGrupo.getCodigo());
 			repository.save(codigoGrupo);

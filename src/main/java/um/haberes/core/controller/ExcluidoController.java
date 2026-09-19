@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.core.exception.ExcluidoException;
-import um.haberes.core.kotlin.model.Excluido;
+import um.haberes.core.model.ExcluidoEntity;
 import um.haberes.core.service.ExcluidoService;
 
 /**
@@ -34,28 +34,28 @@ public class ExcluidoController {
 	private ExcluidoService service;
 
 	@GetMapping("/periodo/{anho}/{mes}")
-	public ResponseEntity<List<Excluido>> findAllByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes) {
-		return new ResponseEntity<List<Excluido>>(service.findAllByPeriodo(anho, mes), HttpStatus.OK);
+	public ResponseEntity<List<ExcluidoEntity>> findAllByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes) {
+		return new ResponseEntity<List<ExcluidoEntity>>(service.findAllByPeriodo(anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/unique/{legajoId}/{anho}/{mes}")
-	public ResponseEntity<Excluido> findByUnique(@PathVariable Long legajoId, @PathVariable Integer anho,
+	public ResponseEntity<ExcluidoEntity> findByUnique(@PathVariable Long legajoId, @PathVariable Integer anho,
 			@PathVariable Integer mes) {
 		try {
-			return new ResponseEntity<Excluido>(service.findByUnique(legajoId, anho, mes), HttpStatus.OK);
+			return new ResponseEntity<ExcluidoEntity>(service.findByUnique(legajoId, anho, mes), HttpStatus.OK);
 		} catch (ExcluidoException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
 
 	@PostMapping("/")
-	public ResponseEntity<Excluido> add(@RequestBody Excluido excluido) {
-		return new ResponseEntity<Excluido>(service.add(excluido), HttpStatus.OK);
+	public ResponseEntity<ExcluidoEntity> add(@RequestBody ExcluidoEntity excluido) {
+		return new ResponseEntity<ExcluidoEntity>(service.add(excluido), HttpStatus.OK);
 	}
 
 	@PutMapping("/{excluidoId}")
-	public ResponseEntity<Excluido> update(@RequestBody Excluido excluido, @PathVariable Long excluidoId) {
-		return new ResponseEntity<Excluido>(service.update(excluido, excluidoId), HttpStatus.OK);
+	public ResponseEntity<ExcluidoEntity> update(@RequestBody ExcluidoEntity excluido, @PathVariable Long excluidoId) {
+		return new ResponseEntity<ExcluidoEntity>(service.update(excluido, excluidoId), HttpStatus.OK);
 	}
 
 	@DeleteMapping("/unique/{legajoId}/{anho}/{mes}")

@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.ClaseException;
-import um.haberes.core.kotlin.model.Clase;
-import um.haberes.core.repository.ClaseRepository;
+import um.haberes.core.model.ClaseEntity;
+import um.haberes.core.repository.JpaClaseRepository;
 
 /**
  * @author daniel
@@ -19,22 +19,22 @@ import um.haberes.core.repository.ClaseRepository;
 @Service
 public class ClaseService {
 
-	private final ClaseRepository repository;
+	private final JpaClaseRepository repository;
 
 	@Autowired
-	public ClaseService(ClaseRepository repository) {
+	public ClaseService(JpaClaseRepository repository) {
 		this.repository = repository;
 	}
 
-	public List<Clase> findAll() {
+	public List<ClaseEntity> findAll() {
 		return repository.findAll();
 	}
 
-	public Clase findLast() {
+	public ClaseEntity findLast() {
 		return repository.findTopByOrderByClaseIdDesc().orElseThrow(() -> new ClaseException());
 	}
 
-	public Clase findByClaseId(Integer claseId) {
+	public ClaseEntity findByClaseId(Integer claseId) {
 		return repository.findByClaseId(claseId).orElseThrow(() -> new ClaseException(claseId));
 	}
 
@@ -42,14 +42,14 @@ public class ClaseService {
 		repository.deleteById(claseId);
 	}
 
-	public Clase add(Clase clase) {
+	public ClaseEntity add(ClaseEntity clase) {
 		repository.save(clase);
 		return clase;
 	}
 
-	public Clase update(Clase newClase, Integer claseId) {
+	public ClaseEntity update(ClaseEntity newClase, Integer claseId) {
 		return repository.findByClaseId(claseId).map(clase -> {
-			clase = new Clase(claseId, newClase.getNombre(), newClase.getValorHora());
+			clase = new ClaseEntity(claseId, newClase.getNombre(), newClase.getValorHora());
 			repository.save(clase);
 			return clase;
 		}).orElseThrow(() -> new ClaseException(claseId));

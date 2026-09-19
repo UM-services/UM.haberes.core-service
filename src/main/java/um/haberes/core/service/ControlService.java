@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import um.haberes.core.exception.ControlException;
-import um.haberes.core.kotlin.model.Control;
-import um.haberes.core.repository.ControlRepository;
+import um.haberes.core.model.ControlEntity;
+import um.haberes.core.repository.JpaControlRepository;
 
 /**
  * @author daniel
@@ -18,28 +18,28 @@ import um.haberes.core.repository.ControlRepository;
 @Service
 public class ControlService {
 
-    private final ControlRepository repository;
+    private final JpaControlRepository repository;
 
     @Autowired
-    public ControlService(ControlRepository repository) {
+    public ControlService(JpaControlRepository repository) {
         this.repository = repository;
     }
 
     @Cacheable("controles")
-    public Control findByPeriodo(Integer anho, Integer mes) {
+    public ControlEntity findByPeriodo(Integer anho, Integer mes) {
         return repository.findByAnhoAndMes(anho, mes).orElseThrow(() -> new ControlException(anho, mes));
     }
 
     @CacheEvict(value = "controles", allEntries = true)
-    public Control add(Control control) {
+    public ControlEntity add(ControlEntity control) {
         repository.save(control);
         return control;
     }
 
     @CacheEvict(value = "controles", allEntries = true)
-    public Control update(Control newControl, Long controlId) {
+    public ControlEntity update(ControlEntity newControl, Long controlId) {
         return repository.findByControlId(controlId).map(control -> {
-            control = new Control(
+            control = new ControlEntity(
                     controlId,
                     newControl.getAnho(),
                     newControl.getMes(),

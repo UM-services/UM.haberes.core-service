@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.core.exception.UsuarioException;
-import um.haberes.core.kotlin.model.Usuario;
+import um.haberes.core.model.UsuarioEntity;
 import um.haberes.core.service.UsuarioService;
 
 /**
@@ -30,7 +30,7 @@ public class UsuarioController {
     private final UsuarioService service;
 
     @GetMapping("/{legajoId}")
-    public ResponseEntity<Usuario> findByLegajoId(@PathVariable Long legajoId) {
+    public ResponseEntity<UsuarioEntity> findByLegajoId(@PathVariable Long legajoId) {
         try {
             return new ResponseEntity<>(service.findByLegajoId(legajoId), HttpStatus.OK);
         } catch (UsuarioException e) {
@@ -39,7 +39,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/lastlog/{legajoId}/{build}")
-    public ResponseEntity<Usuario> updateLastLog(@PathVariable Long legajoId, @PathVariable Long build) {
+    public ResponseEntity<UsuarioEntity> updateLastLog(@PathVariable Long legajoId, @PathVariable Long build) {
         try {
             return new ResponseEntity<>(service.updateLastLog(legajoId, build), HttpStatus.OK);
         } catch (UsuarioException e) {
@@ -48,12 +48,12 @@ public class UsuarioController {
     }
 
     @PutMapping("/isuservalid")
-    public ResponseEntity<Boolean> isUserValid(@RequestBody Usuario usuario) {
+    public ResponseEntity<Boolean> isUserValid(@RequestBody UsuarioEntity usuario) {
         return new ResponseEntity<>(service.isUserValid(usuario), HttpStatus.OK);
     }
 
     @PutMapping("/setpassword")
-    public ResponseEntity<Void> setPassword(@RequestBody Usuario usuario) {
+    public ResponseEntity<Void> setPassword(@RequestBody UsuarioEntity usuario) {
         service.setPassword(usuario);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
