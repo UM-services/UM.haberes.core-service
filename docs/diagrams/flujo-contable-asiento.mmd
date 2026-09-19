@@ -1,0 +1,40 @@
+---
+title: "Cierre Contable por Legajo (generación de imputaciones y asiento)"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant Ctrl as ContableController
+    participant Svc as ContableService (facade)
+    participant LiqSvc as LiquidacionService (hexagonal)
+    participant CodigoGrupos as CodigoGrupoService / ItemService
+    participant Imputacion as Servicios de Imputación (hexagonal)
+    participant LegCtrl as LegajoContabilidadService (hexagonal)
+    participant CuentaCli as CuentaMovimientoClient (OpenFeign)
+
+    Usuario->>Ctrl: GET /contable/generatelegajo/{legajoId}/{anho}/{mes}
+    Ctrl->>Svc: generateByLegajo(legajoId, anho, mes)
+    Svc->>LiqSvc: getLiquidacionByUniqueKey(legajoId, anho, mes)
+    Svc->>CodigoGrupos: getItemsByLegajoAndCodigos(remunerativos + no remunerativos)
+    Svc->>Svc: designacionToolService.indiceAntiguedad(...)
+    Svc->>Imputacion: deleteAllByLegajo(legajoId, anho, mes) (reinicio)
+    loop por cada CargoLiquidacion y detalle de cargo_clase
+        Svc->>Imputacion: updateCategoriaImputacion / updateCargoClaseImputacion
+        Svc->>Imputacion: legajoCategoriaImputacionService.add(...)
+        Svc->>Imputacion: legajoCargoClaseImputacionService.add(...)
+    end
+    loop por cada Item imputable
+        Svc->>Imputacion: createCodigoImputacion / updateCodigoImputacion
+        Svc->>Imputacion: legajoCodigoImputacionService.add(...)
+    end
+    Svc->>LegCtrl: save(LegajoContabilidad con diferencia)
+
+    Usuario->>Ctrl: DELETE /contable/deletelegajo/{legajoId}/{anho}/{mes}
+    Ctrl->>Svc: deleteAllByLegajo(...) (reversión de imputaciones)
+    Usuario->>Ctrl: DELETE /contable/deleteperiodo/{anho}/{mes}
+    Ctrl->>Svc: deleteAllByPeriodo(...) (reversión masiva del período)
+
+    Usuario->>Ctrl: GET /contable/asiento/{fechaContable}/{ordenContable}
+    Ctrl->>Svc: findAllByAsiento(fecha, orden)
+    Svc->>CuentaCli: obtener movimientos contables del asiento
+    CuentaCli-->>Usuario: List~CuentaMovimientoDto~ (servicio externo de cuentas)

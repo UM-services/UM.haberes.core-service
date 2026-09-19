@@ -2,17 +2,17 @@ sequenceDiagram
     participant Usuario
     participant LegajoBancoController
     participant LegajoBancoService
-    participant NovedadService
+    participant NovedadService as NovedadService (hexagonal)
     participant LegajoBancoRepository
 
-    Usuario->>LegajoBancoController: GET /santander/{salida}/{anho}/{mes}/{dependenciaId}/codigo/{codigoId}
+    Usuario->>LegajoBancoController: GET /api/haberes/core/legajobanco/santander/{salida}/{anho}/{mes}/{dependenciaId}/codigo/{codigoId}
     LegajoBancoController->>LegajoBancoService: findAllSantanderConCodigo(salida, anho, mes, dependenciaId, codigoId)
     LegajoBancoService->>NovedadService: findAllByCodigo(codigoId, anho, mes)
-    NovedadService-->>LegajoBancoService: Lista de legajoIds
+    NovedadService-->>LegajoBancoService: List~long~ de legajoIds
     LegajoBancoService->>LegajoBancoRepository: findAllByLegajoIdInAndAnhoAndMesAndCbuLike(legajoIds, anho, mes, "072%")
-    LegajoBancoRepository-->>LegajoBancoService: Lista de LegajoBanco (Santander)
+    LegajoBancoRepository-->>LegajoBancoService: List~LegajoBancoEntity~ (Santander)
     LegajoBancoService->>LegajoBancoService: Filtrar por dependenciaId y salida
     LegajoBancoService-->>LegajoBancoController: Lista filtrada
-    LegajoBancoController-->>Usuario: Lista de LegajoBanco
+    LegajoBancoController-->>Usuario: 200 OK (List~LegajoBancoEntity~)
 
-    Note over Usuario,LegajoBancoController: Similar flujo para /otrosbancos/{salida}/{anho}/{mes}/{dependenciaId}/codigo/{codigoId}<br/>con CBU not like "072%"
+    Note over Usuario,LegajoBancoController: Similar flujo para /api/haberes/core/legajobanco/otrosbancos/{salida}/{anho}/{mes}/{dependenciaId}/codigo/{codigoId}<br/>con findAllByLegajoIdInAndAnhoAndMesAndCbuNotLike (CBU not like "072%")

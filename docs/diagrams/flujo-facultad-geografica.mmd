@@ -1,0 +1,32 @@
+---
+title: "Facultades y Sedes Geográficas (maestros organizacionales)"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant FacCtrl as FacultadController
+    participant FacSvc as FacultadService (hexagonal)
+    participant GeoCtrl as GeograficaController
+    participant GeoSvc as GeograficaService (hexagonal)
+    participant Adapt as Jpa*RepositoryAdapter (hexagonal)
+    participant DB as MySQL
+
+    Usuario->>FacCtrl: GET /facultad/ o GET /facultad/{facultadId}
+    FacCtrl->>FacSvc: getAllFacultades() / getFacultadById(id)
+    FacSvc->>Adapt: findById / findAll (Optional null-safe)
+    Usuario->>FacCtrl: GET /facultad/facultades (listado estático para formularios)
+    FacCtrl->>FacSvc: getFacultadesEstaticas()
+
+    Usuario->>GeoCtrl: GET /geograficas/{id} o GET /geograficas/
+    GeoCtrl->>GeoSvc: getGeograficaById(id) / getAllGeograficas()
+    Usuario->>GeoCtrl: POST /geograficas/ids (consulta batch por ids)
+    GeoCtrl->>GeoSvc: getGeograficasByIds(ids)
+    GeoSvc->>Adapt: findAllById (IN variable)
+    Usuario->>GeoCtrl: POST /geograficas (create con validación @Valid)
+    GeoCtrl->>GeoSvc: createGeografica(geografica)
+    Usuario->>GeoCtrl: PUT /geograficas/{id}
+    GeoCtrl->>GeoSvc: updateGeografica(id, geografica)
+    Usuario->>GeoCtrl: DELETE /geograficas/{id}
+    GeoCtrl->>GeoSvc: deleteGeografica(id)
+    GeoSvc->>Adapt: delete + confirmación booleana
+    Adapt->>DB: INSERT/UPDATE/DELETE geografica

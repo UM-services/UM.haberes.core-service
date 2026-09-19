@@ -1,0 +1,40 @@
+---
+title: "Herramientas de Designación y Cargos de Clase"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant DCtrl as DesignacionToolController
+    participant DSvc as DesignacionToolService (facade)
+    participant CCtrl as CargoClaseToolController
+    participant CSvc as CargoClaseToolService (facade)
+    participant Cursos as CursoCargo/CursoFusion/CursoDesarraigo (hexagonal)
+    participant Periodo as CargoClasePeriodo/Detalle (legacy)
+    participant DB as MySQL
+
+    Usuario->>DCtrl: GET /designaciontool/convertirbylegajo/{legajoId}/{anho}/{mes}
+    DCtrl->>DSvc: convertirGradoByLegajo(...) (pasa designaciones de curso a cargo del período)
+    DSvc->>Cursos: leer curso_cargo vigentes y crear cargo_liquidacion
+    Usuario->>DCtrl: GET /designaciontool/redesignarbylegajo/{legajoId}/{anho}/{mes}
+    DCtrl->>DSvc: redesignarGradoByLegajo(...) (recalcula designaciones)
+    Usuario->>DCtrl: (vía UI) fusionar por legajo o por facultad
+    DCtrl->>DSvc: fusionarGradoByLegajo / fusionarGradoByFacultad (+anual/semestral)
+    DSvc->>Cursos: alta/baja de curso_fusion según horarios coincidentes
+    Usuario->>DCtrl: GET /designaciontool/desarraigobylegajo/{legajoId}/{anho}/{mes}
+    DCtrl->>DSvc: desarraigoGradoByLegajo(...)
+    Usuario->>DCtrl: GET /designaciontool/deletezombies/{anho}/{mes}
+    DCtrl->>DSvc: deleteZombies(anho, mes) (limpia cargos sin designación vigente)
+    Usuario->>DCtrl: GET /designaciontool/indiceantiguedad/{legajoId}/{anho}/{mes}
+    DCtrl->>DSvc: indiceAntiguedad(...) → List~BigDecimal~ (usado por cierre contable y liquidación)
+
+    Note over Usuario,DB: Cargos de clase ETEC (docentes con horas cátedra)
+
+    Usuario->>CCtrl: POST /cargoclasetool/ (nuevo cargo de clase período)
+    CCtrl->>CSvc: addCargo(cargoClasePeriodo)
+    Usuario->>CCtrl: PUT /cargoclasetool/{cargoClasePeriodoId}/{anhoHasta}/{mesHasta}
+    CCtrl->>CSvc: changeHasta(...) (extiende o recorta vigencia)
+    Usuario->>CCtrl: DELETE /cargoclasetool/{cargoClasePeriodoId}
+    CCtrl->>CSvc: deleteCargo(...)
+    Usuario->>CCtrl: GET /cargoclasetool/update/periodo/{anho}/{mes}
+    CCtrl->>CSvc: updateValorHora(anho, mes) (actualiza valor hora del período)
+    CSvc->>Periodo: persistir cargo_clase_periodo y detalle

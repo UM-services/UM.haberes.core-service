@@ -1,0 +1,28 @@
+---
+title: "Dependencias (cruce Facultad x Geográfica)"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant Ctrl as DependenciaController
+    participant Svc as DependenciaService (hexagonal)
+    participant UC as Use Cases (ports/in)
+    participant Adapt as JpaDependenciaRepositoryAdapter
+    participant DB as MySQL
+
+    Usuario->>Ctrl: GET /dependencia/
+    Ctrl->>Svc: findAll()
+    Svc->>UC: GetAllDependenciasUseCase
+    UC->>Adapt: findAll
+    Adapt->>DB: SELECT dependencia (+facultad, +geografica)
+    Usuario->>Ctrl: GET /dependencia/{dependenciaId}
+    Ctrl->>Svc: findByDependenciaId(dependenciaId)
+    Svc->>UC: GetDependenciaByIdUseCase
+    Usuario->>Ctrl: GET /dependencia/context/{facultadId}/{geograficaId}
+    Ctrl->>Svc: findFirstByFacultadIdAndGeograficaId(...)
+    Svc->>UC: GetDependenciaByFacultadAndGeograficaUseCase
+    Usuario->>Ctrl: GET /dependencia/facultad/{facultadId}/{geograficaId}
+    Ctrl->>Svc: findAllByFacultadIdAndGeograficaId(...)
+    Svc->>UC: GetDependenciasByFacultadAndGeograficaUseCase
+
+    Note over Usuario,DB: Las dependencias son estáticas (solo lectura, sin endpoints de escritura)

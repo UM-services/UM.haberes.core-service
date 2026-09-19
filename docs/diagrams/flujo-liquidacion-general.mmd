@@ -1,14 +1,15 @@
 flowchart TD
-    A[Inicio: Solicitud de liquidación general] --> B[MakeLiquidacionGeneralController]
+    A["Inicio: GET /api/haberes/core/makeLiquidacionGeneral/general/{anho}/{mes}/{force}"] --> B[MakeLiquidacionGeneralController]
     B --> C[MakeLiquidacionGeneralService]
-    C --> D[Obtiene lista de personas liquidables]
-    D --> E[LiquidacionProcesoService.crearProceso]
-    E --> F[LiquidacionProcessor.procesarLiquidaciones]
-    F --> G{Por cada persona}
+    C --> D["PersonaService.findAllLiquidables() (hexagonal)"]
+    D --> E["LiquidacionProcesoService.crearProceso(total)"]
+    E --> F["LiquidacionProcessor.procesarLiquidaciones"]
+    F --> G{"Por cada persona"}
     G -->|OK| H[MakeLiquidacionService.liquidacionByLegajoId]
-    H --> I[Actualiza progreso en LiquidacionProceso]
+    H --> I["Actualiza progreso en LiquidacionProceso"]
     G -->|Error| J["Log de error y continúa"]
-    I --> K{¿Todas procesadas?}
-    K -- Sí --> L[Marca proceso como COMPLETED]
+    I --> K{"¿Todas procesadas?"}
+    K -- Sí --> L["Marca proceso como COMPLETED"]
     K -- No --> G
-    L --> M[Fin]
+    L --> M["Fin: devuelve proceso con progreso"]
+    M --> N["Seguimiento: GET /general/progress/{procesoId}"]

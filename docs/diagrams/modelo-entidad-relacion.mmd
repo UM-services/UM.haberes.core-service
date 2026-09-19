@@ -1,61 +1,173 @@
 erDiagram
-    PERSONA ||--o{ CARGO : "tiene"
-    PERSONA ||--o{ LEGAJO_BANCO : "tiene"
     FACULTAD ||--o{ DEPENDENCIA : "agrupa"
-    DEPENDENCIA ||--o{ CARGO : "pertenece a"
-    CARGO ||--o{ LIQUIDACION : "se liquida en"
-    CARGO ||--o{ NOVEDAD : "tiene"
-    CURSO ||--o{ CARGO : "asociado a"
-    
+    GEOGRAFICA ||--o{ DEPENDENCIA : "ubica"
+    DEPENDENCIA ||--o{ PERSONA : "agrupa"
+    PERSONA ||--o{ LIQUIDACION : "se liquida en"
+    PERSONA ||--o{ LIQUIDACION_VERSION : "historiza"
+    PERSONA ||--o{ CARGO_LIQUIDACION : "ejerce"
+    PERSONA ||--o{ NOVEDAD : "registra"
+    PERSONA ||--o{ ITEM : "genera"
+    PERSONA ||--o{ LETRA : "recibe"
+    PERSONA ||--o{ LEGAJO_BANCO : "cobra en"
+    PERSONA ||--o{ CURSO_CARGO : "asigna"
+    CODIGO ||--o{ NOVEDAD : "clasifica"
+    CODIGO ||--o{ ITEM : "clasifica"
+    CATEGORIA ||--o{ CARGO_LIQUIDACION : "remunera"
+    CATEGORIA ||--o{ CURSO_CARGO : "clasifica"
+    DEPENDENCIA ||--o{ LIQUIDACION : "imputa"
+    DEPENDENCIA ||--o{ CARGO_LIQUIDACION : "contiene"
+    DEPENDENCIA ||--o{ NOVEDAD : "origina"
+    FACULTAD ||--o{ CURSO : "ofrece"
+    GEOGRAFICA ||--o{ CURSO : "ubica"
+    CURSO ||--o{ CURSO_CARGO : "dictado"
+
     PERSONA {
-        int id
-        string nombre
+        long legajo_id PK
+        decimal documento
         string apellido
+        string nombre
         string cuil
-    }
-
-    CARGO {
-        int id
-        string descripcion
-        date fecha_alta
-        int persona_id
-        int dependencia_id
-    }
-
-    LIQUIDACION {
-        int id
-        date fecha
-        float monto
-        int cargo_id
-    }
-
-    NOVEDAD {
-        int id
-        string tipo
-        string descripcion
-        date fecha
-        int cargo_id
+        int dependencia_id FK
+        string liquida
     }
 
     DEPENDENCIA {
-        int id
-        string nombre
-        int facultad_id
+        int dependencia_id PK
+        int facultad_id FK
+        int geografica_id FK
     }
 
     FACULTAD {
-        int id
+        int facultad_id PK
         string nombre
     }
 
-    CURSO {
-        int id
+    GEOGRAFICA {
+        int geografica_id PK
         string nombre
+    }
+
+    LIQUIDACION {
+        long liquidacion_id PK
+        long legajo_id FK
+        int dependencia_id FK
+        int anho
+        int mes
+        decimal total_remunerativo
+        decimal total_no_remunerativo
+        decimal total_deduccion
+        decimal total_neto
+        byte bloqueado
+    }
+
+    LIQUIDACION_VERSION {
+        long liquidacion_version_id PK
+        long legajo_id FK
+        int anho
+        int mes
+        int version
+        decimal total_neto
+    }
+
+    CARGO_LIQUIDACION {
+        long cargo_liquidacion_id PK
+        long legajo_id FK
+        int dependencia_id FK
+        int categoria_id FK
+        int anho
+        int mes
+        date fecha_desde
+        date fecha_hasta
+        int jornada
+    }
+
+    CATEGORIA {
+        int categoria_id PK
+        string nombre
+        decimal basico
+        byte docente
+        byte no_docente
+    }
+
+    NOVEDAD {
+        long novedad_id PK
+        long legajo_id FK
+        int codigo_id FK
+        int dependencia_id FK
+        int anho
+        int mes
+        decimal importe
+        byte importado
+    }
+
+    CODIGO {
+        int codigo_id PK
+        string nombre
+        byte docente
+        byte no_docente
+        byte transferible
+    }
+
+    ITEM {
+        long item_id PK
+        long legajo_id FK
+        int codigo_id FK
+        int anho
+        int mes
+        decimal importe
+    }
+
+    LETRA {
+        long letra_id PK
+        long legajo_id FK
+        int anho
+        int mes
+        decimal neto
+        string cadena
     }
 
     LEGAJO_BANCO {
-        int id
+        long legajo_banco_id PK
+        long legajo_id FK
+        int anho
+        int mes
         string cbu
-        string banco
-        int persona_id
+        decimal acreditado
+    }
+
+    ACREDITACION {
+        long acreditacion_id PK
+        int anho
+        int mes
+        byte acreditado
+        date limite_novedades
+    }
+
+    ACREDITACION_PAGO {
+        long acreditacion_pago_id PK
+        int anho
+        int mes
+        date fecha_pago
+        decimal total_santander
+        decimal total_otros_bancos
+    }
+
+    CURSO {
+        long curso_id PK
+        string nombre
+        int facultad_id FK
+        int geografica_id FK
+        int nivel_id FK
+    }
+
+    CURSO_CARGO {
+        long curso_cargo_id PK
+        long curso_id FK
+        long legajo_id FK
+        int cargo_tipo_id FK
+        int designacion_tipo_id FK
+        int categoria_id FK
+        int anho
+        int mes
+        decimal horas_totales
     }

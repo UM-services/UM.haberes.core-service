@@ -1,0 +1,37 @@
+---
+title: "Gestión de Novedades de Liquidación"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant Ctrl as NovedadController
+    participant UpCtrl as NovedadUploadController
+    participant Svc as NovedadService (hexagonal)
+    participant UC as Use Cases (ports/in)
+    participant Adapt as JpaNovedadRepositoryAdapter
+    participant DB as MySQL
+
+    Usuario->>Ctrl: GET /novedad/legajo/{legajoId}/{anho}/{mes}
+    Ctrl->>Svc: findAllByLegajo(legajoId, anho, mes)
+    Svc->>UC: GetNovedadesByLegajoUseCase
+    UC->>Adapt: findByLegajo
+    Usuario->>Ctrl: GET /novedad/codigo/{codigoId}/{anho}/{mes}
+    Ctrl->>Svc: findAllByCodigo(codigoId, anho, mes)
+    Usuario->>Ctrl: GET /novedad/importado/{importado}/{anho}/{mes}
+    Ctrl->>Svc: findAllByImportado(...) (novedades traídas del período anterior)
+    Usuario->>Ctrl: GET /novedad/unique/{legajoId}/{anho}/{mes}/{codigoId}/{dependenciaId}
+    Ctrl->>Svc: findByUnique(...) / findByUniqueWithoutDependencia(...)
+
+    Note over Usuario,DB: Alta, actualización, guardado masivo y baja
+
+    Usuario->>Ctrl: POST /novedad/ (NovedadRequest)
+    Ctrl->>Svc: add(novedad)
+    Usuario->>Ctrl: PUT /novedad/{novedadId}
+    Ctrl->>Svc: update(novedad, novedadId)
+    Usuario->>Ctrl: DELETE /novedad/periodo/{anho}/{mes}
+    Ctrl->>Svc: deleteAllByPeriodo(anho, mes)
+
+    Note over UpCtrl,DB: Carga masiva: pendientes importados desde planilla
+
+    Usuario->>UpCtrl: GET /novedadupload/pendiente/{anho}/{mes}/{pendiente}
+    UpCtrl->>DB: SELECT novedad_upload (ver flujo-novedad-file.mmd)

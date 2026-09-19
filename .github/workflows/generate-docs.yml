@@ -74,12 +74,7 @@ jobs:
                   <p>Última actualización: <span id="update-date"></span></p>
               </div>
               <div id="stats" class="stats"></div>
-              <div id="architecture" class="section"></div>
-              <div id="sequence-diagram" class="section"></div>
-              <div id="general-massive-diagram" class="section"></div>
-              <div id="legajobanco-filter-diagram" class="section"></div>
-              <div id="erd-diagram" class="section"></div>
-              <div id="deployment-diagram" class="section"></div>
+              <div id="diagrams-root"></div>
               <div id="dependencies" class="section">
                   <h2>🌳 Grafo de Dependencias</h2>
                   <p>El siguiente es el árbol de dependencias completo del proyecto, generado por Maven.</p>
@@ -125,61 +120,58 @@ jobs:
               `;
               document.getElementById('stats').innerHTML = statsHTML;
 
-              // --- Architecture Diagram ---
-              fetch('diagrams/arquitectura-general.mmd')
-                  .then(response => response.text())
-                  .then(data => {
-                      const architectureContainer = document.getElementById('architecture');
-                      architectureContainer.innerHTML = '<h2>🏛️ Arquitectura General del Servicio</h2><div class="mermaid">' + data + '</div>';
-                      mermaid.init(undefined, architectureContainer.querySelector('.mermaid'));
-                  });
+              // --- Diagrams (manifest: un solo lugar para registrar diagramas) ---
+              const diagramsManifest = [
+                  { file: 'diagrams/arquitectura-general.mmd', title: '🏛️ Arquitectura General del Servicio' },
+                  { file: 'diagrams/contextos-hexagonales.mmd', title: '🧩 Contextos Acotados Hexagonales' },
+                  { file: 'diagrams/arquitectura-slice-hexagonal.mmd', title: '📐 Arquitectura de Slice Hexagonal (Patrón)' },
+                  { file: 'diagrams/modelo-entidad-relacion.mmd', title: '🗃️ Diagrama de Entidad-Relación (Simplificado)' },
+                  { file: 'diagrams/flujo-liquidacion-sueldos.mmd', title: '🔄 Secuencia: Liquidación Individual de Sueldos' },
+                  { file: 'diagrams/flujo-liquidacion-general.mmd', title: '🔄 Flujo: Liquidación General Masiva' },
+                  { file: 'diagrams/flujo-liquidacion-ciclo.mmd', title: '🔄 Secuencia: Ciclo de Vida de la Liquidación' },
+                  { file: 'diagrams/flujo-cargo-liquidacion.mmd', title: '🔄 Secuencia: Cargos de Liquidación' },
+                  { file: 'diagrams/flujo-item-letra.mmd', title: '🔄 Secuencia: Items y Letras' },
+                  { file: 'diagrams/flujo-novedad-gestion.mmd', title: '🔄 Secuencia: Gestión de Novedades' },
+                  { file: 'diagrams/flujo-novedad-file.mmd', title: '📤 Secuencia: Carga Masiva de Novedades (Excel)' },
+                  { file: 'diagrams/flujo-acreditacion.mmd', title: '💳 Secuencia: Acreditación y Pago' },
+                  { file: 'diagrams/flujo-orden-pago.mmd', title: '💵 Secuencia: Orden de Pago' },
+                  { file: 'diagrams/flujo-contable-asiento.mmd', title: '📒 Secuencia: Cierre Contable por Legajo' },
+                  { file: 'diagrams/flujo-contabilidad-imputaciones.mmd', title: '🧾 Secuencia: Imputaciones Contables' },
+                  { file: 'diagrams/flujo-catalogos-liquidacion.mmd', title: '📚 Secuencia: Catálogos (Códigos, Categorías, Cargos)' },
+                  { file: 'diagrams/flujo-persona-consultas.mmd', title: '👤 Secuencia: Consultas de Personas' },
+                  { file: 'diagrams/flujo-upload-contactos.mmd', title: '📤 Secuencia: Upload de Contactos' },
+                  { file: 'diagrams/flujo-dependencia.mmd', title: '🏢 Secuencia: Dependencias' },
+                  { file: 'diagrams/flujo-cursos.mmd', title: '🎓 Secuencia: Cursos y Cargos de Curso' },
+                  { file: 'diagrams/flujo-facultad-geografica.mmd', title: '🌎 Secuencia: Facultades y Sedes Geográficas' },
+                  { file: 'diagrams/flujo-designacion-tool.mmd', title: '🧰 Secuencia: Herramientas de Designación y Cargos de Clase' },
+                  { file: 'diagrams/flujo-anotacion-aprobacion.mmd', title: '✍️ Secuencia: Anotación y Aprobación Docente' },
+                  { file: 'diagrams/flujo-etec-antiguedad.mmd', title: '🎒 Secuencia: ETEC, Antigüedad y Bonos' },
+                  { file: 'diagrams/flujo-legajobanco-filtro-codigo.mmd', title: '🏦 Secuencia: LegajoBanco con Filtro por Código' },
+                  { file: 'diagrams/flujo-vistas-reporte.mmd', title: '📊 Secuencia: Vistas de Reporte' },
+                  { file: 'diagrams/flujo-sheets-reportes.mmd', title: '📑 Secuencia: Planillas Excel' },
+                  { file: 'diagrams/flujo-libro-sueldo.mmd', title: '📕 Secuencia: Libro de Sueldo y SIJP' },
+                  { file: 'diagrams/flujo-contratados-planilla.mmd', title: '📋 Secuencia: Planilla de Contratados' },
+                  { file: 'diagrams/flujo-administracion-formularios.mmd', title: '⚙️ Secuencia: Sesión, Auditoría y Formularios' },
+                  { file: 'diagrams/despliegue.mmd', title: '🚀 Diagrama de Despliegue' }
+              ];
+              diagramsManifest.forEach(diagram => {
+                  const section = document.createElement('div');
+                  section.className = 'section';
+                  const heading = document.createElement('h2');
+                  heading.textContent = diagram.title;
+                  const holder = document.createElement('div');
+                  holder.className = 'mermaid';
+                  section.appendChild(heading);
+                  section.appendChild(holder);
+                  document.getElementById('diagrams-root').appendChild(section);
+                  fetch(diagram.file)
+                      .then(response => response.text())
+                      .then(text => {
+                          holder.textContent = text;
+                          mermaid.init(undefined, holder);
+                      });
+              });
 
-
-              // --- Sequence Diagram ---
-              fetch('diagrams/flujo-liquidacion-sueldos.mmd')
-                  .then(response => response.text())
-                  .then(data => {
-                      const sequenceContainer = document.getElementById('sequence-diagram');
-                      sequenceContainer.innerHTML = '<h2>🔄 Diagrama de Secuencia: Liquidación de Sueldos</h2><div class="mermaid">' + data + '</div>';
-                      mermaid.init(undefined, sequenceContainer.querySelector('.mermaid'));
-                  });
-
-              // --- General Massive Liquidation Diagram ---
-              fetch('diagrams/flujo-liquidacion-general.mmd')
-                  .then(response => response.text())
-                  .then(data => {
-                      const generalMassiveContainer = document.getElementById('general-massive-diagram');
-                      generalMassiveContainer.innerHTML = '<h2>🔄 Diagrama de Secuencia: Liquidación General Masiva</h2><div class="mermaid">' + data + '</div>';
-                      mermaid.init(undefined, generalMassiveContainer.querySelector('.mermaid'));
-                  });
-
-              // --- LegajoBanco Filter Diagram ---
-              fetch('diagrams/flujo-legajobanco-filtro-codigo.mmd')
-                  .then(response => response.text())
-                  .then(data => {
-                      const legajobancoFilterContainer = document.getElementById('legajobanco-filter-diagram');
-                      legajobancoFilterContainer.innerHTML = '<h2>🔄 Diagrama de Secuencia: LegajoBanco con Filtro por Código</h2><div class="mermaid">' + data + '</div>';
-                      mermaid.init(undefined, legajobancoFilterContainer.querySelector('.mermaid'));
-                  });
-
-              // --- ERD Diagram ---
-              fetch('diagrams/modelo-entidad-relacion.mmd')
-                  .then(response => response.text())
-                  .then(data => {
-                      const erdContainer = document.getElementById('erd-diagram');
-                      erdContainer.innerHTML = '<h2>🗃️ Diagrama de Entidad-Relación (Simplificado)</h2><div class="mermaid">' + data + '</div>';
-                      mermaid.init(undefined, erdContainer.querySelector('.mermaid'));
-                  });
-
-              // --- Deployment Diagram ---
-              fetch('diagrams/despliegue.mmd')
-                  .then(response => response.text())
-                  .then(data => {
-                      const deploymentContainer = document.getElementById('deployment-diagram');
-                      deploymentContainer.innerHTML = '<h2>🚀 Diagrama de Despliegue</h2><div class="mermaid">' + data + '</div>';
-                      mermaid.init(undefined, deploymentContainer.querySelector('.mermaid'));
-                  });
-          
               // --- Milestones ---
               let milestonesHTML = '<h2>🎯 Milestones</h2>';
               milestonesData.forEach(milestone => {

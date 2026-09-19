@@ -1,0 +1,35 @@
+---
+title: "Consultas de Personas (docentes y no docentes)"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant Ctrl as PersonaController
+    participant Svc as PersonaService (hexagonal)
+    participant UC as Use Cases (ports/in)
+    participant SearchAdapt as PersonaSearchServiceAdapter
+    participant Adapt as JpaPersonaRepositoryAdapter
+    participant DB as MySQL
+
+    Usuario->>Ctrl: GET /persona/ o GET /persona/{legajoId}
+    Ctrl->>Svc: findAll() / findByLegajoId(legajoId)
+    Svc->>UC: GetAllPersonasUseCase / GetPersonaByLegajoUseCase
+    UC->>Adapt: findById / findAll
+    Usuario->>Ctrl: GET /persona/docente/{anho}/{mes} o /nodocente/{anho}/{mes}
+    Ctrl->>Svc: findAllDocente(...) / findAllNoDocente(...)
+    Svc->>UC: GetDocentesUseCase / GetNoDocentesUseCase
+    UC->>Adapt: legajos con curso_cargo o cargo del período
+    Usuario->>Ctrl: GET /persona/liquidables
+    Ctrl->>Svc: findAllLiquidables()
+    Usuario->>Ctrl: GET /persona/semestre/{anho}/{semestre} o /desarraigo/{anho}/{mes}
+    Ctrl->>Svc: findAllBySemestre(...) / findAllByDesarraigo(...)
+
+    Note over Usuario,DB: Búsquedas y operación por lote
+
+    Usuario->>Ctrl: POST /persona/search (lista de condiciones de texto)
+    Ctrl->>Svc: findByStrings(conditions)
+    Svc->>SearchAdapt: PersonaSearchRepository (Criteria API sobre vista persona_search)
+    Usuario->>Ctrl: POST /persona/legajos (lista de legajoIds)
+    Ctrl->>Svc: findAllLegajos(legajos)
+    Usuario->>Ctrl: PUT /persona/ (saveall de personas)
+    Ctrl->>Svc: saveall(personas)

@@ -1,0 +1,35 @@
+---
+title: "Items de Liquidación y Letras (neto por legajo)"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant ItemCtrl as ItemController
+    participant ItemSvc as ItemService (hexagonal)
+    participant LetraCtrl as LetraController
+    participant LetraSvc as LetraService (hexagonal)
+    participant Adapt as JpaItemRepositoryAdapter / JpaLetraRepositoryAdapter
+    participant DB as MySQL
+
+    Usuario->>ItemCtrl: GET /item/legajo/{legajoId}/{anho}/{mes} o /unique/{legajoId}/{anho}/{mes}/{codigoId}
+    ItemCtrl->>ItemSvc: getItemsByLegajo(...) / findByUnique(...)
+    ItemSvc->>Adapt: queries por legajo/código/período
+    Adapt->>DB: SELECT item
+    Usuario->>ItemCtrl: PUT /item/ (saveall de items)
+    ItemCtrl->>ItemSvc: saveAllItems(items)
+    Usuario->>ItemCtrl: GET /item/onlyETEC/{legajoId}/{anho}/{mes}
+    ItemCtrl->>ItemSvc: onlyETEC(legajoId, anho, mes)
+    ItemSvc->>Adapt: verificar ítems ETEC (CheckItemsOnlyEtecUseCase)
+    Usuario->>ItemCtrl: DELETE /item/legajo/{legajoId}/{anho}/{mes}/deleteallbyzero
+    ItemCtrl->>ItemSvc: deleteAllByZero(...) (elimina items con importe cero)
+
+    Note over Usuario,DB: Letras: neto del legajo expresado en texto por período
+
+    Usuario->>LetraCtrl: GET /letra/unique/{legajoId}/{anho}/{mes}
+    LetraCtrl->>LetraSvc: findByUnique(...)
+    Usuario->>LetraCtrl: PUT /letra/ (saveall de letras)
+    LetraCtrl->>LetraSvc: saveAllLetras(letras)
+    Usuario->>LetraCtrl: DELETE /letra/periodo/{anho}/{mes}
+    LetraCtrl->>LetraSvc: deleteByPeriodo(anho, mes)
+    LetraSvc->>Adapt: deleteAllByPeriodo
+    Adapt->>DB: DELETE letra

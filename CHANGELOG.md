@@ -1,3 +1,14 @@
+## [1.14.0] - 2026-09-19
+- refactor: Migración completa de los dominios restantes a arquitectura hexagonal: 25 slices nuevos en 6 contextos acotados (personas: persona/dependencia; cursos: curso/curso_cargo/cargo_tipo/curso_desarraigo/curso_fusion/designacion_tipo; liquidaciones: liquidacion/cargo_liquidacion/item/novedad/codigo/categoria/letra/cargo/acreditacion/acreditacion_pago; contabilidad: 7 slices de imputaciones y legajo_contabilidad), eliminando los services, controladores y repositorios legacy correspondientes y preservando todas las rutas `/api/haberes/core/*` verificadas contra `git show HEAD` (basado en `git diff HEAD`)
+- refactor: Eliminación total de Kotlin: ~140 modelos `.kt` migrados a Java (`*Entity.java`, DTOs, views, extern); removidos `kotlin-maven-plugin`, `kotlin-stdlib`, `kotlin-test` y `jackson-module-kotlin` del build (basado en `git diff HEAD` y `pom.xml`)
+- refactor: Repositorios legacy renombrados con prefijo `Jpa*` (p. ej. `ActividadRepository`→`JpaActividadRepository`, `PersonaSearchRepositoryCustomImpl`→`JpaPersonaSearchRepositoryCustomImpl`) y agregada interfaz `Jsonifyable` para modelos Java (basado en `git diff HEAD`)
+- chore: Eliminado `spring-boot-starter-log4j2` y la exclusión de `spring-boot-starter-logging`, revirtiendo a Logback por defecto de Spring Boot (basado en `git diff HEAD` y `pom.xml`)
+- chore: Actualización de Spring Cloud de 2025.1.2 a 2025.1.3 (basado en `git diff HEAD` y `pom.xml`)
+- docs: Nuevos diagramas Mermaid que completan los casos de uso sin documentar (25 nuevos, total 31): mapa de contextos acotados (`contextos-hexagonales.mmd`), patrón de slice hexagonal (`arquitectura-slice-hexagonal.mmd`) y secuencias por flujo de negocio: ciclo de liquidación con versionado, cargos de liquidación, items/letras, novedades (gestión y carga masiva Excel), acreditación y orden de pago, cierre contable e imputaciones, catálogos (códigos/categorías/cargos), personas (consultas y upload de contactos), dependencia, cursos, facultad/geográfica, herramientas de designación y cargos de clase, anotación y aprobación docente, ETEC/antigüedad, vistas de reporte, planillas Excel, libro de sueldo/SIJP, planilla de contratados y administración/formularios (basado en el inventario de endpoints y casos de uso verificado en `git diff HEAD`)
+- ci: Refactorizado el pipeline de `generate-docs.yml` a un manifiesto único `diagramsManifest` con render dinámico por `textContent` (elimina la duplicación de bloques fetch y la corrupción por `innerHTML`); los 31 diagramas de `docs/diagrams` quedaron registrados y validados uno a uno (basado en los nuevos diagramas)
+- docs: Actualizados los diagramas existentes `arquitectura-general.mmd`, `modelo-entidad-relacion.mmd`, `flujo-liquidacion-sueldos.mmd`, `flujo-liquidacion-general.mmd` y `flujo-legajobanco-filtro-codigo.mmd` para reflejar la arquitectura y los flujos reales del código actual (basado en `git diff HEAD`)
+- docs: README corregido: se eliminó Kotlin y Log4j2 del stack, Spring Boot actualizado a 4.1.1 (valor real del parent en `pom.xml`, desalineado desde 1.13.0) y ejemplos de endpoints reemplazados por rutas reales verificadas en los controladores
+
 ## [1.13.0] - 2026-08-26
 - chore: Actualización de MySQL Connector/J de 9.7.0 a 26.7.0 (nuevo esquema de versionado) (basado en `git diff HEAD` y `pom.xml`)
 - chore: Actualización de springdoc-openapi de 3.0.3 a 3.1.0 (basado en `git diff HEAD` y `pom.xml`)
@@ -21,7 +32,7 @@
 ## [1.11.1] - 2026-06-19
 - chore: Actualización de Spring Boot de 4.0.6 a 4.1.0 (basado en `git diff HEAD` y `pom.xml`)
 - chore: Actualización de Kotlin de 2.3.21 a 2.4.0 (basado en `git diff HEAD` y `pom.xml`)
-- chore: Actualización de Spring Cloud de 2025.1.0 a 2025.1.2 (basado en `git diff HEAD` y `pom.xml`)
+- chore: Actualización de Spring Cloud de 2025.1.0 a 2025.1.3 (basado en `git diff HEAD` y `pom.xml`)
 - chore: Actualización de MySQL Connector/J de 9.6.0 a 9.7.0 (basado en `git diff HEAD` y `pom.xml`)
 - chore: Actualización de OpenPDF de 3.0.3 a 3.0.5 (basado en `git diff HEAD` y `pom.xml`)
 - chore: Actualización de springdoc-openapi de 3.0.2 a 3.0.3 (basado en `git diff HEAD` y `pom.xml`)

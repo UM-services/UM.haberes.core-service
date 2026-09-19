@@ -1,0 +1,30 @@
+---
+title: "Cálculo de Antigüedad, ETEC y Bonos"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant AntiCtrl as AntiguedadController
+    participant AntiSvc as AntiguedadService
+    participant EtecCtrl as LiquidacionEtecController
+    participant EtecSvc as LiquidacionEtecService (facade)
+    participant Inasist as LegajoInasistenciaService / InasistenciaDescuentoService
+    participant BonoCtrl as BonoImpresionController
+    participant DB as MySQL
+
+    Usuario->>AntiCtrl: GET /antiguedad/calculate/{legajoId}/{anho}/{mes}
+    AntiCtrl->>AntiSvc: calculate(legajoId, anho, mes)
+    AntiSvc->>DB: recalcular escalafón según antigüedad y categoría (antiguedad_limite)
+    Usuario->>AntiCtrl: GET /antiguedad/unique/{legajoId}/{anho}/{mes} o /periodo/{anho}/{mes}/{limit}
+    AntiCtrl->>AntiSvc: findByUnique(...) / findAllByPeriodo(...)
+
+    Usuario->>EtecCtrl: GET /liquidacion-etec/calcularPorcentajeAntiguedad/{legajoId}/{anho}/{mes}/{facultadId}/{geograficaId}
+    EtecCtrl->>EtecSvc: calcularPorcentajeAntiguedad(...)
+    EtecSvc->>Inasist: legajo_inasistencia del período (docentes ETEC)
+    Inasist->>DB: SELECT inasistencias y reglas de descuento
+    EtecSvc-->>Usuario: porcentaje de antigüedad ajustado por inasistencias
+
+    Usuario->>BonoCtrl: POST /bonoimpresion/ (registro de impresión de bono)
+    BonoCtrl->>DB: INSERT bono_impresion
+
+    Note over Usuario,DB: En la liquidación (MakeLiquidacionService) evaluateOnlyETEC usa estos datos<br/>para aplicar descuentos por asistencia al neto ETEC
