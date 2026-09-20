@@ -11,7 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.Item;
+import um.haberes.core.hexagonal.liquidaciones.item.domain.model.Item;
+import um.haberes.core.hexagonal.personas.persona.domain.model.Persona;
 import um.haberes.core.service.facade.MakeLiquidacionService;
 
 import java.math.BigDecimal;
@@ -51,9 +52,17 @@ class MakeLiquidacionControllerTest {
         item.setCodigoId(5);
         item.setCodigoNombre("Basico");
         item.setImporte(new BigDecimal("1500.25"));
-        item.setPersona(null);
         item.setCodigo(null);
+        item.setPersona(samplePersona());
         return item;
+    }
+
+    private Persona samplePersona() {
+        Persona persona = new Persona();
+        persona.setLegajoId(100L);
+        persona.setApellido("Perez");
+        persona.setNombre("Juan");
+        return persona;
     }
 
     @Test
@@ -85,11 +94,39 @@ class MakeLiquidacionControllerTest {
                             "codigoId": 5,
                             "codigoNombre": "Basico",
                             "importe": 1500.25,
-                            "persona": null,
+                            "codigoIncluidoEtec": null,
                             "codigo": null,
-                            "created": null,
-                            "updated": null
-                          }
+                            "persona": {
+                              "legajoId": 100,
+                              "documento": 0,
+                              "apellido": "Perez",
+                              "nombre": "Juan",
+                              "nacimiento": null,
+                              "altaDocente": null,
+                              "ajusteDocente": 0,
+                              "altaAdministrativa": null,
+                              "ajusteAdministrativo": 0,
+                              "estadoCivil": "",
+                              "situacionId": null,
+                              "reemplazoDesarraigo": 0,
+                              "mitadDesarraigo": 0,
+                              "cuil": "",
+                              "posgrado": 0,
+                              "estado": 0,
+                              "liquida": "",
+                              "estadoAfip": 0,
+                              "dependenciaId": null,
+                              "dependencia": null,
+                              "salida": null,
+                              "obraSocial": null,
+                              "actividadAfip": null,
+                              "localidadAfip": null,
+                              "situacionAfip": 0,
+                              "modeloContratacionAfip": null,
+                              "directivoEtec": 0,
+                              "apellidoNombre": "Perez, Juan"
+                            }
+                                                                                  }
                         ]
                         """, JsonCompareMode.STRICT));
     }

@@ -12,7 +12,7 @@ import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.exception.ControlException;
-import um.haberes.core.kotlin.model.Control;
+import um.haberes.core.model.ControlEntity;
 import um.haberes.core.service.ControlService;
 
 import java.math.BigDecimal;
@@ -44,8 +44,8 @@ class ControlControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private Control sampleControl() {
-        Control control = new Control();
+    private ControlEntity sampleControl() {
+        ControlEntity control = new ControlEntity();
         control.setControlId(1L);
         control.setAnho(2024);
         control.setMes(6);
@@ -137,7 +137,7 @@ class ControlControllerTest {
 
     @Test
     void add_returnsOkWithControlBody() throws Exception {
-        when(service.add(any(Control.class))).thenReturn(sampleControl());
+        when(service.add(any(ControlEntity.class))).thenReturn(sampleControl());
 
         mockMvc.perform(post("/api/haberes/core/control/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -148,7 +148,7 @@ class ControlControllerTest {
 
     @Test
     void update_returnsOkWithControlBody() throws Exception {
-        when(service.update(any(Control.class), eq(1L))).thenReturn(sampleControl());
+        when(service.update(any(ControlEntity.class), eq(1L))).thenReturn(sampleControl());
 
         mockMvc.perform(put("/api/haberes/core/control/{controlId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)

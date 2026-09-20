@@ -11,9 +11,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.exception.AcreditacionException;
-import um.haberes.core.kotlin.model.Acreditacion;
-import um.haberes.core.service.AcreditacionService;
+import um.haberes.core.hexagonal.liquidaciones.acreditacion.application.exception.AcreditacionException;
+import um.haberes.core.hexagonal.liquidaciones.acreditacion.application.service.AcreditacionService;
+import um.haberes.core.hexagonal.liquidaciones.acreditacion.domain.model.Acreditacion;
+import um.haberes.core.hexagonal.liquidaciones.acreditacion.infrastructure.web.controller.AcreditacionController;
+import um.haberes.core.hexagonal.liquidaciones.acreditacion.infrastructure.web.mapper.AcreditacionDtoMapper;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -50,14 +52,13 @@ class AcreditacionControllerTest {
               "ordenContable": 5,
               "sueldosOriginal": 1000.50,
               "sueldosAjustados": 1200.75,
-              "contribucionesPatronales": 300.25,
-              "created": null,
-              "updated": null
-            }
+              "contribucionesPatronales": 300.25
+                                        }
             """;
 
     @BeforeEach
     void setUp() {
+        controller = new AcreditacionController(service, new AcreditacionDtoMapper());
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -95,11 +96,11 @@ class AcreditacionControllerTest {
     }
 
     @Test
-    void findByAcreditacionId_whenServiceThrowsAcreditacionException_returnsBadRequest() throws Exception {
+    void findByAcreditacionId_whenServiceThrowsAcreditacionException_returnsNotFound() throws Exception {
         when(service.findByAcreditacionId(99L)).thenThrow(new AcreditacionException(99L));
 
         mockMvc.perform(get("/api/haberes/core/acreditacion/{acreditacionId}", 99))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -113,11 +114,11 @@ class AcreditacionControllerTest {
     }
 
     @Test
-    void findByPeriodo_whenServiceThrowsAcreditacionException_returnsBadRequest() throws Exception {
+    void findByPeriodo_whenServiceThrowsAcreditacionException_returnsNotFound() throws Exception {
         when(service.findByPeriodo(2024, 1)).thenThrow(new AcreditacionException(2024, 1));
 
         mockMvc.perform(get("/api/haberes/core/acreditacion/periodo/{anho}/{mes}", 2024, 1))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -128,28 +129,18 @@ class AcreditacionControllerTest {
     }
 
     @Test
-    void add_returnsOkWithSavedAcreditacion() throws Exception {
+    void add_returnsCreatedWithSavedAcreditacion() throws Exception {
         String requestJson = new ObjectMapper().writeValueAsString(sampleAcreditacion());
         when(service.add(any(Acreditacion.class))).thenReturn(sampleAcreditacion());
 
         mockMvc.perform(post("/api/haberes/core/acreditacion/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ACREDITACION_JSON, JsonCompareMode.STRICT));
     }
 
-    @Test
-    void add_whenServiceThrowsAcreditacionException_returnsBadRequest() throws Exception {
-        String requestJson = new ObjectMapper().writeValueAsString(sampleAcreditacion());
-        when(service.add(any(Acreditacion.class))).thenThrow(new AcreditacionException(2L));
-
-        mockMvc.perform(post("/api/haberes/core/acreditacion/")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
-                .andExpect(status().isBadRequest());
-    }
 
     @Test
     void update_returnsOkWithUpdatedAcreditacion() throws Exception {
@@ -165,13 +156,13 @@ class AcreditacionControllerTest {
     }
 
     @Test
-    void update_whenServiceThrowsAcreditacionException_returnsBadRequest() throws Exception {
+    void update_whenServiceThrowsAcreditacionException_returnsNotFound() throws Exception {
         String requestJson = new ObjectMapper().writeValueAsString(sampleAcreditacion());
         when(service.update(any(Acreditacion.class), eq(99L))).thenThrow(new AcreditacionException(99L));
 
         mockMvc.perform(put("/api/haberes/core/acreditacion/{acreditacionId}", 99)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 }

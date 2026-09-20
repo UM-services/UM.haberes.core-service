@@ -12,8 +12,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.exception.AntiguedadException;
 import um.haberes.core.exception.view.AntiguedadPeriodoException;
-import um.haberes.core.kotlin.model.Antiguedad;
-import um.haberes.core.kotlin.model.view.AntiguedadPeriodo;
+import um.haberes.core.model.AntiguedadEntity;
+import um.haberes.core.model.view.AntiguedadPeriodo;
 import um.haberes.core.service.AntiguedadService;
 
 import java.util.List;
@@ -44,8 +44,8 @@ class AntiguedadControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private Antiguedad sampleAntiguedad() {
-        Antiguedad antiguedad = new Antiguedad();
+    private AntiguedadEntity sampleAntiguedad() {
+        AntiguedadEntity antiguedad = new AntiguedadEntity();
         antiguedad.setAntiguedadId(1L);
         antiguedad.setLegajoId(100L);
         antiguedad.setAnho(2024);
@@ -56,7 +56,7 @@ class AntiguedadControllerTest {
     }
 
     private String antiguedadBodyJson() throws Exception {
-        return new ObjectMapper().writeValueAsString(new Antiguedad());
+        return new ObjectMapper().writeValueAsString(new AntiguedadEntity());
     }
 
     private static final String ANTIGUEDAD_JSON = """
@@ -150,7 +150,7 @@ class AntiguedadControllerTest {
 
     @Test
     void add_returnsOkWithAntiguedadBody() throws Exception {
-        when(service.add(any(Antiguedad.class))).thenReturn(sampleAntiguedad());
+        when(service.add(any(AntiguedadEntity.class))).thenReturn(sampleAntiguedad());
 
         mockMvc.perform(post("/api/haberes/core/antiguedad/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -162,7 +162,7 @@ class AntiguedadControllerTest {
 
     @Test
     void update_returnsOkWithAntiguedadBody() throws Exception {
-        when(service.update(any(Antiguedad.class), anyLong())).thenReturn(sampleAntiguedad());
+        when(service.update(any(AntiguedadEntity.class), anyLong())).thenReturn(sampleAntiguedad());
 
         mockMvc.perform(put("/api/haberes/core/antiguedad/{antiguedadId}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -178,7 +178,7 @@ class AntiguedadControllerTest {
 
         mockMvc.perform(put("/api/haberes/core/antiguedad/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(List.of(new Antiguedad()))))
+                        .content(new ObjectMapper().writeValueAsString(List.of(new AntiguedadEntity()))))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("[" + ANTIGUEDAD_JSON + "]", JsonCompareMode.STRICT));

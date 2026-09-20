@@ -12,7 +12,7 @@ import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.exception.ClaseException;
-import um.haberes.core.kotlin.model.Clase;
+import um.haberes.core.model.ClaseEntity;
 import um.haberes.core.service.ClaseService;
 
 import java.math.BigDecimal;
@@ -46,8 +46,8 @@ class ClaseControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private Clase sampleClase() {
-        Clase clase = new Clase();
+    private ClaseEntity sampleClase() {
+        ClaseEntity clase = new ClaseEntity();
         clase.setClaseId(1);
         clase.setNombre("Primera");
         clase.setValorHora(new BigDecimal("45.60"));
@@ -126,7 +126,7 @@ class ClaseControllerTest {
 
     @Test
     void add_returnsOkWithClase() throws Exception {
-        when(service.add(any(Clase.class))).thenReturn(sampleClase());
+        when(service.add(any(ClaseEntity.class))).thenReturn(sampleClase());
 
         mockMvc.perform(post("/api/haberes/core/clase/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -137,7 +137,7 @@ class ClaseControllerTest {
 
     @Test
     void update_returnsOkWithClase() throws Exception {
-        when(service.update(any(Clase.class), anyInt())).thenReturn(sampleClase());
+        when(service.update(any(ClaseEntity.class), anyInt())).thenReturn(sampleClase());
 
         mockMvc.perform(put("/api/haberes/core/clase/{claseId}", 1)
                         .contentType(MediaType.APPLICATION_JSON)

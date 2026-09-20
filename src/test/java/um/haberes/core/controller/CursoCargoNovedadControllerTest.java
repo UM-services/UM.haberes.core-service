@@ -12,7 +12,7 @@ import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.exception.CursoCargoNovedadException;
-import um.haberes.core.kotlin.model.CursoCargoNovedad;
+import um.haberes.core.model.CursoCargoNovedadEntity;
 import um.haberes.core.service.CursoCargoNovedadService;
 
 import java.math.BigDecimal;
@@ -46,8 +46,8 @@ class CursoCargoNovedadControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private CursoCargoNovedad sample() {
-        CursoCargoNovedad novedad = new CursoCargoNovedad();
+    private CursoCargoNovedadEntity sample() {
+        CursoCargoNovedadEntity novedad = new CursoCargoNovedadEntity();
         novedad.setCursoCargoNovedadId(1L);
         novedad.setCursoId(2L);
         novedad.setAnho(2024);
@@ -340,7 +340,7 @@ class CursoCargoNovedadControllerTest {
 
     @Test
     void add_returnsOkWithBody() throws Exception {
-        when(service.add(any(CursoCargoNovedad.class))).thenReturn(sample());
+        when(service.add(any(CursoCargoNovedadEntity.class))).thenReturn(sample());
 
         mockMvc.perform(post("/api/haberes/core/cursocargonovedad/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -351,7 +351,7 @@ class CursoCargoNovedadControllerTest {
 
     @Test
     void update_returnsOkWithBody() throws Exception {
-        when(service.update(any(CursoCargoNovedad.class), eq(1L))).thenReturn(sample());
+        when(service.update(any(CursoCargoNovedadEntity.class), eq(1L))).thenReturn(sample());
 
         mockMvc.perform(put("/api/haberes/core/cursocargonovedad/{cursoCargoNovedadId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)

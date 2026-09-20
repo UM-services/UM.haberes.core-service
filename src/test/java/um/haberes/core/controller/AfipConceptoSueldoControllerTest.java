@@ -11,8 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.AfipConceptoSueldo;
-import um.haberes.core.kotlin.model.view.AfipConceptoSueldoSearch;
+import um.haberes.core.model.AfipConceptoSueldoEntity;
+import um.haberes.core.model.view.AfipConceptoSueldoSearch;
 import um.haberes.core.service.AfipConceptoSueldoService;
 
 import java.util.List;
@@ -58,8 +58,8 @@ class AfipConceptoSueldoControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private AfipConceptoSueldo sampleAfipConceptoSueldo() {
-        AfipConceptoSueldo afipConceptoSueldo = new AfipConceptoSueldo();
+    private AfipConceptoSueldoEntity sampleAfipConceptoSueldo() {
+        AfipConceptoSueldoEntity afipConceptoSueldo = new AfipConceptoSueldoEntity();
         afipConceptoSueldo.setAfipConceptoSueldoId(3L);
         afipConceptoSueldo.setDescripcion("Retribuciones del personal");
         afipConceptoSueldo.setAsignado((byte) 1);

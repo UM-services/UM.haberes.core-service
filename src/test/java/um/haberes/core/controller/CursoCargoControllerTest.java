@@ -1,6 +1,5 @@
 package um.haberes.core.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,9 +10,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.exception.CursoCargoException;
-import um.haberes.core.kotlin.model.CursoCargo;
-import um.haberes.core.service.CursoCargoService;
+import um.haberes.core.hexagonal.cursos.curso_cargo.application.exception.CursoCargoException;
+import um.haberes.core.hexagonal.cursos.curso_cargo.application.service.CursoCargoService;
+import um.haberes.core.hexagonal.cursos.curso_cargo.domain.model.CursoCargo;
+import um.haberes.core.hexagonal.cursos.curso_cargo.infrastructure.web.controller.CursoCargoController;
+import um.haberes.core.hexagonal.cursos.curso_cargo.infrastructure.web.dto.CursoCargoResponse;
+import um.haberes.core.hexagonal.cursos.curso_cargo.infrastructure.web.mapper.CursoCargoDtoMapper;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -34,10 +36,11 @@ class CursoCargoControllerTest {
     @Mock
     private CursoCargoService service;
 
+    @Mock
+    private CursoCargoDtoMapper cursoCargoDtoMapper;
+
     @InjectMocks
     private CursoCargoController controller;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private MockMvc mockMvc;
 
@@ -63,6 +66,23 @@ class CursoCargoControllerTest {
         return cursoCargo;
     }
 
+    private CursoCargoResponse sampleResponse() {
+        return CursoCargoResponse.builder()
+                .cursoCargoId(1L)
+                .cursoId(2L)
+                .anho(2024)
+                .mes(6)
+                .cargoTipoId(3)
+                .legajoId(4L)
+                .horasSemanales(new BigDecimal("10.5"))
+                .horasTotales(new BigDecimal("105"))
+                .designacionTipoId(5)
+                .categoriaId(6)
+                .desarraigo((byte) 0)
+                .cursoCargoNovedadId(7L)
+                .build();
+    }
+
     private String cursoCargoJson() {
         return """
                 {
@@ -82,44 +102,37 @@ class CursoCargoControllerTest {
                   "cargoTipo": null,
                   "persona": null,
                   "designacionTipo": null,
-                  "categoria": null,
-                  "created": null,
-                  "updated": null
+                  "categoria": null
                 }
                 """;
     }
 
     private String cursoCargoListJson() {
+        return "[" + cursoCargoJson() + "]";
+    }
+
+    private String cursoCargoRequestJson() {
         return """
-                [
-                  {
-                    "cursoCargoId": 1,
-                    "cursoId": 2,
-                    "anho": 2024,
-                    "mes": 6,
-                    "cargoTipoId": 3,
-                    "legajoId": 4,
-                    "horasSemanales": 10.5,
-                    "horasTotales": 105,
-                    "designacionTipoId": 5,
-                    "categoriaId": 6,
-                    "desarraigo": 0,
-                    "cursoCargoNovedadId": 7,
-                    "curso": null,
-                    "cargoTipo": null,
-                    "persona": null,
-                    "designacionTipo": null,
-                    "categoria": null,
-                    "created": null,
-                    "updated": null
-                  }
-                ]
+                {
+                  "cursoId": 2,
+                  "anho": 2024,
+                  "mes": 6,
+                  "cargoTipoId": 3,
+                  "legajoId": 4,
+                  "horasSemanales": 10.5,
+                  "horasTotales": 105,
+                  "designacionTipoId": 5,
+                  "categoriaId": 6,
+                  "desarraigo": 0,
+                  "cursoCargoNovedadId": 7
+                }
                 """;
     }
 
     @Test
     void findAllByLegajo_returnsOkWithListOfCursoCargos() throws Exception {
         when(service.findAllByLegajo(4L, 2024, 6)).thenReturn(List.of(sampleCursoCargo()));
+        when(cursoCargoDtoMapper.toResponse(any(CursoCargo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(get("/api/haberes/core/cursoCargo/legajo/{legajoId}/{anho}/{mes}", 4L, 2024, 6))
                 .andExpect(status().isOk())
@@ -130,6 +143,7 @@ class CursoCargoControllerTest {
     @Test
     void findAllByLegajoAndNivel_returnsOkWithListOfCursoCargos() throws Exception {
         when(service.findAllByLegajoAndNivel(4L, 2024, 6, 5)).thenReturn(List.of(sampleCursoCargo()));
+        when(cursoCargoDtoMapper.toResponse(any(CursoCargo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(get("/api/haberes/core/cursoCargo/legajonivel/{legajoId}/{anho}/{mes}/{nivelId}",
                         4L, 2024, 6, 5))
@@ -140,6 +154,7 @@ class CursoCargoControllerTest {
     @Test
     void findAllByLegajoDesarraigo_returnsOkWithListOfCursoCargos() throws Exception {
         when(service.findAllByLegajoDesarraigo(4L, 2024, 6)).thenReturn(List.of(sampleCursoCargo()));
+        when(cursoCargoDtoMapper.toResponse(any(CursoCargo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(get("/api/haberes/core/cursoCargo/legajodesarraigo/{legajoId}/{anho}/{mes}", 4L, 2024, 6))
                 .andExpect(status().isOk())
@@ -149,6 +164,7 @@ class CursoCargoControllerTest {
     @Test
     void findAllByCurso_returnsOkWithListOfCursoCargos() throws Exception {
         when(service.findAllByCurso(2L, 2024, 6)).thenReturn(List.of(sampleCursoCargo()));
+        when(cursoCargoDtoMapper.toResponse(any(CursoCargo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(get("/api/haberes/core/cursoCargo/curso/{cursoId}/{anho}/{mes}", 2L, 2024, 6))
                 .andExpect(status().isOk())
@@ -158,6 +174,7 @@ class CursoCargoControllerTest {
     @Test
     void findAllByFacultad_returnsOkWithListOfCursoCargos() throws Exception {
         when(service.findAllByFacultad(4L, 2024, 6, 3)).thenReturn(List.of(sampleCursoCargo()));
+        when(cursoCargoDtoMapper.toResponse(any(CursoCargo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(get("/api/haberes/core/cursoCargo/facultad/{legajoId}/{anho}/{mes}/{facultadId}",
                         4L, 2024, 6, 3))
@@ -169,6 +186,7 @@ class CursoCargoControllerTest {
     void findAllByCargoTipo_returnsOkWithListOfCursoCargos() throws Exception {
         when(service.findAllByCargoTipo(4L, 2024, 6, 3, 2, (byte) 1, (byte) 1, (byte) 0, 5))
                 .thenReturn(List.of(sampleCursoCargo()));
+        when(cursoCargoDtoMapper.toResponse(any(CursoCargo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(get("/api/haberes/core/cursoCargo/cargoTipo/{legajoId}/{anho}/{mes}/{facultadId}/"
                         + "{geograficaId}/{anual}/{semestre1}/{semestre2}/{cargoTipoId}",
@@ -180,6 +198,7 @@ class CursoCargoControllerTest {
     @Test
     void findAllByCursoAny_returnsOkWithListOfCursoCargos() throws Exception {
         when(service.findAnyByCursoId(2L)).thenReturn(List.of(sampleCursoCargo()));
+        when(cursoCargoDtoMapper.toResponse(any(CursoCargo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(get("/api/haberes/core/cursoCargo/cursoany/{cursoId}", 2L))
                 .andExpect(status().isOk())
@@ -189,6 +208,7 @@ class CursoCargoControllerTest {
     @Test
     void findAnyByPeriodo_returnsOkWithListOfCursoCargos() throws Exception {
         when(service.findAnyByAnhoAndMes(2024, 6)).thenReturn(List.of(sampleCursoCargo()));
+        when(cursoCargoDtoMapper.toResponse(any(CursoCargo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(get("/api/haberes/core/cursoCargo/periodoany/{anho}/{mes}", 2024, 6))
                 .andExpect(status().isOk())
@@ -198,6 +218,7 @@ class CursoCargoControllerTest {
     @Test
     void findAllByPeriodo_returnsOkWithListOfCursoCargos() throws Exception {
         when(service.findAllByAnhoAndMes(2024, 6)).thenReturn(List.of(sampleCursoCargo()));
+        when(cursoCargoDtoMapper.toResponse(any(CursoCargo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(get("/api/haberes/core/cursoCargo/periodo/{anho}/{mes}", 2024, 6))
                 .andExpect(status().isOk())
@@ -207,6 +228,7 @@ class CursoCargoControllerTest {
     @Test
     void findByCursoCargoId_returnsOkWithCursoCargoBody() throws Exception {
         when(service.findByCursoCargoId(1L)).thenReturn(sampleCursoCargo());
+        when(cursoCargoDtoMapper.toResponse(any(CursoCargo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(get("/api/haberes/core/cursoCargo/{cursoCargoId}", 1L))
                 .andExpect(status().isOk())
@@ -225,6 +247,7 @@ class CursoCargoControllerTest {
     @Test
     void findByUnique_returnsOkWithCursoCargoBody() throws Exception {
         when(service.findByUnique(2L, 2024, 6, 3, 4L)).thenReturn(sampleCursoCargo());
+        when(cursoCargoDtoMapper.toResponse(any(CursoCargo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(get("/api/haberes/core/cursoCargo/unique/{cursoId}/{anho}/{mes}/{cargoTipoId}/{legajoId}",
                         2L, 2024, 6, 3, 4L))
@@ -245,6 +268,7 @@ class CursoCargoControllerTest {
     @Test
     void findByLegajoId_returnsOkWithCursoCargoBody() throws Exception {
         when(service.findByLegajo(2L, 2024, 6, 4L)).thenReturn(sampleCursoCargo());
+        when(cursoCargoDtoMapper.toResponse(any(CursoCargo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(get("/api/haberes/core/cursoCargo/legajo/{cursoId}/{anho}/{mes}/{legajoId}",
                         2L, 2024, 6, 4L))
@@ -263,22 +287,26 @@ class CursoCargoControllerTest {
 
     @Test
     void add_returnsOkWithCursoCargoBody() throws Exception {
+        when(cursoCargoDtoMapper.toDomain(any())).thenReturn(sampleCursoCargo());
         when(service.add(any(CursoCargo.class))).thenReturn(sampleCursoCargo());
+        when(cursoCargoDtoMapper.toResponse(any(CursoCargo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(post("/api/haberes/core/cursoCargo/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(sampleCursoCargo())))
+                        .content(cursoCargoRequestJson()))
                 .andExpect(status().isOk())
                 .andExpect(content().json(cursoCargoJson(), JsonCompareMode.STRICT));
     }
 
     @Test
     void update_returnsOkWithCursoCargoBody() throws Exception {
+        when(cursoCargoDtoMapper.toDomain(any())).thenReturn(sampleCursoCargo());
         when(service.update(any(CursoCargo.class), eq(1L))).thenReturn(sampleCursoCargo());
+        when(cursoCargoDtoMapper.toResponse(any(CursoCargo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(put("/api/haberes/core/cursoCargo/{cursoCargoId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(sampleCursoCargo())))
+                        .content(cursoCargoRequestJson()))
                 .andExpect(status().isOk())
                 .andExpect(content().json(cursoCargoJson(), JsonCompareMode.STRICT));
     }

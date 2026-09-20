@@ -9,7 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.view.DocenteDesignacion;
+import um.haberes.core.model.view.DocenteDesignacion;
 import um.haberes.core.service.view.DocenteDesignacionService;
 
 import java.math.BigDecimal;

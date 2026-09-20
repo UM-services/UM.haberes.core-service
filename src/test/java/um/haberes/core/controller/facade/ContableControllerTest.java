@@ -9,7 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.extern.CuentaMovimientoDto;
+import um.haberes.core.model.extern.CuentaMovimientoDto;
 import um.haberes.core.service.facade.ContableService;
 
 import java.math.BigDecimal;

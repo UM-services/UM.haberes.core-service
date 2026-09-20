@@ -43,7 +43,7 @@ public class SheetController {
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=cargos.xlsx");
-        headers.add("Cache-ControlEntity", "no-cache, no-store, must-revalidate");
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
         return ResponseEntity.ok().headers(headers).contentLength(file.length())
@@ -58,7 +58,7 @@ public class SheetController {
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=items.xlsx");
-        headers.add("Cache-ControlEntity", "no-cache, no-store, must-revalidate");
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
         return ResponseEntity.ok().headers(headers).contentLength(file.length())
@@ -73,7 +73,7 @@ public class SheetController {
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=codigos.xlsx");
-        headers.add("Cache-ControlEntity", "no-cache, no-store, must-revalidate");
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
         return ResponseEntity.ok().headers(headers).contentLength(file.length())
@@ -95,7 +95,7 @@ public class SheetController {
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=comparativo.xlsx");
-        headers.add("Cache-ControlEntity", "no-cache, no-store, must-revalidate");
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
         return ResponseEntity.ok().headers(headers).contentLength(file.length())
@@ -110,7 +110,7 @@ public class SheetController {
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=simulasac.xlsx");
-        headers.add("Cache-ControlEntity", "no-cache, no-store, must-revalidate");
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
         return ResponseEntity.ok().headers(headers).contentLength(file.length())
@@ -132,7 +132,7 @@ public class SheetController {
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=docentes.xlsx");
-        headers.add("Cache-ControlEntity", "no-cache, no-store, must-revalidate");
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
         return ResponseEntity.ok().headers(headers).contentLength(file.length())
@@ -146,7 +146,7 @@ public class SheetController {
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=liquidables.xlsx");
-        headers.add("Cache-ControlEntity", "no-cache, no-store, must-revalidate");
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
         return ResponseEntity.ok().headers(headers).contentLength(file.length())
@@ -168,7 +168,7 @@ public class SheetController {
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=basicos.xlsx");
-        headers.add("Cache-ControlEntity", "no-cache, no-store, must-revalidate");
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
         return ResponseEntity.ok().headers(headers).contentLength(file.length())
@@ -182,7 +182,7 @@ public class SheetController {
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=personales.xlsx");
-        headers.add("Cache-ControlEntity", "no-cache, no-store, must-revalidate");
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
         return ResponseEntity.ok().headers(headers).contentLength(file.length())
@@ -197,7 +197,7 @@ public class SheetController {
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=consecutivos.xlsx");
-        headers.add("Cache-ControlEntity", "no-cache, no-store, must-revalidate");
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
         return ResponseEntity.ok().headers(headers).contentLength(file.length())
@@ -211,7 +211,7 @@ public class SheetController {
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=imputaciones.xlsx");
-        headers.add("Cache-ControlEntity", "no-cache, no-store, must-revalidate");
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
         return ResponseEntity.ok().headers(headers).contentLength(file.length())
@@ -225,7 +225,7 @@ public class SheetController {
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=cruce.xlsx");
-        headers.add("Cache-ControlEntity", "no-cache, no-store, must-revalidate");
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
         return ResponseEntity.ok().headers(headers).contentLength(file.length())
@@ -237,7 +237,7 @@ public class SheetController {
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=categorias.xlsx");
-        headers.add("Cache-ControlEntity", "no-cache, no-store, must-revalidate");
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
         return ResponseEntity.ok().headers(headers).contentLength(file.length())

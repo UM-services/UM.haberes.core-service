@@ -10,8 +10,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.Dependencia;
-import um.haberes.core.service.DependenciaService;
+import um.haberes.core.hexagonal.personas.dependencia.application.service.DependenciaService;
+import um.haberes.core.hexagonal.personas.dependencia.domain.model.Dependencia;
+import um.haberes.core.hexagonal.personas.dependencia.infrastructure.web.controller.DependenciaController;
+import um.haberes.core.hexagonal.personas.dependencia.infrastructure.web.mapper.DependenciaDtoMapper;
 
 import java.util.List;
 
@@ -33,6 +35,7 @@ class DependenciaControllerTest {
 
     @BeforeEach
     void setUp() {
+        controller = new DependenciaController(service, new DependenciaDtoMapper());
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -54,10 +57,6 @@ class DependenciaControllerTest {
                   "acronimo": "SEA",
                   "facultadId": 2,
                   "geograficaId": 3,
-                  "facultad": null,
-                  "geografica": null,
-                  "created": null,
-                  "updated": null,
                   "sedeKey": "2.3"
                 }
                 """;

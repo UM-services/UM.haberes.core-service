@@ -11,9 +11,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.exception.ItemException;
-import um.haberes.core.kotlin.model.Item;
-import um.haberes.core.service.ItemService;
+import um.haberes.core.hexagonal.liquidaciones.item.application.exception.ItemException;
+import um.haberes.core.hexagonal.liquidaciones.item.application.service.ItemService;
+import um.haberes.core.hexagonal.liquidaciones.item.domain.model.Item;
+import um.haberes.core.hexagonal.liquidaciones.item.infrastructure.web.controller.ItemController;
+import um.haberes.core.hexagonal.liquidaciones.item.infrastructure.web.mapper.ItemDtoMapper;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -42,6 +44,7 @@ class ItemControllerTest {
 
     @BeforeEach
     void setUp() {
+        controller = new ItemController(service, new ItemDtoMapper());
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -66,18 +69,14 @@ class ItemControllerTest {
                   "mes": 6,
                   "codigoId": 5,
                   "codigoNombre": "Básico",
-                  "importe": 100.50,
-                  "persona": null,
-                  "codigo": null,
-                  "created": null,
-                  "updated": null
-                }
+                  "importe": 100.50
+                                                    }
                 """;
     }
 
     @Test
     void findAllByLegajo_returnsOkWithListOfItems() throws Exception {
-        when(service.findAllByLegajo(123L, 2024, 6)).thenReturn(List.of(sampleItem()));
+        when(service.getItemsByLegajo(123L, 2024, 6)).thenReturn(List.of(sampleItem()));
 
         mockMvc.perform(get("/api/haberes/core/item/legajo/{legajoId}/{anho}/{mes}", 123, 2024, 6))
                 .andExpect(status().isOk())
@@ -87,7 +86,7 @@ class ItemControllerTest {
 
     @Test
     void findAllByCodigoId_returnsOkWithListOfItems() throws Exception {
-        when(service.findAllByCodigo(5, 2024, 6)).thenReturn(List.of(sampleItem()));
+        when(service.getItemsByCodigo(5, 2024, 6)).thenReturn(List.of(sampleItem()));
 
         mockMvc.perform(get("/api/haberes/core/item/codigo/{codigoId}/{anho}/{mes}", 5, 2024, 6))
                 .andExpect(status().isOk())
@@ -97,7 +96,7 @@ class ItemControllerTest {
 
     @Test
     void findAllByPeriodo_returnsOkWithListOfItems() throws Exception {
-        when(service.findAllByPeriodo(2024, 6, 100)).thenReturn(List.of(sampleItem()));
+        when(service.getItemsByPeriodo(2024, 6, 100)).thenReturn(List.of(sampleItem()));
 
         mockMvc.perform(get("/api/haberes/core/item/periodo/{anho}/{mes}/{limit}", 2024, 6, 100))
                 .andExpect(status().isOk())
@@ -107,7 +106,7 @@ class ItemControllerTest {
 
     @Test
     void findAllByPeriodo_whenLimitIsZero_usesDefaultLimitOf99999() throws Exception {
-        when(service.findAllByPeriodo(2024, 6, 99999)).thenReturn(List.of());
+        when(service.getItemsByPeriodo(2024, 6, 99999)).thenReturn(List.of());
 
         mockMvc.perform(get("/api/haberes/core/item/periodo/{anho}/{mes}/{limit}", 2024, 6, 0))
                 .andExpect(status().isOk())
@@ -116,7 +115,7 @@ class ItemControllerTest {
 
     @Test
     void findAllByPeriodoAndLegajo_returnsOkWithListOfItems() throws Exception {
-        when(service.findAllByPeriodoAndLegajo(2024, 6, 123L, 50)).thenReturn(List.of(sampleItem()));
+        when(service.getItemsByPeriodoAndLegajo(2024, 6, 123L, 50)).thenReturn(List.of(sampleItem()));
 
         mockMvc.perform(get("/api/haberes/core/item/periodolegajo/{anho}/{mes}/{legajoId}/{limit}", 2024, 6, 123, 50))
                 .andExpect(status().isOk())
@@ -126,7 +125,7 @@ class ItemControllerTest {
 
     @Test
     void findAllByPeriodoAndLegajo_whenLimitIsZero_usesDefaultLimitOf99999() throws Exception {
-        when(service.findAllByPeriodoAndLegajo(2024, 6, 123L, 99999)).thenReturn(List.of());
+        when(service.getItemsByPeriodoAndLegajo(2024, 6, 123L, 99999)).thenReturn(List.of());
 
         mockMvc.perform(get("/api/haberes/core/item/periodolegajo/{anho}/{mes}/{legajoId}/{limit}", 2024, 6, 123, 0))
                 .andExpect(status().isOk())
@@ -152,14 +151,14 @@ class ItemControllerTest {
     }
 
     @Test
-    void add_returnsOkWithSavedItem() throws Exception {
+    void add_returnsCreatedWithSavedItem() throws Exception {
         Item item = sampleItem();
         when(service.add(any(Item.class))).thenReturn(item);
 
         mockMvc.perform(post("/api/haberes/core/item/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(item)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(itemJson(), JsonCompareMode.STRICT));
     }
@@ -180,7 +179,7 @@ class ItemControllerTest {
     @Test
     void saveAll_returnsOkWithSavedItems() throws Exception {
         Item item = sampleItem();
-        when(service.saveAll(anyList())).thenReturn(List.of(item));
+        when(service.saveAllItems(anyList())).thenReturn(List.of(item));
 
         mockMvc.perform(put("/api/haberes/core/item/")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -2,13 +2,18 @@ package um.haberes.core.hexagonal.liquidaciones.item.infrastructure.persistence.
 
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
 import um.haberes.core.hexagonal.liquidaciones.codigo.domain.model.Codigo;
 import um.haberes.core.hexagonal.liquidaciones.codigo.infrastructure.persistence.entity.CodigoEntity;
 import um.haberes.core.hexagonal.liquidaciones.item.domain.model.Item;
 import um.haberes.core.hexagonal.liquidaciones.item.infrastructure.persistence.entity.ItemEntity;
+import um.haberes.core.hexagonal.personas.persona.infrastructure.persistence.mapper.PersonaMapper;
 
 @Component
+@RequiredArgsConstructor
 public class ItemMapper {
+
+    private final PersonaMapper personaMapper;
 
     public ItemEntity toEntity(Item domain) {
         if (domain == null) {
@@ -43,7 +48,8 @@ public class ItemMapper {
                 .anho(entity.getAnho())
                 .mes(entity.getMes())
                 .codigoId(entity.getCodigoId())
-                .codigoIncluidoEtec(entity.getCodigo() != null ? entity.getCodigo().getIncluidoEtec() : null);
+                .codigoIncluidoEtec(entity.getCodigo() != null ? entity.getCodigo().getIncluidoEtec() : null)
+                .persona(personaMapper.toDomain(entity.getPersona()));
         if (entity.getCodigo() != null) {
             builder.codigo(toDomainCodigo(entity.getCodigo()));
         }

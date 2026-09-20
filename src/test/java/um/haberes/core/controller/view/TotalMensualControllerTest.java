@@ -10,7 +10,7 @@ import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.exception.view.TotalMensualException;
-import um.haberes.core.kotlin.model.view.TotalMensual;
+import um.haberes.core.model.view.TotalMensual;
 import um.haberes.core.service.view.TotalMensualService;
 
 import java.math.BigDecimal;

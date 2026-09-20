@@ -11,7 +11,7 @@ import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.exception.UsuarioException;
-import um.haberes.core.kotlin.model.Usuario;
+import um.haberes.core.model.UsuarioEntity;
 import um.haberes.core.service.UsuarioService;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -37,8 +37,8 @@ class UsuarioControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private Usuario sampleUsuario() {
-        Usuario usuario = new Usuario();
+    private UsuarioEntity sampleUsuario() {
+        UsuarioEntity usuario = new UsuarioEntity();
         usuario.setLegajoId(100L);
         usuario.setPassword("hash");
         usuario.setBuild(42L);
@@ -102,7 +102,7 @@ class UsuarioControllerTest {
 
     @Test
     void isUserValid_returnsOkWithTrueBody() throws Exception {
-        when(service.isUserValid(any(Usuario.class))).thenReturn(Boolean.TRUE);
+        when(service.isUserValid(any(UsuarioEntity.class))).thenReturn(Boolean.TRUE);
 
         mockMvc.perform(put("/api/haberes/core/usuario/isuservalid")
                         .contentType(MediaType.APPLICATION_JSON)

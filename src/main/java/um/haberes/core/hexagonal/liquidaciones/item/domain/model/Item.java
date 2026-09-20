@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import um.haberes.core.hexagonal.liquidaciones.codigo.domain.model.Codigo;
+import um.haberes.core.hexagonal.personas.persona.domain.model.Persona;
 import um.haberes.core.util.Jsonifyable;
 
 @Getter
@@ -36,6 +37,8 @@ public class Item implements Jsonifyable {
     private Byte codigoIncluidoEtec;
 
     private Codigo codigo;
+
+    private Persona persona;
 
     public String legajoKey() {
         return String.valueOf(legajoId) + "." + anho + "." + mes + "." + codigoId;

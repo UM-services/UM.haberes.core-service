@@ -10,11 +10,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.exception.PersonaException;
-import um.haberes.core.kotlin.model.Persona;
-import um.haberes.core.kotlin.model.view.PersonaSearch;
-import um.haberes.core.service.PersonaService;
-import um.haberes.core.util.transfer.FileInfo;
+import um.haberes.core.hexagonal.personas.persona.application.exception.PersonaException;
+import um.haberes.core.hexagonal.personas.persona.application.service.PersonaService;
+import um.haberes.core.hexagonal.personas.persona.domain.model.Persona;
+import um.haberes.core.hexagonal.personas.persona.domain.model.PersonaSearch;
+import um.haberes.core.hexagonal.personas.persona.infrastructure.web.controller.PersonaController;
+import um.haberes.core.hexagonal.personas.persona.domain.model.UploadedFile;
+import um.haberes.core.hexagonal.personas.dependencia.infrastructure.web.mapper.DependenciaDtoMapper;
+import um.haberes.core.hexagonal.personas.persona.infrastructure.web.mapper.PersonaDtoMapper;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -40,7 +43,7 @@ class PersonaControllerTest {
 
     @BeforeEach
     void setUp() {
-        controller = new PersonaController(service);
+        controller = new PersonaController(service, new PersonaDtoMapper(new DependenciaDtoMapper()));
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -97,6 +100,7 @@ class PersonaControllerTest {
               "liquida": "S",
               "estadoAfip": 1,
               "dependenciaId": 20,
+              "dependencia": null,
               "salida": "X",
               "obraSocial": 55,
               "actividadAfip": 1,
@@ -104,12 +108,8 @@ class PersonaControllerTest {
               "situacionAfip": 3,
               "modeloContratacionAfip": 1,
               "directivoEtec": 1,
-              "dependencia": null,
-              "afipSituacion": null,
-              "apellidoNombre": "Perez, Juan",
-              "created": null,
-              "updated": null
-            }
+              "apellidoNombre": "Perez, Juan"
+                                        }
             """;
 
     private PersonaSearch samplePersonaSearch() {
@@ -150,10 +150,8 @@ class PersonaControllerTest {
               "situacionAfip": null,
               "modeloContratacionAfip": null,
               "search": "PEREZ, JUAN",
-              "dependencia": null,
-              "created": null,
-              "updated": null
-            }
+              "apellidoNombre": "Perez, Juan"
+                                        }
             """;
 
     @Test
@@ -316,11 +314,11 @@ class PersonaControllerTest {
 
     @Test
     void upload_returnsOkWithListOfPersona() throws Exception {
-        when(service.upload(any(FileInfo.class))).thenReturn(List.of(samplePersona()));
+        when(service.upload(any(UploadedFile.class))).thenReturn(List.of(samplePersona()));
 
         mockMvc.perform(post("/api/haberes/core/persona/upload")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(new FileInfo("personas.xlsx", "e30="))))
+                        .content(new ObjectMapper().writeValueAsString(new UploadedFile("personas.xlsx", "e30="))))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("[" + PERSONA_JSON + "]", JsonCompareMode.STRICT));

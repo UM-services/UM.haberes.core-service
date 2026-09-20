@@ -11,7 +11,7 @@ import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.exception.SeguridadSocialException;
-import um.haberes.core.kotlin.model.SeguridadSocial;
+import um.haberes.core.model.SeguridadSocialEntity;
 import um.haberes.core.service.SeguridadSocialService;
 
 import java.math.BigDecimal;
@@ -40,8 +40,8 @@ class SeguridadSocialControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private SeguridadSocial sampleSeguridadSocial() {
-        SeguridadSocial seguridadSocial = new SeguridadSocial();
+    private SeguridadSocialEntity sampleSeguridadSocial() {
+        SeguridadSocialEntity seguridadSocial = new SeguridadSocialEntity();
         seguridadSocial.setSeguridadSocialId(4L);
         seguridadSocial.setAnho(2024);
         seguridadSocial.setMes(6);
@@ -94,7 +94,7 @@ class SeguridadSocialControllerTest {
 
     @Test
     void add_returnsOkWithSeguridadSocialBody() throws Exception {
-        when(service.add(any(SeguridadSocial.class))).thenReturn(sampleSeguridadSocial());
+        when(service.add(any(SeguridadSocialEntity.class))).thenReturn(sampleSeguridadSocial());
 
         mockMvc.perform(post("/api/haberes/core/seguridadSocial/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -106,7 +106,7 @@ class SeguridadSocialControllerTest {
 
     @Test
     void update_returnsOkWithSeguridadSocialBody() throws Exception {
-        when(service.update(any(SeguridadSocial.class), any())).thenReturn(sampleSeguridadSocial());
+        when(service.update(any(SeguridadSocialEntity.class), any())).thenReturn(sampleSeguridadSocial());
 
         mockMvc.perform(put("/api/haberes/core/seguridadSocial/{seguridadSocialId}", 4)
                         .contentType(MediaType.APPLICATION_JSON)

@@ -11,7 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.CargoClase;
+import um.haberes.core.model.CargoClaseEntity;
 import um.haberes.core.service.CargoClaseService;
 
 import java.util.List;
@@ -41,8 +41,8 @@ class CargoClaseControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private CargoClase sampleCargoClase() {
-        CargoClase cargoClase = new CargoClase();
+    private CargoClaseEntity sampleCargoClase() {
+        CargoClaseEntity cargoClase = new CargoClaseEntity();
         cargoClase.setCargoClaseId(1L);
         cargoClase.setNombre("Ayudante de primera");
         cargoClase.setClaseId(2);
@@ -82,11 +82,11 @@ class CargoClaseControllerTest {
 
     @Test
     void add_returnsOkWithCargoClaseBody() throws Exception {
-        when(service.add(any(CargoClase.class))).thenReturn(sampleCargoClase());
+        when(service.add(any(CargoClaseEntity.class))).thenReturn(sampleCargoClase());
 
         mockMvc.perform(post("/api/haberes/core/cargoclase/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(new CargoClase())))
+                        .content(new ObjectMapper().writeValueAsString(new CargoClaseEntity())))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(CARGO_CLASE_JSON, JsonCompareMode.STRICT));
@@ -94,11 +94,11 @@ class CargoClaseControllerTest {
 
     @Test
     void update_returnsOkWithCargoClaseBody() throws Exception {
-        when(service.update(any(CargoClase.class), anyLong())).thenReturn(sampleCargoClase());
+        when(service.update(any(CargoClaseEntity.class), anyLong())).thenReturn(sampleCargoClase());
 
         mockMvc.perform(put("/api/haberes/core/cargoclase/{cargoClaseId}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(new CargoClase())))
+                        .content(new ObjectMapper().writeValueAsString(new CargoClaseEntity())))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(CARGO_CLASE_JSON, JsonCompareMode.STRICT));

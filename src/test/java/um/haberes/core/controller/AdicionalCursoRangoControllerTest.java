@@ -12,7 +12,7 @@ import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.exception.AdicionalCursoRangoException;
-import um.haberes.core.kotlin.model.AdicionalCursoRango;
+import um.haberes.core.model.AdicionalCursoRangoEntity;
 import um.haberes.core.service.AdicionalCursoRangoService;
 
 import java.math.BigDecimal;
@@ -55,8 +55,8 @@ class AdicionalCursoRangoControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private AdicionalCursoRango sampleAdicionalCursoRango() {
-        AdicionalCursoRango adicionalCursoRango = new AdicionalCursoRango();
+    private AdicionalCursoRangoEntity sampleAdicionalCursoRango() {
+        AdicionalCursoRangoEntity adicionalCursoRango = new AdicionalCursoRangoEntity();
         adicionalCursoRango.setAdicionalCursoRangoId(1L);
         adicionalCursoRango.setHorasDesde(1);
         adicionalCursoRango.setHorasHasta(10);
@@ -96,7 +96,7 @@ class AdicionalCursoRangoControllerTest {
     @Test
     void add_returnsOkWithSavedRango() throws Exception {
         String requestJson = new ObjectMapper().writeValueAsString(sampleAdicionalCursoRango());
-        when(service.add(any(AdicionalCursoRango.class))).thenReturn(sampleAdicionalCursoRango());
+        when(service.add(any(AdicionalCursoRangoEntity.class))).thenReturn(sampleAdicionalCursoRango());
 
         mockMvc.perform(post("/api/haberes/core/adicionalCursoRango/")
                         .contentType(MediaType.APPLICATION_JSON)

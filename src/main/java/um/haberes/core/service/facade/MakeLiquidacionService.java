@@ -787,14 +787,14 @@ public class MakeLiquidacionService {
 
     private void addItem(Long legajoId, Integer anho, Integer mes, Integer codigoId, BigDecimal importe, LiquidacionState state) {
         log.debug("Processing MakeLiquidacionService.addItem");
-        Item item = state.getItems().computeIfAbsent(codigoId, k -> new Item(null, legajoId, anho, mes, k, state.getCodigos().get(k).getNombre(), BigDecimal.ZERO, null, null));
+        Item item = state.getItems().computeIfAbsent(codigoId, k -> new Item(null, legajoId, anho, mes, k, state.getCodigos().get(k).getNombre(), BigDecimal.ZERO, null, null, null));
         item.setImporte(item.getImporte().add(importe).setScale(2, RoundingMode.HALF_UP));
         log.debug("ItemEntity -> {}", item.jsonify());
     }
 
     private void setItem(Long legajoId, Integer anho, Integer mes, Integer codigoId, BigDecimal importe, LiquidacionState state) {
         log.debug("Processing MakeLiquidacionService.setItem");
-        Item item = state.getItems().computeIfAbsent(codigoId, k -> new Item(null, legajoId, anho, mes, k, state.getCodigos().get(k).getNombre(), BigDecimal.ZERO, null, null));
+        Item item = state.getItems().computeIfAbsent(codigoId, k -> new Item(null, legajoId, anho, mes, k, state.getCodigos().get(k).getNombre(), BigDecimal.ZERO, null, null, null));
         item.setImporte(importe.setScale(2, RoundingMode.HALF_UP));
         log.debug("Item -> {}", item.jsonify());
     }

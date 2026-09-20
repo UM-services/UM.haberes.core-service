@@ -1,6 +1,5 @@
 package um.haberes.core.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,8 +10,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.CursoDesarraigo;
-import um.haberes.core.service.CursoDesarraigoService;
+import um.haberes.core.hexagonal.cursos.curso_desarraigo.application.service.CursoDesarraigoService;
+import um.haberes.core.hexagonal.cursos.curso_desarraigo.domain.model.CursoDesarraigo;
+import um.haberes.core.hexagonal.cursos.curso_desarraigo.infrastructure.web.controller.CursoDesarraigoController;
+import um.haberes.core.hexagonal.cursos.curso_desarraigo.infrastructure.web.dto.CursoDesarraigoResponse;
+import um.haberes.core.hexagonal.cursos.curso_desarraigo.infrastructure.web.mapper.CursoDesarraigoDtoMapper;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -33,10 +35,11 @@ class CursoDesarraigoControllerTest {
     @Mock
     private CursoDesarraigoService service;
 
+    @Mock
+    private CursoDesarraigoDtoMapper cursoDesarraigoDtoMapper;
+
     @InjectMocks
     private CursoDesarraigoController controller;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private MockMvc mockMvc;
 
@@ -58,6 +61,19 @@ class CursoDesarraigoControllerTest {
         return desarraigo;
     }
 
+    private CursoDesarraigoResponse sampleResponse() {
+        return CursoDesarraigoResponse.builder()
+                .cursoDesarraigoId(1L)
+                .legajoId(2L)
+                .anho(2024)
+                .mes(6)
+                .cursoId(3L)
+                .geograficaId(4)
+                .importe(new BigDecimal("100.50"))
+                .version(1)
+                .build();
+    }
+
     private String desarraigoJson() {
         return """
                 {
@@ -68,41 +84,33 @@ class CursoDesarraigoControllerTest {
                   "cursoId": 3,
                   "geograficaId": 4,
                   "importe": 100.50,
-                  "version": 1,
-                  "curso": null,
-                  "persona": null,
-                  "geografica": null,
-                  "created": null,
-                  "updated": null
+                  "version": 1
                 }
                 """;
     }
 
     private String desarraigoListJson() {
+        return "[" + desarraigoJson() + "]";
+    }
+
+    private String desarraigoRequestJson() {
         return """
-                [
-                  {
-                    "cursoDesarraigoId": 1,
-                    "legajoId": 2,
-                    "anho": 2024,
-                    "mes": 6,
-                    "cursoId": 3,
-                    "geograficaId": 4,
-                    "importe": 100.50,
-                    "version": 1,
-                    "curso": null,
-                    "persona": null,
-                    "geografica": null,
-                    "created": null,
-                    "updated": null
-                  }
-                ]
+                {
+                  "legajoId": 2,
+                  "anho": 2024,
+                  "mes": 6,
+                  "cursoId": 3,
+                  "geograficaId": 4,
+                  "importe": 100.50,
+                  "version": 1
+                }
                 """;
     }
 
     @Test
     void findAll_returnsOkWithListOfCursoDesarraigos() throws Exception {
         when(service.findAll()).thenReturn(List.of(sample()));
+        when(cursoDesarraigoDtoMapper.toResponse(any(CursoDesarraigo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(get("/api/haberes/core/cursodesarraigo/"))
                 .andExpect(status().isOk())
@@ -113,6 +121,7 @@ class CursoDesarraigoControllerTest {
     @Test
     void findAllByLegajoId_returnsOkWithListOfCursoDesarraigos() throws Exception {
         when(service.findAllByLegajoIdAndAnhoAndMes(2L, 2024, 6)).thenReturn(List.of(sample()));
+        when(cursoDesarraigoDtoMapper.toResponse(any(CursoDesarraigo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(get("/api/haberes/core/cursodesarraigo/legajoId/{legajoId}/{anho}/{mes}", 2L, 2024, 6))
                 .andExpect(status().isOk())
@@ -122,6 +131,7 @@ class CursoDesarraigoControllerTest {
     @Test
     void findAllByVersion_returnsOkWithListOfCursoDesarraigos() throws Exception {
         when(service.findAllByVersion(2L, 2024, 6, 1)).thenReturn(List.of(sample()));
+        when(cursoDesarraigoDtoMapper.toResponse(any(CursoDesarraigo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(get("/api/haberes/core/cursodesarraigo/legajoId/version/{legajoId}/{anho}/{mes}/{version}",
                         2L, 2024, 6, 1))
@@ -130,14 +140,19 @@ class CursoDesarraigoControllerTest {
     }
 
     @Test
-    void findByCursoDesarraigoId_alwaysReturnsInternalServerErrorDueToPathVariableNameMismatch() throws Exception {
-        mockMvc.perform(get("/api/haberes/core/cursodesarraigo/{cursodesarraigoId}", 1L))
-                .andExpect(status().isInternalServerError());
+    void findByCursoDesarraigoId_returnsOkWithBody() throws Exception {
+        when(service.findByCursoDesarraigoId(1L)).thenReturn(sample());
+        when(cursoDesarraigoDtoMapper.toResponse(any(CursoDesarraigo.class))).thenReturn(sampleResponse());
+
+        mockMvc.perform(get("/api/haberes/core/cursodesarraigo/{cursoDesarraigoId}", 1L))
+                .andExpect(status().isOk())
+                .andExpect(content().json(desarraigoJson(), JsonCompareMode.STRICT));
     }
 
     @Test
     void findByUnique_returnsOkWithBody() throws Exception {
         when(service.findByUnique(2L, 2024, 6, 3L)).thenReturn(sample());
+        when(cursoDesarraigoDtoMapper.toResponse(any(CursoDesarraigo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(get("/api/haberes/core/cursodesarraigo/unique/{legajoId}/{anho}/{mes}/{cursoId}",
                         2L, 2024, 6, 3L))
@@ -147,28 +162,32 @@ class CursoDesarraigoControllerTest {
 
     @Test
     void delete_returnsNoContent() throws Exception {
-        mockMvc.perform(delete("/api/haberes/core/cursodesarraigo/{cursodesarraigoId}", 1L))
+        mockMvc.perform(delete("/api/haberes/core/cursodesarraigo/{cursoDesarraigoId}", 1L))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void add_returnsOkWithBody() throws Exception {
+        when(cursoDesarraigoDtoMapper.toDomain(any())).thenReturn(sample());
         when(service.add(any(CursoDesarraigo.class))).thenReturn(sample());
+        when(cursoDesarraigoDtoMapper.toResponse(any(CursoDesarraigo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(post("/api/haberes/core/cursodesarraigo/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(sample())))
+                        .content(desarraigoRequestJson()))
                 .andExpect(status().isOk())
                 .andExpect(content().json(desarraigoJson(), JsonCompareMode.STRICT));
     }
 
     @Test
     void update_returnsOkWithBody() throws Exception {
+        when(cursoDesarraigoDtoMapper.toDomain(any())).thenReturn(sample());
         when(service.update(any(CursoDesarraigo.class), eq(1L))).thenReturn(sample());
+        when(cursoDesarraigoDtoMapper.toResponse(any(CursoDesarraigo.class))).thenReturn(sampleResponse());
 
-        mockMvc.perform(put("/api/haberes/core/cursodesarraigo/{cursodesarraigoId}", 1L)
+        mockMvc.perform(put("/api/haberes/core/cursodesarraigo/{cursoDesarraigoId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(sample())))
+                        .content(desarraigoRequestJson()))
                 .andExpect(status().isOk())
                 .andExpect(content().json(desarraigoJson(), JsonCompareMode.STRICT));
     }

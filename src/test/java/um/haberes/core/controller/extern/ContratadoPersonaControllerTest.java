@@ -10,7 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.extern.ContratadoPersonaDto;
+import um.haberes.core.model.extern.ContratadoPersonaDto;
 import um.haberes.core.service.extern.ContratadoPersonaService;
 
 import java.math.BigDecimal;

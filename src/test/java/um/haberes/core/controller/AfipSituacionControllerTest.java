@@ -11,7 +11,7 @@ import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.exception.AfipSituacionException;
-import um.haberes.core.kotlin.model.AfipSituacion;
+import um.haberes.core.model.AfipSituacionEntity;
 import um.haberes.core.service.AfipSituacionService;
 
 import java.util.List;
@@ -46,8 +46,8 @@ class AfipSituacionControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private AfipSituacion sampleAfipSituacion() {
-        AfipSituacion afipSituacion = new AfipSituacion();
+    private AfipSituacionEntity sampleAfipSituacion() {
+        AfipSituacionEntity afipSituacion = new AfipSituacionEntity();
         afipSituacion.setAfipSituacionId(5);
         afipSituacion.setDescripcion("Situacion de revista");
         return afipSituacion;

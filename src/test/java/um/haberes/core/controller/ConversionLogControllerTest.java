@@ -11,7 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.ConversionLog;
+import um.haberes.core.model.ConversionLogEntity;
 import um.haberes.core.service.ConversionLogService;
 
 import java.util.List;
@@ -41,8 +41,8 @@ class ConversionLogControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private ConversionLog sampleConversionLog() {
-        return new ConversionLog(1L, 2024, 6);
+    private ConversionLogEntity sampleConversionLog() {
+        return new ConversionLogEntity(1L, 2024, 6);
     }
 
     private String conversionLogJson() {
@@ -79,7 +79,7 @@ class ConversionLogControllerTest {
 
     @Test
     void add_returnsOkWithConversionLogBody() throws Exception {
-        when(service.add(any(ConversionLog.class))).thenReturn(sampleConversionLog());
+        when(service.add(any(ConversionLogEntity.class))).thenReturn(sampleConversionLog());
 
         mockMvc.perform(post("/api/haberes/core/conversionlog/")
                         .contentType(MediaType.APPLICATION_JSON)

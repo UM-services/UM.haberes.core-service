@@ -5,7 +5,7 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**1.14.0** (2026-09-19)
+**1.15.0** (2026-09-20)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales

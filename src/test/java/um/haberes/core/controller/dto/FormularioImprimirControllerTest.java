@@ -10,9 +10,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.Contacto;
-import um.haberes.core.kotlin.model.LegajoControl;
-import um.haberes.core.kotlin.model.dto.FormularioImprimir;
+import um.haberes.core.model.ContactoEntity;
+import um.haberes.core.model.LegajoControlEntity;
+import um.haberes.core.model.dto.FormularioImprimir;
 import um.haberes.core.service.dto.FormularioImprimirService;
 
 import java.util.List;
@@ -38,8 +38,8 @@ class FormularioImprimirControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private LegajoControl sampleLegajoControl() {
-        LegajoControl legajoControl = new LegajoControl();
+    private LegajoControlEntity sampleLegajoControl() {
+        LegajoControlEntity legajoControl = new LegajoControlEntity();
         legajoControl.setLegajoControlId(1L);
         legajoControl.setLegajoId(100L);
         legajoControl.setAnho(2024);
@@ -50,8 +50,8 @@ class FormularioImprimirControllerTest {
         return legajoControl;
     }
 
-    private Contacto sampleContacto() {
-        Contacto contacto = new Contacto();
+    private ContactoEntity sampleContacto() {
+        ContactoEntity contacto = new ContactoEntity();
         contacto.setLegajoId(100L);
         contacto.setFijo("44445555");
         contacto.setMovil("1155556666");

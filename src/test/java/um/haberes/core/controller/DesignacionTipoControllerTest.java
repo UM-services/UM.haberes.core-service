@@ -10,9 +10,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.exception.DesignacionTipoException;
-import um.haberes.core.kotlin.model.DesignacionTipo;
-import um.haberes.core.service.DesignacionTipoService;
+import um.haberes.core.hexagonal.cursos.designacion_tipo.application.exception.DesignacionTipoException;
+import um.haberes.core.hexagonal.cursos.designacion_tipo.application.service.DesignacionTipoService;
+import um.haberes.core.hexagonal.cursos.designacion_tipo.domain.model.DesignacionTipo;
+import um.haberes.core.hexagonal.cursos.designacion_tipo.infrastructure.web.controller.DesignacionTipoController;
+import um.haberes.core.hexagonal.cursos.designacion_tipo.infrastructure.web.mapper.DesignacionTipoDtoMapper;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -35,6 +37,7 @@ class DesignacionTipoControllerTest {
 
     @BeforeEach
     void setUp() {
+        controller = new DesignacionTipoController(service, new DesignacionTipoDtoMapper());
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -55,10 +58,8 @@ class DesignacionTipoControllerTest {
                   "nombre": "Dedicación Simple",
                   "horasSemanales": 20.00,
                   "horasTotales": 800.00,
-                  "simples": 1,
-                  "created": null,
-                  "updated": null
-                }
+                  "simples": 1
+                                                    }
                 """;
     }
 

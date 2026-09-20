@@ -11,9 +11,9 @@ import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.hexagonal.facultad.domain.model.Facultad;
-import um.haberes.core.kotlin.model.Categoria;
-import um.haberes.core.kotlin.model.Dependencia;
-import um.haberes.core.kotlin.model.dto.FormularioAsignacionCargo;
+import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.Categoria;
+import um.haberes.core.hexagonal.personas.dependencia.domain.model.Dependencia;
+import um.haberes.core.model.dto.FormularioAsignacionCargo;
 import um.haberes.core.service.dto.FormularioAsignacionCargoService;
 
 import java.math.BigDecimal;
@@ -100,9 +100,7 @@ class FormularioAsignacionCargoControllerTest {
                               "docente": 1,
                               "noDocente": 0,
                               "liquidaPorHora": 0,
-                              "estadoDocente": 35.00,
-                              "created": null,
-                              "updated": null
+                              "estadoDocente": 35.00
                             }
                           ],
                           "categoriasAsignables": [
@@ -113,9 +111,7 @@ class FormularioAsignacionCargoControllerTest {
                               "docente": 1,
                               "noDocente": 0,
                               "liquidaPorHora": 0,
-                              "estadoDocente": 35.00,
-                              "created": null,
-                              "updated": null
+                              "estadoDocente": 35.00
                             }
                           ],
                           "dependencias": [
@@ -125,10 +121,6 @@ class FormularioAsignacionCargoControllerTest {
                               "acronimo": "SECG",
                               "facultadId": 1,
                               "geograficaId": 2,
-                              "facultad": null,
-                              "geografica": null,
-                              "created": null,
-                              "updated": null,
                               "sedeKey": "1.2"
                             }
                           ],

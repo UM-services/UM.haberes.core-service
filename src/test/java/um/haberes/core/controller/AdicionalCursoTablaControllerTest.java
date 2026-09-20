@@ -11,7 +11,7 @@ import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.exception.AdicionalCursoTablaException;
-import um.haberes.core.kotlin.model.AdicionalCursoTabla;
+import um.haberes.core.model.AdicionalCursoTablaEntity;
 import um.haberes.core.service.AdicionalCursoTablaService;
 
 import java.util.List;
@@ -52,8 +52,8 @@ class AdicionalCursoTablaControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private AdicionalCursoTabla sampleAdicionalCursoTabla() {
-        AdicionalCursoTabla adicionalCursoTabla = new AdicionalCursoTabla();
+    private AdicionalCursoTablaEntity sampleAdicionalCursoTabla() {
+        AdicionalCursoTablaEntity adicionalCursoTabla = new AdicionalCursoTablaEntity();
         adicionalCursoTabla.setAdicionalCursoTablaId(1L);
         adicionalCursoTabla.setPeriodoDesde(202401L);
         adicionalCursoTabla.setPeriodoHasta(202412L);

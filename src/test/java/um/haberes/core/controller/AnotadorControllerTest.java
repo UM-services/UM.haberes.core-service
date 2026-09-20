@@ -12,7 +12,7 @@ import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.exception.AnotadorException;
-import um.haberes.core.kotlin.model.Anotador;
+import um.haberes.core.model.AnotadorEntity;
 import um.haberes.core.service.AnotadorService;
 
 import java.util.List;
@@ -65,8 +65,8 @@ class AnotadorControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private Anotador sampleAnotador() {
-        Anotador anotador = new Anotador();
+    private AnotadorEntity sampleAnotador() {
+        AnotadorEntity anotador = new AnotadorEntity();
         anotador.setAnotadorId(10L);
         anotador.setLegajoId(100L);
         anotador.setAnho(2024);
@@ -195,7 +195,7 @@ class AnotadorControllerTest {
     @Test
     void add_returnsOkWithSavedAnotador() throws Exception {
         String requestJson = new ObjectMapper().writeValueAsString(sampleAnotador());
-        when(service.add(any(Anotador.class))).thenReturn(sampleAnotador());
+        when(service.add(any(AnotadorEntity.class))).thenReturn(sampleAnotador());
 
         mockMvc.perform(post("/api/haberes/core/anotador/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -208,7 +208,7 @@ class AnotadorControllerTest {
     @Test
     void update_returnsOkWithUpdatedAnotador() throws Exception {
         String requestJson = new ObjectMapper().writeValueAsString(sampleAnotador());
-        when(service.update(any(Anotador.class), eq(10L))).thenReturn(sampleAnotador());
+        when(service.update(any(AnotadorEntity.class), eq(10L))).thenReturn(sampleAnotador());
 
         mockMvc.perform(put("/api/haberes/core/anotador/{anotadorId}", 10)
                         .contentType(MediaType.APPLICATION_JSON)

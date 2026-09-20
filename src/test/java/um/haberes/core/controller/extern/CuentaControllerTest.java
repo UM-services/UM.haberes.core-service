@@ -12,7 +12,7 @@ import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.exception.extern.CuentaException;
-import um.haberes.core.kotlin.model.extern.CuentaDto;
+import um.haberes.core.model.extern.CuentaDto;
 import um.haberes.core.service.extern.CuentaService;
 
 import java.math.BigDecimal;

@@ -10,7 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.LegajoControl;
+import um.haberes.core.model.LegajoControlEntity;
 import um.haberes.core.service.LegajoControlService;
 
 import java.util.List;
@@ -41,8 +41,8 @@ class LegajoControlControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private LegajoControl sampleLegajoControl() {
-        LegajoControl legajoControl = new LegajoControl();
+    private LegajoControlEntity sampleLegajoControl() {
+        LegajoControlEntity legajoControl = new LegajoControlEntity();
         legajoControl.setLegajoControlId(1L);
         legajoControl.setLegajoId(100L);
         legajoControl.setAnho(2024);
@@ -111,7 +111,7 @@ class LegajoControlControllerTest {
 
     @Test
     void add_returnsOkWithSavedLegajoControl() throws Exception {
-        when(service.add(any(LegajoControl.class))).thenReturn(sampleLegajoControl());
+        when(service.add(any(LegajoControlEntity.class))).thenReturn(sampleLegajoControl());
 
         String body = new ObjectMapper().writeValueAsString(sampleLegajoControl());
 
@@ -125,7 +125,7 @@ class LegajoControlControllerTest {
 
     @Test
     void update_returnsOkWithUpdatedLegajoControl() throws Exception {
-        when(service.update(any(LegajoControl.class), anyLong())).thenReturn(sampleLegajoControl());
+        when(service.update(any(LegajoControlEntity.class), anyLong())).thenReturn(sampleLegajoControl());
 
         String body = new ObjectMapper().writeValueAsString(sampleLegajoControl());
 
