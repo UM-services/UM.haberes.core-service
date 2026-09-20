@@ -10,9 +10,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.exception.NovedadException;
-import um.haberes.core.kotlin.model.Novedad;
-import um.haberes.core.service.NovedadService;
+import um.haberes.core.hexagonal.liquidaciones.novedad.application.exception.NovedadException;
+import um.haberes.core.hexagonal.liquidaciones.novedad.application.service.NovedadService;
+import um.haberes.core.hexagonal.liquidaciones.novedad.domain.model.Novedad;
+import um.haberes.core.hexagonal.liquidaciones.novedad.infrastructure.web.mapper.NovedadDtoMapper;
+import um.haberes.core.hexagonal.liquidaciones.novedad.infrastructure.web.controller.NovedadController;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -38,7 +40,7 @@ class NovedadControllerTest {
 
     @BeforeEach
     void setUp() {
-        controller = new NovedadController(service);
+        controller = new NovedadController(service, new NovedadDtoMapper());
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -74,13 +76,8 @@ class NovedadControllerTest {
               "value": "A",
               "observaciones": "obs",
               "importado": 1,
-              "novedadUploadId": 7,
-              "persona": null,
-              "codigo": null,
-              "dependencia": null,
-              "created": null,
-              "updated": null
-            }
+              "novedadUploadId": 7
+                                                                    }
             """;
 
     @Test
@@ -163,13 +160,13 @@ class NovedadControllerTest {
     }
 
     @Test
-    void add_returnsOkWithNovedadBody() throws Exception {
+    void add_returnsCreatedWithNovedadBody() throws Exception {
         when(service.add(any(Novedad.class))).thenReturn(sampleNovedad());
 
         mockMvc.perform(post("/api/haberes/core/novedad/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(novedadBodyJson()))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(NOVEDAD_JSON, JsonCompareMode.STRICT));
     }

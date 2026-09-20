@@ -11,9 +11,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.Codigo;
-import um.haberes.core.kotlin.model.view.CodigoSearch;
-import um.haberes.core.service.CodigoService;
+import um.haberes.core.hexagonal.liquidaciones.codigo.application.service.CodigoService;
+import um.haberes.core.hexagonal.liquidaciones.codigo.domain.model.Codigo;
+import um.haberes.core.hexagonal.liquidaciones.codigo.domain.model.CodigoSearchResult;
+import um.haberes.core.hexagonal.liquidaciones.codigo.infrastructure.web.controller.CodigoController;
+import um.haberes.core.hexagonal.liquidaciones.codigo.infrastructure.web.dto.CodigoResponse;
+import um.haberes.core.hexagonal.liquidaciones.codigo.infrastructure.web.dto.CodigoSearchResponse;
+import um.haberes.core.hexagonal.liquidaciones.codigo.infrastructure.web.mapper.CodigoDtoMapper;
 
 import java.util.List;
 
@@ -33,6 +37,9 @@ class CodigoControllerTest {
 
     @Mock
     private CodigoService service;
+
+    @Mock
+    private CodigoDtoMapper codigoDtoMapper;
 
     @InjectMocks
     private CodigoController controller;
@@ -59,6 +66,19 @@ class CodigoControllerTest {
         return codigo;
     }
 
+    private CodigoResponse sampleResponse() {
+        return CodigoResponse.builder()
+                .codigoId(10)
+                .nombre("SUELDO")
+                .docente((byte) 1)
+                .noDocente((byte) 1)
+                .transferible((byte) 0)
+                .incluidoEtec((byte) 1)
+                .afipConceptoSueldoIdPrimerSemestre(11L)
+                .afipConceptoSueldoIdSegundoSemestre(12L)
+                .build();
+    }
+
     private String codigoJson() {
         return """
                 {
@@ -69,37 +89,19 @@ class CodigoControllerTest {
                   "transferible": 0,
                   "incluidoEtec": 1,
                   "afipConceptoSueldoIdPrimerSemestre": 11,
-                  "afipConceptoSueldoIdSegundoSemestre": 12,
-                  "afipConceptoSueldoPrimerSemestre": null,
-                  "afipConceptoSueldoSegundoSemestre": null,
-                  "created": null,
-                  "updated": null
+                  "afipConceptoSueldoIdSegundoSemestre": 12
                 }
                 """;
     }
 
     private String codigoArrayJson() {
-        return """
-                [ {
-                  "codigoId": 10,
-                  "nombre": "SUELDO",
-                  "docente": 1,
-                  "noDocente": 1,
-                  "transferible": 0,
-                  "incluidoEtec": 1,
-                  "afipConceptoSueldoIdPrimerSemestre": 11,
-                  "afipConceptoSueldoIdSegundoSemestre": 12,
-                  "afipConceptoSueldoPrimerSemestre": null,
-                  "afipConceptoSueldoSegundoSemestre": null,
-                  "created": null,
-                  "updated": null
-                } ]
-                """;
+        return "[ " + codigoJson() + " ]";
     }
 
     @Test
     void findAll_returnsOkWithListOfCodigo() throws Exception {
         when(service.findAll()).thenReturn(List.of(sampleCodigo()));
+        when(codigoDtoMapper.toResponse(any(Codigo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(get("/api/haberes/core/codigo/"))
                 .andExpect(status().isOk())
@@ -110,6 +112,7 @@ class CodigoControllerTest {
     @Test
     void findAllByPeriodo_returnsOkWithListOfCodigo() throws Exception {
         when(service.findAllByPeriodo(2024, 6)).thenReturn(List.of(sampleCodigo()));
+        when(codigoDtoMapper.toResponse(any(Codigo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(get("/api/haberes/core/codigo/periodo/{anho}/{mes}", 2024, 6))
                 .andExpect(status().isOk())
@@ -118,13 +121,21 @@ class CodigoControllerTest {
 
     @Test
     void findAllSearch_returnsOkWithListOfCodigoSearch() throws Exception {
-        CodigoSearch codigoSearch = new CodigoSearch();
+        CodigoSearchResult codigoSearch = new CodigoSearchResult();
         codigoSearch.setCodigoId(10);
         codigoSearch.setNombre("SUELDO");
         codigoSearch.setDocente((byte) 1);
         codigoSearch.setNoDocente((byte) 0);
         codigoSearch.setSearch("sueldo");
         when(service.findAllSearch("sue")).thenReturn(List.of(codigoSearch));
+        when(codigoDtoMapper.toSearchResponse(any(CodigoSearchResult.class))).thenReturn(
+                CodigoSearchResponse.builder()
+                        .codigoId(10)
+                        .nombre("SUELDO")
+                        .docente((byte) 1)
+                        .noDocente((byte) 0)
+                        .search("sueldo")
+                        .build());
 
         mockMvc.perform(get("/api/haberes/core/codigo/search/{chain}", "sue"))
                 .andExpect(status().isOk())
@@ -134,9 +145,7 @@ class CodigoControllerTest {
                           "nombre": "SUELDO",
                           "docente": 1,
                           "noDocente": 0,
-                          "search": "sueldo",
-                          "created": null,
-                          "updated": null
+                          "search": "sueldo"
                         } ]
                         """, JsonCompareMode.STRICT));
     }
@@ -144,6 +153,7 @@ class CodigoControllerTest {
     @Test
     void findByCodigoId_returnsOkWithCodigo() throws Exception {
         when(service.findByCodigoId(10)).thenReturn(sampleCodigo());
+        when(codigoDtoMapper.toResponse(any(Codigo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(get("/api/haberes/core/codigo/{codigoId}", 10))
                 .andExpect(status().isOk())
@@ -153,6 +163,7 @@ class CodigoControllerTest {
     @Test
     void findLast_returnsOkWithCodigo() throws Exception {
         when(service.findLast()).thenReturn(sampleCodigo());
+        when(codigoDtoMapper.toResponse(any(Codigo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(get("/api/haberes/core/codigo/last"))
                 .andExpect(status().isOk())
@@ -166,19 +177,23 @@ class CodigoControllerTest {
     }
 
     @Test
-    void add_returnsOkWithCodigo() throws Exception {
+    void add_returnsCreatedWithCodigo() throws Exception {
+        when(codigoDtoMapper.toDomain(any())).thenReturn(sampleCodigo());
         when(service.add(any(Codigo.class))).thenReturn(sampleCodigo());
+        when(codigoDtoMapper.toResponse(any(Codigo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(post("/api/haberes/core/codigo/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sampleCodigo())))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().json(codigoJson(), JsonCompareMode.STRICT));
     }
 
     @Test
     void update_returnsOkWithCodigo() throws Exception {
+        when(codigoDtoMapper.toDomain(any())).thenReturn(sampleCodigo());
         when(service.update(any(Codigo.class), anyInt())).thenReturn(sampleCodigo());
+        when(codigoDtoMapper.toResponse(any(Codigo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(put("/api/haberes/core/codigo/{codigoId}", 10)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -189,7 +204,9 @@ class CodigoControllerTest {
 
     @Test
     void saveAll_returnsOkWithListOfCodigo() throws Exception {
+        when(codigoDtoMapper.toDomain(any())).thenReturn(sampleCodigo());
         when(service.saveAll(anyList())).thenReturn(List.of(sampleCodigo()));
+        when(codigoDtoMapper.toResponse(any(Codigo.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(put("/api/haberes/core/codigo/")
                         .contentType(MediaType.APPLICATION_JSON)

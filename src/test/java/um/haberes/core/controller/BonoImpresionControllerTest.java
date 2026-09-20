@@ -10,7 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.BonoImpresion;
+import um.haberes.core.model.BonoImpresionEntity;
 import um.haberes.core.service.BonoImpresionService;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -35,8 +35,8 @@ class BonoImpresionControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private BonoImpresion sampleBonoImpresion() {
-        BonoImpresion bonoImpresion = new BonoImpresion();
+    private BonoImpresionEntity sampleBonoImpresion() {
+        BonoImpresionEntity bonoImpresion = new BonoImpresionEntity();
         bonoImpresion.setBonoImpresionId(1L);
         bonoImpresion.setLegajoId(100L);
         bonoImpresion.setAnho(2024);
@@ -48,11 +48,11 @@ class BonoImpresionControllerTest {
 
     @Test
     void add_returnsOkWithBonoImpresionBody() throws Exception {
-        when(service.add(any(BonoImpresion.class))).thenReturn(sampleBonoImpresion());
+        when(service.add(any(BonoImpresionEntity.class))).thenReturn(sampleBonoImpresion());
 
         mockMvc.perform(post("/api/haberes/core/bonoimpresion/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(new BonoImpresion())))
+                        .content(new ObjectMapper().writeValueAsString(new BonoImpresionEntity())))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("""

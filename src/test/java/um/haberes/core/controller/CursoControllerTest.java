@@ -11,9 +11,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.Curso;
-import um.haberes.core.service.CursoCargoService;
-import um.haberes.core.service.CursoService;
+import um.haberes.core.hexagonal.cursos.curso.application.service.CursoService;
+import um.haberes.core.hexagonal.cursos.curso.domain.model.Curso;
+import um.haberes.core.hexagonal.cursos.curso.infrastructure.web.controller.CursoController;
+import um.haberes.core.hexagonal.cursos.curso.infrastructure.web.mapper.CursoDtoMapper;
 
 import java.util.List;
 
@@ -33,9 +34,6 @@ class CursoControllerTest {
     @Mock
     private CursoService service;
 
-    @Mock
-    private CursoCargoService cursoCargoService;
-
     @InjectMocks
     private CursoController controller;
 
@@ -45,6 +43,7 @@ class CursoControllerTest {
 
     @BeforeEach
     void setUp() {
+        controller = new CursoController(service, new CursoDtoMapper());
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -73,13 +72,8 @@ class CursoControllerTest {
                   "semestre1": 1,
                   "semestre2": 0,
                   "nivelId": 4,
-                  "adicionalCargaHoraria": 2,
-                  "facultad": null,
-                  "geografica": null,
-                  "nivel": null,
-                  "created": null,
-                  "updated": null
-                }
+                  "adicionalCargaHoraria": 2
+                                                    }
                 """;
     }
 
@@ -95,13 +89,8 @@ class CursoControllerTest {
                     "semestre1": 1,
                     "semestre2": 0,
                     "nivelId": 4,
-                    "adicionalCargaHoraria": 2,
-                    "facultad": null,
-                    "geografica": null,
-                    "nivel": null,
-                    "created": null,
-                    "updated": null
-                  }
+                    "adicionalCargaHoraria": 2
+                                                          }
                 ]
                 """;
     }
@@ -139,7 +128,7 @@ class CursoControllerTest {
 
     @Test
     void findAllByFacultadIdAndGeograficaIdAndAnhoAndMes_returnsOkWithListOfCursos() throws Exception {
-        when(service.findAllByFacultadIdAndGeograficaIdAndAnhoAndMes(2, 3, 2024, 6, cursoCargoService))
+        when(service.findAllByFacultadIdAndGeograficaIdAndAnhoAndMes(2, 3, 2024, 6))
                 .thenReturn(List.of(sampleCurso()));
 
         mockMvc.perform(get("/api/haberes/core/curso/facultad/{facultadId}/geografica/{geograficaId}/periodo/{anho}/{mes}",

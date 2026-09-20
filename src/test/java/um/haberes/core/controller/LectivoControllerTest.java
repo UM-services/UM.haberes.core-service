@@ -11,7 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.Lectivo;
+import um.haberes.core.model.LectivoEntity;
 import um.haberes.core.service.LectivoService;
 
 import java.util.List;
@@ -39,8 +39,8 @@ class LectivoControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private Lectivo sampleLectivo() {
-        Lectivo lectivo = new Lectivo();
+    private LectivoEntity sampleLectivo() {
+        LectivoEntity lectivo = new LectivoEntity();
         lectivo.setLectivoId(1);
         lectivo.setNombre("Lectivo 2024");
         lectivo.setReducido(2024);
@@ -93,7 +93,7 @@ class LectivoControllerTest {
 
     @Test
     void saveAll_returnsOkWithSavedLectivos() throws Exception {
-        Lectivo lectivo = sampleLectivo();
+        LectivoEntity lectivo = sampleLectivo();
         when(service.saveAll(anyList())).thenReturn(List.of(lectivo));
 
         mockMvc.perform(put("/api/haberes/core/lectivo/saveall")

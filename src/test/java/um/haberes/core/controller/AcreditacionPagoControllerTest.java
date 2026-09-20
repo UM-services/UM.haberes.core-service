@@ -11,8 +11,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.AcreditacionPago;
-import um.haberes.core.service.AcreditacionPagoService;
+import um.haberes.core.hexagonal.liquidaciones.acreditacion_pago.application.service.AcreditacionPagoService;
+import um.haberes.core.hexagonal.liquidaciones.acreditacion_pago.domain.model.AcreditacionPago;
+import um.haberes.core.hexagonal.liquidaciones.acreditacion_pago.infrastructure.web.controller.AcreditacionPagoController;
+import um.haberes.core.hexagonal.liquidaciones.acreditacion_pago.infrastructure.web.mapper.AcreditacionPagoDtoMapper;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -44,19 +46,18 @@ class AcreditacionPagoControllerTest {
               "acreditacionPagoId": 1,
               "anho": 2024,
               "mes": 6,
-              "fechaPago": null,
+              "fechaPago": "2024-06-15T10:30:00Z",
               "totalSantander": 5000.25,
               "totalOtrosBancos": 2500.75,
               "comprobanteIdPago": 11,
               "puntoVentaPago": 22,
-              "numeroComprobantePago": 33,
-              "created": null,
-              "updated": null
-            }
+              "numeroComprobantePago": 33
+                                        }
             """;
 
     @BeforeEach
     void setUp() {
+        controller = new AcreditacionPagoController(service, new AcreditacionPagoDtoMapper());
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -65,6 +66,7 @@ class AcreditacionPagoControllerTest {
         acreditacionPago.setAcreditacionPagoId(1L);
         acreditacionPago.setAnho(2024);
         acreditacionPago.setMes(6);
+        acreditacionPago.setFechaPago(OffsetDateTime.parse(FECHA_PAGO));
         acreditacionPago.setTotalSantander(new BigDecimal("5000.25"));
         acreditacionPago.setTotalOtrosBancos(new BigDecimal("2500.75"));
         acreditacionPago.setComprobanteIdPago(11);
@@ -85,7 +87,18 @@ class AcreditacionPagoControllerTest {
 
     @Test
     void add_returnsOkWithSavedAcreditacionPago() throws Exception {
-        String requestJson = new ObjectMapper().writeValueAsString(sampleAcreditacionPago());
+        String requestJson = """
+                {
+                  "anho": 2024,
+                  "mes": 6,
+                  "fechaPago": "2024-06-15T10:30:00Z",
+                  "totalSantander": 5000.25,
+                  "totalOtrosBancos": 2500.75,
+                  "comprobanteIdPago": 11,
+                  "puntoVentaPago": 22,
+                  "numeroComprobantePago": 33
+                }
+                """;
         when(service.add(any(AcreditacionPago.class))).thenReturn(sampleAcreditacionPago());
 
         mockMvc.perform(post("/api/haberes/core/acreditacionpago/")
@@ -98,7 +111,18 @@ class AcreditacionPagoControllerTest {
 
     @Test
     void update_returnsOkWithUpdatedAcreditacionPago() throws Exception {
-        String requestJson = new ObjectMapper().writeValueAsString(sampleAcreditacionPago());
+        String requestJson = """
+                {
+                  "anho": 2024,
+                  "mes": 6,
+                  "fechaPago": "2024-06-15T10:30:00Z",
+                  "totalSantander": 5000.25,
+                  "totalOtrosBancos": 2500.75,
+                  "comprobanteIdPago": 11,
+                  "puntoVentaPago": 22,
+                  "numeroComprobantePago": 33
+                }
+                """;
         when(service.update(any(AcreditacionPago.class), eq(1L))).thenReturn(sampleAcreditacionPago());
 
         mockMvc.perform(put("/api/haberes/core/acreditacionpago/{acreditacionpagoId}", 1)

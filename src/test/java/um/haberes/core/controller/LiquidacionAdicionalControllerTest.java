@@ -11,7 +11,7 @@ import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.exception.LiquidacionAdicionalException;
-import um.haberes.core.kotlin.model.LiquidacionAdicional;
+import um.haberes.core.model.LiquidacionAdicionalEntity;
 import um.haberes.core.service.LiquidacionAdicionalService;
 
 import java.math.BigDecimal;
@@ -41,8 +41,8 @@ class LiquidacionAdicionalControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private LiquidacionAdicional sampleLiquidacionAdicional() {
-        LiquidacionAdicional liquidacionAdicional = new LiquidacionAdicional();
+    private LiquidacionAdicionalEntity sampleLiquidacionAdicional() {
+        LiquidacionAdicionalEntity liquidacionAdicional = new LiquidacionAdicionalEntity();
         liquidacionAdicional.setLiquidacionAdicionalId(1L);
         liquidacionAdicional.setLegajoId(100L);
         liquidacionAdicional.setAnho(2024);
@@ -108,7 +108,7 @@ class LiquidacionAdicionalControllerTest {
 
     @Test
     void add_returnsOkWithSavedLiquidacionAdicional() throws Exception {
-        when(service.add(any(LiquidacionAdicional.class))).thenReturn(sampleLiquidacionAdicional());
+        when(service.add(any(LiquidacionAdicionalEntity.class))).thenReturn(sampleLiquidacionAdicional());
 
         String body = new ObjectMapper().writeValueAsString(sampleLiquidacionAdicional());
 

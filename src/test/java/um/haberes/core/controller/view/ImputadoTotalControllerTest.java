@@ -10,7 +10,7 @@ import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.exception.view.ImputadoTotalException;
-import um.haberes.core.kotlin.model.view.ImputadoTotal;
+import um.haberes.core.model.view.ImputadoTotal;
 import um.haberes.core.service.view.ImputadoTotalService;
 
 import java.math.BigDecimal;

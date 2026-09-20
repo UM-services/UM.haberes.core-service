@@ -11,10 +11,15 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.exception.CargoLiquidacionException;
-import um.haberes.core.kotlin.model.CargoLiquidacion;
-import um.haberes.core.kotlin.model.view.CargoLiquidacionPeriodo;
-import um.haberes.core.service.CargoLiquidacionService;
+import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.application.exception.CargoLiquidacionException;
+import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.application.service.CargoLiquidacionService;
+import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.model.CargoLiquidacion;
+import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.infrastructure.web.controller.CargoLiquidacionController;
+import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.infrastructure.web.mapper.CargoLiquidacionDtoMapper;
+import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.web.mapper.CategoriaDtoMapper;
+import um.haberes.core.hexagonal.personas.dependencia.infrastructure.web.mapper.DependenciaDtoMapper;
+import um.haberes.core.hexagonal.personas.persona.infrastructure.web.mapper.PersonaDtoMapper;
+import um.haberes.core.model.view.CargoLiquidacionPeriodo;
 import um.haberes.core.service.view.CargoLiquidacionPeriodoService;
 
 import java.math.BigDecimal;
@@ -51,6 +56,9 @@ class CargoLiquidacionControllerTest {
 
     @BeforeEach
     void setUp() {
+        controller = new CargoLiquidacionController(service, new CargoLiquidacionDtoMapper(
+                new PersonaDtoMapper(new DependenciaDtoMapper()), new DependenciaDtoMapper(), new CategoriaDtoMapper()),
+                cargoLiquidacionPeriodoService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -92,10 +100,8 @@ class CargoLiquidacionControllerTest {
                   "situacion": "A",
                   "persona": null,
                   "dependencia": null,
-                  "categoria": null,
-                  "created": null,
-                  "updated": null
-                }
+                  "categoria": null
+                                                    }
                 """;
     }
 
@@ -143,10 +149,8 @@ class CargoLiquidacionControllerTest {
                           "situacion": "A",
                           "persona": null,
                           "dependencia": null,
-                          "categoria": null,
-                          "created": null,
-                          "updated": null
-                        } ]
+                          "categoria": null
+                                                                            } ]
                         """, JsonCompareMode.STRICT));
     }
 
@@ -175,10 +179,8 @@ class CargoLiquidacionControllerTest {
                           "situacion": "A",
                           "persona": null,
                           "dependencia": null,
-                          "categoria": null,
-                          "created": null,
-                          "updated": null
-                        } ]
+                          "categoria": null
+                                                                            } ]
                         """, JsonCompareMode.STRICT));
     }
 
@@ -208,10 +210,8 @@ class CargoLiquidacionControllerTest {
                           "situacion": "A",
                           "persona": null,
                           "dependencia": null,
-                          "categoria": null,
-                          "created": null,
-                          "updated": null
-                        } ]
+                          "categoria": null
+                                                                            } ]
                         """, JsonCompareMode.STRICT));
     }
 
@@ -240,10 +240,8 @@ class CargoLiquidacionControllerTest {
                           "situacion": "A",
                           "persona": null,
                           "dependencia": null,
-                          "categoria": null,
-                          "created": null,
-                          "updated": null
-                        } ]
+                          "categoria": null
+                                                                            } ]
                         """, JsonCompareMode.STRICT));
     }
 
@@ -273,10 +271,8 @@ class CargoLiquidacionControllerTest {
                           "situacion": "A",
                           "persona": null,
                           "dependencia": null,
-                          "categoria": null,
-                          "created": null,
-                          "updated": null
-                        } ]
+                          "categoria": null
+                                                                            } ]
                         """, JsonCompareMode.STRICT));
     }
 
@@ -305,10 +301,8 @@ class CargoLiquidacionControllerTest {
                           "situacion": "A",
                           "persona": null,
                           "dependencia": null,
-                          "categoria": null,
-                          "created": null,
-                          "updated": null
-                        } ]
+                          "categoria": null
+                                                                            } ]
                         """, JsonCompareMode.STRICT));
     }
 
@@ -337,10 +331,8 @@ class CargoLiquidacionControllerTest {
                           "situacion": "A",
                           "persona": null,
                           "dependencia": null,
-                          "categoria": null,
-                          "created": null,
-                          "updated": null
-                        } ]
+                          "categoria": null
+                                                                            } ]
                         """, JsonCompareMode.STRICT));
     }
 
@@ -368,13 +360,8 @@ class CargoLiquidacionControllerTest {
                           "presentismo": 100,
                           "asignacionEspecialPermanente": 2.00,
                           "situacion": "A",
-                          "periodo": 202406,
-                          "persona": null,
-                          "dependencia": null,
-                          "categoria": null,
-                          "created": null,
-                          "updated": null
-                        } ]
+                          "periodo": 202406
+                                                                            } ]
                         """, JsonCompareMode.STRICT));
     }
 
@@ -454,10 +441,8 @@ class CargoLiquidacionControllerTest {
                           "situacion": "A",
                           "persona": null,
                           "dependencia": null,
-                          "categoria": null,
-                          "created": null,
-                          "updated": null
-                        } ]
+                          "categoria": null
+                                                                            } ]
                         """, JsonCompareMode.STRICT));
     }
 

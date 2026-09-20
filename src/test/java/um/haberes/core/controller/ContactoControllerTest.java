@@ -12,7 +12,7 @@ import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.exception.ContactoException;
-import um.haberes.core.kotlin.model.Contacto;
+import um.haberes.core.model.ContactoEntity;
 import um.haberes.core.service.ContactoService;
 
 import java.util.List;
@@ -45,8 +45,8 @@ class ContactoControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private Contacto sampleContacto() {
-        Contacto contacto = new Contacto();
+    private ContactoEntity sampleContacto() {
+        ContactoEntity contacto = new ContactoEntity();
         contacto.setLegajoId(1L);
         contacto.setFijo("1234-5678");
         contacto.setMovil("099-123-456");
@@ -134,7 +134,7 @@ class ContactoControllerTest {
 
     @Test
     void add_returnsOkWithContactoBody() throws Exception {
-        when(service.add(any(Contacto.class))).thenReturn(sampleContacto());
+        when(service.add(any(ContactoEntity.class))).thenReturn(sampleContacto());
 
         mockMvc.perform(post("/api/haberes/core/contacto/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -145,7 +145,7 @@ class ContactoControllerTest {
 
     @Test
     void update_returnsOkWithContactoBody() throws Exception {
-        when(service.update(any(Contacto.class), eq(1L))).thenReturn(sampleContacto());
+        when(service.update(any(ContactoEntity.class), eq(1L))).thenReturn(sampleContacto());
 
         mockMvc.perform(put("/api/haberes/core/contacto/{legajoId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)

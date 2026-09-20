@@ -11,7 +11,7 @@ import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.exception.view.TotalSalidaException;
-import um.haberes.core.kotlin.model.view.TotalSalida;
+import um.haberes.core.model.view.TotalSalida;
 import um.haberes.core.service.view.TotalSalidaService;
 
 import java.math.BigDecimal;

@@ -10,8 +10,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.Letra;
-import um.haberes.core.service.LetraService;
+import um.haberes.core.hexagonal.liquidaciones.letra.application.service.LetraService;
+import um.haberes.core.hexagonal.liquidaciones.letra.domain.model.Letra;
+import um.haberes.core.hexagonal.liquidaciones.letra.infrastructure.web.mapper.LetraDtoMapper;
+import um.haberes.core.hexagonal.liquidaciones.letra.infrastructure.web.controller.LetraController;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -39,7 +41,7 @@ class LetraControllerTest {
 
     @BeforeEach
     void setUp() {
-        controller = new LetraController(service);
+        controller = new LetraController(service, new LetraDtoMapper());
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -56,14 +58,22 @@ class LetraControllerTest {
 
     private final String expectedLetra = """
             {
+              "legajoId": 100,
+              "anho": 2024,
+              "mes": 6,
+              "neto": 105.00,
+              "cadena": "A.B.C"
+            }
+            """;
+
+    private final String expectedLetraFull = """
+            {
               "letraId": 1,
               "legajoId": 100,
               "anho": 2024,
               "mes": 6,
               "neto": 105.00,
-              "cadena": "A.B.C",
-              "created": null,
-              "updated": null
+              "cadena": "A.B.C"
             }
             """;
 
@@ -74,7 +84,7 @@ class LetraControllerTest {
         mockMvc.perform(get("/api/haberes/core/letra/periodo/{anho}/{mes}/{limit}", 2024, 6, 100))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(content().json("[" + expectedLetra + "]", JsonCompareMode.STRICT));
+                .andExpect(content().json("[" + expectedLetraFull + "]", JsonCompareMode.STRICT));
     }
 
     @Test
@@ -83,7 +93,7 @@ class LetraControllerTest {
 
         mockMvc.perform(get("/api/haberes/core/letra/periodo/{anho}/{mes}/{limit}", 2024, 6, 0))
                 .andExpect(status().isOk())
-                .andExpect(content().json("[" + expectedLetra + "]", JsonCompareMode.STRICT));
+                .andExpect(content().json("[" + expectedLetraFull + "]", JsonCompareMode.STRICT));
     }
 
     @Test
@@ -93,11 +103,11 @@ class LetraControllerTest {
         mockMvc.perform(get("/api/haberes/core/letra/unique/{legajoId}/{anho}/{mes}", 100L, 2024, 6))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(expectedLetra, JsonCompareMode.STRICT));
+                .andExpect(content().json(expectedLetraFull, JsonCompareMode.STRICT));
     }
 
     @Test
-    void add_returnsOkWithSavedLetra() throws Exception {
+    void add_returnsCreatedWithSavedLetra() throws Exception {
         when(service.add(any(Letra.class))).thenReturn(sampleLetra());
 
         String body = new ObjectMapper().writeValueAsString(sampleLetra());
@@ -105,9 +115,9 @@ class LetraControllerTest {
         mockMvc.perform(post("/api/haberes/core/letra/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(expectedLetra, JsonCompareMode.STRICT));
+                .andExpect(content().json(expectedLetraFull, JsonCompareMode.STRICT));
     }
 
     @Test
@@ -121,12 +131,12 @@ class LetraControllerTest {
                         .content(body))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(expectedLetra, JsonCompareMode.STRICT));
+                .andExpect(content().json(expectedLetraFull, JsonCompareMode.STRICT));
     }
 
     @Test
     void saveAll_returnsOkWithListOfSavedLetra() throws Exception {
-        when(service.saveAll(anyList())).thenReturn(List.of(sampleLetra()));
+        when(service.saveAllLetras(anyList())).thenReturn(List.of(sampleLetra()));
 
         String body = new ObjectMapper().writeValueAsString(List.of(sampleLetra()));
 
@@ -135,7 +145,7 @@ class LetraControllerTest {
                         .content(body))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(content().json("[" + expectedLetra + "]", JsonCompareMode.STRICT));
+                .andExpect(content().json("[" + expectedLetraFull + "]", JsonCompareMode.STRICT));
     }
 
     @Test

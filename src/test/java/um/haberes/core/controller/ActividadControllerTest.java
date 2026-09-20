@@ -12,8 +12,8 @@ import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.exception.ActividadException;
-import um.haberes.core.kotlin.model.Actividad;
-import um.haberes.core.kotlin.model.view.ActividadPeriodo;
+import um.haberes.core.model.ActividadEntity;
+import um.haberes.core.model.view.ActividadPeriodo;
 import um.haberes.core.service.ActividadService;
 
 import java.util.List;
@@ -76,8 +76,8 @@ class ActividadControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private Actividad sampleActividad() {
-        Actividad actividad = new Actividad();
+    private ActividadEntity sampleActividad() {
+        ActividadEntity actividad = new ActividadEntity();
         actividad.setActividadId(1L);
         actividad.setLegajoId(100L);
         actividad.setAnho(2024);
@@ -144,7 +144,7 @@ class ActividadControllerTest {
     @Test
     void add_returnsOkWithSavedActividad() throws Exception {
         String requestJson = new ObjectMapper().writeValueAsString(sampleActividad());
-        when(service.add(any(Actividad.class))).thenReturn(sampleActividad());
+        when(service.add(any(ActividadEntity.class))).thenReturn(sampleActividad());
 
         mockMvc.perform(post("/api/haberes/core/actividad/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -157,7 +157,7 @@ class ActividadControllerTest {
     @Test
     void update_returnsOkWithUpdatedActividad() throws Exception {
         String requestJson = new ObjectMapper().writeValueAsString(sampleActividad());
-        when(service.update(any(Actividad.class), eq(1L))).thenReturn(sampleActividad());
+        when(service.update(any(ActividadEntity.class), eq(1L))).thenReturn(sampleActividad());
 
         mockMvc.perform(put("/api/haberes/core/actividad/{actividadId}", 1)
                         .contentType(MediaType.APPLICATION_JSON)

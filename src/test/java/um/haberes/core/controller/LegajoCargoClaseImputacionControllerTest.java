@@ -10,12 +10,16 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.LegajoCargoClaseImputacion;
-import um.haberes.core.service.LegajoCargoClaseImputacionService;
+import um.haberes.core.hexagonal.contabilidad.legajo_cargo_clase_imputacion.application.service.LegajoCargoClaseImputacionService;
+import um.haberes.core.hexagonal.contabilidad.legajo_cargo_clase_imputacion.domain.model.LegajoCargoClaseImputacion;
+import um.haberes.core.hexagonal.contabilidad.legajo_cargo_clase_imputacion.infrastructure.web.controller.LegajoCargoClaseImputacionController;
+import um.haberes.core.hexagonal.contabilidad.legajo_cargo_clase_imputacion.infrastructure.web.dto.LegajoCargoClaseImputacionResponse;
+import um.haberes.core.hexagonal.contabilidad.legajo_cargo_clase_imputacion.infrastructure.web.mapper.LegajoCargoClaseImputacionDtoMapper;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -26,6 +30,9 @@ class LegajoCargoClaseImputacionControllerTest {
 
     @Mock
     private LegajoCargoClaseImputacionService service;
+
+    @Mock
+    private LegajoCargoClaseImputacionDtoMapper mapper;
 
     @InjectMocks
     private LegajoCargoClaseImputacionController controller;
@@ -54,6 +61,23 @@ class LegajoCargoClaseImputacionControllerTest {
         return legajoCargoClaseImputacion;
     }
 
+    private LegajoCargoClaseImputacionResponse sampleResponse() {
+        return LegajoCargoClaseImputacionResponse.builder()
+                .legajoCargoClaseImputacionId(11L)
+                .legajoId(123L)
+                .anho(2024)
+                .mes(6)
+                .dependenciaId(2)
+                .facultadId(3)
+                .geograficaId(4)
+                .cargoClaseId(55L)
+                .cuentaSueldos(new BigDecimal("30000"))
+                .basico(new BigDecimal("20000.00"))
+                .antiguedad(new BigDecimal("1500.50"))
+                .cuentaAportes(new BigDecimal("5000"))
+                .build();
+    }
+
     private String legajoCargoClaseImputacionJson() {
         return """
                 {
@@ -68,9 +92,7 @@ class LegajoCargoClaseImputacionControllerTest {
                   "cuentaSueldos": 30000,
                   "basico": 20000.00,
                   "antiguedad": 1500.50,
-                  "cuentaAportes": 5000,
-                  "created": null,
-                  "updated": null
+                  "cuentaAportes": 5000
                 }
                 """;
     }
@@ -78,6 +100,7 @@ class LegajoCargoClaseImputacionControllerTest {
     @Test
     void findAllByLegajo_returnsOkWithListOfLegajoCargoClaseImputacions() throws Exception {
         when(service.findAllByLegajo(123L, 2024, 6)).thenReturn(List.of(sampleLegajoCargoClaseImputacion()));
+        when(mapper.toResponse(any(LegajoCargoClaseImputacion.class))).thenReturn(sampleResponse());
 
         mockMvc.perform(get("/api/haberes/core/legajocargoclaseimputacion/legajo/{legajoId}/{anho}/{mes}", 123, 2024, 6))
                 .andExpect(status().isOk())

@@ -10,9 +10,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.exception.CargoTipoException;
-import um.haberes.core.kotlin.model.CargoTipo;
-import um.haberes.core.service.CargoTipoService;
+import um.haberes.core.hexagonal.cursos.cargo_tipo.application.exception.CargoTipoException;
+import um.haberes.core.hexagonal.cursos.cargo_tipo.application.service.CargoTipoService;
+import um.haberes.core.hexagonal.cursos.cargo_tipo.domain.model.CargoTipo;
+import um.haberes.core.hexagonal.cursos.cargo_tipo.infrastructure.web.controller.CargoTipoController;
+import um.haberes.core.hexagonal.cursos.cargo_tipo.infrastructure.web.mapper.CargoTipoDtoMapper;
 
 import java.util.List;
 
@@ -34,6 +36,7 @@ class CargoTipoControllerTest {
 
     @BeforeEach
     void setUp() {
+        controller = new CargoTipoController(service, new CargoTipoDtoMapper());
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -52,10 +55,8 @@ class CargoTipoControllerTest {
                   "cargoTipoId": 1,
                   "aCargo": 1,
                   "nombre": "TITULAR",
-                  "precedencia": 10,
-                  "created": null,
-                  "updated": null
-                }
+                  "precedencia": 10
+                                                    }
                 """;
     }
 
@@ -71,10 +72,8 @@ class CargoTipoControllerTest {
                           "cargoTipoId": 1,
                           "aCargo": 1,
                           "nombre": "TITULAR",
-                          "precedencia": 10,
-                          "created": null,
-                          "updated": null
-                        } ]
+                          "precedencia": 10
+                                                                            } ]
                         """, JsonCompareMode.STRICT));
     }
 

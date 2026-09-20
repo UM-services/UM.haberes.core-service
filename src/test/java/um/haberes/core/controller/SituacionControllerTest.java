@@ -9,7 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.Situacion;
+import um.haberes.core.model.SituacionEntity;
 import um.haberes.core.service.SituacionService;
 
 import java.util.List;
@@ -35,8 +35,8 @@ class SituacionControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private Situacion sampleSituacion() {
-        Situacion situacion = new Situacion();
+    private SituacionEntity sampleSituacion() {
+        SituacionEntity situacion = new SituacionEntity();
         situacion.setSituacionId(5);
         situacion.setNombre("TITULAR");
         situacion.setInterino((byte) 0);

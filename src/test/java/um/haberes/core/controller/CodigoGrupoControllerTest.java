@@ -11,7 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.CodigoGrupo;
+import um.haberes.core.model.CodigoGrupoEntity;
 import um.haberes.core.service.CodigoGrupoService;
 
 import java.util.List;
@@ -43,8 +43,8 @@ class CodigoGrupoControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private CodigoGrupo sampleCodigoGrupo() {
-        CodigoGrupo codigoGrupo = new CodigoGrupo();
+    private CodigoGrupoEntity sampleCodigoGrupo() {
+        CodigoGrupoEntity codigoGrupo = new CodigoGrupoEntity();
         codigoGrupo.setCodigoId(10);
         codigoGrupo.setRemunerativo((byte) 1);
         codigoGrupo.setNoRemunerativo((byte) 0);
@@ -131,7 +131,7 @@ class CodigoGrupoControllerTest {
 
     @Test
     void add_returnsOkWithCodigoGrupo() throws Exception {
-        when(service.add(any(CodigoGrupo.class))).thenReturn(sampleCodigoGrupo());
+        when(service.add(any(CodigoGrupoEntity.class))).thenReturn(sampleCodigoGrupo());
 
         mockMvc.perform(post("/api/haberes/core/codigogrupo/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -142,7 +142,7 @@ class CodigoGrupoControllerTest {
 
     @Test
     void update_returnsOkWithCodigoGrupo() throws Exception {
-        when(service.update(any(CodigoGrupo.class), anyInt())).thenReturn(sampleCodigoGrupo());
+        when(service.update(any(CodigoGrupoEntity.class), anyInt())).thenReturn(sampleCodigoGrupo());
 
         mockMvc.perform(put("/api/haberes/core/codigogrupo/{codigoId}", 10)
                         .contentType(MediaType.APPLICATION_JSON)

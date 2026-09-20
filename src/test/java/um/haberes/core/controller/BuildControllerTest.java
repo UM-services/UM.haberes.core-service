@@ -9,7 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.Build;
+import um.haberes.core.model.BuildEntity;
 import um.haberes.core.service.BuildService;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -35,8 +35,8 @@ class BuildControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private Build sampleBuild() {
-        Build build = new Build();
+    private BuildEntity sampleBuild() {
+        BuildEntity build = new BuildEntity();
         build.setBuild(42L);
         return build;
     }
@@ -59,7 +59,7 @@ class BuildControllerTest {
 
     @Test
     void add_returnsOkWithBuildBody() throws Exception {
-        when(service.add(any(Build.class))).thenReturn(sampleBuild());
+        when(service.add(any(BuildEntity.class))).thenReturn(sampleBuild());
 
         mockMvc.perform(post("/api/haberes/core/build/"))
                 .andExpect(status().isOk())

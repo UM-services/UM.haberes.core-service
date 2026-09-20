@@ -11,12 +11,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.exception.CategoriaException;
-import um.haberes.core.exception.common.TituloNotFoundException;
-import um.haberes.core.kotlin.model.Categoria;
-import um.haberes.core.kotlin.model.view.CategoriaSearch;
-import um.haberes.core.service.CategoriaService;
-import um.haberes.core.util.transfer.FileInfo;
+import um.haberes.core.hexagonal.liquidaciones.categoria.application.exception.CategoriaException;
+import um.haberes.core.hexagonal.liquidaciones.categoria.application.exception.CategoriaException;
+import um.haberes.core.hexagonal.liquidaciones.categoria.application.service.CategoriaService;
+import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.Categoria;
+import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.web.controller.CategoriaController;
+import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.CategoriaSearchResult;
+import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.UploadedFile;
+import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.web.mapper.CategoriaDtoMapper;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -39,7 +41,6 @@ class CategoriaControllerTest {
     @Mock
     private CategoriaService service;
 
-    @InjectMocks
     private CategoriaController controller;
 
     private MockMvc mockMvc;
@@ -48,6 +49,7 @@ class CategoriaControllerTest {
 
     @BeforeEach
     void setUp() {
+        controller = new CategoriaController(service, new CategoriaDtoMapper());
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -72,10 +74,8 @@ class CategoriaControllerTest {
                   "docente": 1,
                   "noDocente": 0,
                   "liquidaPorHora": 0,
-                  "estadoDocente": 1.20,
-                  "created": null,
-                  "updated": null
-                }
+                  "estadoDocente": 1.20
+                                                    }
                 """;
     }
 
@@ -88,10 +88,8 @@ class CategoriaControllerTest {
                   "docente": 1,
                   "noDocente": 0,
                   "liquidaPorHora": 0,
-                  "estadoDocente": 1.20,
-                  "created": null,
-                  "updated": null
-                } ]
+                  "estadoDocente": 1.20
+                                                    } ]
                 """;
     }
 
@@ -116,7 +114,7 @@ class CategoriaControllerTest {
 
     @Test
     void findAllSearch_returnsOkWithListOfCategoriaSearch() throws Exception {
-        CategoriaSearch categoriaSearch = new CategoriaSearch();
+        CategoriaSearchResult categoriaSearch = new CategoriaSearchResult();
         categoriaSearch.setCategoriaId(5);
         categoriaSearch.setNombre("Auxiliar");
         categoriaSearch.setBasico(new BigDecimal("9.75"));
@@ -130,9 +128,7 @@ class CategoriaControllerTest {
                           "categoriaId": 5,
                           "nombre": "Auxiliar",
                           "basico": 9.75,
-                          "search": "auxiliar 9.75",
-                          "created": null,
-                          "updated": null
+                          "search": "auxiliar 9.75"
                         } ]
                         """, JsonCompareMode.STRICT));
     }
@@ -230,7 +226,7 @@ class CategoriaControllerTest {
 
     @Test
     void upload_returnsNoContent() throws Exception {
-        FileInfo fileInfo = new FileInfo("categorias.xlsx", "YWJjZGVm");
+        UploadedFile fileInfo = new UploadedFile("categorias.xlsx", "YWJjZGVm");
 
         mockMvc.perform(post("/api/haberes/core/categoria/upload/{anho}/{mes}", 2024, 6)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -239,10 +235,10 @@ class CategoriaControllerTest {
     }
 
     @Test
-    void upload_whenServiceThrowsTituloNotFoundException_returnsBadRequest() throws Exception {
-        FileInfo fileInfo = new FileInfo("categorias.xlsx", "YWJjZGVm");
-        doThrow(new TituloNotFoundException("titulo no encontrado"))
-                .when(service).upload(any(FileInfo.class), anyInt(), anyInt());
+    void upload_whenServiceThrowsCategoriaException_returnsBadRequest() throws Exception {
+        UploadedFile fileInfo = new UploadedFile("categorias.xlsx", "YWJjZGVm");
+        doThrow(new CategoriaException("titulo no encontrado"))
+                .when(service).upload(any(UploadedFile.class), anyInt(), anyInt());
 
         mockMvc.perform(post("/api/haberes/core/categoria/upload/{anho}/{mes}", 2024, 6)
                         .contentType(MediaType.APPLICATION_JSON)

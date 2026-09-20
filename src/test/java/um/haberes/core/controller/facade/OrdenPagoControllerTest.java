@@ -11,14 +11,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.internal.OrdenPagoRequest;
+import um.haberes.core.model.internal.OrdenPagoRequest;
 import um.haberes.core.service.facade.OrdenPagoService;
 
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -93,7 +91,7 @@ class OrdenPagoControllerTest {
         assertEquals(6, received.getMes());
         assertEquals(new BigDecimal("1000.50"), received.getTotalSantander());
         assertEquals(new BigDecimal("200.25"), received.getTotalOtrosBancos());
-        assertEquals(true, received.getIndividual());
+        assertTrue(received.isIndividual());
         assertNull(received.getFechaPago());
     }
 }

@@ -11,7 +11,7 @@ import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.exception.extern.EjercicioException;
-import um.haberes.core.kotlin.model.extern.EjercicioDto;
+import um.haberes.core.model.extern.EjercicioDto;
 import um.haberes.core.service.extern.EjercicioService;
 
 import java.time.OffsetDateTime;

@@ -9,7 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.CargoClasePeriodo;
+import um.haberes.core.model.CargoClasePeriodoEntity;
 import um.haberes.core.service.facade.CargoClaseToolService;
 
 import java.math.BigDecimal;
@@ -40,8 +40,8 @@ class CargoClaseToolControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private CargoClasePeriodo sampleCargoClasePeriodo() {
-        return new CargoClasePeriodo(
+    private CargoClasePeriodoEntity sampleCargoClasePeriodo() {
+        return new CargoClasePeriodoEntity(
                 7L,
                 100L,
                 2L,
@@ -64,7 +64,7 @@ class CargoClaseToolControllerTest {
 
     @Test
     void addCargo_returnsOkWithMessage() throws Exception {
-        when(service.addCargo(any(CargoClasePeriodo.class))).thenReturn("Ok");
+        when(service.addCargo(any(CargoClasePeriodoEntity.class))).thenReturn("Ok");
 
         mockMvc.perform(post("/api/haberes/core/cargoclasetool/")
                         .contentType(MediaType.APPLICATION_JSON)

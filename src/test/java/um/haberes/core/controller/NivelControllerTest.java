@@ -9,7 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.Nivel;
+import um.haberes.core.model.NivelEntity;
 import um.haberes.core.service.NivelService;
 
 import java.util.List;
@@ -35,8 +35,8 @@ class NivelControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private Nivel sampleNivel() {
-        return new Nivel(1, "Grado");
+    private NivelEntity sampleNivel() {
+        return new NivelEntity(1, "Grado");
     }
 
     @Test

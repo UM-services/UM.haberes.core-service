@@ -11,8 +11,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.CategoriaImputacion;
-import um.haberes.core.service.CategoriaImputacionService;
+import um.haberes.core.hexagonal.contabilidad.categoria_imputacion.application.service.CategoriaImputacionService;
+import um.haberes.core.hexagonal.contabilidad.categoria_imputacion.domain.model.CategoriaImputacion;
+import um.haberes.core.hexagonal.contabilidad.categoria_imputacion.infrastructure.web.controller.CategoriaImputacionController;
+import um.haberes.core.hexagonal.contabilidad.categoria_imputacion.infrastructure.web.mapper.CategoriaImputacionDtoMapper;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -41,6 +43,7 @@ class CategoriaImputacionControllerTest {
 
     @BeforeEach
     void setUp() {
+        controller = new CategoriaImputacionController(service, new CategoriaImputacionDtoMapper());
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -65,16 +68,14 @@ class CategoriaImputacionControllerTest {
                   "geograficaId": 4,
                   "categoriaId": 5,
                   "cuentaSueldos": 3100.10,
-                  "cuentaAportes": 3200.20,
-                  "created": null,
-                  "updated": null
-                }
+                  "cuentaAportes": 3200.20
+                                                    }
                 """;
     }
 
     @Test
     void findAll_returnsOkWithListOfCategoriaImputacion() throws Exception {
-        when(service.findAll()).thenReturn(List.of(sampleCategoriaImputacion()));
+        when(service.getAllCategoriaImputaciones()).thenReturn(List.of(sampleCategoriaImputacion()));
 
         mockMvc.perform(get("/api/haberes/core/categoriaimputacion/"))
                 .andExpect(status().isOk())
@@ -87,16 +88,14 @@ class CategoriaImputacionControllerTest {
                           "geograficaId": 4,
                           "categoriaId": 5,
                           "cuentaSueldos": 3100.10,
-                          "cuentaAportes": 3200.20,
-                          "created": null,
-                          "updated": null
-                        } ]
+                          "cuentaAportes": 3200.20
+                                                                            } ]
                         """, JsonCompareMode.STRICT));
     }
 
     @Test
     void findByCategoriaimputacionId_returnsOkWithCategoriaImputacion() throws Exception {
-        when(service.findByCategoriaimputacionId(1L)).thenReturn(sampleCategoriaImputacion());
+        when(service.getCategoriaImputacionById(1L)).thenReturn(sampleCategoriaImputacion());
 
         mockMvc.perform(get("/api/haberes/core/categoriaimputacion/{categoriaimputacionId}", 1))
                 .andExpect(status().isOk())
@@ -105,7 +104,7 @@ class CategoriaImputacionControllerTest {
 
     @Test
     void findByUnique_returnsOkWithCategoriaImputacion() throws Exception {
-        when(service.findByUnique(2, 3, 4, 5)).thenReturn(sampleCategoriaImputacion());
+        when(service.getCategoriaImputacionByUnique(2, 3, 4, 5)).thenReturn(sampleCategoriaImputacion());
 
         mockMvc.perform(get("/api/haberes/core/categoriaimputacion/unique/{dependenciaId}/{facultadId}/{geograficaId}/{categoriaId}",
                         2, 3, 4, 5))
@@ -114,24 +113,14 @@ class CategoriaImputacionControllerTest {
     }
 
     @Test
-    void add_returnsOkWithCategoriaImputacion() throws Exception {
-        when(service.add(any(CategoriaImputacion.class))).thenReturn(sampleCategoriaImputacion());
+    void add_returnsCreatedWithCategoriaImputacion() throws Exception {
+        when(service.createCategoriaImputacion(any(CategoriaImputacion.class))).thenReturn(sampleCategoriaImputacion());
 
         mockMvc.perform(post("/api/haberes/core/categoriaimputacion/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sampleCategoriaImputacion())))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().json(categoriaImputacionJson(), JsonCompareMode.STRICT));
     }
 
-    @Test
-    void update_returnsOkWithCategoriaImputacion() throws Exception {
-        when(service.update(any(CategoriaImputacion.class), anyLong())).thenReturn(sampleCategoriaImputacion());
-
-        mockMvc.perform(put("/api/haberes/core/categoriaimputacion/{categoriaimputacionId}", 1)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(sampleCategoriaImputacion())))
-                .andExpect(status().isOk())
-                .andExpect(content().json(categoriaImputacionJson(), JsonCompareMode.STRICT));
-    }
 }

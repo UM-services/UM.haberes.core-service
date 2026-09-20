@@ -10,7 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.PersonaFacultad;
+import um.haberes.core.model.PersonaFacultadEntity;
 import um.haberes.core.service.PersonaFacultadService;
 
 import java.util.List;
@@ -39,8 +39,8 @@ class PersonaFacultadControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private PersonaFacultad samplePersonaFacultad() {
-        PersonaFacultad personaFacultad = new PersonaFacultad();
+    private PersonaFacultadEntity samplePersonaFacultad() {
+        PersonaFacultadEntity personaFacultad = new PersonaFacultadEntity();
         personaFacultad.setPersonaFacultadId(3L);
         personaFacultad.setLegajoId(100L);
         personaFacultad.setFacultadId(1);
@@ -81,7 +81,7 @@ class PersonaFacultadControllerTest {
 
     @Test
     void add_returnsOkWithPersonaFacultadBody() throws Exception {
-        when(service.add(any(PersonaFacultad.class))).thenReturn(samplePersonaFacultad());
+        when(service.add(any(PersonaFacultadEntity.class))).thenReturn(samplePersonaFacultad());
 
         mockMvc.perform(post("/api/haberes/core/personaFacultad/")
                         .contentType(MediaType.APPLICATION_JSON)

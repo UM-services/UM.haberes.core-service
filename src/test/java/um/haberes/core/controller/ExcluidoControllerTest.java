@@ -12,7 +12,7 @@ import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.exception.ExcluidoException;
-import um.haberes.core.kotlin.model.Excluido;
+import um.haberes.core.model.ExcluidoEntity;
 import um.haberes.core.service.ExcluidoService;
 
 import java.util.List;
@@ -43,8 +43,8 @@ class ExcluidoControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private Excluido sampleExcluido() {
-        Excluido excluido = new Excluido();
+    private ExcluidoEntity sampleExcluido() {
+        ExcluidoEntity excluido = new ExcluidoEntity();
         excluido.setExcluidoId(9L);
         excluido.setLegajoId(123L);
         excluido.setAnho(2024);
@@ -98,8 +98,8 @@ class ExcluidoControllerTest {
 
     @Test
     void add_returnsOkWithSavedExcluido() throws Exception {
-        Excluido excluido = sampleExcluido();
-        when(service.add(any(Excluido.class))).thenReturn(excluido);
+        ExcluidoEntity excluido = sampleExcluido();
+        when(service.add(any(ExcluidoEntity.class))).thenReturn(excluido);
 
         mockMvc.perform(post("/api/haberes/core/excluido/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -111,8 +111,8 @@ class ExcluidoControllerTest {
 
     @Test
     void update_returnsOkWithUpdatedExcluido() throws Exception {
-        Excluido excluido = sampleExcluido();
-        when(service.update(any(Excluido.class), anyLong())).thenReturn(excluido);
+        ExcluidoEntity excluido = sampleExcluido();
+        when(service.update(any(ExcluidoEntity.class), anyLong())).thenReturn(excluido);
 
         mockMvc.perform(put("/api/haberes/core/excluido/{excluidoId}", 9)
                         .contentType(MediaType.APPLICATION_JSON)

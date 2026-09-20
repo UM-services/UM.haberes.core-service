@@ -10,8 +10,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.LegajoCategoriaImputacion;
-import um.haberes.core.service.LegajoCategoriaImputacionService;
+import um.haberes.core.hexagonal.contabilidad.legajo_categoria_imputacion.application.service.LegajoCategoriaImputacionService;
+import um.haberes.core.hexagonal.contabilidad.legajo_categoria_imputacion.domain.model.LegajoCategoriaImputacion;
+import um.haberes.core.hexagonal.contabilidad.legajo_categoria_imputacion.infrastructure.web.controller.LegajoCategoriaImputacionController;
+import um.haberes.core.hexagonal.contabilidad.legajo_categoria_imputacion.infrastructure.web.mapper.LegajoCategoriaImputacionDtoMapper;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -34,6 +36,7 @@ class LegajoCategoriaImputacionControllerTest {
 
     @BeforeEach
     void setUp() {
+        controller = new LegajoCategoriaImputacionController(service, new LegajoCategoriaImputacionDtoMapper());
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -68,15 +71,8 @@ class LegajoCategoriaImputacionControllerTest {
                   "cuentaSueldos": 30000,
                   "basico": 20000.00,
                   "antiguedad": 1500.50,
-                  "cuentaAportes": 5000,
-                  "persona": null,
-                  "dependencia": null,
-                  "facultad": null,
-                  "geografica": null,
-                  "categoria": null,
-                  "created": null,
-                  "updated": null
-                }
+                  "cuentaAportes": 5000
+                                                                                        }
                 """;
     }
 

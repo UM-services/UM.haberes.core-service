@@ -12,7 +12,7 @@ import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.exception.LegajoBancoException;
-import um.haberes.core.kotlin.model.LegajoBanco;
+import um.haberes.core.model.LegajoBancoEntity;
 import um.haberes.core.service.LegajoBancoService;
 
 import java.math.BigDecimal;
@@ -44,8 +44,8 @@ class LegajoBancoControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private LegajoBanco sampleLegajoBanco() {
-        LegajoBanco legajoBanco = new LegajoBanco();
+    private LegajoBancoEntity sampleLegajoBanco() {
+        LegajoBancoEntity legajoBanco = new LegajoBancoEntity();
         legajoBanco.setLegajoBancoId(3L);
         legajoBanco.setLegajoId(123L);
         legajoBanco.setAnho(2024);
@@ -205,8 +205,8 @@ class LegajoBancoControllerTest {
 
     @Test
     void add_returnsOkWithSavedLegajoBanco() throws Exception {
-        LegajoBanco legajoBanco = sampleLegajoBanco();
-        when(service.add(any(LegajoBanco.class))).thenReturn(legajoBanco);
+        LegajoBancoEntity legajoBanco = sampleLegajoBanco();
+        when(service.add(any(LegajoBancoEntity.class))).thenReturn(legajoBanco);
 
         mockMvc.perform(post("/api/haberes/core/legajobanco/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -218,8 +218,8 @@ class LegajoBancoControllerTest {
 
     @Test
     void update_returnsOkWithUpdatedLegajoBanco() throws Exception {
-        LegajoBanco legajoBanco = sampleLegajoBanco();
-        when(service.update(any(LegajoBanco.class), anyLong())).thenReturn(legajoBanco);
+        LegajoBancoEntity legajoBanco = sampleLegajoBanco();
+        when(service.update(any(LegajoBancoEntity.class), anyLong())).thenReturn(legajoBanco);
 
         mockMvc.perform(put("/api/haberes/core/legajobanco/{legajobancoId}", 3)
                         .contentType(MediaType.APPLICATION_JSON)

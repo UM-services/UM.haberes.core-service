@@ -11,9 +11,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.exception.CargoLiquidacionException;
-import um.haberes.core.kotlin.model.Cargo;
-import um.haberes.core.service.CargoService;
+import um.haberes.core.hexagonal.liquidaciones.cargo.application.service.CargoService;
+import um.haberes.core.hexagonal.liquidaciones.cargo.domain.model.Cargo;
+import um.haberes.core.hexagonal.liquidaciones.cargo.infrastructure.web.controller.CargoController;
+import um.haberes.core.hexagonal.liquidaciones.cargo.infrastructure.web.mapper.CargoDtoMapper;
+import um.haberes.core.hexagonal.liquidaciones.cargo.application.exception.CargoException;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -41,6 +43,7 @@ class CargoControllerTest {
 
     @BeforeEach
     void setUp() {
+        controller = new CargoController(service, new CargoDtoMapper());
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -67,12 +70,11 @@ class CargoControllerTest {
               "jornada": 1,
               "presentismo": 2,
               "horasJornada": 8.50,
-              "persona": null,
-              "dependencia": null,
-              "categoria": null,
-              "created": null,
-              "updated": null
-            }
+              "dependenciaNombre": null,
+              "categoriaNombre": null,
+              "personaApellido": null,
+              "personaNombre": null
+                                        }
             """;
 
     @Test
@@ -96,8 +98,8 @@ class CargoControllerTest {
     }
 
     @Test
-    void findByCargoId_whenServiceThrowsCargoLiquidacionException_returnsBadRequest() throws Exception {
-        when(service.findByCargoId(99L)).thenThrow(new CargoLiquidacionException(99L));
+    void findByCargoId_whenServiceThrowsCargoException_returnsBadRequest() throws Exception {
+        when(service.findByCargoId(99L)).thenThrow(new CargoException(99L));
 
         mockMvc.perform(get("/api/haberes/core/cargo/{cargoId}", 99))
                 .andExpect(status().isBadRequest());
@@ -109,7 +111,16 @@ class CargoControllerTest {
 
         mockMvc.perform(post("/api/haberes/core/cargo/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(new Cargo())))
+                        .content("""
+                        {
+                          "legajoId": 100,
+                          "fechaAlta": "2024-01-15T10:00:00Z",
+                          "categoriaId": 3,
+                          "jornada": 1,
+                          "presentismo": 2,
+                          "horasJornada": 8.50
+                        }
+                        """))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(CARGO_JSON, JsonCompareMode.STRICT));
@@ -121,7 +132,16 @@ class CargoControllerTest {
 
         mockMvc.perform(put("/api/haberes/core/cargo/{cargoId}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(new Cargo())))
+                        .content("""
+                        {
+                          "legajoId": 100,
+                          "fechaAlta": "2024-01-15T10:00:00Z",
+                          "categoriaId": 3,
+                          "jornada": 1,
+                          "presentismo": 2,
+                          "horasJornada": 8.50
+                        }
+                        """))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(CARGO_JSON, JsonCompareMode.STRICT));

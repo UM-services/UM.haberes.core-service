@@ -11,7 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import um.haberes.core.kotlin.model.CargoClasePeriodo;
+import um.haberes.core.model.CargoClasePeriodoEntity;
 import um.haberes.core.service.CargoClasePeriodoService;
 
 import java.math.BigDecimal;
@@ -43,8 +43,8 @@ class CargoClasePeriodoControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
-    private CargoClasePeriodo samplePeriodo() {
-        CargoClasePeriodo periodo = new CargoClasePeriodo();
+    private CargoClasePeriodoEntity samplePeriodo() {
+        CargoClasePeriodoEntity periodo = new CargoClasePeriodoEntity();
         periodo.setCargoClasePeriodoId(1L);
         periodo.setLegajoId(100L);
         periodo.setCargoClaseId(2L);
@@ -116,11 +116,11 @@ class CargoClasePeriodoControllerTest {
 
     @Test
     void add_returnsOkWithPeriodoBody() throws Exception {
-        when(service.add(any(CargoClasePeriodo.class))).thenReturn(samplePeriodo());
+        when(service.add(any(CargoClasePeriodoEntity.class))).thenReturn(samplePeriodo());
 
         mockMvc.perform(post("/api/haberes/core/cargoclaseperiodo/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(new CargoClasePeriodo())))
+                        .content(new ObjectMapper().writeValueAsString(new CargoClasePeriodoEntity())))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(PERIODO_JSON, JsonCompareMode.STRICT));
@@ -128,11 +128,11 @@ class CargoClasePeriodoControllerTest {
 
     @Test
     void update_returnsOkWithPeriodoBody() throws Exception {
-        when(service.update(any(CargoClasePeriodo.class), anyLong())).thenReturn(samplePeriodo());
+        when(service.update(any(CargoClasePeriodoEntity.class), anyLong())).thenReturn(samplePeriodo());
 
         mockMvc.perform(put("/api/haberes/core/cargoclaseperiodo/{cargoClasePeriodoId}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(new CargoClasePeriodo())))
+                        .content(new ObjectMapper().writeValueAsString(new CargoClasePeriodoEntity())))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(PERIODO_JSON, JsonCompareMode.STRICT));
