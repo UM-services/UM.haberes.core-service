@@ -33,3 +33,5 @@ sequenceDiagram
     Ctrl->>Svc: findAllLegajos(legajos)
     Usuario->>Ctrl: PUT /persona/ (saveall de personas)
     Ctrl->>Svc: saveall(personas)
+
+    Note over Ctrl,Svc: PersonaResponse incluye la dependencia anidada<br/>(dependenciaDtoMapper.toResponse)

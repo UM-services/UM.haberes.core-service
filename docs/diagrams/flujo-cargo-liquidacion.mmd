@@ -32,3 +32,5 @@ sequenceDiagram
     UC->>Adapt: saveAll + versionado (CargoLiquidacionVersion)
     Usuario->>Ctrl: DELETE /cargoliquidacion/periodo/{anho}/{mes}
     Ctrl->>Svc: deleteByPeriodo(anho, mes)
+
+    Note over Ctrl,Svc: CargoLiquidacionResponse incluye relaciones anidadas:<br/>persona, dependencia y categoria (vía CargoLiquidacionDtoMapper)

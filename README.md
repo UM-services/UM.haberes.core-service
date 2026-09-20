@@ -44,6 +44,8 @@ Liquidaciones:
 - `docs/diagrams/flujo-orden-pago.mmd`
 - `docs/diagrams/flujo-catalogos-liquidacion.mmd`
 - `docs/diagrams/flujo-etec-antiguedad.mmd`
+- `docs/diagrams/flujo-cargo-clase.mmd`
+- `docs/diagrams/flujo-liquidacion-adicional.mmd`
 
 Personas y cursos:
 - `docs/diagrams/flujo-persona-consultas.mmd`
@@ -63,6 +65,11 @@ Contabilidad y reportes:
 - `docs/diagrams/flujo-libro-sueldo.mmd`
 - `docs/diagrams/flujo-contratados-planilla.mmd`
 - `docs/diagrams/flujo-administracion-formularios.mmd`
+
+Maestros e integración:
+- `docs/diagrams/flujo-maestros-catalogos.mmd`
+- `docs/diagrams/flujo-actividad-contacto.mmd`
+- `docs/diagrams/flujo-integracion-externa.mmd`
 
 ## Documentación automática
 

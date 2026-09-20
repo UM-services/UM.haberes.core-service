@@ -24,6 +24,8 @@ sequenceDiagram
     Usuario->>CCtrl: POST /cursoCargo/ , PUT /cursoCargo/{cursoCargoId} , DELETE /cursoCargo/unique/{...}
     CCtrl->>CSvc: add / update / deleteByUnique
 
+    Note over CCtrl,CSvc: CursoCargoResponse incluye relaciones anidadas:<br/>curso, cargoTipo, persona, designacionTipo y categoria (vía CursoCargoDtoMapper)
+
     Note over Usuario,DB: Fusion de cursos (cursos anuales que se fusionan por facultad)
 
     Usuario->>FusionSvc: (vía /cursofusion) findAllByLegajoIdAndFacultadId(...)

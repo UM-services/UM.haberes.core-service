@@ -1,0 +1,41 @@
+---
+title: "Actividad del Legajo y Contactos (datos de soporte por persona)"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant ActCtrl as ActividadController
+    participant ActSvc as ActividadService (legacy)
+    participant ConCtrl as ContactoController
+    participant ConSvc as ContactoService (legacy)
+    participant ML as MakeLiquidacionService (facade)
+    participant DB as MySQL
+
+    Note over Usuario,DB: Actividad: situación docente/otras/clases del legajo en el período
+
+    Usuario->>ActCtrl: GET /actividad/legajo/{legajoId}
+    ActCtrl->>ActSvc: findAllByLegajoId(legajoId)
+    Usuario->>ActCtrl: GET /actividad/unique/{legajoId}/{anho}/{mes}
+    ActCtrl->>ActSvc: findByUnique(...)
+    alt sin actividad registrada
+        ActSvc-->>ActCtrl: ActividadException → 400 BAD_REQUEST
+    end
+    Usuario->>ActCtrl: GET /actividad/periodo/{legajoId}/{anho}/{mes} (vista ActividadPeriodo)
+    Usuario->>ActCtrl: POST /actividad/ , PUT /actividad/{actividadId}
+
+    Note over Usuario,DB: Garantizada por la liquidación: si el legajo no tiene actividad, se crea por defecto
+
+    ML->>ActSvc: findByUnique(legajoId, anho, mes)
+    ML->>ActSvc: add(ActividadEntity docente/otras/clases por defecto) ante ActividadException
+    ActSvc->>DB: INSERT/UPDATE actividad
+
+    Note over Usuario,DB: Contacto: mails personales/institucionales y teléfono por legajo
+
+    Usuario->>ConCtrl: GET /contacto/ , GET /contacto/{legajoId}
+    ConCtrl->>ConSvc: findAll() / findByLegajoId(legajoId)
+    Usuario->>ConCtrl: POST /contacto/legajos (batch de legajoIds)
+    ConCtrl->>ConSvc: findAllLegajos(legajoIds)
+    Usuario->>ConCtrl: POST /contacto/ , PUT /contacto/{legajoId} , DELETE /contacto/{legajoId}
+    ConSvc->>DB: INSERT/UPDATE/DELETE contacto
+
+    Note over Usuario,DB: Carga masiva de contactos: POST /persona/upload (ver flujo-upload-contactos.mmd),<br/>consumo en planillas SAC y notificaciones de novedades
