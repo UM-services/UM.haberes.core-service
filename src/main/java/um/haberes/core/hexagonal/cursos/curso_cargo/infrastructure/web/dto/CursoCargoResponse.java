@@ -7,6 +7,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import um.haberes.core.hexagonal.cursos.cargo_tipo.infrastructure.web.dto.CargoTipoResponse;
+import um.haberes.core.hexagonal.cursos.curso.infrastructure.web.dto.CursoResponse;
+import um.haberes.core.hexagonal.cursos.designacion_tipo.infrastructure.web.dto.DesignacionTipoResponse;
+import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.web.dto.CategoriaResponse;
+import um.haberes.core.hexagonal.personas.persona.infrastructure.web.dto.PersonaResponse;
 
 @Getter
 @Setter
@@ -38,4 +43,14 @@ public class CursoCargoResponse {
     private Byte desarraigo;
 
     private Long cursoCargoNovedadId;
+
+    private CursoResponse curso;
+
+    private CargoTipoResponse cargoTipo;
+
+    private PersonaResponse persona;
+
+    private DesignacionTipoResponse designacionTipo;
+
+    private CategoriaResponse categoria;
 }

@@ -7,10 +7,13 @@ import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.model.Ca
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.infrastructure.persistence.entity.CargoLiquidacionEntity;
 import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.persistence.mapper.CategoriaMapper;
 import um.haberes.core.hexagonal.personas.dependencia.infrastructure.persistence.mapper.DependenciaMapper;
+import um.haberes.core.hexagonal.personas.persona.infrastructure.persistence.mapper.PersonaMapper;
 
 @Component
 @RequiredArgsConstructor
 public class CargoLiquidacionMapper {
+
+    private final PersonaMapper personaMapper;
 
     private final DependenciaMapper dependenciaMapper;
 
@@ -63,6 +66,7 @@ public class CargoLiquidacionMapper {
                 .jornada(entity.getJornada())
                 .presentismo(entity.getPresentismo())
                 .situacion(entity.getSituacion())
+                .persona(personaMapper.toDomain(entity.getPersona()))
                 .dependencia(dependenciaMapper.toDomain(entity.getDependencia()))
                 .categoria(categoriaMapper.toDomain(entity.getCategoria()));
         if (entity.getCategoriaNombre() != null) {

@@ -2,6 +2,8 @@ package um.haberes.core.hexagonal.personas.persona.infrastructure.web.mapper;
 
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
+import um.haberes.core.hexagonal.personas.dependencia.infrastructure.web.mapper.DependenciaDtoMapper;
 import um.haberes.core.hexagonal.personas.persona.domain.model.Persona;
 import um.haberes.core.hexagonal.personas.persona.domain.model.PersonaSearch;
 import um.haberes.core.hexagonal.personas.persona.domain.model.UploadedFile;
@@ -11,7 +13,10 @@ import um.haberes.core.hexagonal.personas.persona.infrastructure.web.dto.Persona
 import um.haberes.core.hexagonal.personas.persona.infrastructure.web.dto.PersonaUploadRequest;
 
 @Component
+@RequiredArgsConstructor
 public class PersonaDtoMapper {
+
+    private final DependenciaDtoMapper dependenciaDtoMapper;
 
     public Persona toDomain(PersonaRequest request) {
         if (request == null) {
@@ -101,6 +106,7 @@ public class PersonaDtoMapper {
                 .liquida(domain.getLiquida())
                 .estadoAfip(domain.getEstadoAfip())
                 .dependenciaId(domain.getDependenciaId())
+                .dependencia(dependenciaDtoMapper.toResponse(domain.getDependencia()))
                 .salida(domain.getSalida())
                 .obraSocial(domain.getObraSocial())
                 .actividadAfip(domain.getActividadAfip())

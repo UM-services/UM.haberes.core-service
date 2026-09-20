@@ -2,14 +2,25 @@ package um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.infrastructure
 
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.model.CargoLiquidacion;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.infrastructure.web.dto.CargoLiquidacionPeriodoResponse;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.infrastructure.web.dto.CargoLiquidacionRequest;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.infrastructure.web.dto.CargoLiquidacionResponse;
+import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.web.mapper.CategoriaDtoMapper;
+import um.haberes.core.hexagonal.personas.dependencia.infrastructure.web.mapper.DependenciaDtoMapper;
+import um.haberes.core.hexagonal.personas.persona.infrastructure.web.mapper.PersonaDtoMapper;
 import um.haberes.core.model.view.CargoLiquidacionPeriodo;
 
 @Component
+@RequiredArgsConstructor
 public class CargoLiquidacionDtoMapper {
+
+    private final PersonaDtoMapper personaDtoMapper;
+
+    private final DependenciaDtoMapper dependenciaDtoMapper;
+
+    private final CategoriaDtoMapper categoriaDtoMapper;
 
     public CargoLiquidacion toDomain(CargoLiquidacionRequest request) {
         if (request == null) {
@@ -48,14 +59,17 @@ public class CargoLiquidacionDtoMapper {
         return CargoLiquidacionResponse.builder()
                 .cargoLiquidacionId(domain.getCargoLiquidacionId())
                 .legajoId(domain.getLegajoId())
+                .persona(personaDtoMapper.toResponse(domain.getPersona()))
                 .anho(domain.getAnho())
                 .mes(domain.getMes())
                 .dependenciaId(domain.getDependenciaId())
+                .dependencia(dependenciaDtoMapper.toResponse(domain.getDependencia()))
                 .fechaDesde(domain.getFechaDesde())
                 .fechaHasta(domain.getFechaHasta())
                 .categoriaId(domain.getCategoriaId())
                 .categoriaNombre(domain.getCategoriaNombre())
                 .categoriaBasico(domain.getCategoriaBasico())
+                .categoria(categoriaDtoMapper.toResponse(domain.getCategoria()))
                 .estadoDocente(domain.getEstadoDocente())
                 .horasJornada(domain.getHorasJornada())
                 .jornada(domain.getJornada())

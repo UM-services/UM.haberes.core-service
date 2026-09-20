@@ -654,6 +654,7 @@ public class MakeLiquidacionService {
                         cargo.getPresentismo(),
                         "A",
                         null,
+                        null,
                         categoria));
             }
         }
@@ -677,6 +678,7 @@ public class MakeLiquidacionService {
                         1,
                         0,
                         "A",
+                        null,
                         dependencia,
                         categoria));
             }
@@ -701,6 +703,7 @@ public class MakeLiquidacionService {
                             1,
                             0,
                             "A",
+                            null,
                             dependencia,
                             categoria));
                 }
@@ -723,6 +726,7 @@ public class MakeLiquidacionService {
                     1,
                     0,
                     "A",
+                    null,
                     novedad.getDependencia(),
                     categoria));
         }
@@ -752,6 +756,7 @@ public class MakeLiquidacionService {
                         cargo.getJornada(),
                         cargo.getPresentismo(),
                         "A",
+                        null,
                         null,
                         categoria));
             }

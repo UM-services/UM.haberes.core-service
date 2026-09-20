@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import um.haberes.core.hexagonal.personas.dependencia.infrastructure.web.dto.DependenciaResponse;
 
 @Getter
 @Setter
@@ -59,6 +60,8 @@ public class PersonaResponse {
     private Integer estadoAfip;
 
     private Integer dependenciaId;
+
+    private DependenciaResponse dependencia;
 
     private String salida;
 

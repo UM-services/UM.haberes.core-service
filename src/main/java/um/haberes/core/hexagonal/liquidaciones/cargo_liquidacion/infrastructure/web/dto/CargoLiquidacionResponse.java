@@ -10,6 +10,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.web.dto.CategoriaResponse;
+import um.haberes.core.hexagonal.personas.dependencia.infrastructure.web.dto.DependenciaResponse;
+import um.haberes.core.hexagonal.personas.persona.infrastructure.web.dto.PersonaResponse;
 
 @Getter
 @Setter
@@ -22,11 +25,15 @@ public class CargoLiquidacionResponse {
 
     private Long legajoId;
 
+    private PersonaResponse persona;
+
     private Integer anho;
 
     private Integer mes;
 
     private Integer dependenciaId;
+
+    private DependenciaResponse dependencia;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXX", timezone = "UTC")
     private OffsetDateTime fechaDesde;
@@ -39,6 +46,8 @@ public class CargoLiquidacionResponse {
     private String categoriaNombre;
 
     private BigDecimal categoriaBasico;
+
+    private CategoriaResponse categoria;
 
     private BigDecimal estadoDocente;
 

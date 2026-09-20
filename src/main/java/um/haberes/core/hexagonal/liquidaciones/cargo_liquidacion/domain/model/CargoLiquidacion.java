@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.Categoria;
 import um.haberes.core.hexagonal.personas.dependencia.domain.model.Dependencia;
+import um.haberes.core.hexagonal.personas.persona.domain.model.Persona;
 
 @Getter
 @Setter
@@ -53,6 +54,8 @@ public class CargoLiquidacion {
     private int presentismo = 0;
 
     private String situacion;
+
+    private Persona persona;
 
     private Dependencia dependencia;
 
