@@ -10,10 +10,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.ActividadException;
-import um.haberes.core.kotlin.model.Actividad;
-import um.haberes.core.kotlin.model.view.ActividadPeriodo;
-import um.haberes.core.repository.ActividadRepository;
-import um.haberes.core.repository.view.ActividadPeriodoRepository;
+import um.haberes.core.model.ActividadEntity;
+import um.haberes.core.model.view.ActividadPeriodo;
+import um.haberes.core.repository.JpaActividadRepository;
+import um.haberes.core.repository.view.JpaActividadPeriodoRepository;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -25,12 +25,12 @@ import lombok.extern.slf4j.Slf4j;
 public class ActividadService {
 
 	@Autowired
-	private ActividadRepository repository;
+	private JpaActividadRepository repository;
 
 	@Autowired
-	private ActividadPeriodoRepository actividadperiodorepository;
+	private JpaActividadPeriodoRepository actividadperiodorepository;
 
-	public List<Actividad> findAllByLegajoId(Long legajoId) {
+	public List<ActividadEntity> findAllByLegajoId(Long legajoId) {
 		return repository.findAllByLegajoId(legajoId, Sort.by("anho", "mes").ascending());
 	}
 
@@ -39,25 +39,25 @@ public class ActividadService {
 				Sort.by("anho", "mes").ascending());
 	}
 
-	public Actividad findByUnique(Long legajoId, Integer anho, Integer mes) {
+	public ActividadEntity findByUnique(Long legajoId, Integer anho, Integer mes) {
 		return repository.findByLegajoIdAndAnhoAndMes(legajoId, anho, mes)
 				.orElseThrow(() -> new ActividadException(legajoId, anho, mes));
 	}
 
-	public Actividad add(Actividad actividad) {
+	public ActividadEntity add(ActividadEntity actividad) {
 		actividad = repository.save(actividad);
-		log.debug("Actividad -> {}", actividad);
+		log.debug("ActividadEntity -> {}", actividad);
 		return actividad;
 	}
 
-	public Actividad update(Actividad newActividad, Long actividadId) {
+	public ActividadEntity update(ActividadEntity newActividad, Long actividadId) {
 		return repository.findById(actividadId).map(actividad -> {
 			actividad.setDocente(newActividad.getDocente());
 			actividad.setOtras(newActividad.getOtras());
 			actividad.setClases(newActividad.getClases());
 			actividad.setDependenciaId(newActividad.getDependenciaId());
 			actividad = repository.save(actividad);
-			log.debug("Actividad -> {}", actividad);
+			log.debug("ActividadEntity -> {}", actividad);
 			return actividad;
 		}).orElseThrow(() -> new ActividadException(actividadId));
 	}

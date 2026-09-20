@@ -6,9 +6,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
-import um.haberes.core.kotlin.model.Actividad;
-import um.haberes.core.repository.ActividadRepository;
-import um.haberes.core.repository.view.ActividadPeriodoRepository;
+import um.haberes.core.model.ActividadEntity;
+import um.haberes.core.repository.JpaActividadRepository;
+import um.haberes.core.repository.view.JpaActividadPeriodoRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,10 +22,10 @@ import static org.mockito.Mockito.when;
 class ActividadServiceTest {
 
     @Mock
-    private ActividadRepository repository;
+    private JpaActividadRepository repository;
 
     @Mock
-    private ActividadPeriodoRepository actividadPeriodoRepository;
+    private JpaActividadPeriodoRepository actividadPeriodoRepository;
 
     @InjectMocks
     private ActividadService actividadService;
@@ -33,7 +33,7 @@ class ActividadServiceTest {
     @Test
     void testFindAllByLegajoId() {
         // Setup
-        Actividad actividad = new Actividad();
+        ActividadEntity actividad = new ActividadEntity();
         actividad.setLegajoId(123L);
         actividad.setAnho(2025);
         actividad.setMes(7);
@@ -42,7 +42,7 @@ class ActividadServiceTest {
                 .thenReturn(List.of(actividad));
 
         // Execute
-        List<Actividad> result = actividadService.findAllByLegajoId(123L);
+        List<ActividadEntity> result = actividadService.findAllByLegajoId(123L);
 
         // Verify
         assertThat(result).isNotNull();
@@ -54,47 +54,47 @@ class ActividadServiceTest {
     @Test
     void testAdd() {
         // Setup
-        Actividad actividadToSave = new Actividad();
+        ActividadEntity actividadToSave = new ActividadEntity();
         actividadToSave.setLegajoId(456L);
 
-        Actividad savedActividad = new Actividad();
+        ActividadEntity savedActividad = new ActividadEntity();
         savedActividad.setActividadId(1L);
         savedActividad.setLegajoId(456L);
 
-        when(repository.save(any(Actividad.class))).thenReturn(savedActividad);
+        when(repository.save(any(ActividadEntity.class))).thenReturn(savedActividad);
 
         // Execute
-        Actividad result = actividadService.add(actividadToSave);
+        ActividadEntity result = actividadService.add(actividadToSave);
 
         // Verify
         assertThat(result).isNotNull();
         assertThat(result.getActividadId()).isEqualTo(1L);
         assertThat(result.getLegajoId()).isEqualTo(456L);
-        verify(repository).save(any(Actividad.class));
+        verify(repository).save(any(ActividadEntity.class));
     }
     
     @Test
     void testUpdate() {
         // Setup
         Long actividadId = 1L;
-        Actividad existingActividad = new Actividad();
+        ActividadEntity existingActividad = new ActividadEntity();
         existingActividad.setActividadId(actividadId);
         existingActividad.setDocente((byte) 0);
 
-        Actividad newActividadData = new Actividad();
+        ActividadEntity newActividadData = new ActividadEntity();
         newActividadData.setDocente((byte) 1);
 
         when(repository.findById(actividadId)).thenReturn(Optional.of(existingActividad));
-        when(repository.save(any(Actividad.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(repository.save(any(ActividadEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Execute
-        Actividad result = actividadService.update(newActividadData, actividadId);
+        ActividadEntity result = actividadService.update(newActividadData, actividadId);
 
         // Verify
         assertThat(result).isNotNull();
         assertThat(result.getActividadId()).isEqualTo(actividadId);
         assertThat(result.getDocente()).isEqualTo((byte) 1);
         verify(repository).findById(actividadId);
-        verify(repository).save(any(Actividad.class));
+        verify(repository).save(any(ActividadEntity.class));
     }
 }

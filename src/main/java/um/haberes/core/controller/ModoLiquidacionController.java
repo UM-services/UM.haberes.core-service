@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import um.haberes.core.kotlin.model.ModoLiquidacion;
+import um.haberes.core.model.ModoLiquidacionEntity;
 import um.haberes.core.service.ModoLiquidacionService;
 
 import java.util.List;
@@ -24,12 +24,12 @@ public class ModoLiquidacionController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<ModoLiquidacion>> findAll() {
+    public ResponseEntity<List<ModoLiquidacionEntity>> findAll() {
         return new ResponseEntity<>(service.findAll(), HttpStatus.OK);
     }
 
     @GetMapping("/{modoLiquidacionId}")
-    public ResponseEntity<ModoLiquidacion> findByModoLiquidacionId(@PathVariable Integer modoLiquidacionId) {
+    public ResponseEntity<ModoLiquidacionEntity> findByModoLiquidacionId(@PathVariable Integer modoLiquidacionId) {
         return new ResponseEntity<>(service.findByModoLiquidacionId(modoLiquidacionId), HttpStatus.OK);
     }
 

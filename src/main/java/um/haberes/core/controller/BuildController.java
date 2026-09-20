@@ -3,7 +3,7 @@
  */
 package um.haberes.core.controller;
 
-import um.haberes.core.kotlin.model.Build;
+import um.haberes.core.model.BuildEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,13 +28,13 @@ public class BuildController {
 	}
 	
 	@GetMapping("/last")
-	public ResponseEntity<Build> findLast() {
+	public ResponseEntity<BuildEntity> findLast() {
 		return new ResponseEntity<>(service.findLast(), HttpStatus.OK);
 	}
 
 	@PostMapping("/")
-	public ResponseEntity<Build> add() {
-		return new ResponseEntity<>(service.add(new Build()), HttpStatus.OK);
+	public ResponseEntity<BuildEntity> add() {
+		return new ResponseEntity<>(service.add(new BuildEntity()), HttpStatus.OK);
 	}
 	
 }

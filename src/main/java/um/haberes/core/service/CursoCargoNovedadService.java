@@ -3,13 +3,10 @@
  */
 package um.haberes.core.service;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import jakarta.transaction.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
@@ -18,8 +15,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.CursoCargoNovedadException;
-import um.haberes.core.kotlin.model.CursoCargoNovedad;
-import um.haberes.core.repository.CursoCargoNovedadRepository;
+import um.haberes.core.model.CursoCargoNovedadEntity;
+import um.haberes.core.repository.JpaCursoCargoNovedadRepository;
 import um.haberes.core.util.Jsonifier;
 
 /**
@@ -31,13 +28,13 @@ import um.haberes.core.util.Jsonifier;
 public class CursoCargoNovedadService {
 
 	@Autowired
-	private CursoCargoNovedadRepository repository;
+	private JpaCursoCargoNovedadRepository repository;
 
-	public List<CursoCargoNovedad> findAllPendientes(Integer anho, Integer mes) {
+	public List<CursoCargoNovedadEntity> findAllPendientes(Integer anho, Integer mes) {
 		return repository.findAllByAnhoAndMesAndAutorizadoAndRechazado(anho, mes, (byte) 0, (byte) 0);
 	}
 
-	public List<CursoCargoNovedad> findAllPendientesAlta(Integer anho, Integer mes) {
+	public List<CursoCargoNovedadEntity> findAllPendientesAlta(Integer anho, Integer mes) {
 		var pendientesAlta = repository
 				.findAllByAnhoAndMesAndAutorizadoAndRechazado(anho, mes, (byte) 0, (byte) 0,
 						Sort.by("persona.apellido").ascending().and(Sort.by("persona.nombre").ascending())
@@ -47,7 +44,7 @@ public class CursoCargoNovedadService {
         return pendientesAlta;
 	}
 
-	public List<CursoCargoNovedad> findAllCursoPendientesAlta(Long cursoId, Integer anho, Integer mes) {
+	public List<CursoCargoNovedadEntity> findAllCursoPendientesAlta(Long cursoId, Integer anho, Integer mes) {
 		return Stream.concat(repository
 				.findAllByCursoIdAndAnhoAndMesAndAltaAndAutorizadoAndRechazado(cursoId, anho, mes, (byte) 1, (byte) 0,
 						(byte) 0, Sort.by("cargoTipo.aCargo").descending().and(Sort.by("cargoTipoId").ascending()))
@@ -60,7 +57,7 @@ public class CursoCargoNovedadService {
 				.collect(Collectors.toList());
 	}
 
-	public List<CursoCargoNovedad> findAllAutorizadosAlta(Integer anho, Integer mes) {
+	public List<CursoCargoNovedadEntity> findAllAutorizadosAlta(Integer anho, Integer mes) {
 		return repository
 				.findAllByAnhoAndMesAndAutorizado(anho, mes, (byte) 1,
 						Sort.by("persona.apellido").ascending().and(Sort.by("persona.nombre").ascending())
@@ -68,7 +65,7 @@ public class CursoCargoNovedadService {
 				.stream().filter(cargo -> cargo.getAlta() == 1 || cargo.getCambio() == 1).collect(Collectors.toList());
 	}
 
-	public List<CursoCargoNovedad> findAllRechazadosAlta(Integer anho, Integer mes) {
+	public List<CursoCargoNovedadEntity> findAllRechazadosAlta(Integer anho, Integer mes) {
 		return repository
 				.findAllByAnhoAndMesAndRechazado(anho, mes, (byte) 1,
 						Sort.by("persona.apellido").ascending().and(Sort.by("persona.nombre").ascending())
@@ -76,7 +73,7 @@ public class CursoCargoNovedadService {
 				.stream().filter(cargo -> cargo.getAlta() == 1 || cargo.getCambio() == 1).collect(Collectors.toList());
 	}
 
-	public List<CursoCargoNovedad> findAllPendientesBaja(Integer anho, Integer mes) {
+	public List<CursoCargoNovedadEntity> findAllPendientesBaja(Integer anho, Integer mes) {
 		var pendientesBaja = repository.findAllByAnhoAndMesAndBajaAndAutorizadoAndRechazado(anho, mes, (byte) 1, (byte) 0, (byte) 0,
 				Sort.by("persona.apellido").ascending().and(Sort.by("persona.nombre").ascending())
 						.and(Sort.by("cargoTipo.aCargo").descending()).and(Sort.by("cargoTipoId").ascending()));
@@ -84,88 +81,88 @@ public class CursoCargoNovedadService {
         return pendientesBaja;
 	}
 
-	public List<CursoCargoNovedad> findAllCursoPendientesBaja(Long cursoId, Integer anho, Integer mes) {
+	public List<CursoCargoNovedadEntity> findAllCursoPendientesBaja(Long cursoId, Integer anho, Integer mes) {
 		return repository.findAllByCursoIdAndAnhoAndMesAndBajaAndAutorizadoAndRechazado(cursoId, anho, mes, (byte) 1,
 				(byte) 0, (byte) 0, Sort.by("cargoTipo.aCargo").descending().and(Sort.by("cargoTipoId").ascending()));
 	}
 
-	public List<CursoCargoNovedad> findAllAutorizadosBaja(Integer anho, Integer mes) {
+	public List<CursoCargoNovedadEntity> findAllAutorizadosBaja(Integer anho, Integer mes) {
 		return repository.findAllByAnhoAndMesAndBajaAndAutorizado(anho, mes, (byte) 1, (byte) 1,
 				Sort.by("persona.apellido").ascending().and(Sort.by("persona.nombre").ascending())
 						.and(Sort.by("cargoTipo.aCargo").descending()).and(Sort.by("cargoTipoId").ascending()));
 	}
 
-	public List<CursoCargoNovedad> findAllRechazadosBaja(Integer anho, Integer mes) {
+	public List<CursoCargoNovedadEntity> findAllRechazadosBaja(Integer anho, Integer mes) {
 		return repository.findAllByAnhoAndMesAndBajaAndRechazado(anho, mes, (byte) 1, (byte) 1,
 				Sort.by("persona.apellido").ascending().and(Sort.by("persona.nombre").ascending())
 						.and(Sort.by("cargoTipo.aCargo").descending()).and(Sort.by("cargoTipoId").ascending()));
 	}
 
-	public List<CursoCargoNovedad> findAllAutorizadosLegajo(Long legajoId, Long cursoId, Integer anho, Integer mes) {
+	public List<CursoCargoNovedadEntity> findAllAutorizadosLegajo(Long legajoId, Long cursoId, Integer anho, Integer mes) {
 		return repository.findAllByCursoIdAndAnhoAndMesAndAutorizadoAndLegajoId(cursoId, anho, mes, (byte) 1, legajoId);
 	}
 
-	public List<CursoCargoNovedad> findAllRechazadosLegajo(Long legajoId, Long cursoId, Integer anho, Integer mes) {
+	public List<CursoCargoNovedadEntity> findAllRechazadosLegajo(Long legajoId, Long cursoId, Integer anho, Integer mes) {
 		return repository.findAllByCursoIdAndAnhoAndMesAndRechazadoAndLegajoId(cursoId, anho, mes, (byte) 1, legajoId);
 	}
 
-	public List<CursoCargoNovedad> findAllPendientesLegajo(Long legajoId, Long cursoId, Integer anho, Integer mes) {
+	public List<CursoCargoNovedadEntity> findAllPendientesLegajo(Long legajoId, Long cursoId, Integer anho, Integer mes) {
 		var pendientesLegajo = repository.findAllByCursoIdAndAnhoAndMesAndAutorizadoAndRechazadoAndLegajoId(cursoId, anho, mes,
 				(byte) 0, (byte) 0, legajoId);
 		log.debug("pendientesLegajo -> {}", Jsonifier.builder(pendientesLegajo).build());
         return pendientesLegajo;
 	}
 
-	public List<CursoCargoNovedad> findAllByFacultad(Integer facultadId, Integer anho, Integer mes) {
+	public List<CursoCargoNovedadEntity> findAllByFacultad(Integer facultadId, Integer anho, Integer mes) {
 		return repository.findAllByCursoFacultadIdAndAnhoAndMes(facultadId, anho, mes);
 	}
 
-	public List<CursoCargoNovedad> findAllByFacultadAndGeograficaAndAlta(Integer facultadId, Integer geograficaId, Integer anho, Integer mes) {
+	public List<CursoCargoNovedadEntity> findAllByFacultadAndGeograficaAndAlta(Integer facultadId, Integer geograficaId, Integer anho, Integer mes) {
 		return repository.findAllByCursoFacultadIdAndCursoGeograficaIdAndAnhoAndMesAndAltaOrderByCursoNombre(facultadId, geograficaId, anho, mes, (byte) 1);
 	}
 
-	public List<CursoCargoNovedad> findAllByFacultadAndGeograficaAndCambio(Integer facultadId, Integer geograficaId, Integer anho, Integer mes) {
+	public List<CursoCargoNovedadEntity> findAllByFacultadAndGeograficaAndCambio(Integer facultadId, Integer geograficaId, Integer anho, Integer mes) {
 		return repository.findAllByCursoFacultadIdAndCursoGeograficaIdAndAnhoAndMesAndCambioOrderByCursoNombre(facultadId, geograficaId, anho, mes, (byte) 1);
 	}
 
-	public List<CursoCargoNovedad> findAllByFacultadAndGeograficaAndBaja(Integer facultadId, Integer geograficaId, Integer anho, Integer mes) {
+	public List<CursoCargoNovedadEntity> findAllByFacultadAndGeograficaAndBaja(Integer facultadId, Integer geograficaId, Integer anho, Integer mes) {
 		return repository.findAllByCursoFacultadIdAndCursoGeograficaIdAndAnhoAndMesAndBajaOrderByCursoNombre(facultadId, geograficaId, anho, mes, (byte) 1);
 	}
 
-	public CursoCargoNovedad findByCursoCargoNovedadId(Long cursoCargoNovedadId) {
+	public CursoCargoNovedadEntity findByCursoCargoNovedadId(Long cursoCargoNovedadId) {
 		var cursoCargoNovedad = repository.findByCursoCargoNovedadId(cursoCargoNovedadId)
 				.orElseThrow(() -> new CursoCargoNovedadException(cursoCargoNovedadId));
-		log.debug("CursoCargoNovedad -> {}",  cursoCargoNovedad.jsonify());
+		log.debug("CursoCargoNovedadEntity -> {}",  cursoCargoNovedad.jsonify());
         return cursoCargoNovedad;
 	}
 
-	public CursoCargoNovedad findByLegajo(Long legajoId, Long cursoId, Integer anho, Integer mes) {
+	public CursoCargoNovedadEntity findByLegajo(Long legajoId, Long cursoId, Integer anho, Integer mes) {
 		var cursoCargoNovedad = repository.findByLegajoIdAndCursoIdAndAnhoAndMes(legajoId, cursoId, anho, mes)
 				.orElseThrow(() -> new CursoCargoNovedadException(legajoId, cursoId, anho, mes));
-		log.debug("CursoCargoNovedad -> {}",  cursoCargoNovedad.jsonify());
+		log.debug("CursoCargoNovedadEntity -> {}",  cursoCargoNovedad.jsonify());
         return cursoCargoNovedad;
 	}
 
-	public CursoCargoNovedad findByUnique(Long cursoId, Integer anho, Integer mes, Integer cargoTipoId, Long legajoId) {
+	public CursoCargoNovedadEntity findByUnique(Long cursoId, Integer anho, Integer mes, Integer cargoTipoId, Long legajoId) {
 		var cursoCargoNovedad = repository.findByCursoIdAndAnhoAndMesAndCargoTipoIdAndLegajoId(cursoId, anho, mes, cargoTipoId, legajoId)
 				.orElseThrow(() -> new CursoCargoNovedadException(cursoId, anho, mes, cargoTipoId, legajoId));
-		log.debug("CursoCargoNovedad -> {}",  cursoCargoNovedad.jsonify());
+		log.debug("CursoCargoNovedadEntity -> {}",  cursoCargoNovedad.jsonify());
         return cursoCargoNovedad;
 	}
 
-	public CursoCargoNovedad add(CursoCargoNovedad cursoCargoNovedad) {
+	public CursoCargoNovedadEntity add(CursoCargoNovedadEntity cursoCargoNovedad) {
 		if (cursoCargoNovedad.getRespuesta() == null) {
 			cursoCargoNovedad.setRespuesta("");
 		}
-		log.debug("CursoCargoNovedad (before) -> {}",  cursoCargoNovedad.jsonify());
+		log.debug("CursoCargoNovedadEntity (before) -> {}",  cursoCargoNovedad.jsonify());
         cursoCargoNovedad = repository.save(cursoCargoNovedad);
-		log.debug("CursoCargoNovedad (after) -> {}",  cursoCargoNovedad.jsonify());
+		log.debug("CursoCargoNovedadEntity (after) -> {}",  cursoCargoNovedad.jsonify());
 		return cursoCargoNovedad;
 	}
 
-	public CursoCargoNovedad update(CursoCargoNovedad newCursoCargoNovedad, Long cursoCargoNovedadId) {
+	public CursoCargoNovedadEntity update(CursoCargoNovedadEntity newCursoCargoNovedad, Long cursoCargoNovedadId) {
 		return repository.findByCursoCargoNovedadId(cursoCargoNovedadId).map(cursoCargoNovedad -> {
-			cursoCargoNovedad = new CursoCargoNovedad(cursoCargoNovedadId, newCursoCargoNovedad.getCursoId(),
+			cursoCargoNovedad = new CursoCargoNovedadEntity(cursoCargoNovedadId, newCursoCargoNovedad.getCursoId(),
 					newCursoCargoNovedad.getAnho(), newCursoCargoNovedad.getMes(),
 					newCursoCargoNovedad.getCargoTipoId(), newCursoCargoNovedad.getLegajoId(),
 					newCursoCargoNovedad.getHorasSemanales(), newCursoCargoNovedad.getHorasTotales(),

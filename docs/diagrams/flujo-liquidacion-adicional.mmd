@@ -1,0 +1,44 @@
+---
+title: "Liquidación Adicional HCS (adicional por carga horaria)"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant Ctrl as LiquidacionAdicionalController
+    participant Svc as LiquidacionAdicionalService (legacy)
+    participant ML as MakeLiquidacionService (facade)
+    participant Tablas as AdicionalCursoTabla/Rango (catálogo)
+    participant Cont as ContableService (facade)
+    participant Sheet as SheetService / LibroSueldoService
+    participant Repo as JpaLiquidacionAdicionalRepository
+    participant DB as MySQL
+
+    Note over Usuario,DB: Generación durante la liquidación del legajo
+
+    ML->>Tablas: resolver tabla por facultad+geográfica (fallback: sólo facultad)
+    ML->>ML: acumular horas y total de categoría por dependencia
+    ML->>Tablas: rango aplicable (horasDesde ≤ horas ≤ horasHasta → porcentaje)
+    ML->>Svc: add(LiquidacionAdicionalEntity con adicional = total × %)
+    Svc->>Repo: INSERT liquidacion_adicional
+    ML->>ML: registrar ítems básico (981) y antigüedad proporcional
+
+    Note over Usuario,DB: Mantenimiento y consulta
+
+    Usuario->>Ctrl: GET /liquidacion-adicional/legajo/{legajoId}/{anho}/{mes}
+    Ctrl->>Svc: findAllByLegajo(legajoId, anho, mes)
+    Usuario->>Ctrl: GET /liquidacion-adicional/dependencia/{legajoId}/{anho}/{mes}/{dependenciaId}
+    Ctrl->>Svc: findByDependencia(...) (findByLegajoIdAndAnhoAndMesAndDependenciaId)
+    alt sin registro
+        Svc-->>Ctrl: LiquidacionAdicionalException → 400 BAD_REQUEST
+    end
+    Usuario->>Ctrl: POST /liquidacion-adicional/ (alta manual)
+    Usuario->>Ctrl: DELETE /liquidacion-adicional/legajo/{legajoId}/{anho}/{mes}
+    Ctrl->>Repo: DELETE por legajo y período
+
+    Note over Usuario,DB: Consumo en procesos de cierre
+
+    Cont->>Svc: findByDependencia(legajoId, anho, mes, dependenciaId)
+    Cont->>Cont: sumar adicional al básico de la imputación y recalcular antigüedad
+    Sheet->>Svc: findAllByLegajo(legajoId, anho, mes) (planilla/libro: fila del ítem 981 por dependencia)
+
+    Note over Usuario,DB: Vista de cargos: GET /cargoliquidacion/legajoadicionalhcs/{legajoId}/{anho}/{mes}<br/>(GetAdicionalesHcsByLegajoUseCase en el slice cargo_liquidacion)

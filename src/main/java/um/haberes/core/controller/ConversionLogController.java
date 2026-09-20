@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import um.haberes.core.kotlin.model.ConversionLog;
+import um.haberes.core.model.ConversionLogEntity;
 import um.haberes.core.service.ConversionLogService;
 
 /**
@@ -31,13 +31,13 @@ public class ConversionLogController {
 	}
 	
 	@GetMapping("/")
-	public ResponseEntity<List<ConversionLog>> findAll() {
+	public ResponseEntity<List<ConversionLogEntity>> findAll() {
 		return new ResponseEntity<>(service.findAll(), HttpStatus.OK);
 	}
 	
 	@PostMapping("/")
-	public ResponseEntity<ConversionLog> add(@RequestBody ConversionLog conversion) {
-		return new ResponseEntity<ConversionLog>(service.add(conversion), HttpStatus.OK);
+	public ResponseEntity<ConversionLogEntity> add(@RequestBody ConversionLogEntity conversion) {
+		return new ResponseEntity<ConversionLogEntity>(service.add(conversion), HttpStatus.OK);
 	}
 	
 }

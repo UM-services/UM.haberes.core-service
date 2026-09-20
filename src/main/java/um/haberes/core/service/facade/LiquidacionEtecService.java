@@ -31,17 +31,17 @@ public class LiquidacionEtecService {
             try {
                 var inasistenciaDescuento = inasistenciaDescuentoService.findByInasistencias(facultadId, geograficaId, inasistencias);
                 try {
-                    log.debug("InasistenciaDescuento: {}", JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(inasistenciaDescuento));
+                    log.debug("InasistenciaDescuentoEntity: {}", JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(inasistenciaDescuento));
                 } catch (JsonProcessingException e) {
-                    log.debug("InasistenciaDescuento: null");
+                    log.debug("InasistenciaDescuentoEntity: null");
                 }
                 var porcentaje = BigDecimal.ONE.subtract(new BigDecimal(inasistenciaDescuento.getPorcentaje()).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP)).setScale(2, RoundingMode.HALF_UP);
                 porcentajeAntiguedad = porcentajeAntiguedad.multiply(porcentaje).setScale(2, RoundingMode.HALF_UP);
             } catch (InasistenciaDescuentoException e) {
-                log.debug("Sin Configuración de InasistenciaDescuento -> {}", e.getMessage());
+                log.debug("Sin Configuración de InasistenciaDescuentoEntity -> {}", e.getMessage());
             }
         }
-        log.debug("Porcentaje Antiguedad -> {}", porcentajeAntiguedad);
+        log.debug("Porcentaje AntiguedadEntity -> {}", porcentajeAntiguedad);
         return porcentajeAntiguedad;
     }
 

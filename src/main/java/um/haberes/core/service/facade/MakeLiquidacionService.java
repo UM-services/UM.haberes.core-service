@@ -1,14 +1,40 @@
 package um.haberes.core.service.facade;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import um.haberes.core.exception.*;
-import um.haberes.core.kotlin.model.*;
-import um.haberes.core.kotlin.model.view.NovedadDuplicada;
+import um.haberes.core.hexagonal.cursos.curso.domain.model.Curso;
+import um.haberes.core.hexagonal.cursos.curso_cargo.application.service.CursoCargoService;
+import um.haberes.core.hexagonal.cursos.curso_cargo.domain.model.CursoCargo;
+import um.haberes.core.hexagonal.cursos.curso_desarraigo.application.service.CursoDesarraigoService;
+import um.haberes.core.hexagonal.cursos.curso_desarraigo.domain.model.CursoDesarraigo;
+import um.haberes.core.hexagonal.cursos.curso_fusion.application.service.CursoFusionService;
+import um.haberes.core.hexagonal.cursos.curso_fusion.domain.model.CursoFusion;
+import um.haberes.core.hexagonal.liquidaciones.cargo.application.service.CargoService;
+import um.haberes.core.hexagonal.liquidaciones.cargo.domain.model.Cargo;
+import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.application.service.CargoLiquidacionService;
+import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.model.CargoLiquidacion;
+import um.haberes.core.hexagonal.liquidaciones.categoria.application.service.CategoriaService;
+import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.Categoria;
+import um.haberes.core.hexagonal.liquidaciones.codigo.application.service.CodigoService;
+import um.haberes.core.hexagonal.liquidaciones.codigo.domain.model.Codigo;
+import um.haberes.core.hexagonal.liquidaciones.item.application.service.ItemService;
+import um.haberes.core.hexagonal.liquidaciones.item.domain.model.Item;
+import um.haberes.core.hexagonal.liquidaciones.letra.application.exception.LetraException;
+import um.haberes.core.hexagonal.liquidaciones.letra.application.service.LetraService;
+import um.haberes.core.hexagonal.liquidaciones.letra.domain.model.Letra;
+import um.haberes.core.hexagonal.liquidaciones.liquidacion.application.exception.LiquidacionException;
+import um.haberes.core.hexagonal.liquidaciones.liquidacion.application.service.LiquidacionService;
+import um.haberes.core.hexagonal.liquidaciones.liquidacion.domain.model.Liquidacion;
+import um.haberes.core.hexagonal.liquidaciones.novedad.application.service.NovedadService;
+import um.haberes.core.hexagonal.liquidaciones.novedad.domain.model.Novedad;
+import um.haberes.core.hexagonal.personas.dependencia.application.service.DependenciaService;
+import um.haberes.core.hexagonal.personas.dependencia.domain.model.Dependencia;
+import um.haberes.core.hexagonal.personas.persona.application.service.PersonaService;
+import um.haberes.core.model.*;
+import um.haberes.core.model.view.NovedadDuplicada;
 import um.haberes.core.service.*;
 import um.haberes.core.service.facade.liquidaciones.LiquidacionState;
 import um.haberes.core.service.view.NovedadDuplicadaService;
@@ -95,7 +121,7 @@ public class MakeLiquidacionService {
         try {
             legajoControlService.findByUnique(legajoId, anho, mes);
         } catch (LegajoControlException e) {
-            legajoControlService.add(new LegajoControl(null, legajoId, anho, mes, (byte) 0, (byte) 0, (byte) 0, null));
+            legajoControlService.add(new LegajoControlEntity(null, legajoId, anho, mes, (byte) 0, (byte) 0, (byte) 0, null));
         }
         state.setCodigos(codigoService.findAll().stream().collect(Collectors.toMap(Codigo::getCodigoId, codigo -> codigo)));
         state.setNovedades(novedadService.findAllByLegajo(legajoId, anho, mes).stream().filter(novedad -> !Objects.equals(novedad.getCodigoId(), CODIGO_NOVEDAD_AJUSTE_BASICO)).collect(Collectors.toMap(Novedad::getCodigoId, novedad -> novedad)));
@@ -117,10 +143,10 @@ public class MakeLiquidacionService {
 
         inicializarLiquidacion(legajoId, anho, mes, state);
 
-        List<CodigoGrupo> allCodigoGrupos = codigoGrupoService.findAll();
-        List<CodigoGrupo> remunerativosGrupos = allCodigoGrupos.stream().filter(c -> c.getRemunerativo() == 1).toList();
-        List<CodigoGrupo> noRemunerativosGrupos = allCodigoGrupos.stream().filter(c -> c.getNoRemunerativo() == 1).toList();
-        List<CodigoGrupo> deduccionGrupos = allCodigoGrupos.stream().filter(c -> c.getDeduccion() == 1).toList();
+        List<CodigoGrupoEntity> allCodigoGrupos = codigoGrupoService.findAll();
+        List<CodigoGrupoEntity> remunerativosGrupos = allCodigoGrupos.stream().filter(c -> c.getRemunerativo() == 1).toList();
+        List<CodigoGrupoEntity> noRemunerativosGrupos = allCodigoGrupos.stream().filter(c -> c.getNoRemunerativo() == 1).toList();
+        List<CodigoGrupoEntity> deduccionGrupos = allCodigoGrupos.stream().filter(c -> c.getDeduccion() == 1).toList();
 
         if (!esPeriodoLiquidable(legajoId, anho, mes, state)) {
             return;
@@ -146,7 +172,7 @@ public class MakeLiquidacionService {
     private boolean puedeLiquidar(Long legajoId, Integer anho, Integer mes, Boolean force, LiquidacionState state) {
         if (!force) {
             try {
-                Liquidacion liquidacion = liquidacionService.findByLegajoIdAndAnhoAndMes(legajoId, anho, mes);
+                Liquidacion liquidacion = liquidacionService.getLiquidacionByUniqueKey(legajoId, anho, mes);
                 if (liquidacion.getBloqueado() == (byte) 1) {
                     return false;
                 }
@@ -158,9 +184,9 @@ public class MakeLiquidacionService {
         state.setPersona(personaService.findByLegajoId(legajoId));
         if (state.getPersona().getEstado() == 9 && "N".equals(state.getPersona().getLiquida())) {
             try {
-                Liquidacion liquidacionAnterior = liquidacionService.findByPeriodoAnterior(legajoId, anho, mes);
+                Liquidacion liquidacionAnterior = liquidacionService.getLiquidacionByPeriodoAnterior(legajoId, anho, mes);
                 if (liquidacionAnterior.getEstado() == 1 && "S".equals(liquidacionAnterior.getLiquida())) {
-                    log.debug("SIN Liquidacion {}/{}/{}", legajoId, anho, mes);
+                    log.debug("SIN LiquidacionEntity {}/{}/{}", legajoId, anho, mes);
                     return false;
                 }
             } catch (LiquidacionException e) {
@@ -170,7 +196,7 @@ public class MakeLiquidacionService {
 
         if (!(state.getPersona().getEstado() == 1 && "S".equals(state.getPersona().getLiquida()))) {
             try {
-                Liquidacion liquidacionAnterior = liquidacionService.findByPeriodoAnterior(legajoId, anho, mes);
+                Liquidacion liquidacionAnterior = liquidacionService.getLiquidacionByPeriodoAnterior(legajoId, anho, mes);
                 if (liquidacionAnterior.getEstado() == 9 && "S".equals(liquidacionAnterior.getLiquida())) {
                     state.getPersona().setLiquida("N");
                     personaService.update(state.getPersona(), legajoId);
@@ -207,7 +233,7 @@ public class MakeLiquidacionService {
         return tieneCargosActivos || tieneCargosClase;
     }
 
-    private void calcularConceptosGenerales(Long legajoId, Integer anho, Integer mes, List<CodigoGrupo> remunerativos, List<CodigoGrupo> noRemunerativos, LiquidacionState state) {
+    private void calcularConceptosGenerales(Long legajoId, Integer anho, Integer mes, List<CodigoGrupoEntity> remunerativos, List<CodigoGrupoEntity> noRemunerativos, LiquidacionState state) {
         // Incentivo Posgrado
         BigDecimal incentivoPosgrado = switch (state.getPersona().getPosgrado()) {
             case 1 -> state.getControl().getDoctorado();
@@ -220,7 +246,7 @@ public class MakeLiquidacionService {
         }
 
         // Carga de Novedades Remunerativas
-        for (CodigoGrupo codigoGrupo : remunerativos) {
+        for (CodigoGrupoEntity codigoGrupo : remunerativos) {
             if (state.getNovedades().containsKey(codigoGrupo.getCodigoId())) {
                 addItem(legajoId, anho, mes, codigoGrupo.getCodigoId(), state.getNovedades().get(codigoGrupo.getCodigoId()).getImporte(), state);
             }
@@ -239,7 +265,7 @@ public class MakeLiquidacionService {
         calcularCargosConClase(legajoId, anho, mes, state);
 
         // Carga de Novedades No Remunerativas
-        for (CodigoGrupo codigoGrupo : noRemunerativos) {
+        for (CodigoGrupoEntity codigoGrupo : noRemunerativos) {
             if (state.getNovedades().containsKey(codigoGrupo.getCodigoId())) {
                 addItem(legajoId, anho, mes, codigoGrupo.getCodigoId(), state.getNovedades().get(codigoGrupo.getCodigoId()).getImporte(), state);
             }
@@ -251,8 +277,8 @@ public class MakeLiquidacionService {
 
         state.setCargoClases(cargoClaseDetalleService.findAllByLegajo(legajoId, anho, mes));
 
-        for (CargoClaseDetalle detalle : state.getCargoClases()) {
-            log.debug("CargoClaseDetalle -> {}", detalle.jsonify());
+        for (CargoClaseDetalleEntity detalle : state.getCargoClases()) {
+            log.debug("CargoClaseDetalleEntity -> {}", detalle.jsonify());
             BigDecimal basico = detalle.getValorHora().multiply(new BigDecimal(detalle.getHoras())).setScale(2, RoundingMode.HALF_UP);
             addItem(legajoId, anho, mes, CODIGO_BASICO, basico, state);
 
@@ -271,7 +297,7 @@ public class MakeLiquidacionService {
 
     }
 
-    private void calcularTotalesParciales(Long legajoId, Integer anho, Integer mes, List<CodigoGrupo> remunerativos, List<CodigoGrupo> noRemunerativos, LiquidacionState state) {
+    private void calcularTotalesParciales(Long legajoId, Integer anho, Integer mes, List<CodigoGrupoEntity> remunerativos, List<CodigoGrupoEntity> noRemunerativos, LiquidacionState state) {
         // Total Remunerativo Parcial
         BigDecimal totalRemunerativo = sumarItemsPorGrupo(remunerativos, Set.of(CODIGO_INASISTENCIAS), state);
         setItem(legajoId, anho, mes, CODIGO_TOTAL_REMUNERATIVO, totalRemunerativo, state);
@@ -309,7 +335,7 @@ public class MakeLiquidacionService {
         }
     }
 
-    private void recalcularTotales(Long legajoId, Integer anho, Integer mes, List<CodigoGrupo> remunerativos, List<CodigoGrupo> noRemunerativos, LiquidacionState state) {
+    private void recalcularTotales(Long legajoId, Integer anho, Integer mes, List<CodigoGrupoEntity> remunerativos, List<CodigoGrupoEntity> noRemunerativos, LiquidacionState state) {
         // Recalcular Total Remunerativo
         BigDecimal totalRemunerativo = sumarItemsPorGrupo(remunerativos, Collections.emptySet(), state);
         setItem(legajoId, anho, mes, CODIGO_TOTAL_REMUNERATIVO, totalRemunerativo, state);
@@ -374,9 +400,9 @@ public class MakeLiquidacionService {
         }
     }
 
-    private void calcularDeducciones(Long legajoId, Integer anho, Integer mes, List<CodigoGrupo> deduccionGrupos, LiquidacionState state) {
+    private void calcularDeducciones(Long legajoId, Integer anho, Integer mes, List<CodigoGrupoEntity> deduccionGrupos, LiquidacionState state) {
         // Cargar Novedades de Deducción
-        for (CodigoGrupo codigoGrupo : deduccionGrupos) {
+        for (CodigoGrupoEntity codigoGrupo : deduccionGrupos) {
             if (state.getNovedades().containsKey(codigoGrupo.getCodigoId())) {
                 BigDecimal value = state.getNovedades().get(codigoGrupo.getCodigoId()).getImporte();
                 if (value.compareTo(BigDecimal.ZERO) != 0) {
@@ -418,21 +444,30 @@ public class MakeLiquidacionService {
     }
 
     private void persistirResultadosLiquidacion(Long legajoId, Integer anho, Integer mes, LiquidacionState state) {
-        itemService.saveAll(new ArrayList<>(state.getItems().values()));
+        itemService.saveAllItems(new ArrayList<>(state.getItems().values()));
 
-        Liquidacion liquidacion = new Liquidacion(null, legajoId, anho, mes, Tool.dateAbsoluteArgentina(), null,
-                state.getPersona().getDependenciaId(), state.getPersona().getSalida(),
+        Liquidacion liquidacion = new Liquidacion(null,
+                legajoId,
+                anho,
+                mes,
+                Tool.dateAbsoluteArgentina(),
+                null,
+                state.getPersona().getDependenciaId(),
+                state.getPersona().getSalida(),
                 getItemValue(CODIGO_TOTAL_REMUNERATIVO, state),
                 getItemValue(CODIGO_TOTAL_NO_REMUNERATIVO, state),
                 getItemValue(CODIGO_TOTAL_DEDUCCIONES, state),
                 getItemValue(CODIGO_NETO, state),
-                (byte) 0, state.getPersona().getEstado(), state.getPersona().getLiquida(), null, null);
+                (byte) 0,
+                state.getPersona().getEstado(),
+                state.getPersona().getLiquida(),
+                null);
         liquidacionService.add(liquidacion);
 
         try {
             actividadService.findByUnique(legajoId, anho, mes);
         } catch (ActividadException e) {
-            actividadService.add(new Actividad(null, legajoId, anho, mes, (byte) 1, (byte) 1, (byte) 1, 10, null, null));
+            actividadService.add(new ActividadEntity(null, legajoId, anho, mes, (byte) 1, (byte) 1, (byte) 1, 10, null, null));
         }
 
         try {
@@ -441,7 +476,7 @@ public class MakeLiquidacionService {
             letraService.add(new Letra(null, legajoId, anho, mes, BigDecimal.ZERO, ""));
         }
 
-        LegajoControl legajoControl = legajoControlService.findByUnique(legajoId, anho, mes);
+        LegajoControlEntity legajoControl = legajoControlService.findByUnique(legajoId, anho, mes);
         legajoControl.setLiquidado((byte) 1);
         legajoControlService.update(legajoControl, legajoControl.getLegajoControlId());
     }
@@ -450,7 +485,7 @@ public class MakeLiquidacionService {
     public void deleteLiquidacionByLegajoId(Long legajoId, Integer anho, Integer mes, Boolean force) {
         if (!force) {
             try {
-                Liquidacion liquidacion = liquidacionService.findByLegajoIdAndAnhoAndMes(legajoId, anho, mes);
+                Liquidacion liquidacion = liquidacionService.getLiquidacionByUniqueKey(legajoId, anho, mes);
                 if (liquidacion.getBloqueado() == (byte) 1) {
                     return;
                 }
@@ -463,7 +498,7 @@ public class MakeLiquidacionService {
         letraService.deleteByUnique(legajoId, anho, mes);
         itemService.deleteAllByLegajo(legajoId, anho, mes);
         liquidacionService.deleteByLegajo(legajoId, anho, mes);
-        LegajoControl legajoControl = legajoControlService.findByUnique(legajoId, anho, mes);
+        LegajoControlEntity legajoControl = legajoControlService.findByUnique(legajoId, anho, mes);
         legajoControl.setLiquidado((byte) 0);
         legajoControlService.update(legajoControl, legajoControl.getLegajoControlId());
     }
@@ -500,10 +535,10 @@ public class MakeLiquidacionService {
         Map<Integer, Dependencia> dependenciasById = dependenciaService.findAllByIds(totalDependencia.keySet()).stream()
                 .collect(Collectors.toMap(Dependencia::getDependenciaId, Function.identity()));
         Set<Integer> facultadIds = dependenciasById.values().stream().map(Dependencia::getFacultadId).collect(Collectors.toSet());
-        List<AdicionalCursoTabla> tablasAdicionales = adicionalCursoTablaService.findAllByFacultadesAndPeriodo(facultadIds, anho, mes);
-        Map<Integer, AdicionalCursoTabla> tablaPorFacultad = new HashMap<>();
-        Map<String, AdicionalCursoTabla> tablaPorFacultadYGeografica = new HashMap<>();
-        for (AdicionalCursoTabla tabla : tablasAdicionales) {
+        List<AdicionalCursoTablaEntity> tablasAdicionales = adicionalCursoTablaService.findAllByFacultadesAndPeriodo(facultadIds, anho, mes);
+        Map<Integer, AdicionalCursoTablaEntity> tablaPorFacultad = new HashMap<>();
+        Map<String, AdicionalCursoTablaEntity> tablaPorFacultadYGeografica = new HashMap<>();
+        for (AdicionalCursoTablaEntity tabla : tablasAdicionales) {
             if (tabla.getGeograficaId() == null) {
                 tablaPorFacultad.put(tabla.getFacultadId(), tabla);
             } else {
@@ -515,7 +550,7 @@ public class MakeLiquidacionService {
             Dependencia dependencia = dependenciasById.get(dependenciaId);
             if (dependencia == null) continue;
 
-            AdicionalCursoTabla adicionalCursoTabla = tablaPorFacultadYGeografica.get(dependencia.getFacultadId() + "." + dependencia.getGeograficaId());
+            AdicionalCursoTablaEntity adicionalCursoTabla = tablaPorFacultadYGeografica.get(dependencia.getFacultadId() + "." + dependencia.getGeograficaId());
             if (adicionalCursoTabla == null) {
                 adicionalCursoTabla = tablaPorFacultad.get(dependencia.getFacultadId());
             }
@@ -524,7 +559,7 @@ public class MakeLiquidacionService {
                 Integer horas = horasDependencia.getOrDefault(dependenciaId, 0);
                 BigDecimal totalCategoria = totalDependencia.get(dependenciaId);
                 BigDecimal porcentaje = BigDecimal.ZERO;
-                for (AdicionalCursoRango adicionalCursoRango : Objects.requireNonNull(adicionalCursoTabla.getAdicionalCursoRangos())) {
+                for (AdicionalCursoRangoEntity adicionalCursoRango : Objects.requireNonNull(adicionalCursoTabla.getAdicionalCursoRangos())) {
                     if (horas >= adicionalCursoRango.getHorasDesde() && horas <= adicionalCursoRango.getHorasHasta()) {
                         porcentaje = adicionalCursoRango.getPorcentaje();
                         break;
@@ -532,7 +567,7 @@ public class MakeLiquidacionService {
                 }
                 BigDecimal adicional = totalCategoria.multiply(porcentaje).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
                 if (adicional.compareTo(BigDecimal.ZERO) > 0) {
-                    liquidacionAdicionalService.add(new LiquidacionAdicional(null, legajoId, anho, mes, dependenciaId, adicional, null, null));
+                    liquidacionAdicionalService.add(new LiquidacionAdicionalEntity(null, legajoId, anho, mes, dependenciaId, adicional, null, null));
                     addItem(legajoId, anho, mes, CODIGO_BASICO, adicional, state);
                     BigDecimal antiguedad = adicional.multiply(state.getIndices().getFirst()).setScale(2, RoundingMode.HALF_UP);
                     if (antiguedad.compareTo(BigDecimal.ZERO) != 0) {
@@ -603,15 +638,49 @@ public class MakeLiquidacionService {
         for (Cargo cargo : cargoService.findAllDocenteByPeriodo(legajoId, anho, mes)) {
             Categoria categoria = cargo.getCategoria();
             if (categoria.getCategoriaId() != CODIGO_NOVEDAD_AJUSTE_BASICO) {
-                cargoLiquidacions.add(new CargoLiquidacion(null, legajoId, anho, mes, cargo.getDependenciaId(), Periodo.firstDay(anho, mes), Periodo.lastDay(anho, mes), categoria.getCategoriaId(), categoria.getNombre(), categoria.getBasico(), categoria.getEstadoDocente(), cargo.getHorasJornada(), cargo.getJornada(), cargo.getPresentismo(), "A", null, null, categoria));
+                cargoLiquidacions.add(new CargoLiquidacion(null,
+                        legajoId,
+                        anho,
+                        mes,
+                        cargo.getDependenciaId(),
+                        Periodo.firstDay(anho, mes),
+                        Periodo.lastDay(anho, mes),
+                        categoria.getCategoriaId(),
+                        categoria.getNombre(),
+                        categoria.getBasico(),
+                        categoria.getEstadoDocente(),
+                        cargo.getHorasJornada(),
+                        cargo.getJornada(),
+                        cargo.getPresentismo(),
+                        "A",
+                        null,
+                        null,
+                        categoria));
             }
         }
-        Control control = controlService.findByPeriodo(anho, mes);
+        ControlEntity control = controlService.findByPeriodo(anho, mes);
         if (control.getModoLiquidacionId() == constLiquidarConFusion) {
             for (CursoFusion cursoFusion : cursoFusionService.findAllByLegajoId(legajoId, anho, mes)) {
                 Dependencia dependencia = dependencias.get(cursoFusion.getFacultadId() + "." + cursoFusion.getGeograficaId());
                 Categoria categoria = cursoFusion.getCategoria();
-                cargoLiquidacions.add(new CargoLiquidacion(null, legajoId, anho, mes, dependencia.getDependenciaId(), Periodo.firstDay(anho, mes), Periodo.lastDay(anho, mes), categoria.getCategoriaId(), categoria.getNombre(), categoria.getBasico(), categoria.getEstadoDocente(), BigDecimal.ZERO, 1, 0, "A", null, dependencia, categoria));
+                cargoLiquidacions.add(new CargoLiquidacion(null,
+                        legajoId,
+                        anho,
+                        mes,
+                        dependencia.getDependenciaId(),
+                        Periodo.firstDay(anho, mes),
+                        Periodo.lastDay(anho, mes),
+                        categoria.getCategoriaId(),
+                        categoria.getNombre(),
+                        categoria.getBasico(),
+                        categoria.getEstadoDocente(),
+                        BigDecimal.ZERO,
+                        1,
+                        0,
+                        "A",
+                        null,
+                        dependencia,
+                        categoria));
             }
         }
         if (control.getModoLiquidacionId() == constLiquidarSinFusion) {
@@ -619,13 +688,47 @@ public class MakeLiquidacionService {
                 if (cursoCargo.getCategoriaId() != null) {
                     Dependencia dependencia = dependencias.get(Objects.requireNonNull(cursoCargo.getCurso()).getFacultadId() + "." + cursoCargo.getCurso().getGeograficaId());
                     Categoria categoria = cursoCargo.getCategoria();
-                    cargoLiquidacions.add(new CargoLiquidacion(null, legajoId, anho, mes, dependencia.getDependenciaId(), Periodo.firstDay(anho, mes), Periodo.lastDay(anho, mes), categoria.getCategoriaId(), categoria.getNombre(), categoria.getBasico(), categoria.getEstadoDocente(), BigDecimal.ZERO, 1, 0, "A", null, dependencia, categoria));
+                    cargoLiquidacions.add(new CargoLiquidacion(null,
+                            legajoId,
+                            anho,
+                            mes,
+                            dependencia.getDependenciaId(),
+                            Periodo.firstDay(anho, mes),
+                            Periodo.lastDay(anho, mes),
+                            categoria.getCategoriaId(),
+                            categoria.getNombre(),
+                            categoria.getBasico(),
+                            categoria.getEstadoDocente(),
+                            BigDecimal.ZERO,
+                            1,
+                            0,
+                            "A",
+                            null,
+                            dependencia,
+                            categoria));
                 }
             }
         }
         Categoria categoria = categoriaService.findByCategoriaId(CODIGO_NOVEDAD_AJUSTE_BASICO);
         for (Novedad novedad : novedadService.findAllByLegajoAndCodigo(legajoId, anho, mes, CODIGO_NOVEDAD_AJUSTE_BASICO)) {
-            cargoLiquidacions.add(new CargoLiquidacion(null, legajoId, anho, mes, novedad.getDependenciaId(), Periodo.firstDay(anho, mes), Periodo.lastDay(anho, mes), categoria.getCategoriaId(), categoria.getNombre(), novedad.getImporte(), BigDecimal.ZERO, BigDecimal.ZERO, 1, 0, "A", null, novedad.getDependencia(), categoria));
+            cargoLiquidacions.add(new CargoLiquidacion(null,
+                    legajoId,
+                    anho,
+                    mes,
+                    novedad.getDependenciaId(),
+                    Periodo.firstDay(anho, mes),
+                    Periodo.lastDay(anho, mes),
+                    categoria.getCategoriaId(),
+                    categoria.getNombre(),
+                    novedad.getImporte(),
+                    BigDecimal.ZERO,
+                    BigDecimal.ZERO,
+                    1,
+                    0,
+                    "A",
+                    null,
+                    novedad.getDependencia(),
+                    categoria));
         }
         cargoLiquidacions = cargoLiquidacionService.saveAll(cargoLiquidacions, mes, false);
     }
@@ -635,10 +738,27 @@ public class MakeLiquidacionService {
         List<CargoLiquidacion> cargoLiquidacions = new ArrayList<>();
         cargoLiquidacionService.deleteAllCargosNoDocentes(legajoId, anho, mes);
         for (Cargo cargo : cargoService.findAllNoDocenteByPeriodo(legajoId, anho, mes)) {
-            log.debug("Cargo -> {}", cargo);
+            log.debug("Cargo -> {}", cargo.jsonify());
             Categoria categoria = cargo.getCategoria();
             if (categoria.getCategoriaId() != CODIGO_NOVEDAD_AJUSTE_BASICO) {
-                cargoLiquidacions.add(new CargoLiquidacion(null, legajoId, anho, mes, cargo.getDependenciaId(), Periodo.firstDay(anho, mes), Periodo.lastDay(anho, mes), categoria.getCategoriaId(), categoria.getNombre(), categoria.getBasico(), categoria.getEstadoDocente(), cargo.getHorasJornada(), cargo.getJornada(), cargo.getPresentismo(), "A", null, null, categoria));
+                cargoLiquidacions.add(new CargoLiquidacion(null,
+                        legajoId,
+                        anho,
+                        mes,
+                        cargo.getDependenciaId(),
+                        Periodo.firstDay(anho, mes),
+                        Periodo.lastDay(anho, mes),
+                        categoria.getCategoriaId(),
+                        categoria.getNombre(),
+                        categoria.getBasico(),
+                        categoria.getEstadoDocente(),
+                        cargo.getHorasJornada(),
+                        cargo.getJornada(),
+                        cargo.getPresentismo(),
+                        "A",
+                        null,
+                        null,
+                        categoria));
             }
         }
         cargoLiquidacionService.saveAll(cargoLiquidacions, mes, false);
@@ -654,8 +774,8 @@ public class MakeLiquidacionService {
 
     @Transactional
     public void desmarcaPeriodo(Integer anho, Integer mes) {
-        List<LegajoControl> legajos = legajoControlService.findAllByPeriodo(anho, mes);
-        for (LegajoControl legajoControl : legajos) {
+        List<LegajoControlEntity> legajos = legajoControlService.findAllByPeriodo(anho, mes);
+        for (LegajoControlEntity legajoControl : legajos) {
             legajoControl.setLiquidado((byte) 0);
         }
         legajoControlService.saveAll(legajos);
@@ -669,7 +789,7 @@ public class MakeLiquidacionService {
         log.debug("Processing MakeLiquidacionService.addItem");
         Item item = state.getItems().computeIfAbsent(codigoId, k -> new Item(null, legajoId, anho, mes, k, state.getCodigos().get(k).getNombre(), BigDecimal.ZERO, null, null));
         item.setImporte(item.getImporte().add(importe).setScale(2, RoundingMode.HALF_UP));
-        log.debug("Item -> {}", item.jsonify());
+        log.debug("ItemEntity -> {}", item.jsonify());
     }
 
     private void setItem(Long legajoId, Integer anho, Integer mes, Integer codigoId, BigDecimal importe, LiquidacionState state) {
@@ -683,9 +803,9 @@ public class MakeLiquidacionService {
         return Optional.ofNullable(state.getItems().get(codigoId)).map(Item::getImporte).orElse(BigDecimal.ZERO);
     }
 
-    private BigDecimal sumarItemsPorGrupo(List<CodigoGrupo> grupo, Set<Integer> codigosExcluidos, LiquidacionState state) {
+    private BigDecimal sumarItemsPorGrupo(List<CodigoGrupoEntity> grupo, Set<Integer> codigosExcluidos, LiquidacionState state) {
         return grupo.stream()
-                .map(CodigoGrupo::getCodigoId)
+                .map(CodigoGrupoEntity::getCodigoId)
                 .filter(id -> !codigosExcluidos.contains(id))
                 .map(codigoId -> getItemValue(codigoId, state))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -697,13 +817,13 @@ public class MakeLiquidacionService {
         if (cursoFusions.isEmpty()) return totalDependencia;
 
         Set<Integer> categoriaIds = cursoFusions.stream().map(CursoFusion::getCategoriaId).collect(Collectors.toSet());
-        Map<Integer, CategoriaPeriodo> categoriaPeriodos = categoriaPeriodoService.findAllByCategoriaIdsAndPeriodo(categoriaIds, anho, mes).stream().collect(Collectors.toMap(CategoriaPeriodo::getCategoriaId, Function.identity()));
+        Map<Integer, CategoriaPeriodoEntity> categoriaPeriodos = categoriaPeriodoService.findAllByCategoriaIdsAndPeriodo(categoriaIds, anho, mes).stream().collect(Collectors.toMap(CategoriaPeriodoEntity::getCategoriaId, Function.identity()));
         Map<Integer, Categoria> categorias = categoriaService.findAllByIds(categoriaIds).stream().collect(Collectors.toMap(Categoria::getCategoriaId, Function.identity()));
 
         for (CursoFusion cursoFusion : cursoFusions) {
             Dependencia dependencia = dependenciasBySede.get(cursoFusion.getFacultadId() + "." + cursoFusion.getGeograficaId());
             if (dependencia == null) continue;
-            BigDecimal basico = Optional.ofNullable(categoriaPeriodos.get(cursoFusion.getCategoriaId())).map(CategoriaPeriodo::getBasico)
+            BigDecimal basico = Optional.ofNullable(categoriaPeriodos.get(cursoFusion.getCategoriaId())).map(CategoriaPeriodoEntity::getBasico)
                     .orElseGet(() -> Optional.ofNullable(categorias.get(cursoFusion.getCategoriaId())).map(Categoria::getBasico).orElse(BigDecimal.ZERO));
             totalDependencia.compute(dependencia.getDependenciaId(), (k, v) -> (v == null) ? basico : v.add(basico));
         }
@@ -719,7 +839,7 @@ public class MakeLiquidacionService {
         Set<Integer> categoriaIds = cursoCargos.stream().map(CursoCargo::getCategoriaId).filter(Objects::nonNull).collect(Collectors.toSet());
         if (categoriaIds.isEmpty()) return totalDependencia;
 
-        Map<Integer, CategoriaPeriodo> categoriaPeriodos = categoriaPeriodoService.findAllByCategoriaIdsAndPeriodo(categoriaIds, anho, mes).stream().collect(Collectors.toMap(CategoriaPeriodo::getCategoriaId, Function.identity()));
+        Map<Integer, CategoriaPeriodoEntity> categoriaPeriodos = categoriaPeriodoService.findAllByCategoriaIdsAndPeriodo(categoriaIds, anho, mes).stream().collect(Collectors.toMap(CategoriaPeriodoEntity::getCategoriaId, Function.identity()));
         Map<Integer, Categoria> categorias = categoriaService.findAllByIds(categoriaIds).stream().collect(Collectors.toMap(Categoria::getCategoriaId, Function.identity()));
 
         for (CursoCargo cursoCargo : cursoCargos) {
@@ -728,7 +848,7 @@ public class MakeLiquidacionService {
                 if (curso == null) continue;
                 Dependencia dependencia = dependenciasBySede.get(curso.getFacultadId() + "." + curso.getGeograficaId());
                 if (dependencia == null) continue;
-                BigDecimal basico = Optional.ofNullable(categoriaPeriodos.get(cursoCargo.getCategoriaId())).map(CategoriaPeriodo::getBasico)
+                BigDecimal basico = Optional.ofNullable(categoriaPeriodos.get(cursoCargo.getCategoriaId())).map(CategoriaPeriodoEntity::getBasico)
                         .orElseGet(() -> Optional.ofNullable(categorias.get(cursoCargo.getCategoriaId())).map(Categoria::getBasico).orElse(BigDecimal.ZERO));
                 totalDependencia.compute(dependencia.getDependenciaId(), (k, v) -> (v == null) ? basico : v.add(basico));
             }
@@ -739,7 +859,7 @@ public class MakeLiquidacionService {
 
     public boolean evaluateOnlyETEC(LiquidacionState state) {
         boolean hasCargoClaseInFacultades = false;
-        for (CargoClaseDetalle detalle : state.getCargoClases()) {
+        for (CargoClaseDetalleEntity detalle : state.getCargoClases()) {
             if (detalle.getFacultadId() != 6) {
                 hasCargoClaseInFacultades = true;
             }

@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import um.haberes.core.exception.extern.CuentaException;
-import um.haberes.core.kotlin.model.extern.CuentaDto;
+import um.haberes.core.model.extern.CuentaDto;
 import um.haberes.core.service.extern.CuentaService;
 
 import java.math.BigDecimal;

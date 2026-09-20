@@ -1,0 +1,38 @@
+---
+title: "Anotaciones y Ciclo de Aprobación de Novedades de Curso (altas/bajas)"
+---
+sequenceDiagram
+    autonumber
+    actor Secretario
+    actor Director
+    participant AnoCtrl as AnotadorController
+    participant AnoSvc as AnotadorService
+    participant CCNCtrl as CursoCargoNovedadController
+    participant CCNSvc as CursoCargoNovedadService
+    participant Tool as ToolController (validación de mail)
+    participant Mail as MailingController / MailingService
+    participant DB as MySQL
+
+    Secretario->>CCNCtrl: POST /cursocargonovedad/ (solicitar alta o baja de asignación)
+    CCNCtrl->>CCNSvc: add(cursoCargoNovedad) (pendiente, estado inicial)
+    CCNSvc->>DB: INSERT curso_cargo_novedad
+
+    Director->>AnoCtrl: GET /anotador/pendientefiltro/{anho}/{mes}/{filtro}
+    AnoCtrl->>AnoSvc: findPendientesFiltro(...) (cola de visado)
+    Director->>AnoCtrl: POST /anotador/ (anotar revisión con ipVisado)
+    AnoCtrl->>AnoSvc: add(anotador) (marca revisado y valida ipVisado/respuesta)
+
+    alt aprobación
+        Director->>CCNCtrl: PUT /cursocargonovedad/{cursoCargoNovedadId} (estado autorizado)
+        CCNCtrl->>CCNSvc: update(...) → curso_cargo definitivamente afectado
+    else rechazo
+        Director->>CCNCtrl: PUT /cursocargonovedad/{cursoCargoNovedadId} (estado rechazado)
+        Director->>CCNCtrl: DELETE /cursocargonovedad/legajoPendiente/{legajoId}/{cursoId}/{anho}/{mes}
+    end
+
+    Secretario->>AnoCtrl: GET /anotador/autorizadofacultad/{facultadId}/{anho}/{mes}
+    AnoCtrl->>AnoSvc: findAutorizadosByFacultad(...) (reporte de visados)
+    Tool-->>Mail: (vía POST /mailvalidate) contactos válidos de destinatarios
+    Mail->>DB: notificar estados por mail (MailingService.mailing(List~MailInfo~))
+
+    Note over Secretario,DB: Vistas del circuito: pendiente/autorizado/rechazado por curso,<br/>legajo y facultad (GET /cursocargonovedad/*) y revisados (GET /anotador/revisado*)

@@ -1,35 +1,31 @@
 package um.haberes.core.service.facade;
 
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import um.haberes.core.exception.AcreditacionPagoException;
+import um.haberes.core.hexagonal.liquidaciones.acreditacion_pago.application.exception.AcreditacionPagoException;
 import um.haberes.core.exception.extern.ProveedorMovimientoException;
-import um.haberes.core.kotlin.model.internal.OrdenPagoRequest;
-import um.haberes.core.kotlin.model.AcreditacionPago;
-import um.haberes.core.kotlin.model.extern.EjercicioDto;
-import um.haberes.core.kotlin.model.extern.ProveedorMovimientoDto;
-import um.haberes.core.service.AcreditacionPagoService;
+import um.haberes.core.hexagonal.liquidaciones.acreditacion_pago.domain.model.AcreditacionPago;
+import um.haberes.core.model.internal.OrdenPagoRequest;
+import um.haberes.core.model.extern.EjercicioDto;
+import um.haberes.core.model.extern.ProveedorMovimientoDto;
+import um.haberes.core.hexagonal.liquidaciones.acreditacion_pago.application.service.AcreditacionPagoService;
 import um.haberes.core.service.extern.EjercicioService;
 import um.haberes.core.service.extern.ProveedorMovimientoService;
 
 import java.math.BigDecimal;
 
 @Service
+@RequiredArgsConstructor
 public class OrdenPagoService {
 
-    @Autowired
-    private EjercicioService ejercicioService;
-
-    @Autowired
-    private AcreditacionPagoService acreditacionPagoService;
-
-    @Autowired
-    private ProveedorMovimientoService proveedorMovimientoService;
+    private final EjercicioService ejercicioService;
+    private final AcreditacionPagoService acreditacionPagoService;
+    private final ProveedorMovimientoService proveedorMovimientoService;
 
     @Transactional
     public Boolean generateOrdenPago(OrdenPagoRequest ordenPagoRequest) {
-        if (ordenPagoRequest.getIndividual()) {
+        if (ordenPagoRequest.isIndividual()) {
             return true;
         }
         EjercicioDto ejercicioDto = ejercicioService.findByFecha(ordenPagoRequest.getFechaPago());

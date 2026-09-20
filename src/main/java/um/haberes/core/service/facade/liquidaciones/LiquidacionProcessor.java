@@ -1,24 +1,21 @@
 package um.haberes.core.service.facade.liquidaciones;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import um.haberes.core.kotlin.model.Persona;
+import um.haberes.core.hexagonal.personas.persona.domain.model.Persona;
 import um.haberes.core.service.facade.MakeLiquidacionService;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class LiquidacionProcessor {
 
     private final MakeLiquidacionService makeLiquidacionService;
-
-    public LiquidacionProcessor(MakeLiquidacionService makeLiquidacionService) {
-        this.makeLiquidacionService = makeLiquidacionService;
-    }
 
     @Async
     public void procesarLiquidaciones(List<Persona> personas, Integer anho, Integer mes, Boolean force, LiquidacionProceso proceso) {

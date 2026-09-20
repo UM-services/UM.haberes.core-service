@@ -3,7 +3,7 @@ package um.haberes.core.client;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
-import um.haberes.core.kotlin.model.extern.EjercicioDto;
+import um.haberes.core.model.extern.EjercicioDto;
 
 import java.time.OffsetDateTime;
 import java.util.List;

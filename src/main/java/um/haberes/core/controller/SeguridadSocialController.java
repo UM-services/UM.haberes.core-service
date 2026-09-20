@@ -4,7 +4,6 @@
 package um.haberes.core.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.core.exception.SeguridadSocialException;
-import um.haberes.core.kotlin.model.SeguridadSocial;
+import um.haberes.core.model.SeguridadSocialEntity;
 import um.haberes.core.service.SeguridadSocialService;
 
 /**
@@ -32,7 +31,7 @@ public class SeguridadSocialController {
 	private final SeguridadSocialService service;
 
 	@GetMapping("/unique/{anho}/{mes}")
-	public ResponseEntity<SeguridadSocial> findByUnique(@PathVariable Integer anho, @PathVariable Integer mes) {
+	public ResponseEntity<SeguridadSocialEntity> findByUnique(@PathVariable Integer anho, @PathVariable Integer mes) {
 		try {
             return ResponseEntity.ok(service.findByUnique(anho, mes));
 		} catch (SeguridadSocialException e) {
@@ -41,12 +40,12 @@ public class SeguridadSocialController {
 	}
 
 	@PostMapping("/")
-	public ResponseEntity<SeguridadSocial> add(@RequestBody SeguridadSocial seguridadSocial) {
+	public ResponseEntity<SeguridadSocialEntity> add(@RequestBody SeguridadSocialEntity seguridadSocial) {
         return ResponseEntity.ok(service.add(seguridadSocial));
 	}
 
 	@PutMapping("/{seguridadSocialId}")
-	public ResponseEntity<SeguridadSocial> update(@RequestBody SeguridadSocial seguridadSocial,
+	public ResponseEntity<SeguridadSocialEntity> update(@RequestBody SeguridadSocialEntity seguridadSocial,
 			@PathVariable Long seguridadSocialId) {
         return ResponseEntity.ok(service.update(seguridadSocial, seguridadSocialId));
 	}

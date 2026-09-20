@@ -9,9 +9,10 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.AnotadorException;
-import um.haberes.core.kotlin.model.Anotador;
-import um.haberes.core.kotlin.model.Persona;
-import um.haberes.core.repository.AnotadorRepository;
+import um.haberes.core.hexagonal.personas.persona.application.service.PersonaService;
+import um.haberes.core.hexagonal.personas.persona.domain.model.Persona;
+import um.haberes.core.model.AnotadorEntity;
+import um.haberes.core.repository.JpaAnotadorRepository;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -22,25 +23,25 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AnotadorService {
 
-	private final AnotadorRepository repository;
+	private final JpaAnotadorRepository repository;
 	private final PersonaService personaservice;
 
-	public AnotadorService(AnotadorRepository repository,
+	public AnotadorService(JpaAnotadorRepository repository,
 						   PersonaService personaservice) {
 		this.repository = repository;
 		this.personaservice = personaservice;
 	}
 
-	public List<Anotador> findAllByLegajo(Long legajoId) {
+	public List<AnotadorEntity> findAllByLegajo(Long legajoId) {
 		return repository.findAllByLegajoIdOrderByAnotadorIdDesc(legajoId);
 	}
 
-	public List<Anotador> findPendientes(Integer anho, Integer mes) {
+	public List<AnotadorEntity> findPendientes(Integer anho, Integer mes) {
 		return repository.findAllByAnhoAndMesAndAutorizadoAndRechazadoOrderByPersonaApellidoAscPersonaNombreAsc(
 			anho, mes, (byte) 0, (byte) 0);
 	}
 
-	public List<Anotador> findPendientesFiltro(Integer anho, Integer mes, String filtro) {
+	public List<AnotadorEntity> findPendientesFiltro(Integer anho, Integer mes, String filtro) {
 		List<Long> legajos = personaservice.findAllByFiltro(filtro).stream()
 				.map(Persona::getLegajoId)
 				.collect(Collectors.toList());
@@ -49,28 +50,28 @@ public class AnotadorService {
 				anho, mes, (byte) 0, (byte) 0, legajos);
 	}
 
-	public List<Anotador> findPendientesByFacultad(Integer facultadId, Integer anho, Integer mes) {
+	public List<AnotadorEntity> findPendientesByFacultad(Integer facultadId, Integer anho, Integer mes) {
 		return repository.findTop1000ByAnhoAndMesAndAutorizadoAndRechazadoAndFacultadIdOrderByPersonaApellidoAscPersonaNombreAsc(
 			anho, mes, (byte) 0, (byte) 0, facultadId);
 	}
 
-	public List<Anotador> findAutorizadosByFacultad(Integer facultadId, Integer anho, Integer mes) {
+	public List<AnotadorEntity> findAutorizadosByFacultad(Integer facultadId, Integer anho, Integer mes) {
 		return repository.findTop1000ByAnhoAndMesAndAutorizadoAndRechazadoAndFacultadIdOrderByPersonaApellidoAscPersonaNombreAsc(
 			anho, mes, (byte) 1, (byte) 0, facultadId);
 	}
 
-	public List<Anotador> findRechazadosByFacultad(Integer facultadId, Integer anho, Integer mes) {
+	public List<AnotadorEntity> findRechazadosByFacultad(Integer facultadId, Integer anho, Integer mes) {
 		return repository.findTop1000ByAnhoAndMesAndAutorizadoAndRechazadoAndFacultadIdOrderByPersonaApellidoAscPersonaNombreAsc(
 			anho, mes, (byte) 0, (byte) 1, facultadId);
 	}
 
-	public List<Anotador> findRevisados(Integer anho, Integer mes) {
+	public List<AnotadorEntity> findRevisados(Integer anho, Integer mes) {
 		return repository.findTop1000ByAnhoAndMesOrderByPersonaApellidoAscPersonaNombreAsc(anho, mes).stream()
 				.filter(anotador -> anotador.getAutorizado() == 1 || anotador.getRechazado() == 1)
 				.collect(Collectors.toList());
 	}
 
-	public List<Anotador> findRevisadosFiltro(Integer anho, Integer mes, String filtro) {
+	public List<AnotadorEntity> findRevisadosFiltro(Integer anho, Integer mes, String filtro) {
 		List<Long> legajos = personaservice.findAllByFiltro(filtro).stream()
 				.map(Persona::getLegajoId)
 				.collect(Collectors.toList());
@@ -79,17 +80,17 @@ public class AnotadorService {
 				.collect(Collectors.toList());
 	}
 
-	public List<Anotador> findRevisadosByFacultad(Integer facultadId, Integer anho, Integer mes) {
+	public List<AnotadorEntity> findRevisadosByFacultad(Integer facultadId, Integer anho, Integer mes) {
 		return repository.findTop1000ByAnhoAndMesAndFacultadIdOrderByPersonaApellidoAscPersonaNombreAsc(anho, mes, facultadId).stream()
 				.filter(anotador -> anotador.getAutorizado() == 1 || anotador.getRechazado() == 1)
 				.collect(Collectors.toList());
 	}
 
-	public Anotador findByAnotadorId(Long anotadorId) {
+	public AnotadorEntity findByAnotadorId(Long anotadorId) {
 		return repository.findByAnotadorId(anotadorId).orElseThrow(() -> new AnotadorException(anotadorId));
 	}
 
-	public Anotador add(Anotador anotador) {
+	public AnotadorEntity add(AnotadorEntity anotador) {
 		if (anotador.getIpVisado() == null) {
 			anotador.setIpVisado("");
 		}
@@ -100,9 +101,9 @@ public class AnotadorService {
 		return anotador;
 	}
 
-	public Anotador update(Anotador newAnotador, Long anotadorId) {
+	public AnotadorEntity update(AnotadorEntity newAnotador, Long anotadorId) {
 		return repository.findByAnotadorId(anotadorId).map(anotador -> {
-			anotador = new Anotador(anotadorId, newAnotador.getLegajoId(), newAnotador.getAnho(), newAnotador.getMes(),
+			anotador = new AnotadorEntity(anotadorId, newAnotador.getLegajoId(), newAnotador.getAnho(), newAnotador.getMes(),
 					newAnotador.getFacultadId(), newAnotador.getAnotacion(), newAnotador.getVisado(),
 					newAnotador.getIpVisado(), newAnotador.getUser(), newAnotador.getRespuesta(),
 					newAnotador.getAutorizado(), newAnotador.getRechazado(), newAnotador.getRectorado(),

@@ -4,7 +4,6 @@
 package um.haberes.core.controller.view;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.web.server.ResponseStatusException;
 import um.haberes.core.exception.view.ImputadoTotalException;
-import um.haberes.core.kotlin.model.view.ImputadoTotal;
+import um.haberes.core.model.view.ImputadoTotal;
 import um.haberes.core.service.view.ImputadoTotalService;
 
 /**

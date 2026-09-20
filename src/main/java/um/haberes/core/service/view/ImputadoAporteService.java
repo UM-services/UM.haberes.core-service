@@ -8,8 +8,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.core.kotlin.model.view.ImputadoAporte;
-import um.haberes.core.repository.view.ImputadoAporteRepository;
+import um.haberes.core.model.view.ImputadoAporte;
+import um.haberes.core.repository.view.JpaImputadoAporteRepository;
 
 /**
  * @author daniel
@@ -19,7 +19,7 @@ import um.haberes.core.repository.view.ImputadoAporteRepository;
 public class ImputadoAporteService {
 		
 	@Autowired
-	private ImputadoAporteRepository repository;
+	private JpaImputadoAporteRepository repository;
 	
 	public List<ImputadoAporte> findAllByPeriodo(Integer anho, Integer mes) {
 		return repository.findAllByAnhoAndMes(anho, mes);

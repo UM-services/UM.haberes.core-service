@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.core.exception.LiquidacionAdicionalException;
-import um.haberes.core.kotlin.model.LiquidacionAdicional;
+import um.haberes.core.model.LiquidacionAdicionalEntity;
 import um.haberes.core.service.LiquidacionAdicionalService;
 
 @RestController
@@ -28,12 +28,12 @@ public class LiquidacionAdicionalController {
     }
 
     @GetMapping("/legajo/{legajoId}/{anho}/{mes}")
-    public ResponseEntity<List<LiquidacionAdicional>> findAllByLegajo(@PathVariable Long legajoId, @PathVariable Integer anho, @PathVariable Integer mes) {
+    public ResponseEntity<List<LiquidacionAdicionalEntity>> findAllByLegajo(@PathVariable Long legajoId, @PathVariable Integer anho, @PathVariable Integer mes) {
         return new ResponseEntity<>(service.findAllByLegajo(legajoId, anho, mes), HttpStatus.OK);
     }
 
     @GetMapping("/dependencia/{legajoId}/{anho}/{mes}/{dependenciaId}")
-    public ResponseEntity<LiquidacionAdicional> findByDependencia(@PathVariable Long legajoId, @PathVariable Integer anho, @PathVariable Integer mes, @PathVariable Integer dependenciaId) {
+    public ResponseEntity<LiquidacionAdicionalEntity> findByDependencia(@PathVariable Long legajoId, @PathVariable Integer anho, @PathVariable Integer mes, @PathVariable Integer dependenciaId) {
         try {
             return new ResponseEntity<>(service.findByDependencia(legajoId, anho, mes, dependenciaId), HttpStatus.OK);
         } catch (LiquidacionAdicionalException e) {
@@ -48,7 +48,7 @@ public class LiquidacionAdicionalController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<LiquidacionAdicional> add(@RequestBody LiquidacionAdicional liquidacionAdicional) {
+    public ResponseEntity<LiquidacionAdicionalEntity> add(@RequestBody LiquidacionAdicionalEntity liquidacionAdicional) {
         return new ResponseEntity<>(service.add(liquidacionAdicional), HttpStatus.OK);
     }
 

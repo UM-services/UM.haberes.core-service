@@ -3,8 +3,8 @@
  */
 package um.haberes.core.controller.facade;
 
-import um.haberes.core.kotlin.model.extern.CuentaMovimientoDto;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import um.haberes.core.model.extern.CuentaMovimientoDto;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,14 +25,10 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/haberes/core/contable")
+@RequiredArgsConstructor
 public class ContableController {
 
 	private final ContableService service;
-
-	@Autowired
-	public ContableController(ContableService service) {
-		this.service = service;
-	}
 
 	@GetMapping("/generatelegajo/{legajoId}/{anho}/{mes}")
 	public ResponseEntity<Void> generateByLegajo(@PathVariable Long legajoId, @PathVariable Integer anho,

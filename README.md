@@ -5,19 +5,18 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**1.13.0** (2026-08-26)
+**1.14.0** (2026-09-19)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
 
 - Java 25
-- Kotlin 2.4.10
-- Spring Boot 4.1.0
-- Spring Cloud 2025.1.2 (OpenFeign, Consul)
+- Spring Boot 4.1.1
+- Spring Cloud 2025.1.3 (OpenFeign, Consul)
 - Spring Data JPA
 - Apache POI 5.5.1 (Excel)
 - OpenPDF 3.0.5 (PDF)
-- Log4j2
+- Logback
 - Caffeine Cache
 - Jackson
 - MySQL Connector/J 26.7.0
@@ -26,12 +25,51 @@ _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Diagramas principales
 
-- Arquitectura: `docs/diagrams/arquitectura-general.mmd`
-- Flujo de liquidación de sueldos: `docs/diagrams/flujo-liquidacion-sueldos.mmd`
-- Modelo entidad-relación: `docs/diagrams/modelo-entidad-relacion.mmd`
-- Despliegue: `docs/diagrams/despliegue.mmd`
-- Flujo de liquidación general masiva: `docs/diagrams/flujo-liquidacion-general.mmd`
-- Flujo de LegajoBanco con filtro por código: `docs/diagrams/flujo-legajobanco-filtro-codigo.mmd`
+Arquitectura y modelo:
+- `docs/diagrams/arquitectura-general.mmd`
+- `docs/diagrams/contextos-hexagonales.mmd`
+- `docs/diagrams/arquitectura-slice-hexagonal.mmd`
+- `docs/diagrams/modelo-entidad-relacion.mmd`
+- `docs/diagrams/despliegue.mmd`
+
+Liquidaciones:
+- `docs/diagrams/flujo-liquidacion-sueldos.mmd`
+- `docs/diagrams/flujo-liquidacion-general.mmd`
+- `docs/diagrams/flujo-liquidacion-ciclo.mmd`
+- `docs/diagrams/flujo-cargo-liquidacion.mmd`
+- `docs/diagrams/flujo-item-letra.mmd`
+- `docs/diagrams/flujo-novedad-gestion.mmd`
+- `docs/diagrams/flujo-novedad-file.mmd`
+- `docs/diagrams/flujo-acreditacion.mmd`
+- `docs/diagrams/flujo-orden-pago.mmd`
+- `docs/diagrams/flujo-catalogos-liquidacion.mmd`
+- `docs/diagrams/flujo-etec-antiguedad.mmd`
+- `docs/diagrams/flujo-cargo-clase.mmd`
+- `docs/diagrams/flujo-liquidacion-adicional.mmd`
+
+Personas y cursos:
+- `docs/diagrams/flujo-persona-consultas.mmd`
+- `docs/diagrams/flujo-upload-contactos.mmd`
+- `docs/diagrams/flujo-dependencia.mmd`
+- `docs/diagrams/flujo-cursos.mmd`
+- `docs/diagrams/flujo-facultad-geografica.mmd`
+- `docs/diagrams/flujo-designacion-tool.mmd`
+- `docs/diagrams/flujo-anotacion-aprobacion.mmd`
+
+Contabilidad y reportes:
+- `docs/diagrams/flujo-contable-asiento.mmd`
+- `docs/diagrams/flujo-contabilidad-imputaciones.mmd`
+- `docs/diagrams/flujo-legajobanco-filtro-codigo.mmd`
+- `docs/diagrams/flujo-vistas-reporte.mmd`
+- `docs/diagrams/flujo-sheets-reportes.mmd`
+- `docs/diagrams/flujo-libro-sueldo.mmd`
+- `docs/diagrams/flujo-contratados-planilla.mmd`
+- `docs/diagrams/flujo-administracion-formularios.mmd`
+
+Maestros e integración:
+- `docs/diagrams/flujo-maestros-catalogos.mmd`
+- `docs/diagrams/flujo-actividad-contacto.mmd`
+- `docs/diagrams/flujo-integracion-externa.mmd`
 
 ## Documentación automática
 
@@ -113,29 +151,35 @@ docker run -d \
 ## Endpoints principales (ejemplo)
 
 ### Liquidaciones
-- `POST /liquidaciones` - Generar nueva liquidación
-- `GET /liquidaciones/{id}` - Obtener liquidación
-- `PUT /liquidaciones/{id}` - Actualizar liquidación
-- `DELETE /liquidaciones/{id}` - Eliminar liquidación
+- `GET /api/haberes/core/liquidacion/{liquidacionId}` - Obtener liquidación
+- `GET /api/haberes/core/liquidacion/unique/{legajoId}/{anho}/{mes}` - Obtener liquidación por clave única
+- `POST /api/haberes/core/liquidacion/` - Crear liquidación
+- `PUT /api/haberes/core/liquidacion/{liquidacionId}` - Actualizar liquidación
+- `DELETE /api/haberes/core/liquidacion/periodo/{anho}/{mes}` - Eliminar liquidaciones del período
+- `GET /api/haberes/core/makeLiquidacion/legajo/{legajoId}/{anho}/{mes}/{force}` - Liquidar un legajo
+- `GET /api/haberes/core/makeLiquidacionGeneral/general/{anho}/{mes}/{force}` - Liquidación general masiva
 
 ### Cargos
-- `POST /cargos` - Crear nuevo cargo
-- `GET /cargos/{id}` - Obtener cargo
-- `PUT /cargos/{id}` - Actualizar cargo
-- `GET /cargos/docente/{legajoId}` - Obtener cargos docentes
-- `GET /cargos/no-docente/{legajoId}` - Obtener cargos no docentes
+- `GET /api/haberes/core/cargo/legajo/{legajoId}` - Obtener cargos por legajo
+- `GET /api/haberes/core/cargo/{cargoId}` - Obtener cargo
+- `POST /api/haberes/core/cargo/` - Crear cargo
+- `PUT /api/haberes/core/cargo/{cargoId}` - Actualizar cargo
+- `DELETE /api/haberes/core/cargo/{cargoId}` - Eliminar cargo
 
 ### Categorías
-- `GET /categorias` - Listar categorías
-- `POST /categorias` - Crear categoría
-- `PUT /categorias/{id}` - Actualizar categoría
-- `GET /categorias/docente` - Listar categorías docentes
-- `GET /categorias/no-docente` - Listar categorías no docentes
+- `GET /api/haberes/core/categoria/` - Listar categorías
+- `GET /api/haberes/core/categoria/{categoriaId}` - Obtener categoría
+- `POST /api/haberes/core/categoria/upload/{anho}/{mes}` - Cargar categorías desde Excel
+- `GET /api/haberes/core/categoria/nogrado` - Listar categorías sin grado
+
+### Personas
+- `GET /api/haberes/core/persona/` - Listar personas
+- `GET /api/haberes/core/persona/liquidables` - Listar personas liquidables
+- `POST /api/haberes/core/persona/upload` - Cargar contactos de personas desde Excel
 
 ### Reportes
-- `GET /reportes/liquidacion/{id}` - Generar reporte de liquidación
-- `GET /reportes/cargos` - Generar reporte de cargos
-- `GET /reportes/categorias` - Generar reporte de categorías
+- `POST /api/haberes/core/libroSueldo/generate/{anho}/{mes}` - Generar libro de sueldo
+- `GET /api/haberes/core/sheet/generateitems/{anho}/{mes}` - Generar planilla de items
 
 
 ## Arquitectura

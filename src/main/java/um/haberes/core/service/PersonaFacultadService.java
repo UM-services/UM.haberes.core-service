@@ -10,8 +10,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.core.kotlin.model.PersonaFacultad;
-import um.haberes.core.repository.PersonaFacultadRepository;
+import um.haberes.core.model.PersonaFacultadEntity;
+import um.haberes.core.repository.JpaPersonaFacultadRepository;
 
 /**
  * @author daniel
@@ -21,17 +21,17 @@ import um.haberes.core.repository.PersonaFacultadRepository;
 public class PersonaFacultadService {
 
 	@Autowired
-	private PersonaFacultadRepository repository;
+	private JpaPersonaFacultadRepository repository;
 
-	public List<PersonaFacultad> findAllByFacultad(Integer facultadId) {
+	public List<PersonaFacultadEntity> findAllByFacultad(Integer facultadId) {
 		return repository.findAllByFacultadId(facultadId);
 	}
 
-	public List<PersonaFacultad> findAllByPersona(Long legajoId) {
+	public List<PersonaFacultadEntity> findAllByPersona(Long legajoId) {
 		return repository.findAllByLegajoId(legajoId);
 	}
 
-	public PersonaFacultad add(PersonaFacultad personaFacultad) {
+	public PersonaFacultadEntity add(PersonaFacultadEntity personaFacultad) {
 		personaFacultad = repository.save(personaFacultad);
 		return personaFacultad;
 	}

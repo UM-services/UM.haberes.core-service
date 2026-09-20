@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import um.haberes.core.kotlin.model.CargoClasePeriodo;
+import um.haberes.core.model.CargoClasePeriodoEntity;
 import um.haberes.core.service.facade.CargoClaseToolService;
 
 /**
@@ -34,7 +34,7 @@ public class CargoClaseToolController {
 	}
 
 	@PostMapping("/")
-	public ResponseEntity<String> addCargo(@RequestBody CargoClasePeriodo cargoclaseperiodo) {
+	public ResponseEntity<String> addCargo(@RequestBody CargoClasePeriodoEntity cargoclaseperiodo) {
 		return new ResponseEntity<>(service.addCargo(cargoclaseperiodo), HttpStatus.OK);
 	}
 

@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import um.haberes.core.kotlin.model.view.AsignadoClase;
-import um.haberes.core.repository.view.AsignadoClaseRepository;
+import um.haberes.core.model.view.AsignadoClase;
+import um.haberes.core.repository.view.JpaAsignadoClaseRepository;
 
 /**
  * @author daniel
@@ -20,7 +20,7 @@ import um.haberes.core.repository.view.AsignadoClaseRepository;
 public class AsignadoClaseService {
 
 	@Autowired
-	private AsignadoClaseRepository repository;
+	private JpaAsignadoClaseRepository repository;
 
 	public List<AsignadoClase> findAllAsignados(Integer dependenciaId, Long cargoClaseId) {
 		return repository.findAllByDependenciaIdAndCargoClaseId(dependenciaId, cargoClaseId,
