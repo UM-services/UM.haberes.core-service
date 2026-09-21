@@ -21,6 +21,8 @@ public interface JpaCargoClaseDetalleRepository extends JpaRepository<CargoClase
 
     List<CargoClaseDetalleEntity> findAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
 
+    boolean existsByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
+
     List<CargoClaseDetalleEntity> findAllByLegajoIdAndAnhoAndMesAndFacultadId(Long legajoId, Integer anho, Integer mes, Integer facultadId);
 
     List<CargoClaseDetalleEntity> findAllByCargoClaseDetalleIdIn(List<Long> cargoClaseDetalleIds);

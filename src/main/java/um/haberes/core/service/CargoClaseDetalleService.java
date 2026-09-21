@@ -28,6 +28,10 @@ public class CargoClaseDetalleService {
 		return repository.findAllByLegajoIdAndAnhoAndMes(legajoId, anho, mes);
 	}
 
+	public boolean existsByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes) {
+		return repository.existsByLegajoIdAndAnhoAndMes(legajoId, anho, mes);
+	}
+
 	public List<CargoClaseDetalleEntity> findAllByLegajoAndFacultad(Long legajoId, Integer anho, Integer mes, Integer facultadId) {
 		return repository.findAllByLegajoIdAndAnhoAndMesAndFacultadId(legajoId, anho, mes, facultadId);
 	}
