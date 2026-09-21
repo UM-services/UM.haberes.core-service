@@ -5,7 +5,7 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**1.15.0** (2026-09-20)
+**1.16.0** (2026-09-20)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
@@ -46,6 +46,7 @@ Liquidaciones:
 - `docs/diagrams/flujo-etec-antiguedad.mmd`
 - `docs/diagrams/flujo-cargo-clase.mmd`
 - `docs/diagrams/flujo-liquidacion-adicional.mmd`
+- `docs/diagrams/flujo-bono-individual.mmd`
 
 Personas y cursos:
 - `docs/diagrams/flujo-persona-consultas.mmd`

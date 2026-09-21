@@ -155,6 +155,7 @@ jobs:
                   { file: 'diagrams/flujo-maestros-catalogos.mmd', title: '🗂️ Secuencia: Maestros y Catálogos Legacy' },
                   { file: 'diagrams/flujo-cargo-clase.mmd', title: '🧑‍🏫 Secuencia: Cargos de Clase por Período' },
                   { file: 'diagrams/flujo-liquidacion-adicional.mmd', title: '➕ Secuencia: Liquidación Adicional HCS' },
+                  { file: 'diagrams/flujo-bono-individual.mmd', title: '🎫 Secuencia: Bono Individual (integridad, prepare, auditoría y envío)' },
                   { file: 'diagrams/flujo-actividad-contacto.mmd', title: '📇 Secuencia: Actividad del Legajo y Contactos' },
                   { file: 'diagrams/flujo-integracion-externa.mmd', title: '🔌 Secuencia: Proxies de Integración Externa' },
                   { file: 'diagrams/despliegue.mmd', title: '🚀 Diagrama de Despliegue' }
