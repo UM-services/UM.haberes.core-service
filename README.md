@@ -46,6 +46,7 @@ Liquidaciones:
 - `docs/diagrams/flujo-etec-antiguedad.mmd`
 - `docs/diagrams/flujo-cargo-clase.mmd`
 - `docs/diagrams/flujo-liquidacion-adicional.mmd`
+- `docs/diagrams/flujo-bono-individual.mmd`
 
 Personas y cursos:
 - `docs/diagrams/flujo-persona-consultas.mmd`

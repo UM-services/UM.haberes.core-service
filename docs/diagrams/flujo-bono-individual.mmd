@@ -1,0 +1,81 @@
+---
+title: "Bono Individual: integridad, preparación, auditoría de impresión y envío (slice liquidaciones/bono)"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant Ctrl as BonoIndividualController
+    participant Svc as BonoService (application)
+    participant IntUC as VerificarIntegridadBonoUseCaseImpl
+    participant PrepUC as PrepararBonoUseCaseImpl
+    participant AudUC as RegistrarAuditoriaBonoUseCaseImpl
+    participant PrintUC as PrintPrepareBonoUseCaseImpl
+    participant SendUC as PrepararEnvioBonoUseCaseImpl
+    participant Legacy as Adapters a servicios legacy
+    participant DB as MySQL
+
+    Note over Usuario,DB: E1 - Verificación de integridad previa a emitir el bono (VB6 cmdIntegridad_Click)
+
+    Usuario->>Ctrl: GET /api/haberes/core/bono/{legajoId}/{anho}/{mes}/integridad
+    Ctrl->>Svc: verificarIntegridad(PeriodoBono)
+    Svc->>IntUC: verificarIntegridad(periodo)
+    IntUC->>Legacy: dependencia de persona, liquidacion, item, actividad y legajocontrol del período
+    Legacy->>DB: SELECT exists por legajoId/anho/mes
+    IntUC-->>Usuario: IntegridadBonoResponse ok y faltantes (DEPENDENCIA, LIQUIDACION, ITEM, ACTIVIDAD, LEGAJO_CONTROL)
+
+    Note over Usuario,DB: E2 - beforePrintBono: recalcula flags docente/otras/clases de actividad (VB6 clsCtlLiquidacion)
+
+    Usuario->>Ctrl: POST /api/haberes/core/bono/{legajoId}/{anho}/{mes}/prepare
+    Ctrl->>Svc: preparar(periodo)
+    Svc->>PrepUC: preparar(periodo)
+    alt sin liquidación en el período
+        PrepUC-->>Ctrl: BonoException → 400 BAD_REQUEST
+    end
+    PrepUC->>Legacy: cargos básicos docentes/no docentes (cargo_liquidacion) y exists de cargo_clase_detalle
+    PrepUC->>DB: UPSERT actividad (docente/otras/clases)
+    PrepUC-->>Usuario: ActividadResponse
+
+    Note over Usuario,DB: E3 - Auditoría de impresión con IP y solicitante resueltos server-side (VB6 clsCtlPrint + modIP)
+
+    Usuario->>Ctrl: POST /api/haberes/core/bono/{legajoId}/{anho}/{mes}/auditoria (header X-Legajo-Solicitante o body)
+    Ctrl->>Ctrl: ClientIpResolver: X-Forwarded-For → X-Real-IP → getRemoteAddr
+    Ctrl->>Svc: registrarAuditoria(AuditoriaBono)
+    Svc->>AudUC: registrarAuditoria(auditoria)
+    alt sin legajoIdSolicitud
+        AudUC-->>Ctrl: BonoException → 400 BAD_REQUEST
+    end
+    AudUC->>DB: INSERT bono_impresion (legajoId, anho, mes, legajoIdSolicitud, fecha, ipAddress)
+
+    Note over Usuario,DB: E4 - Orquestación completa antes de pedir el PDF al report service
+
+    Usuario->>Ctrl: POST /api/haberes/core/bono/{legajoId}/{anho}/{mes}/print-prepare
+    Ctrl->>Svc: printPrepare(auditoria)
+    Svc->>PrintUC: printPrepare(auditoria)
+    PrintUC->>IntUC: verificarIntegridad(periodo)
+    alt integridad fallida
+        PrintUC-->>Ctrl: BonoException con faltantes
+        Ctrl-->>Usuario: 400 + IntegridadBonoResponse ok=false con lista de faltantes
+    end
+    PrintUC->>PrepUC: preparar(periodo)
+    PrintUC->>AudUC: registrarAuditoria(auditoria)
+    PrintUC-->>Usuario: BonoImpresionResponse
+
+    Note over Usuario,DB: E5 - Envío por e-mail: valida y guarda el contacto institucional + auditoría (VB6 sendBono)
+
+    Usuario->>Ctrl: POST /api/haberes/core/bono/{legajoId}/{anho}/{mes}/send-prepare (SendBonoRequest con mailInstitucional)
+    Ctrl->>Svc: prepararEnvio(EnvioBono con ip del request)
+    Svc->>SendUC: prepararEnvio(envio)
+    alt mail inválido
+        SendUC-->>Ctrl: BonoException → 400 BAD_REQUEST
+    end
+    SendUC->>Legacy: upsert mailInstitucional en contacto
+    SendUC->>AudUC: registrarAuditoria(auditoria derivada del envío)
+    SendUC-->>Usuario: BonoImpresionResponse
+
+    Note over Usuario,DB: E6 - Historial de impresiones/auditorías del período
+
+    Usuario->>Ctrl: GET /api/haberes/core/bono/{legajoId}/{anho}/{mes}/auditoria
+    Ctrl->>Svc: getHistorial(periodo)
+    Svc->>Legacy: findAllByLegajoIdAndAnhoAndMesOrderByFechaDesc
+    Legacy->>DB: SELECT bono_impresion ORDER BY fecha DESC
+    Svc-->>Usuario: List~BonoImpresionResponse~
