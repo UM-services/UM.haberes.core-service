@@ -4,6 +4,7 @@
 package um.haberes.core.controller.facade;
 
 import lombok.RequiredArgsConstructor;
+import um.haberes.core.model.dto.imputacion.ImputacionIndividualResponse;
 import um.haberes.core.model.extern.CuentaMovimientoDto;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,12 @@ public class ContableController {
 			@PathVariable Integer mes) {
 		service.generateByLegajo(legajoId, anho, mes);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	@GetMapping("/imputacion-individual/{legajoId}/{anho}/{mes}")
+	public ResponseEntity<ImputacionIndividualResponse> getImputacionIndividual(@PathVariable Long legajoId,
+			@PathVariable Integer anho, @PathVariable Integer mes) {
+		return ResponseEntity.ok(service.getImputacionIndividual(legajoId, anho, mes));
 	}
 
 	@DeleteMapping("/deletelegajo/{legajoId}/{anho}/{mes}")
