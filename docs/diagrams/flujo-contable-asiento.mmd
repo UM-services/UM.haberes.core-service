@@ -34,6 +34,12 @@ sequenceDiagram
     Usuario->>Ctrl: DELETE /contable/deleteperiodo/{anho}/{mes}
     Ctrl->>Svc: deleteAllByPeriodo(...) (reversión masiva del período)
 
+    Usuario->>Ctrl: GET /contable/imputacion-individual/{legajoId}/{anho}/{mes}
+    Ctrl->>Svc: getImputacionIndividual(legajoId, anho, mes) (vista consolidada con totales)
+    Svc->>Imputacion: findAllByLegajo(...) (cargos de categoría, clases y códigos)
+    Svc->>Svc: resolución de catálogos y totales (remunerativo/no remunerativo)
+    Svc->>LegCtrl: findByUnique(...) para la diferencia contable (default 0 si no existe)
+
     Usuario->>Ctrl: GET /contable/asiento/{fechaContable}/{ordenContable}
     Ctrl->>Svc: findAllByAsiento(fecha, orden)
     Svc->>CuentaCli: obtener movimientos contables del asiento
