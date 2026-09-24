@@ -37,9 +37,17 @@ import um.haberes.core.hexagonal.liquidaciones.item.application.service.ItemServ
 import um.haberes.core.hexagonal.liquidaciones.item.domain.model.Item;
 import um.haberes.core.hexagonal.liquidaciones.liquidacion.application.service.LiquidacionService;
 import um.haberes.core.hexagonal.liquidaciones.liquidacion.domain.model.Liquidacion;
+import um.haberes.core.hexagonal.liquidaciones.categoria.application.service.CategoriaService;
+import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.Categoria;
+import um.haberes.core.hexagonal.facultad.application.service.FacultadService;
+import um.haberes.core.hexagonal.facultad.domain.model.Facultad;
+import um.haberes.core.hexagonal.geografica.application.service.GeograficaService;
+import um.haberes.core.hexagonal.geografica.domain.model.Geografica;
+import um.haberes.core.hexagonal.personas.dependencia.application.service.DependenciaService;
 import um.haberes.core.hexagonal.personas.dependencia.domain.model.Dependencia;
 import um.haberes.core.hexagonal.personas.dependencia.infrastructure.persistence.entity.DependenciaEntity;
 import um.haberes.core.model.*;
+import um.haberes.core.model.dto.imputacion.*;
 import um.haberes.core.model.extern.CuentaMovimientoDto;
 import um.haberes.core.service.*;
 import jakarta.transaction.Transactional;
@@ -78,6 +86,11 @@ public class ContableService {
     private final CodigoGrupoService codigoGrupoService;
     private final LiquidacionAdicionalService liquidacionAdicionalService;
     private final CuentaMovimientoClient cuentaMovimientoClient;
+    private final CategoriaService categoriaService;
+    private final CargoClaseService cargoClaseService;
+    private final FacultadService facultadService;
+    private final GeograficaService geograficaService;
+    private final DependenciaService dependenciaService;
 
     @Transactional
     public void generateByLegajo(Long legajoId, Integer anho, Integer mes) {
@@ -497,6 +510,141 @@ public class ContableService {
         legajoCargoClaseImputacionService.deleteAllByPeriodo(anho, mes);
         legajoCategoriaImputacionService.deleteAllByPeriodo(anho, mes);
         legajoCodigoImputacionService.deleteAllByPeriodo(anho, mes);
+    }
+
+    public ImputacionIndividualResponse getImputacionIndividual(Long legajoId, Integer anho, Integer mes) {
+        List<LegajoCategoriaImputacion> categoriaImputaciones = legajoCategoriaImputacionService.findAllByLegajo(legajoId, anho, mes);
+        List<LegajoCargoClaseImputacion> cargoClaseImputaciones = legajoCargoClaseImputacionService.findAllByLegajo(legajoId, anho, mes);
+        List<LegajoCodigoImputacion> codigoImputaciones = legajoCodigoImputacionService.findAllByLegajo(legajoId, anho, mes);
+
+        Map<Integer, String> categoriasMap = categoriaService.findAll().stream()
+                .collect(Collectors.toMap(Categoria::getCategoriaId, Categoria::getNombre, (k1, k2) -> k1));
+        Map<Long, String> cargoClasesMap = cargoClaseService.findAll().stream()
+                .collect(Collectors.toMap(CargoClaseEntity::getCargoClaseId, CargoClaseEntity::getNombre, (k1, k2) -> k1));
+        Map<Integer, String> codigosMap = codigoService.findAll().stream()
+                .collect(Collectors.toMap(Codigo::getCodigoId, Codigo::getNombre, (k1, k2) -> k1));
+        Map<Integer, String> facultadesMap = facultadService.getAllFacultades().stream()
+                .collect(Collectors.toMap(Facultad::getFacultadId, Facultad::getNombre, (k1, k2) -> k1));
+        Map<Integer, String> geograficasMap = geograficaService.getAllGeograficas().stream()
+                .collect(Collectors.toMap(Geografica::getGeograficaId, Geografica::getNombre, (k1, k2) -> k1));
+        Map<Integer, String> dependenciasMap = dependenciaService.findAll().stream()
+                .collect(Collectors.toMap(Dependencia::getDependenciaId, d -> (d.getAcronimo() != null && !d.getAcronimo().isBlank()) ? d.getAcronimo() : d.getNombre(), (k1, k2) -> k1));
+
+        List<Integer> codigoIdRemunerativos = codigoGrupoService.findAllByRemunerativo((byte) 1).stream()
+                .map(CodigoGrupoEntity::getCodigoId).toList();
+
+        BigDecimal totalCargosBasico = BigDecimal.ZERO;
+        BigDecimal totalCargosAntiguedad = BigDecimal.ZERO;
+        List<CargoImputacionDto> cargosDto = new java.util.ArrayList<>();
+        for (LegajoCategoriaImputacion item : categoriaImputaciones) {
+            BigDecimal basico = item.getBasico() != null ? item.getBasico() : BigDecimal.ZERO;
+            BigDecimal antiguedad = item.getAntiguedad() != null ? item.getAntiguedad() : BigDecimal.ZERO;
+            totalCargosBasico = totalCargosBasico.add(basico);
+            totalCargosAntiguedad = totalCargosAntiguedad.add(antiguedad);
+
+            cargosDto.add(CargoImputacionDto.builder()
+                    .categoriaId(item.getCategoriaId())
+                    .categoriaNombre(categoriasMap.getOrDefault(item.getCategoriaId(), ""))
+                    .dependenciaId(item.getDependenciaId())
+                    .dependenciaAcronimo(dependenciasMap.getOrDefault(item.getDependenciaId(), ""))
+                    .facultadId(item.getFacultadId())
+                    .facultadNombre(facultadesMap.getOrDefault(item.getFacultadId(), ""))
+                    .geograficaId(item.getGeograficaId())
+                    .geograficaNombre(geograficasMap.getOrDefault(item.getGeograficaId(), ""))
+                    .basico(basico)
+                    .antiguedad(antiguedad)
+                    .cuentaSueldos(item.getCuentaSueldos())
+                    .build());
+        }
+
+        BigDecimal totalClasesBasico = BigDecimal.ZERO;
+        BigDecimal totalClasesAntiguedad = BigDecimal.ZERO;
+        List<CargoClaseImputacionDto> cargosClaseDto = new java.util.ArrayList<>();
+        for (LegajoCargoClaseImputacion item : cargoClaseImputaciones) {
+            BigDecimal basico = item.getBasico() != null ? item.getBasico() : BigDecimal.ZERO;
+            BigDecimal antiguedad = item.getAntiguedad() != null ? item.getAntiguedad() : BigDecimal.ZERO;
+            totalClasesBasico = totalClasesBasico.add(basico);
+            totalClasesAntiguedad = totalClasesAntiguedad.add(antiguedad);
+
+            cargosClaseDto.add(CargoClaseImputacionDto.builder()
+                    .cargoClaseId(item.getCargoClaseId())
+                    .cargoClaseNombre(cargoClasesMap.getOrDefault(item.getCargoClaseId(), ""))
+                    .dependenciaId(item.getDependenciaId())
+                    .dependenciaAcronimo(dependenciasMap.getOrDefault(item.getDependenciaId(), ""))
+                    .facultadId(item.getFacultadId())
+                    .facultadNombre(facultadesMap.getOrDefault(item.getFacultadId(), ""))
+                    .geograficaId(item.getGeograficaId())
+                    .geograficaNombre(geograficasMap.getOrDefault(item.getGeograficaId(), ""))
+                    .basico(basico)
+                    .antiguedad(antiguedad)
+                    .cuentaSueldos(item.getCuentaSueldos())
+                    .build());
+        }
+
+        BigDecimal totalCodigosImporte = BigDecimal.ZERO;
+        BigDecimal totalCodigosRemunerativo = BigDecimal.ZERO;
+        BigDecimal totalCodigosNoRemunerativo = BigDecimal.ZERO;
+        List<CodigoImputacionDetalleDto> codigosDto = new java.util.ArrayList<>();
+        for (LegajoCodigoImputacion item : codigoImputaciones) {
+            BigDecimal importe = item.getImporte() != null ? item.getImporte() : BigDecimal.ZERO;
+            totalCodigosImporte = totalCodigosImporte.add(importe);
+            boolean esRemunerativo = codigoIdRemunerativos.contains(item.getCodigoId());
+            if (esRemunerativo) {
+                totalCodigosRemunerativo = totalCodigosRemunerativo.add(importe);
+            } else {
+                totalCodigosNoRemunerativo = totalCodigosNoRemunerativo.add(importe);
+            }
+
+            codigosDto.add(CodigoImputacionDetalleDto.builder()
+                    .codigoId(item.getCodigoId())
+                    .codigoNombre(codigosMap.getOrDefault(item.getCodigoId(), ""))
+                    .dependenciaId(item.getDependenciaId())
+                    .dependenciaAcronimo(dependenciasMap.getOrDefault(item.getDependenciaId(), ""))
+                    .facultadId(item.getFacultadId())
+                    .facultadNombre(facultadesMap.getOrDefault(item.getFacultadId(), ""))
+                    .geograficaId(item.getGeograficaId())
+                    .geograficaNombre(geograficasMap.getOrDefault(item.getGeograficaId(), ""))
+                    .importe(importe)
+                    .cuentaSueldos(item.getCuentaSueldos())
+                    .remunerativo(esRemunerativo)
+                    .build());
+        }
+
+        BigDecimal totalBruto = totalCargosBasico
+                .add(totalCargosAntiguedad)
+                .add(totalClasesBasico)
+                .add(totalClasesAntiguedad)
+                .add(totalCodigosRemunerativo);
+
+        BigDecimal totalNoRemunerativo = totalCodigosNoRemunerativo;
+
+        TotalesImputacionDto totalesDto = TotalesImputacionDto.builder()
+                .totalCargosBasico(totalCargosBasico)
+                .totalCargosAntiguedad(totalCargosAntiguedad)
+                .totalClasesBasico(totalClasesBasico)
+                .totalClasesAntiguedad(totalClasesAntiguedad)
+                .totalCodigosImporte(totalCodigosImporte)
+                .totalBruto(totalBruto)
+                .totalNoRemunerativo(totalNoRemunerativo)
+                .build();
+
+        Byte diferencia = 0;
+        try {
+            diferencia = legajoContabilidadService.findByUnique(legajoId, anho, mes).getDiferencia();
+        } catch (LegajoContabilidadException e) {
+            log.debug("Sin registro en legajoContabilidad para legajoId={}, anho={}, mes={}", legajoId, anho, mes);
+        }
+
+        return ImputacionIndividualResponse.builder()
+                .legajoId(legajoId)
+                .anho(anho)
+                .mes(mes)
+                .cargos(cargosDto)
+                .cargosClase(cargosClaseDto)
+                .codigos(codigosDto)
+                .totales(totalesDto)
+                .diferencia(diferencia)
+                .build();
     }
 
     public List<CuentaMovimientoDto> findAllByAsiento(OffsetDateTime fechaContable, Integer ordenContable) {

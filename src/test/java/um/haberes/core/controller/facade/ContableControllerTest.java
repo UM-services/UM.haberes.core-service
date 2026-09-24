@@ -121,4 +121,30 @@ class ContableControllerTest {
                         ]
                         """, JsonCompareMode.STRICT));
     }
+
+    @Test
+    void getImputacionIndividual_returnsOkWithResponse() throws Exception {
+        um.haberes.core.model.dto.imputacion.ImputacionIndividualResponse response =
+                um.haberes.core.model.dto.imputacion.ImputacionIndividualResponse.builder()
+                        .legajoId(100L)
+                        .anho(2024)
+                        .mes(6)
+                        .cargos(List.of())
+                        .cargosClase(List.of())
+                        .codigos(List.of())
+                        .totales(um.haberes.core.model.dto.imputacion.TotalesImputacionDto.builder()
+                                .totalBruto(BigDecimal.valueOf(1500.50))
+                                .totalNoRemunerativo(BigDecimal.valueOf(200.00))
+                                .build())
+                        .diferencia((byte) 0)
+                        .build();
+
+        when(service.getImputacionIndividual(100L, 2024, 6)).thenReturn(response);
+
+        mockMvc.perform(get("/api/haberes/core/contable/imputacion-individual/{legajoId}/{anho}/{mes}", 100, 2024, 6))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+
+        verify(service).getImputacionIndividual(100L, 2024, 6);
+    }
 }
