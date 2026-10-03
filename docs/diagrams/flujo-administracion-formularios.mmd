@@ -18,6 +18,8 @@ sequenceDiagram
     Usuario->>UCtrl: PUT /usuario/lastlog/{legajoId}/{build}
     UCtrl->>USvc: updateLastLog(legajoId, build) (auditoría de ingreso)
     Usuario->>UCtrl: PUT /usuario/setpassword (cambio de contraseña)
+    Usuario->>UCtrl: PUT /usuario/cambiarclave (anterior + nueva + re-entrada)
+    UCtrl->>USvc: cambiarClave(request) → verifica SHA-256 de la anterior y persiste la nueva
     Usuario->>BCtrl: GET /build/last (versión de cliente exigida)
 
     Usuario->>FCtrl: GET /formularioAsignacionCargo/ (datos para formulario de asignación)
