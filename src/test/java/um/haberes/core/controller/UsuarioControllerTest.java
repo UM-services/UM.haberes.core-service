@@ -12,9 +12,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.exception.UsuarioException;
 import um.haberes.core.model.UsuarioEntity;
+import um.haberes.core.model.dto.CambiarClaveRequest;
 import um.haberes.core.service.UsuarioService;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -118,5 +120,39 @@ class UsuarioControllerTest {
                         .content(usuarioBodyJson()))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string(""));
+    }
+
+    @Test
+    void cambiarClave_returnsNoContent() throws Exception {
+        String body = new ObjectMapper().writeValueAsString(CambiarClaveRequest.builder()
+                .legajoId(100L)
+                .currentPassword("old")
+                .newPassword("new")
+                .reClaveNueva("new")
+                .build());
+
+        mockMvc.perform(put("/api/haberes/core/usuario/cambiarclave")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+    }
+
+    @Test
+    void cambiarClave_whenServiceThrowsIllegalArgument_returnsBadRequest() throws Exception {
+        doThrow(new IllegalArgumentException("ERROR: Usuario NO Autenticado"))
+                .when(service).cambiarClave(any(CambiarClaveRequest.class));
+
+        String body = new ObjectMapper().writeValueAsString(CambiarClaveRequest.builder()
+                .legajoId(100L)
+                .currentPassword("wrong")
+                .newPassword("new")
+                .reClaveNueva("new")
+                .build());
+
+        mockMvc.perform(put("/api/haberes/core/usuario/cambiarclave")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isBadRequest());
     }
 }

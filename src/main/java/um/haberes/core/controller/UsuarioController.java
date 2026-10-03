@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.core.exception.UsuarioException;
 import um.haberes.core.model.UsuarioEntity;
+import um.haberes.core.model.dto.CambiarClaveRequest;
 import um.haberes.core.service.UsuarioService;
 
 /**
@@ -56,6 +57,21 @@ public class UsuarioController {
     public ResponseEntity<Void> setPassword(@RequestBody UsuarioEntity usuario) {
         service.setPassword(usuario);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    /**
+     * Cambio de clave con verificacion server-side de la anterior. Devuelve el
+     * mensaje de negocio en {@code detail} (ProblemDetail) con status 400,
+     * patron del resto de endpoints de este controller.
+     */
+    @PutMapping("/cambiarclave")
+    public ResponseEntity<Void> cambiarClave(@RequestBody CambiarClaveRequest request) {
+        try {
+            service.cambiarClave(request);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 
 }
