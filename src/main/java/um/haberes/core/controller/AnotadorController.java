@@ -6,7 +6,6 @@ package um.haberes.core.controller;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.core.exception.AnotadorException;
-import um.haberes.core.kotlin.model.Anotador;
+import um.haberes.core.model.AnotadorEntity;
 import um.haberes.core.service.AnotadorService;
 
 /**
@@ -34,60 +33,60 @@ public class AnotadorController {
 	private final AnotadorService service;
 
 	@GetMapping("/legajo/{legajoId}")
-	public ResponseEntity<List<Anotador>> findAllByLegajo(@PathVariable Long legajoId) {
+	public ResponseEntity<List<AnotadorEntity>> findAllByLegajo(@PathVariable Long legajoId) {
 		return new ResponseEntity<>(service.findAllByLegajo(legajoId), HttpStatus.OK);
 	}
 
 	@GetMapping("/pendiente/{anho}/{mes}")
-	public ResponseEntity<List<Anotador>> findPendientes(@PathVariable Integer anho, @PathVariable Integer mes) {
+	public ResponseEntity<List<AnotadorEntity>> findPendientes(@PathVariable Integer anho, @PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findPendientes(anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/pendientefiltro/{anho}/{mes}/{filtro}")
-	public ResponseEntity<List<Anotador>> findPendientesByFiltro(@PathVariable Integer anho, @PathVariable Integer mes,
+	public ResponseEntity<List<AnotadorEntity>> findPendientesByFiltro(@PathVariable Integer anho, @PathVariable Integer mes,
 			@PathVariable String filtro) {
 		return new ResponseEntity<>(service.findPendientesFiltro(anho, mes, filtro), HttpStatus.OK);
 	}
 
 	@GetMapping("/pendientefacultad/{facultadId}/{anho}/{mes}")
-	public ResponseEntity<List<Anotador>> findPendientesByFacultad(@PathVariable Integer facultadId,
+	public ResponseEntity<List<AnotadorEntity>> findPendientesByFacultad(@PathVariable Integer facultadId,
 			@PathVariable Integer anho, @PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findPendientesByFacultad(facultadId, anho, mes),
 				HttpStatus.OK);
 	}
 
 	@GetMapping("/revisado/{anho}/{mes}")
-	public ResponseEntity<List<Anotador>> findRevisados(@PathVariable Integer anho, @PathVariable Integer mes) {
+	public ResponseEntity<List<AnotadorEntity>> findRevisados(@PathVariable Integer anho, @PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findRevisados(anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/revisadofiltro/{anho}/{mes}/{filtro}")
-	public ResponseEntity<List<Anotador>> findRevisadosByFiltro(@PathVariable Integer anho, @PathVariable Integer mes,
+	public ResponseEntity<List<AnotadorEntity>> findRevisadosByFiltro(@PathVariable Integer anho, @PathVariable Integer mes,
 			@PathVariable String filtro) {
 		return new ResponseEntity<>(service.findRevisadosFiltro(anho, mes, filtro), HttpStatus.OK);
 	}
 
 	@GetMapping("/revisadofacultad/{facultadId}/{anho}/{mes}")
-	public ResponseEntity<List<Anotador>> findRevisadosByFacultad(@PathVariable Integer facultadId,
+	public ResponseEntity<List<AnotadorEntity>> findRevisadosByFacultad(@PathVariable Integer facultadId,
 			@PathVariable Integer anho, @PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findRevisadosByFacultad(facultadId, anho, mes),
 				HttpStatus.OK);
 	}
 
 	@GetMapping("/autorizadofacultad/{facultadId}/{anho}/{mes}")
-	public ResponseEntity<List<Anotador>> findAutorizadosByFacultad(@PathVariable Integer facultadId,
+	public ResponseEntity<List<AnotadorEntity>> findAutorizadosByFacultad(@PathVariable Integer facultadId,
 																	@PathVariable Integer anho, @PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findAutorizadosByFacultad(facultadId, anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/rechazadofacultad/{facultadId}/{anho}/{mes}")
-	public ResponseEntity<List<Anotador>> findRechazadosByFacultad(@PathVariable Integer facultadId,
+	public ResponseEntity<List<AnotadorEntity>> findRechazadosByFacultad(@PathVariable Integer facultadId,
 																   @PathVariable Integer anho, @PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findRechazadosByFacultad(facultadId, anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/{anotadorId}")
-	public ResponseEntity<Anotador> findByAnotadorId(@PathVariable Long anotadorId) {
+	public ResponseEntity<AnotadorEntity> findByAnotadorId(@PathVariable Long anotadorId) {
 		try {
 			return new ResponseEntity<>(service.findByAnotadorId(anotadorId), HttpStatus.OK);
 		} catch (AnotadorException e) {
@@ -96,12 +95,12 @@ public class AnotadorController {
 	}
 
 	@PostMapping("/")
-	public ResponseEntity<Anotador> add(@RequestBody Anotador anotador) {
+	public ResponseEntity<AnotadorEntity> add(@RequestBody AnotadorEntity anotador) {
 		return new ResponseEntity<>(service.add(anotador), HttpStatus.OK);
 	}
 
 	@PutMapping("/{anotadorId}")
-	public ResponseEntity<Anotador> update(@RequestBody Anotador anotador, @PathVariable Long anotadorId) {
+	public ResponseEntity<AnotadorEntity> update(@RequestBody AnotadorEntity anotador, @PathVariable Long anotadorId) {
 		return new ResponseEntity<>(service.update(anotador, anotadorId), HttpStatus.OK);
 	}
 

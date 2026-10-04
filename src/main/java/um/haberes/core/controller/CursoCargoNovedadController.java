@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.core.exception.CursoCargoNovedadException;
-import um.haberes.core.kotlin.model.CursoCargoNovedad;
+import um.haberes.core.model.CursoCargoNovedadEntity;
 import um.haberes.core.service.CursoCargoNovedadService;
 
 /**
@@ -36,105 +36,105 @@ public class CursoCargoNovedadController {
 	}
 
 	@GetMapping("/pendiente/{anho}/{mes}")
-	public ResponseEntity<List<CursoCargoNovedad>> findAllPendientes(@PathVariable Integer anho,
+	public ResponseEntity<List<CursoCargoNovedadEntity>> findAllPendientes(@PathVariable Integer anho,
 																	 @PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findAllPendientes(anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/pendientealta/{anho}/{mes}")
-	public ResponseEntity<List<CursoCargoNovedad>> findAllPendientesAlta(@PathVariable Integer anho,
+	public ResponseEntity<List<CursoCargoNovedadEntity>> findAllPendientesAlta(@PathVariable Integer anho,
 			@PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findAllPendientesAlta(anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/cursopendientealta/{cursoId}/{anho}/{mes}")
-	public ResponseEntity<List<CursoCargoNovedad>> findAllCursoPendientesAlta(@PathVariable Long cursoId,
+	public ResponseEntity<List<CursoCargoNovedadEntity>> findAllCursoPendientesAlta(@PathVariable Long cursoId,
 			@PathVariable Integer anho, @PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findAllCursoPendientesAlta(cursoId, anho, mes),
 				HttpStatus.OK);
 	}
 
 	@GetMapping("/autorizadoalta/{anho}/{mes}")
-	public ResponseEntity<List<CursoCargoNovedad>> findAllAutorizadosAlta(@PathVariable Integer anho,
+	public ResponseEntity<List<CursoCargoNovedadEntity>> findAllAutorizadosAlta(@PathVariable Integer anho,
 			@PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findAllAutorizadosAlta(anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/rechazadoalta/{anho}/{mes}")
-	public ResponseEntity<List<CursoCargoNovedad>> findAllRechazadosAlta(@PathVariable Integer anho,
+	public ResponseEntity<List<CursoCargoNovedadEntity>> findAllRechazadosAlta(@PathVariable Integer anho,
 			@PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findAllRechazadosAlta(anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/pendientebaja/{anho}/{mes}")
-	public ResponseEntity<List<CursoCargoNovedad>> findAllPendientesBaja(@PathVariable Integer anho,
+	public ResponseEntity<List<CursoCargoNovedadEntity>> findAllPendientesBaja(@PathVariable Integer anho,
 			@PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findAllPendientesBaja(anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/cursopendientebaja/{cursoId}/{anho}/{mes}")
-	public ResponseEntity<List<CursoCargoNovedad>> findAllCursoPendientesBaja(@PathVariable Long cursoId,
+	public ResponseEntity<List<CursoCargoNovedadEntity>> findAllCursoPendientesBaja(@PathVariable Long cursoId,
 			@PathVariable Integer anho, @PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findAllCursoPendientesBaja(cursoId, anho, mes),
 				HttpStatus.OK);
 	}
 
 	@GetMapping("/autorizadobaja/{anho}/{mes}")
-	public ResponseEntity<List<CursoCargoNovedad>> findAllAutorizadosBaja(@PathVariable Integer anho,
+	public ResponseEntity<List<CursoCargoNovedadEntity>> findAllAutorizadosBaja(@PathVariable Integer anho,
 			@PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findAllAutorizadosBaja(anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/rechazadobaja/{anho}/{mes}")
-	public ResponseEntity<List<CursoCargoNovedad>> findAllRechazadosBaja(@PathVariable Integer anho,
+	public ResponseEntity<List<CursoCargoNovedadEntity>> findAllRechazadosBaja(@PathVariable Integer anho,
 			@PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findAllRechazadosBaja(anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/autorizadolegajo/{legajoId}/{cursoId}/{anho}/{mes}")
-	public ResponseEntity<List<CursoCargoNovedad>> findAllAutorizadosLegajo(@PathVariable Long legajoId,
+	public ResponseEntity<List<CursoCargoNovedadEntity>> findAllAutorizadosLegajo(@PathVariable Long legajoId,
 			@PathVariable Long cursoId, @PathVariable Integer anho, @PathVariable Integer mes) {
 		return new ResponseEntity<>(
 				service.findAllAutorizadosLegajo(legajoId, cursoId, anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/rechazadolegajo/{legajoId}/{cursoId}/{anho}/{mes}")
-	public ResponseEntity<List<CursoCargoNovedad>> findAllRechazadosLegajo(@PathVariable Long legajoId,
+	public ResponseEntity<List<CursoCargoNovedadEntity>> findAllRechazadosLegajo(@PathVariable Long legajoId,
 			@PathVariable Long cursoId, @PathVariable Integer anho, @PathVariable Integer mes) {
 		return new ResponseEntity<>(
 				service.findAllRechazadosLegajo(legajoId, cursoId, anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/pendientelegajo/{legajoId}/{cursoId}/{anho}/{mes}")
-	public ResponseEntity<List<CursoCargoNovedad>> findAllPendientesLegajo(@PathVariable Long legajoId,
+	public ResponseEntity<List<CursoCargoNovedadEntity>> findAllPendientesLegajo(@PathVariable Long legajoId,
 			@PathVariable Long cursoId, @PathVariable Integer anho, @PathVariable Integer mes) {
 		return new ResponseEntity<>(
 				service.findAllPendientesLegajo(legajoId, cursoId, anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/facultad/{facultadId}/{anho}/{mes}")
-	public ResponseEntity<List<CursoCargoNovedad>> findAllByFacultad(@PathVariable Integer facultadId,
+	public ResponseEntity<List<CursoCargoNovedadEntity>> findAllByFacultad(@PathVariable Integer facultadId,
 			@PathVariable Integer anho, @PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findAllByFacultad(facultadId, anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/facultad/{facultadId}/geografica/{geograficaId}/periodo/{anho}/{mes}/alta")
-	public ResponseEntity<List<CursoCargoNovedad>> findAllByFacultadAndGeograficaAndAlta(@PathVariable Integer facultadId, @PathVariable Integer geograficaId, @PathVariable Integer anho, @PathVariable Integer mes) {
+	public ResponseEntity<List<CursoCargoNovedadEntity>> findAllByFacultadAndGeograficaAndAlta(@PathVariable Integer facultadId, @PathVariable Integer geograficaId, @PathVariable Integer anho, @PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findAllByFacultadAndGeograficaAndAlta(facultadId, geograficaId, anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/facultad/{facultadId}/geografica/{geograficaId}/periodo/{anho}/{mes}/cambio")
-	public ResponseEntity<List<CursoCargoNovedad>> findAllByFacultadAndGeograficaAndCambio(@PathVariable Integer facultadId, @PathVariable Integer geograficaId, @PathVariable Integer anho, @PathVariable Integer mes) {
+	public ResponseEntity<List<CursoCargoNovedadEntity>> findAllByFacultadAndGeograficaAndCambio(@PathVariable Integer facultadId, @PathVariable Integer geograficaId, @PathVariable Integer anho, @PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findAllByFacultadAndGeograficaAndCambio(facultadId, geograficaId, anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/facultad/{facultadId}/geografica/{geograficaId}/periodo/{anho}/{mes}/baja")
-	public ResponseEntity<List<CursoCargoNovedad>> findAllByFacultadAndGeograficaAndBaja(@PathVariable Integer facultadId, @PathVariable Integer geograficaId, @PathVariable Integer anho, @PathVariable Integer mes) {
+	public ResponseEntity<List<CursoCargoNovedadEntity>> findAllByFacultadAndGeograficaAndBaja(@PathVariable Integer facultadId, @PathVariable Integer geograficaId, @PathVariable Integer anho, @PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findAllByFacultadAndGeograficaAndBaja(facultadId, geograficaId, anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/{cursoCargoNovedadId}")
-	public ResponseEntity<CursoCargoNovedad> findByCursoCargoNovedadId(@PathVariable Long cursoCargoNovedadId) {
+	public ResponseEntity<CursoCargoNovedadEntity> findByCursoCargoNovedadId(@PathVariable Long cursoCargoNovedadId) {
 		try {
 			return new ResponseEntity<>(service.findByCursoCargoNovedadId(cursoCargoNovedadId),
 					HttpStatus.OK);
@@ -144,7 +144,7 @@ public class CursoCargoNovedadController {
 	}
 
 	@GetMapping("/legajo/{legajoId}/{cursoId}/{anho}/{mes}")
-	public ResponseEntity<CursoCargoNovedad> findByLegajo(@PathVariable Long legajoId, @PathVariable Long cursoId,
+	public ResponseEntity<CursoCargoNovedadEntity> findByLegajo(@PathVariable Long legajoId, @PathVariable Long cursoId,
 			@PathVariable Integer anho, @PathVariable Integer mes) {
 		try {
 			return new ResponseEntity<>(service.findByLegajo(legajoId, cursoId, anho, mes),
@@ -155,7 +155,7 @@ public class CursoCargoNovedadController {
 	}
 
 	@GetMapping("/unique/{cursoId}/{anho}/{mes}/{cargoTipoId}/{legajoId}")
-	public ResponseEntity<CursoCargoNovedad> findByUnique(@PathVariable Long cursoId, @PathVariable Integer anho,
+	public ResponseEntity<CursoCargoNovedadEntity> findByUnique(@PathVariable Long cursoId, @PathVariable Integer anho,
 			@PathVariable Integer mes, @PathVariable Integer cargoTipoId, @PathVariable Long legajoId) {
 		try {
 			return new ResponseEntity<>(
@@ -166,12 +166,12 @@ public class CursoCargoNovedadController {
 	}
 
 	@PostMapping("/")
-	public ResponseEntity<CursoCargoNovedad> add(@RequestBody CursoCargoNovedad cursoCargoNovedad) {
+	public ResponseEntity<CursoCargoNovedadEntity> add(@RequestBody CursoCargoNovedadEntity cursoCargoNovedad) {
 		return ResponseEntity.ok(service.add(cursoCargoNovedad));
 	}
 
 	@PutMapping("/{cursoCargoNovedadId}")
-	public ResponseEntity<CursoCargoNovedad> update(@RequestBody CursoCargoNovedad cursoCargoNovedad,
+	public ResponseEntity<CursoCargoNovedadEntity> update(@RequestBody CursoCargoNovedadEntity cursoCargoNovedad,
 			@PathVariable Long cursoCargoNovedadId) {
 		return new ResponseEntity<>(service.update(cursoCargoNovedad, cursoCargoNovedadId),
 				HttpStatus.OK);

@@ -1,0 +1,40 @@
+---
+title: "Proxies de Integración Externa (cuentas, ejercicios y contratados)"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario as Cliente HTTP
+    participant CuCtrl as CuentaController
+    participant EjCtrl as EjercicioController
+    participant CP as ContratadoPersonaController
+    participant CCC as CursoCargoContratadoController
+    participant Svc as Servicios extern (Cuenta/Ejercicio/ContratadoPersona/CursoCargoContratado)
+    participant Feign as Clients OpenFeign (descubiertos por Consul)
+    participant Tes as tesoreria-core-service (externo)
+
+    Usuario->>CuCtrl: GET /cuenta/
+    CuCtrl->>Svc: findAll()
+    Usuario->>CuCtrl: POST /cuenta/search/{visible} (condiciones de texto)
+    Usuario->>CuCtrl: GET /cuenta/{numeroCuenta} , GET /cuenta/id/{cuentaContableId}
+    Svc->>Feign: CuentaClient (tesoreria-core-service/cuenta)
+    alt cuenta inexistente
+        Feign-->>Svc: CuentaException → 400 BAD_REQUEST
+    end
+
+    Usuario->>EjCtrl: GET /ejercicio/periodo/{anho}/{mes}
+    EjCtrl->>Svc: findByPeriodo(anho, mes) (último día del período)
+    Usuario->>EjCtrl: GET /ejercicio/fecha/{fecha}
+    Svc->>Feign: EjercicioClient.findByFecha(fecha) (tesoreria-core-service/ejercicio)
+    alt sin ejercicio vigente
+        Feign-->>Svc: EjercicioException → manejo de error
+    end
+
+    Usuario->>CP: GET /contratadoPersona/
+    CP->>Feign: ContratadoPersonaClient.findAll() (path /contratadopersona)
+    Usuario->>CCC: GET /cursoCargoContratado/curso/{cursoId}/{anho}/{mes}
+    CCC->>Feign: CursoCargoContratadoClient.findAllByCurso(...) (path /cursocargocontratado)
+
+    Feign->>Tes: llamada HTTP entre microservicios
+    Tes-->>Usuario: DTOs externos (CuentaDto / EjercicioDto / ContratadoPersonaDto / CursoCargoContratadoDto)
+
+    Note over Usuario,Tes: Mismos clients usados internamente por: OrdenPagoService (EjercicioClient,<br/>ProveedorMovimientoClient), ContableService (CuentaMovimientoClient) y ContratadoService<br/>(planilla de contratados, ver flujo-contratados-planilla.mmd)

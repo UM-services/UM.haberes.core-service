@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.AdicionalCursoRangoException;
-import um.haberes.core.kotlin.model.AdicionalCursoRango;
-import um.haberes.core.repository.AdicionalCursoRangoRepository;
+import um.haberes.core.model.AdicionalCursoRangoEntity;
+import um.haberes.core.repository.JpaAdicionalCursoRangoRepository;
 
 /**
  * @author daniel
@@ -22,18 +22,18 @@ import um.haberes.core.repository.AdicionalCursoRangoRepository;
 public class AdicionalCursoRangoService {
 
 	@Autowired
-	private AdicionalCursoRangoRepository repository;
+	private JpaAdicionalCursoRangoRepository repository;
 
-	public List<AdicionalCursoRango> findAllByAdicionalCursoTabla(Long adicionalCursoTablaId) {
+	public List<AdicionalCursoRangoEntity> findAllByAdicionalCursoTabla(Long adicionalCursoTablaId) {
 		return repository.findAllByAdicionalCursoTablaIdOrderByHorasDesde(adicionalCursoTablaId);
 	}
 
-	public AdicionalCursoRango findByAdicionalCursoRangoId(Long adicionalCursoRangoId) {
+	public AdicionalCursoRangoEntity findByAdicionalCursoRangoId(Long adicionalCursoRangoId) {
 		return repository.findByAdicionalCursoRangoId(adicionalCursoRangoId)
 				.orElseThrow(() -> new AdicionalCursoRangoException(adicionalCursoRangoId));
 	}
 
-	public AdicionalCursoRango add(AdicionalCursoRango adicionalCursoRango) {
+	public AdicionalCursoRangoEntity add(AdicionalCursoRangoEntity adicionalCursoRango) {
 		return repository.save(adicionalCursoRango);
 	}
 

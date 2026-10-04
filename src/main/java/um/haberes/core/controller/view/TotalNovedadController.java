@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import um.haberes.core.kotlin.model.view.TotalNovedad;
+import um.haberes.core.model.view.TotalNovedad;
 import um.haberes.core.service.view.TotalNovedadService;
 
 import java.util.List;

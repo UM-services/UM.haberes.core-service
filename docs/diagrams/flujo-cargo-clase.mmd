@@ -1,0 +1,47 @@
+---
+title: "Cargos de Clase por Período (maestro ETEC y su mantenimiento)"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant CCtrl as CargoClaseController
+    participant PCtrl as CargoClasePeriodoController
+    participant DCtrl as CargoClaseDetalleController
+    participant TCtrl as CargoClaseToolController (facade)
+    participant Svc as CargoClase*Service (legacy)
+    participant DB as MySQL
+
+    Note over Usuario,DB: Catálogo maestro de cargos de clase
+
+    Usuario->>CCtrl: GET /cargoclase/ , GET /cargoclase/{cargoClaseId}
+    CCtrl->>Svc: findAll() / findByCargoClaseId(cargoClaseId)
+    Usuario->>CCtrl: POST /cargoclase/ , PUT /cargoclase/{cargoClaseId}
+
+    Note over Usuario,DB: Vigencia del cargo de clase por legajo y facultad
+
+    Usuario->>PCtrl: GET /cargoclaseperiodo/legajo/{legajoId}
+    PCtrl->>Svc: findAllByLegajo(legajoId)
+    Usuario->>PCtrl: GET /cargoclaseperiodo/facultad/{facultadId}
+    PCtrl->>Svc: findAllByFacultad(facultadId)
+    Usuario->>PCtrl: GET /cargoclaseperiodo/{cargoClasePeriodoId}
+    Usuario->>PCtrl: POST /cargoclaseperiodo/ , PUT /cargoclaseperiodo/{cargoClasePeriodoId} , DELETE /cargoclaseperiodo/{cargoClasePeriodoId}
+
+    Note over Usuario,DB: Detalle imputable (horas por cargo/período/facultad)
+
+    Usuario->>DCtrl: GET /cargoclasedetalle/legajo/{legajoId}/{anho}/{mes}
+    DCtrl->>Svc: findAllByLegajo(...)
+    Usuario->>DCtrl: GET /cargoclasedetalle/legajo/{legajoId}/{anho}/{mes}/facultad/{facultadId}
+    Usuario->>DCtrl: GET /cargoclasedetalle/facultad/{facultadId}/{anho}/{mes}
+    Usuario->>DCtrl: GET /cargoclasedetalle/cargoclase/{cargoclaseId}/{anho}/{mes}
+    Usuario->>DCtrl: GET /cargoclasedetalle/cargoclaseperiodo/{cargoclaseperiodoId}
+    Usuario->>DCtrl: POST /cargoclasedetalle/ , PUT /cargoclasedetalle/{id} , PUT /cargoclasedetalle/ (saveall) , DELETE /cargoclasedetalle/{id}
+
+    Note over Usuario,DB: Operación de negocio agrupada (herramienta)
+
+    Usuario->>TCtrl: POST /cargoclasetool/ (alta con detalle)
+    Usuario->>TCtrl: PUT /cargoclasetool/{cargoClasePeriodoId}/{anhoHasta}/{mesHasta} (extender/recortar vigencia)
+    Usuario->>TCtrl: DELETE /cargoclasetool/{cargoClasePeriodoId}
+    Usuario->>TCtrl: GET /cargoclasetool/update/periodo/{anho}/{mes} (recalcula valor hora del período)
+    Svc->>DB: INSERT/UPDATE/DELETE cargo_clase, cargo_clase_periodo, cargo_clase_detalle
+
+    Note over Usuario,DB: Insumo de: liquidación ETEC (LiquidacionEtecController), cierre contable<br/>(updateCargoClaseImputacion) y redesignación (ver flujo-designacion-tool.mmd)

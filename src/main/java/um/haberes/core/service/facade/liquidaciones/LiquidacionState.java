@@ -1,7 +1,11 @@
 package um.haberes.core.service.facade.liquidaciones;
 
 import lombok.*;
-import um.haberes.core.kotlin.model.*;
+import um.haberes.core.hexagonal.liquidaciones.codigo.domain.model.Codigo;
+import um.haberes.core.hexagonal.liquidaciones.item.domain.model.Item;
+import um.haberes.core.hexagonal.liquidaciones.novedad.domain.model.Novedad;
+import um.haberes.core.hexagonal.personas.persona.domain.model.Persona;
+import um.haberes.core.model.*;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -15,12 +19,12 @@ import java.util.Map;
 @AllArgsConstructor
 public class LiquidacionState {
 
-    private Control control;
+    private ControlEntity control;
     private Persona persona;
     private List<BigDecimal> indices;
     private Map<Integer, Codigo> codigos;
     private Map<Integer, Item> items = new HashMap<>();
     private Map<Integer, Novedad> novedades;
-    private List<CargoClaseDetalle> cargoClases;
+    private List<CargoClaseDetalleEntity> cargoClases;
 
 }

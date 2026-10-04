@@ -4,7 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
-import um.haberes.core.kotlin.model.Auditable;
+import um.haberes.core.model.AuditableEntity;
 
 import java.math.BigDecimal;
 
@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @Table(name = "geografica")
 @EqualsAndHashCode(callSuper = true)
 @Builder
-public class GeograficaEntity extends Auditable {
+public class GeograficaEntity extends AuditableEntity {
 
     @Id
     private Integer geograficaId;

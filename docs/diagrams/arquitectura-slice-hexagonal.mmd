@@ -1,0 +1,94 @@
+---
+title: "Patrón de Slice Hexagonal (slice de referencia: persona)"
+---
+classDiagram
+    direction TB
+
+    namespace Dominio {
+        class Persona {
+            +Long legajoId
+            +String apellido
+            +String nombre
+            +String cuil
+        }
+        class PersonaRepository {
+            << interface >>
+            +findAll() List~Persona~
+            +findById(Long) Persona
+            +saveAll(List~Persona~) List~Persona~
+        }
+        class ContactoRepository {
+            << interface >>
+            +findByLegajoId(Long) ContactoMail
+            +saveAll(List~ContactoMail~) List~ContactoMail~
+        }
+        class UploadContactosUseCase {
+            << interface >>
+            +uploadContactos(UploadedFile) List~Persona~
+        }
+        class ContactoUploadFileReader {
+            << interface >>
+            +readContactos(UploadedFile) List~ContactoMail~
+        }
+        class MailValidator {
+            << interface >>
+            +isValid(String) boolean
+        }
+    }
+
+    namespace Aplicacion {
+        class PersonaService {
+            -UploadContactosUseCase uploadContactosUseCase
+            +findAll() List~Persona~
+            +upload(UploadedFile) List~Persona~
+        }
+        class UploadContactosUseCaseImpl {
+            +uploadContactos(UploadedFile) List~Persona~
+        }
+    }
+
+    namespace Infraestructura {
+        class PersonaController {
+            -PersonaService service
+            +findAll() List~PersonaResponse~
+            +upload(PersonaUploadRequest) List~PersonaResponse~
+        }
+        class JpaPersonaRepositoryAdapter {
+            +findAll() List~Persona~
+            +findById(Long) Persona
+        }
+        class JpaPersonaRepository {
+            << JpaRepository >>
+        }
+        class PersonaEntity {
+            +Long legajoId
+            +Integer dependenciaId
+            +String cuil
+        }
+        class PersonaMapper {
+            +toEntity(Persona) PersonaEntity
+            +toDomain(PersonaEntity) Persona
+        }
+        class ExcelContactoUploadFileReader {
+            +readContactos(UploadedFile) List~ContactoMail~
+        }
+        class ToolServiceMailValidator {
+            +isValid(String) boolean
+        }
+    }
+
+    PersonaController --> PersonaService
+    PersonaService --> UploadContactosUseCase
+    UploadContactosUseCaseImpl ..|> UploadContactosUseCase
+    UploadContactosUseCaseImpl --> PersonaRepository
+    UploadContactosUseCaseImpl --> ContactoRepository
+    UploadContactosUseCaseImpl --> ContactoUploadFileReader
+    UploadContactosUseCaseImpl --> MailValidator
+    JpaPersonaRepositoryAdapter ..|> PersonaRepository
+    JpaPersonaRepositoryAdapter --> JpaPersonaRepository
+    JpaPersonaRepository --> PersonaEntity
+    JpaPersonaRepositoryAdapter --> PersonaMapper
+    PersonaMapper --> PersonaEntity
+    PersonaMapper --> Persona
+    ExcelContactoUploadFileReader ..|> ContactoUploadFileReader
+    ToolServiceMailValidator ..|> MailValidator

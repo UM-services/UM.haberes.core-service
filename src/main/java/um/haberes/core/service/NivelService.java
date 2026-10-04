@@ -8,8 +8,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.core.kotlin.model.Nivel;
-import um.haberes.core.repository.NivelRepository;
+import um.haberes.core.model.NivelEntity;
+import um.haberes.core.repository.JpaNivelRepository;
 
 /**
  * @author daniel
@@ -19,9 +19,9 @@ import um.haberes.core.repository.NivelRepository;
 public class NivelService {
 	
 	@Autowired
-	private NivelRepository repository;
+	private JpaNivelRepository repository;
 
-	public List<Nivel> findAll() {
+	public List<NivelEntity> findAll() {
 		return repository.findAll();
 	}
 }

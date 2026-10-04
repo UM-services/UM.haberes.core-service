@@ -4,12 +4,11 @@
 package um.haberes.core.service.dto;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.core.kotlin.model.dto.FormularioAsignacionCargo;
-import um.haberes.core.service.CategoriaService;
-import um.haberes.core.service.DependenciaService;
+import um.haberes.core.model.dto.FormularioAsignacionCargo;
+import um.haberes.core.hexagonal.liquidaciones.categoria.application.service.CategoriaService;
+import um.haberes.core.hexagonal.personas.dependencia.application.service.DependenciaService;
 import um.haberes.core.hexagonal.facultad.application.service.FacultadService;
 
 /**

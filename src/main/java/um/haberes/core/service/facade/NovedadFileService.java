@@ -5,7 +5,6 @@ package um.haberes.core.service.facade;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -26,17 +25,18 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Service;
 
-import um.haberes.core.exception.NovedadException;
+import um.haberes.core.hexagonal.liquidaciones.codigo.domain.model.Codigo;
+import um.haberes.core.hexagonal.liquidaciones.novedad.application.exception.NovedadException;
 import um.haberes.core.exception.common.ImportNewsException;
 import um.haberes.core.exception.common.TituloNotFoundException;
-import um.haberes.core.kotlin.model.Codigo;
-import um.haberes.core.kotlin.model.Novedad;
-import um.haberes.core.kotlin.model.NovedadUpload;
-import um.haberes.core.kotlin.model.Persona;
-import um.haberes.core.service.CodigoService;
-import um.haberes.core.service.NovedadService;
+import um.haberes.core.hexagonal.liquidaciones.codigo.infrastructure.persistence.entity.CodigoEntity;
+import um.haberes.core.hexagonal.liquidaciones.novedad.domain.model.Novedad;
+import um.haberes.core.hexagonal.personas.persona.domain.model.Persona;
+import um.haberes.core.model.NovedadUploadEntity;
+import um.haberes.core.hexagonal.liquidaciones.codigo.application.service.CodigoService;
+import um.haberes.core.hexagonal.liquidaciones.novedad.application.service.NovedadService;
 import um.haberes.core.service.NovedadUploadService;
-import um.haberes.core.service.PersonaService;
+import um.haberes.core.hexagonal.personas.persona.application.service.PersonaService;
 import um.haberes.core.util.Periodo;
 import um.haberes.core.util.Tool;
 import um.haberes.core.util.transfer.FileInfo;
@@ -68,7 +68,7 @@ public class NovedadFileService {
         novedadUploadService.deleteAllByPendiente((byte) 1);
 
         Map<Long, Persona> legajoIds = personaService.findAll().stream().collect(Collectors.toMap(Persona::getLegajoId, persona -> persona));
-        List<NovedadUpload> novedades = new ArrayList<>();
+        List<NovedadUploadEntity> novedades = new ArrayList<>();
         File file = Tool.writeFile(fileInfo);
 
         // Procesa Excel
@@ -86,17 +86,17 @@ public class NovedadFileService {
                 // Verificacion Legajo
                 Integer columnLegajoId = null;
                 try {
-                    columnName = row.getCell(0).getStringCellValue().toLowerCase().replaceAll(" ", "");
+                    columnName = row.getCell(0).getStringCellValue().toLowerCase().replace(" ", "");
                     if (columnName.equals("legajoid")) {
                         columnLegajoId = 0;
                     }
                 } catch (NullPointerException e) {
                     response = response + "Sheet= " + sheet.getSheetName() + " SIN LegajoId" + (char) 10;
                 }
-                // Verificacion Codigo
+                // Verificacion CodigoEntity
                 Integer columnCodigoId = null;
                 try {
-                    columnName = row.getCell(1).getStringCellValue().toLowerCase().replaceAll(" ", "");
+                    columnName = row.getCell(1).getStringCellValue().toLowerCase().replace(" ", "");
                     if (columnName.equals("codigoid")) {
                         columnCodigoId = 1;
                     }
@@ -106,16 +106,16 @@ public class NovedadFileService {
                 // Verificacion Importe
                 Integer columnImporte = null;
                 try {
-                    columnName = row.getCell(2).getStringCellValue().toLowerCase().replaceAll(" ", "");
+                    columnName = row.getCell(2).getStringCellValue().toLowerCase().replace(" ", "");
                     if (columnName.equals("importe")) {
                         columnImporte = 2;
                     }
                 } catch (NullPointerException e) {
                 }
-                // Verificacion Dependencia
+                // Verificacion DependenciaEntity
                 Integer columnDependenciaId = null;
                 try {
-                    columnName = row.getCell(3).getStringCellValue().toLowerCase().replaceAll(" ", "");
+                    columnName = row.getCell(3).getStringCellValue().toLowerCase().replace(" ", "");
                     if (columnName.equals("dependenciaid")) {
                         columnDependenciaId = 3;
                     }
@@ -178,7 +178,7 @@ public class NovedadFileService {
                             Integer dependenciaId = null;
                             if (cellDependenciaId != null)
                                 dependenciaId = cellDependenciaId.intValue();
-                            var novedadUpload = new NovedadUpload(null, legajoId, anho, mes, codigoId, dependenciaId, importe,
+                            var novedadUpload = new NovedadUploadEntity(null, legajoId, anho, mes, codigoId, dependenciaId, importe,
                                     value, (byte) 1, null, null, null);
                             novedades.add(novedadUpload);
                         }
@@ -192,12 +192,12 @@ public class NovedadFileService {
         }
 
         if (stepByStep) {
-            for (NovedadUpload novedadUpload : novedades) {
+            for (NovedadUploadEntity novedadUpload : novedades) {
                 String detail = "";
                 try {
-                    log.debug("NovedadUpload -> {}", detail =JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(novedadUpload));
+                    log.debug("NovedadUploadEntity -> {}", detail =JsonMapper.builder().findAndAddModules().build().writerWithDefaultPrettyPrinter().writeValueAsString(novedadUpload));
                 } catch (JsonProcessingException e) {
-                    log.debug("NovedadUpload -> null {}", e.getMessage());
+                    log.debug("NovedadUploadEntity -> null {}", e.getMessage());
                 }
                 try {
                 novedadUploadService.add(novedadUpload);
@@ -220,7 +220,7 @@ public class NovedadFileService {
     @Transactional
     public void importNews(Integer anho, Integer mes) {
         List<Novedad> novedades = new ArrayList<>();
-        for (NovedadUpload novedadUpload : novedadUploadService.findAllByPendiente(anho, mes, (byte) 1)) {
+        for (NovedadUploadEntity novedadUpload : novedadUploadService.findAllByPendiente(anho, mes, (byte) 1)) {
             Long novedadId = null;
             try {
                 Novedad novedad = novedadService.findByUnique(novedadUpload.getLegajoId(), anho, mes,
@@ -234,14 +234,14 @@ public class NovedadFileService {
             }
             novedades.add(new Novedad(novedadId, novedadUpload.getLegajoId(), anho, mes, novedadUpload.getCodigoId(),
                     novedadUpload.getDependenciaId(), novedadUpload.getImporte(), novedadUpload.getValue(),
-                    "Importado Excel", (byte) 1, novedadUpload.getNovedadUploadId(), null, null, null));
+                    "Importado Excel", (byte) 1, novedadUpload.getNovedadUploadId(), null));
         }
         novedadService.saveAll(novedades);
     }
 
     @Transactional
     public void transfer(Integer anho, Integer mes) {
-        List<Novedad> novedades = new ArrayList<Novedad>();
+        List<Novedad> novedades = new ArrayList<>();
         Periodo anterior = Periodo.prevMonth(anho, mes);
         Integer anhoAnterior = anterior.getAnho();
         Integer mesAnterior = anterior.getMes();
@@ -257,7 +257,7 @@ public class NovedadFileService {
                 }
                 novedades.add(
                         new Novedad(novedadId, old.getLegajoId(), anho, mes, old.getCodigoId(), old.getDependenciaId(),
-                                old.getImporte(), old.getValue(), "Transferido", (byte) 1, null, null, null, null));
+                                old.getImporte(), old.getValue(), "Transferido", (byte) 1, null,null));
             }
         }
         novedadService.saveAll(novedades);

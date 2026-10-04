@@ -5,7 +5,7 @@ package um.haberes.core.controller;
 
 import java.util.List;
 
-import um.haberes.core.kotlin.model.Contacto;
+import um.haberes.core.model.ContactoEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,32 +36,32 @@ public class ContactoController {
 	}
 
 	@GetMapping("/")
-	public ResponseEntity<List<Contacto>> findAll() {
-		return new ResponseEntity<List<Contacto>>(service.findAll(), HttpStatus.OK);
+	public ResponseEntity<List<ContactoEntity>> findAll() {
+		return new ResponseEntity<List<ContactoEntity>>(service.findAll(), HttpStatus.OK);
 	}
 
 	@PostMapping("/legajos")
-	public ResponseEntity<List<Contacto>> findAllLegajos(@RequestBody List<Long> legajos) {
-		return new ResponseEntity<List<Contacto>>(service.findAllLegajos(legajos), HttpStatus.OK);
+	public ResponseEntity<List<ContactoEntity>> findAllLegajos(@RequestBody List<Long> legajos) {
+		return new ResponseEntity<List<ContactoEntity>>(service.findAllLegajos(legajos), HttpStatus.OK);
 	}
 
 	@GetMapping("/{legajoId}")
-	public ResponseEntity<Contacto> findByLegajoId(@PathVariable Long legajoId) {
+	public ResponseEntity<ContactoEntity> findByLegajoId(@PathVariable Long legajoId) {
 		try {
-			return new ResponseEntity<Contacto>(service.findByLegajoId(legajoId), HttpStatus.OK);
+			return new ResponseEntity<ContactoEntity>(service.findByLegajoId(legajoId), HttpStatus.OK);
 		} catch (ContactoException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
 
 	@PostMapping("/")
-	public ResponseEntity<Contacto> add(@RequestBody Contacto contacto) {
-		return new ResponseEntity<Contacto>(service.add(contacto), HttpStatus.OK);
+	public ResponseEntity<ContactoEntity> add(@RequestBody ContactoEntity contacto) {
+		return new ResponseEntity<ContactoEntity>(service.add(contacto), HttpStatus.OK);
 	}
 
 	@PutMapping("/{legajoId}")
-	public ResponseEntity<Contacto> update(@RequestBody Contacto contacto, @PathVariable Long legajoId) {
-		return new ResponseEntity<Contacto>(service.update(contacto, legajoId), HttpStatus.OK);
+	public ResponseEntity<ContactoEntity> update(@RequestBody ContactoEntity contacto, @PathVariable Long legajoId) {
+		return new ResponseEntity<ContactoEntity>(service.update(contacto, legajoId), HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{legajoId}")

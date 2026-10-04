@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import um.haberes.core.kotlin.model.CargoClaseDetalle;
+import um.haberes.core.model.CargoClaseDetalleEntity;
 import um.haberes.core.service.CargoClaseDetalleService;
 
 /**
@@ -32,50 +32,50 @@ public class CargoClaseDetalleController {
 	private CargoClaseDetalleService service;
 
 	@GetMapping("/legajo/{legajoId}/{anho}/{mes}")
-	public ResponseEntity<List<CargoClaseDetalle>> findAllByLegajo(@PathVariable Long legajoId,
+	public ResponseEntity<List<CargoClaseDetalleEntity>> findAllByLegajo(@PathVariable Long legajoId,
 																   @PathVariable Integer anho, @PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findAllByLegajo(legajoId, anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/legajo/{legajoId}/{anho}/{mes}/facultad/{facultadId}")
-	public ResponseEntity<List<CargoClaseDetalle>> findAllByLegajoAndFacultad(@PathVariable Long legajoId, @PathVariable Integer anho, @PathVariable Integer mes, @PathVariable Integer facultadId) {
+	public ResponseEntity<List<CargoClaseDetalleEntity>> findAllByLegajoAndFacultad(@PathVariable Long legajoId, @PathVariable Integer anho, @PathVariable Integer mes, @PathVariable Integer facultadId) {
 		return new ResponseEntity<>(service.findAllByLegajoAndFacultad(legajoId, anho, mes, facultadId), HttpStatus.OK);
 	}
 
 	@GetMapping("/facultad/{facultadId}/{anho}/{mes}")
-	public ResponseEntity<List<CargoClaseDetalle>> findAllByFacultad(@PathVariable Integer facultadId,
+	public ResponseEntity<List<CargoClaseDetalleEntity>> findAllByFacultad(@PathVariable Integer facultadId,
 			@PathVariable Integer anho, @PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findAllByFacultad(facultadId, anho, mes),
 				HttpStatus.OK);
 	}
 
 	@GetMapping("/cargoclaseperiodo/{cargoclaseperiodoId}")
-	public ResponseEntity<List<CargoClaseDetalle>> findAllByCargoClasePeriodo(@PathVariable Long cargoclaseperiodoId) {
+	public ResponseEntity<List<CargoClaseDetalleEntity>> findAllByCargoClasePeriodo(@PathVariable Long cargoclaseperiodoId) {
 		return new ResponseEntity<>(service.findAllByCargoClasePeriodo(cargoclaseperiodoId),
 				HttpStatus.OK);
 	}
 
 	@GetMapping("/cargoclase/{cargoclaseId}/{anho}/{mes}")
-	public ResponseEntity<List<CargoClaseDetalle>> findAllByCargoclase(@PathVariable Long cargoclaseId,
+	public ResponseEntity<List<CargoClaseDetalleEntity>> findAllByCargoclase(@PathVariable Long cargoclaseId,
 			@PathVariable Integer anho, @PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findAllByCargoClase(cargoclaseId, anho, mes),
 				HttpStatus.OK);
 	}
 
 	@PostMapping("/")
-	public ResponseEntity<CargoClaseDetalle> add(@RequestBody CargoClaseDetalle cargoclasedetalle) {
+	public ResponseEntity<CargoClaseDetalleEntity> add(@RequestBody CargoClaseDetalleEntity cargoclasedetalle) {
 		return new ResponseEntity<>(service.add(cargoclasedetalle), HttpStatus.OK);
 	}
 
 	@PutMapping("/{cargoclasedetalleId}")
-	public ResponseEntity<CargoClaseDetalle> update(@RequestBody CargoClaseDetalle cargoclasedetalle,
+	public ResponseEntity<CargoClaseDetalleEntity> update(@RequestBody CargoClaseDetalleEntity cargoclasedetalle,
 			@PathVariable Long cargoclasedetalleId) {
 		return new ResponseEntity<>(service.update(cargoclasedetalle, cargoclasedetalleId),
 				HttpStatus.OK);
 	}
 
 	@PutMapping("/")
-	public ResponseEntity<List<CargoClaseDetalle>> saveall(@RequestBody List<CargoClaseDetalle> cargoclasedetalles) {
+	public ResponseEntity<List<CargoClaseDetalleEntity>> saveall(@RequestBody List<CargoClaseDetalleEntity> cargoclasedetalles) {
 		return new ResponseEntity<>(service.saveAll(cargoclasedetalles), HttpStatus.OK);
 	}
 

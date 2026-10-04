@@ -14,10 +14,10 @@ public class ClaseException extends RuntimeException {
 	private static final long serialVersionUID = -7384247627894476254L;
 
 	public ClaseException() {
-		super("Could not find Clase ");
+		super("Could not find ClaseEntity ");
 	}
 
 	public ClaseException(Integer claseID) {
-		super("Could not find Clase " + claseID);
+		super("Could not find ClaseEntity " + claseID);
 	}
 }

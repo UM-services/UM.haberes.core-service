@@ -1,0 +1,18 @@
+---
+title: "Vistas de Reporte (consultas agregadas de MySQL)"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant Ctrl as Controladores de Vista (13)
+    participant Svc as View Services
+    participant Repo as Repositorios de Vista (Jpa*Repository)
+    participant DB as MySQL (vistas materializadas)
+
+    Usuario->>Ctrl: GET /api/haberes/core/{recurso} + parámetros de período/legajo
+    Ctrl->>Svc: findByLegajo / findByPeriodo / findByUnique(...)
+    Svc->>Repo: derived queries / Criteria API
+    Repo->>DB: SELECT sobre vista (totales, asignados, imputados)
+    DB-->>Usuario: List~ViewEntity~ proyectado
+
+    Note over Usuario,DB: Vistas disponibles: TotalItem, TotalMensual, TotalNovedad,<br/>TotalSalida, ImputadoSueldo, ImputadoAporte, ImputadoTotal,<br/>AsignadoCategoria, AsignadoClase, DocenteDesignacion,<br/>CargoLiquidacionDocente, CargoLiquidacionNoDocente, NovedadExiste

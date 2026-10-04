@@ -1,0 +1,36 @@
+---
+title: "Gestión de Cargos de Liquidación (designaciones para liquidar)"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant Ctrl as CargoLiquidacionController
+    participant Svc as CargoLiquidacionService (hexagonal)
+    participant UC as Use Cases (ports/in)
+    participant Adapt as JpaCargoLiquidacionRepositoryAdapter
+    participant Repo as JpaCargoLiquidacionRepository (+Custom Criteria)
+    participant DB as MySQL
+
+    Usuario->>Ctrl: GET /cargoliquidacion/legajodocente/{legajoId}/{anho}/{mes}
+    Ctrl->>Svc: findAllDocenteByLegajo(legajoId, anho, mes)
+    Svc->>UC: GetCargoLiquidacionesDocentesByLegajoUseCase
+    UC->>Adapt: findByLegajo filtrado por docente
+    Usuario->>Ctrl: GET /cargoliquidacion/legajonodocente/{legajoId}/{anho}/{mes}
+    Ctrl->>Svc: findAllNoDocenteByLegajo(...)
+    Usuario->>Ctrl: GET /cargoliquidacion/legajoadicionalhcs/{legajoId}/{anho}/{mes}
+    Ctrl->>Svc: findAllAdicionalHCSByLegajo(...)
+    Usuario->>Ctrl: GET /cargoliquidacion/categorianodocente/{legajoId}/{anho}/{mes}/{categoriaId}
+    Ctrl->>Svc: findByCategoriaNoDocente(...)
+
+    Note over Usuario,DB: Alta, actualización masiva con versión y baja
+
+    Usuario->>Ctrl: POST /cargoliquidacion/ (CargoLiquidacionRequest)
+    Ctrl->>Svc: add(cargoLiquidacion)
+    Usuario->>Ctrl: PUT /cargoliquidacion/saveall/{version} (lista de cargos)
+    Ctrl->>Svc: saveAll(cargos, version, withVersion)
+    Svc->>UC: SaveAllCargoLiquidacionesUseCase
+    UC->>Adapt: saveAll + versionado (CargoLiquidacionVersion)
+    Usuario->>Ctrl: DELETE /cargoliquidacion/periodo/{anho}/{mes}
+    Ctrl->>Svc: deleteByPeriodo(anho, mes)
+
+    Note over Ctrl,Svc: CargoLiquidacionResponse incluye relaciones anidadas:<br/>persona, dependencia y categoria (vía CargoLiquidacionDtoMapper)

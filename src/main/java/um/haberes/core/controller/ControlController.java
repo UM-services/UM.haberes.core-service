@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.core.exception.ControlException;
-import um.haberes.core.kotlin.model.Control;
+import um.haberes.core.model.ControlEntity;
 import um.haberes.core.service.ControlService;
 
 /**
@@ -35,7 +35,7 @@ public class ControlController {
 	}
 
 	@GetMapping("/periodo/{anho}/{mes}")
-	public ResponseEntity<Control> findByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes) {
+	public ResponseEntity<ControlEntity> findByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes) {
 		try {
 			return new ResponseEntity<>(service.findByPeriodo(anho, mes), HttpStatus.OK);
 		} catch (ControlException e) {
@@ -44,12 +44,12 @@ public class ControlController {
 	}
 
 	@PostMapping("/")
-	public ResponseEntity<Control> add(@RequestBody Control control) {
+	public ResponseEntity<ControlEntity> add(@RequestBody ControlEntity control) {
 		return new ResponseEntity<>(service.add(control), HttpStatus.OK);
 	}
 
 	@PutMapping("/{controlId}")
-	public ResponseEntity<Control> update(@RequestBody Control control, @PathVariable Long controlId) {
+	public ResponseEntity<ControlEntity> update(@RequestBody ControlEntity control, @PathVariable Long controlId) {
 		return new ResponseEntity<>(service.update(control, controlId), HttpStatus.OK);
 	}
 

@@ -1,0 +1,28 @@
+---
+title: "Libro de Sueldo y SIJP (documentos del período)"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant LCtrl as LibroSueldoController
+    participant LSvc as LibroSueldoService (facade)
+    participant MCtrl as MakeLiquidacionController
+    participant MSvc as MakeLiquidacionService (facade)
+    participant Data as Liquidacion/Item/LegajoBanco/Control (servicios)
+    participant Afip as AfipContextService
+    participant PDF as OpenPDF / Archivo
+
+    Usuario->>LCtrl: POST /libroSueldo/generate/{anho}/{mes} (lista de legajos en el body)
+    LCtrl->>LSvc: generate(anho, mes, legajoIds)
+    LSvc->>Data: liquidaciones e ítems del período por legajo
+    LSvc->>Data: CBU/bancos de cada legajo (legajoBancoService)
+    LSvc->>Data: controles y legajo_controles del período
+    LSvc->>Afip: contexto AFIP (categorías de sueldo y situaciones)
+    LSvc->>PDF: renderizar libro de sueldo (por período y legajos)
+    PDF-->>Usuario: ruta del libro generado
+
+    Usuario->>MCtrl: GET /makeLiquidacion/generateSIJP/{anho}/{mes}
+    MCtrl->>MSvc: generateSIJP(anho, mes)
+    MSvc->>Data: liquidaciones acreditadas del período (estado y totales)
+    MSvc->>PDF: generar archivo SIJP (jubilaciones y aportes)
+    PDF-->>Usuario: Resource con el archivo para descarga

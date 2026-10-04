@@ -3,8 +3,8 @@ package um.haberes.core.service.view;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import um.haberes.core.exception.view.TotalNovedadException;
-import um.haberes.core.kotlin.model.view.TotalNovedad;
-import um.haberes.core.repository.view.TotalNovedadRepository;
+import um.haberes.core.model.view.TotalNovedad;
+import um.haberes.core.repository.view.JpaTotalNovedadRepository;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
 public class TotalNovedadService {
 
     @Autowired
-    private TotalNovedadRepository repository;
+    private JpaTotalNovedadRepository repository;
 
     public List<TotalNovedad> findAllByPeriodo(Integer anho, Integer mes) {
         return repository.findAllByAnhoAndMes(anho, mes);

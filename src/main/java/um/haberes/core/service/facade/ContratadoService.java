@@ -8,16 +8,16 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import um.haberes.core.client.ContratadoPersonaClient;
 import um.haberes.core.client.CursoCargoContratadoClient;
+import um.haberes.core.hexagonal.cursos.cargo_tipo.domain.model.CargoTipo;
+import um.haberes.core.hexagonal.cursos.curso.domain.model.Curso;
 import um.haberes.core.hexagonal.facultad.domain.model.Facultad;
 import um.haberes.core.hexagonal.geografica.application.service.GeograficaService;
 import um.haberes.core.hexagonal.geografica.domain.model.Geografica;
-import um.haberes.core.hexagonal.geografica.infrastructure.persistence.entity.GeograficaEntity;
-import um.haberes.core.kotlin.model.CargoTipo;
-import um.haberes.core.kotlin.model.Curso;
-import um.haberes.core.kotlin.model.extern.ContratadoPersonaDto;
-import um.haberes.core.kotlin.model.extern.CursoCargoContratadoDto;
-import um.haberes.core.service.CargoTipoService;
-import um.haberes.core.service.CursoService;
+import um.haberes.core.hexagonal.cursos.curso.infrastructure.persistence.entity.CursoEntity;
+import um.haberes.core.model.extern.ContratadoPersonaDto;
+import um.haberes.core.model.extern.CursoCargoContratadoDto;
+import um.haberes.core.hexagonal.cursos.cargo_tipo.application.service.CargoTipoService;
+import um.haberes.core.hexagonal.cursos.curso.application.service.CursoService;
 import um.haberes.core.hexagonal.facultad.application.service.FacultadService;
 
 import java.io.File;
@@ -69,10 +69,10 @@ public class ContratadoService {
         this.setCellString(row, 4, "Facultad", styleBold);
         this.setCellString(row, 5, "#Sede", styleBold);
         this.setCellString(row, 6, "Sede", styleBold);
-        this.setCellString(row, 7, "#Curso", styleBold);
-        this.setCellString(row, 8, "Curso", styleBold);
-        this.setCellString(row, 9, "#Cargo", styleBold);
-        this.setCellString(row, 10, "Cargo", styleBold);
+        this.setCellString(row, 7, "#CursoEntity", styleBold);
+        this.setCellString(row, 8, "CursoEntity", styleBold);
+        this.setCellString(row, 9, "#CargoEntity", styleBold);
+        this.setCellString(row, 10, "CargoEntity", styleBold);
         this.setCellString(row, 11, "Horas", styleBold);
         this.setCellString(row, 12, "Dictado", styleBold);
 

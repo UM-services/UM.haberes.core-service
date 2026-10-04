@@ -2,7 +2,7 @@ package um.haberes.core.controller.extern;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import um.haberes.core.exception.extern.EjercicioException;
-import um.haberes.core.kotlin.model.extern.EjercicioDto;
+import um.haberes.core.model.extern.EjercicioDto;
 import um.haberes.core.service.extern.EjercicioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

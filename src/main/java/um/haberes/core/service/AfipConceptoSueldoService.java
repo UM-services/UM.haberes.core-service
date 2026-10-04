@@ -3,10 +3,10 @@ package um.haberes.core.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import um.haberes.core.exception.AfipConceptoSueldoException;
-import um.haberes.core.kotlin.model.AfipConceptoSueldo;
-import um.haberes.core.kotlin.model.view.AfipConceptoSueldoSearch;
-import um.haberes.core.repository.AfipConceptoSueldoRepository;
-import um.haberes.core.repository.view.AfipConceptoSueldoSearchRepository;
+import um.haberes.core.model.AfipConceptoSueldoEntity;
+import um.haberes.core.model.view.AfipConceptoSueldoSearch;
+import um.haberes.core.repository.JpaAfipConceptoSueldoRepository;
+import um.haberes.core.repository.view.JpaAfipConceptoSueldoSearchRepository;
 
 import java.util.List;
 
@@ -14,12 +14,12 @@ import java.util.List;
 public class AfipConceptoSueldoService {
 
     @Autowired
-    private AfipConceptoSueldoRepository repository;
+    private JpaAfipConceptoSueldoRepository repository;
 
     @Autowired
-    private AfipConceptoSueldoSearchRepository afipConceptoSueldoSearchRepository;
+    private JpaAfipConceptoSueldoSearchRepository afipConceptoSueldoSearchRepository;
 
-    public AfipConceptoSueldo findByAfipConceptoSueldoId(Long afipConceptoSueldoId) {
+    public AfipConceptoSueldoEntity findByAfipConceptoSueldoId(Long afipConceptoSueldoId) {
         return repository.findByAfipConceptoSueldoId(afipConceptoSueldoId).orElseThrow(() -> new AfipConceptoSueldoException(afipConceptoSueldoId));
     }
 

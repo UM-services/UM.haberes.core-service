@@ -1,0 +1,24 @@
+---
+title: "Planilla de Contratados (datos externos + Excel)"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant Ctrl as ContratadoController
+    participant Svc as ContratadoService (facade)
+    participant CPCli as ContratadoPersonaClient (OpenFeign)
+    participant CCCli as CursoCargoContratadoClient (OpenFeign)
+    participant Maestros as Facultad/Geográfica/Curso/CargoTipo (hexagonal)
+    participant FS as Sistema de archivos
+
+    Usuario->>Ctrl: GET /contratado/planilla/{anho}/{mes}
+    Ctrl->>Svc: generatePlanillaContratados(anho, mes)
+    Svc->>Maestros: cargar mapas de facultades, geográficas, cursos y cargos
+    loop por cada contratado externo
+        Svc->>CPCli: findAll() (personas contratadas)
+        Svc->>CCCli: findAllByPersona(personaId, documentoId, anho, mes)
+        CCCli-->>Svc: asignaciones de curso del período
+    end
+    Svc->>Svc: armar XSSFWorkbook (POI) con la planilla consolidada
+    Svc->>FS: escribir path.files/contratados{anho}{mes}.xlsx
+    FS-->>Usuario: ruta del archivo generado

@@ -8,8 +8,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.core.kotlin.model.ConversionLog;
-import um.haberes.core.repository.ConversionLogRepository;
+import um.haberes.core.model.ConversionLogEntity;
+import um.haberes.core.repository.JpaConversionLogRepository;
 
 /**
  * @author daniel
@@ -19,13 +19,13 @@ import um.haberes.core.repository.ConversionLogRepository;
 public class ConversionLogService {
 	
 	@Autowired
-	private ConversionLogRepository repository;
+	private JpaConversionLogRepository repository;
 
-	public List<ConversionLog> findAll() {
+	public List<ConversionLogEntity> findAll() {
 		return repository.findAll();
 	}
 
-	public ConversionLog add(ConversionLog conversion) {
+	public ConversionLogEntity add(ConversionLogEntity conversion) {
 		repository.save(conversion);
 		return conversion;
 	}

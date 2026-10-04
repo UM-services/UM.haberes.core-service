@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.ExcluidoException;
-import um.haberes.core.kotlin.model.Excluido;
-import um.haberes.core.repository.ExcluidoRepository;
+import um.haberes.core.model.ExcluidoEntity;
+import um.haberes.core.repository.JpaExcluidoRepository;
 
 /**
  * @author daniel
@@ -22,25 +22,25 @@ import um.haberes.core.repository.ExcluidoRepository;
 public class ExcluidoService {
 
 	@Autowired
-	private ExcluidoRepository repository;
+	private JpaExcluidoRepository repository;
 
-	public List<Excluido> findAllByPeriodo(Integer anho, Integer mes) {
+	public List<ExcluidoEntity> findAllByPeriodo(Integer anho, Integer mes) {
 		return repository.findAllByAnhoAndMes(anho, mes);
 	}
 
-	public Excluido findByUnique(Long legajoId, Integer anho, Integer mes) {
+	public ExcluidoEntity findByUnique(Long legajoId, Integer anho, Integer mes) {
 		return repository.findByLegajoIdAndAnhoAndMes(legajoId, anho, mes)
 				.orElseThrow(() -> new ExcluidoException(legajoId, anho, mes));
 	}
 
-	public Excluido add(Excluido excluido) {
+	public ExcluidoEntity add(ExcluidoEntity excluido) {
 		repository.save(excluido);
 		return excluido;
 	}
 
-	public Excluido update(Excluido newexcluido, Long excluidoId) {
+	public ExcluidoEntity update(ExcluidoEntity newexcluido, Long excluidoId) {
 		return repository.findByExcluidoId(excluidoId).map(excluido -> {
-			excluido = new Excluido(excluidoId, newexcluido.getLegajoId(), newexcluido.getAnho(), newexcluido.getMes(),
+			excluido = new ExcluidoEntity(excluidoId, newexcluido.getLegajoId(), newexcluido.getAnho(), newexcluido.getMes(),
 					newexcluido.getFecha(), newexcluido.getObservaciones());
 			repository.save(excluido);
 			return excluido;

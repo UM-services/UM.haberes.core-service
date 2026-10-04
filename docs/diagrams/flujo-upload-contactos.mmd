@@ -1,0 +1,33 @@
+---
+title: Flujo de Upload de Contactos (Excel)
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant Controller as PersonaController
+    participant DtoMapper as PersonaDtoMapper
+    participant Service as PersonaService
+    participant UseCase as UploadContactosUseCaseImpl
+    participant FileReader as ExcelContactoUploadFileReader
+    participant ContactoPort as ContactoServiceAdapter
+    participant Validator as ToolServiceMailValidator
+    participant PersonaPort as JpaPersonaRepositoryAdapter
+
+    Usuario->>Controller: POST /api/haberes/core/persona/upload (PersonaUploadRequest)
+    Controller->>DtoMapper: toUploadedFile(request)
+    Controller->>Service: upload(UploadedFile)
+    Service->>UseCase: uploadContactos(file)
+    UseCase->>FileReader: readContactos(file)
+    FileReader-->>UseCase: List~ContactoMail~ (filas del Excel)
+    loop por cada fila con legajoId válido
+        UseCase->>ContactoPort: findByLegajoId(legajoId)
+        ContactoPort-->>UseCase: ContactoMail existente o nuevo
+        UseCase->>Validator: isValid(mailPersonal / mailInstitucional)
+    end
+    UseCase->>ContactoPort: saveAll(contactos)
+    UseCase->>PersonaPort: findAllByLegajoIds(legajos)
+    PersonaPort-->>UseCase: List~Persona~
+    UseCase-->>Controller: List~Persona~ (vía PersonaService)
+    Controller-->>Usuario: 200 OK (List~PersonaResponse~)
+
+    Note over UseCase,Validator: Los mails inválidos se descartan y solo se persisten<br/>los contactos con algún mail válido

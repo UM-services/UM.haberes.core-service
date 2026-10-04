@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import um.haberes.core.kotlin.model.LegajoControl;
+import um.haberes.core.model.LegajoControlEntity;
 import um.haberes.core.service.LegajoControlService;
 
 /**
@@ -33,42 +33,42 @@ public class LegajoControlController {
 	}
 
 	@GetMapping("/periodo/{anho}/{mes}")
-	public ResponseEntity<List<LegajoControl>> findAllByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes) {
+	public ResponseEntity<List<LegajoControlEntity>> findAllByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findAllByPeriodo(anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/liquidado/{anho}/{mes}")
-	public ResponseEntity<List<LegajoControl>> findAllLiquidadoByPeriodo(@PathVariable Integer anho,
+	public ResponseEntity<List<LegajoControlEntity>> findAllLiquidadoByPeriodo(@PathVariable Integer anho,
 			@PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findAllLiquidadoByPeriodo(anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/dependencia/{anho}/{mes}/{dependenciaId}/{filtro}")
-	public ResponseEntity<List<LegajoControl>> findAllDependenciaByPeriodo(@PathVariable Integer anho,
+	public ResponseEntity<List<LegajoControlEntity>> findAllDependenciaByPeriodo(@PathVariable Integer anho,
 			@PathVariable Integer mes, @PathVariable Integer dependenciaId, @PathVariable String filtro) {
 		return new ResponseEntity<>(
 				service.findAllDependenciaByPeriodo(anho, mes, dependenciaId, filtro), HttpStatus.OK);
 	}
 
 	@GetMapping("/unique/{legajoId}/{anho}/{mes}")
-	public ResponseEntity<LegajoControl> findByUnique(@PathVariable Long legajoId, @PathVariable Integer anho,
+	public ResponseEntity<LegajoControlEntity> findByUnique(@PathVariable Long legajoId, @PathVariable Integer anho,
 			@PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findByUnique(legajoId, anho, mes), HttpStatus.OK);
 	}
 
 	@PostMapping("/")
-	public ResponseEntity<LegajoControl> add(@RequestBody LegajoControl legajocontrol) {
+	public ResponseEntity<LegajoControlEntity> add(@RequestBody LegajoControlEntity legajocontrol) {
 		return new ResponseEntity<>(service.add(legajocontrol), HttpStatus.OK);
 	}
 
 	@PutMapping("/{legajocontrolId}")
-	public ResponseEntity<LegajoControl> update(@RequestBody LegajoControl legajocontrol,
+	public ResponseEntity<LegajoControlEntity> update(@RequestBody LegajoControlEntity legajocontrol,
 			@PathVariable Long legajocontrolId) {
 		return new ResponseEntity<>(service.update(legajocontrol, legajocontrolId), HttpStatus.OK);
 	}
 
 	@PutMapping("/saveall")
-	public ResponseEntity<List<LegajoControl>> saveAll(@RequestBody List<LegajoControl> controles) {
+	public ResponseEntity<List<LegajoControlEntity>> saveAll(@RequestBody List<LegajoControlEntity> controles) {
 		return new ResponseEntity<>(service.saveAll(controles), HttpStatus.OK);
 	}
 

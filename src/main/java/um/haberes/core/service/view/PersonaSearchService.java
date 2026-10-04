@@ -6,11 +6,10 @@ package um.haberes.core.service.view;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.core.kotlin.model.view.PersonaSearch;
-import um.haberes.core.repository.view.PersonaSearchRepository;
+import um.haberes.core.model.view.PersonaSearch;
+import um.haberes.core.repository.view.JpaPersonaSearchRepository;
 
 /**
  * @author daniel
@@ -20,7 +19,7 @@ import um.haberes.core.repository.view.PersonaSearchRepository;
 @RequiredArgsConstructor
 public class PersonaSearchService {
 
-	private final PersonaSearchRepository repository;
+	private final JpaPersonaSearchRepository repository;
 
 	public List<PersonaSearch> findAllByStrings(List<String> conditions) {
 		return repository.findAllByStrings(conditions);

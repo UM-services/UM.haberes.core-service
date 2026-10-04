@@ -2,7 +2,7 @@ package um.haberes.core.service.extern;
 
 import lombok.extern.slf4j.Slf4j;
 import um.haberes.core.client.EjercicioClient;
-import um.haberes.core.kotlin.model.extern.EjercicioDto;
+import um.haberes.core.model.extern.EjercicioDto;
 import um.haberes.core.util.Periodo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

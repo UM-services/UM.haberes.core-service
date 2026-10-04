@@ -1,0 +1,40 @@
+---
+title: "Cursos y Cargos de Curso (estructura docente)"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant CursoCtrl as CursoController
+    participant CursoSvc as CursoService (hexagonal)
+    participant CCtrl as CursoCargoController
+    participant CSvc as CursoCargoService (hexagonal)
+    participant FusionSvc as CursoFusionService (hexagonal)
+    participant DesarrSvc as CursoDesarraigoService (hexagonal)
+    participant Adapt as Repository Adapters (hexagonal)
+    participant DB as MySQL
+
+    Usuario->>CursoCtrl: GET /curso/geografica/{facultadId}/{geograficaId}
+    CursoCtrl->>CursoSvc: findAllByFacultadIdAndGeograficaId(...)
+    CursoSvc->>Adapt: findByFacultadAndGeografica
+    Usuario->>CCtrl: GET /cursoCargo/legajo/{legajoId}/{anho}/{mes} o /curso/{cursoId}/{anho}/{mes}
+    CCtrl->>CSvc: findAllByLegajo(...) / findAllByCurso(...)
+    Usuario->>CCtrl: GET /cursoCargo/cargoTipo/{legajoId}/{anho}/{mes}/{facultadId}/{geograficaId}/{anual}/{semestre1}/{semestre2}/{cargoTipoId}
+    CCtrl->>CSvc: findAllByCargoTipo(... filtros múltiples)
+    CSvc->>Adapt: consulta combinada de curso + cargo + designación
+    Usuario->>CCtrl: POST /cursoCargo/ , PUT /cursoCargo/{cursoCargoId} , DELETE /cursoCargo/unique/{...}
+    CCtrl->>CSvc: add / update / deleteByUnique
+
+    Note over CCtrl,CSvc: CursoCargoResponse incluye relaciones anidadas:<br/>curso, cargoTipo, persona, designacionTipo y categoria (vía CursoCargoDtoMapper)
+
+    Note over Usuario,DB: Fusion de cursos (cursos anuales que se fusionan por facultad)
+
+    Usuario->>FusionSvc: (vía /cursofusion) findAllByLegajoIdAndFacultadId(...)
+    Usuario->>FusionSvc: deleteAllByLegajoIdAndAnhoAndMesAndFacultadIdAndGeograficaId(...)
+    FusionSvc->>Adapt: SELECT/DELETE curso_fusion
+
+    Note over Usuario,DB: Desarraigo (cargos fuera de la sede)
+
+    Usuario->>DesarrSvc: (vía /cursodesarraigo) findAllByVersion(legajoId, anho, mes, version)
+    DesarrSvc->>Adapt: SELECT curso_desarraigo por versión
+
+    Note over CursoCtrl,DB: Catálogos de lectura: /cargotipo y /designaciontipo (findAll, findById, findByHorasSemanales)

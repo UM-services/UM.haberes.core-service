@@ -18,8 +18,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.core.exception.AntiguedadException;
 import um.haberes.core.exception.view.AntiguedadPeriodoException;
-import um.haberes.core.kotlin.model.Antiguedad;
-import um.haberes.core.kotlin.model.view.AntiguedadPeriodo;
+import um.haberes.core.model.AntiguedadEntity;
+import um.haberes.core.model.view.AntiguedadPeriodo;
 import um.haberes.core.service.AntiguedadService;
 
 /**
@@ -37,7 +37,7 @@ public class AntiguedadController {
     }
 
     @GetMapping("/unique/{legajoId}/{anho}/{mes}")
-    public ResponseEntity<Antiguedad> findByUnique(@PathVariable Long legajoId, @PathVariable Integer anho,
+    public ResponseEntity<AntiguedadEntity> findByUnique(@PathVariable Long legajoId, @PathVariable Integer anho,
                                                    @PathVariable Integer mes) {
         try {
             return new ResponseEntity<>(service.findByUnique(legajoId, anho, mes), HttpStatus.OK);
@@ -57,7 +57,7 @@ public class AntiguedadController {
     }
 
     @GetMapping("/periodo/{anho}/{mes}/{limit}")
-    public ResponseEntity<List<Antiguedad>> findAllByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes,
+    public ResponseEntity<List<AntiguedadEntity>> findAllByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes,
                                                              @PathVariable Integer limit) {
         if (limit == 0)
             limit = 30000;
@@ -65,17 +65,17 @@ public class AntiguedadController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<Antiguedad> add(@RequestBody Antiguedad antiguedad) {
+    public ResponseEntity<AntiguedadEntity> add(@RequestBody AntiguedadEntity antiguedad) {
         return new ResponseEntity<>(service.add(antiguedad), HttpStatus.OK);
     }
 
     @PutMapping("/{antiguedadId}")
-    public ResponseEntity<Antiguedad> update(@RequestBody Antiguedad antiguedad, @PathVariable Long antiguedadId) {
+    public ResponseEntity<AntiguedadEntity> update(@RequestBody AntiguedadEntity antiguedad, @PathVariable Long antiguedadId) {
         return new ResponseEntity<>(service.update(antiguedad, antiguedadId), HttpStatus.OK);
     }
 
     @PutMapping("/")
-    public ResponseEntity<List<Antiguedad>> saveAll(@RequestBody List<Antiguedad> antiguedades) {
+    public ResponseEntity<List<AntiguedadEntity>> saveAll(@RequestBody List<AntiguedadEntity> antiguedades) {
         return new ResponseEntity<>(service.saveAll(antiguedades), HttpStatus.OK);
     }
 

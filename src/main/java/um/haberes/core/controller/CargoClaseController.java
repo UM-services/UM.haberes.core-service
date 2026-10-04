@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import um.haberes.core.kotlin.model.CargoClase;
+import um.haberes.core.model.CargoClaseEntity;
 import um.haberes.core.service.CargoClaseService;
 
 /**
@@ -31,22 +31,22 @@ public class CargoClaseController {
 	private CargoClaseService service;
 
 	@GetMapping("/")
-	public ResponseEntity<List<CargoClase>> findAll() {
+	public ResponseEntity<List<CargoClaseEntity>> findAll() {
 		return new ResponseEntity<>(service.findAll(), HttpStatus.OK);
 	}
 
 	@GetMapping("/{cargoClaseId}")
-	public ResponseEntity<CargoClase> findByCargoClaseId(@PathVariable Long cargoClaseId) {
+	public ResponseEntity<CargoClaseEntity> findByCargoClaseId(@PathVariable Long cargoClaseId) {
 		return new ResponseEntity<>(service.findByCargoClaseId(cargoClaseId), HttpStatus.OK);
 	}
 
 	@PostMapping("/")
-	public ResponseEntity<CargoClase> add(@RequestBody CargoClase cargoClase) {
+	public ResponseEntity<CargoClaseEntity> add(@RequestBody CargoClaseEntity cargoClase) {
 		return new ResponseEntity<>(service.add(cargoClase), HttpStatus.OK);
 	}
 
 	@PutMapping("/{cargoClaseId}")
-	public ResponseEntity<CargoClase> update(@RequestBody CargoClase cargoClase, @PathVariable Long cargoClaseId) {
+	public ResponseEntity<CargoClaseEntity> update(@RequestBody CargoClaseEntity cargoClase, @PathVariable Long cargoClaseId) {
 		return new ResponseEntity<>(service.update(cargoClase, cargoClaseId), HttpStatus.OK);
 	}
 

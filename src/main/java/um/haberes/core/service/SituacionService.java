@@ -9,8 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.SituacionException;
-import um.haberes.core.kotlin.model.Situacion;
-import um.haberes.core.repository.SituacionRepository;
+import um.haberes.core.model.SituacionEntity;
+import um.haberes.core.repository.JpaSituacionRepository;
 
 /**
  * @author daniel
@@ -20,13 +20,13 @@ import um.haberes.core.repository.SituacionRepository;
 @RequiredArgsConstructor
 public class SituacionService {
 
-	private final SituacionRepository repository;
+	private final JpaSituacionRepository repository;
 
-	public List<Situacion> findAll() {
+	public List<SituacionEntity> findAll() {
 		return repository.findAll();
 	}
 
-	public Situacion findBySituacionId(Integer situacionId) {
+	public SituacionEntity findBySituacionId(Integer situacionId) {
 		return repository.findById(situacionId).orElseThrow(() -> new SituacionException(situacionId));
 	}
 }

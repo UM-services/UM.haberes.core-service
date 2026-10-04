@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.CargoClaseException;
-import um.haberes.core.kotlin.model.CargoClase;
-import um.haberes.core.repository.CargoClaseRepository;
+import um.haberes.core.model.CargoClaseEntity;
+import um.haberes.core.repository.JpaCargoClaseRepository;
 
 /**
  * @author daniel
@@ -20,25 +20,25 @@ import um.haberes.core.repository.CargoClaseRepository;
 public class CargoClaseService {
 
 	@Autowired
-	private CargoClaseRepository repository;
+	private JpaCargoClaseRepository repository;
 
-	public List<CargoClase> findAll() {
+	public List<CargoClaseEntity> findAll() {
 		return repository.findAll();
 	}
 
-	public CargoClase findByCargoClaseId(Long cargoClaseId) {
+	public CargoClaseEntity findByCargoClaseId(Long cargoClaseId) {
 		return repository.findByCargoClaseId(cargoClaseId)
 				.orElseThrow(() -> new CargoClaseException(cargoClaseId));
 	}
 
-	public CargoClase add(CargoClase cargoClase) {
+	public CargoClaseEntity add(CargoClaseEntity cargoClase) {
 		repository.save(cargoClase);
 		return cargoClase;
 	}
 
-	public CargoClase update(CargoClase newCargoClase, Long cargoClaseId) {
+	public CargoClaseEntity update(CargoClaseEntity newCargoClase, Long cargoClaseId) {
 		return repository.findByCargoClaseId(cargoClaseId).map(cargoClase -> {
-			cargoClase = new CargoClase(cargoClaseId, newCargoClase.getNombre(), newCargoClase.getClaseId(),
+			cargoClase = new CargoClaseEntity(cargoClaseId, newCargoClase.getNombre(), newCargoClase.getClaseId(),
 					newCargoClase.getClase());
 			repository.save(cargoClase);
 			return cargoClase;

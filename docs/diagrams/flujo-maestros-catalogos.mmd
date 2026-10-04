@@ -1,0 +1,55 @@
+---
+title: "Maestros y Catálogos Legacy (configuración base)"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant Maestros as Nivel/Clase/Situacion/SeguridadSocial/ModoLiquidacion/Lectivo Controllers
+    participant Afip as AfipConceptoSueldo / AfipSituacion Controllers
+    participant Adic as AdicionalCursoTabla / AdicionalCursoRango Controllers
+    participant CGCtrl as CodigoGrupoController
+    participant PFCtrl as PersonaFacultadController
+    participant Svc as Servicios legacy (Jpa*Repository)
+    participant DB as MySQL
+
+    Note over Usuario,DB: Maestros de lectura (catálogos estáticos)
+
+    Usuario->>Maestros: GET /nivel/ , GET /situacion/ , GET /modoLiquidacion/
+    Maestros->>Svc: findAll()
+    Usuario->>Maestros: GET /clase/ , GET /clase/{claseId} , GET /clase/last
+    Usuario->>Maestros: GET /seguridadSocial/unique/{anho}/{mes}
+    Usuario->>Maestros: GET /lectivo/ , GET /lectivo/reverse , GET /lectivo/{lectivoId}
+
+    Note over Usuario,DB: Maestros con escritura
+
+    Usuario->>Maestros: POST /clase/ , PUT /clase/{claseId} , DELETE /clase/{claseId}
+    Usuario->>Maestros: POST /seguridadSocial/ , PUT /seguridadSocial/{seguridadSocialId}
+    Usuario->>Maestros: PUT /lectivo/saveall (lista de ciclos lectivos)
+
+    Note over Usuario,DB: AFIP (contexto para libro de sueldo y liquidación)
+
+    Usuario->>Afip: GET /afipSituacion/ , GET /afipSituacion/{afipSituacionId}
+    Usuario->>Afip: GET /afipConceptoSueldo/{afipConceptoSueldoId}
+    Usuario->>Afip: POST /afipConceptoSueldo/search (lista de condiciones de texto)
+    Afip->>Svc: findAllByAsignadoAndConditions(conditions)
+
+    Note over Usuario,DB: Adicional por curso (tablas de rangos horarios usadas en liquidación)
+
+    Usuario->>Adic: GET /adicionalCursoTabla/ , GET /adicionalCursoTabla/{adicionalCursoTablaId}
+    Usuario->>Adic: GET /adicionalCursoRango/tabla/{adicionalCursoTablaId}
+    Adic->>Svc: findAllByAdicionalCursoTabla (rangos horasDesde/horasHasta → porcentaje)
+    Usuario->>Adic: POST /adicionalCursoRango/ , DELETE /adicionalCursoRango/{adicionalCursoRangoId}
+    Note over Adic,DB: Consumidas por MakeLiquidacionService para el adicional HCS (ver flujo-liquidacion-adicional.mmd)
+
+    Note over Usuario,DB: Agrupamiento de códigos (remunerativo / no remunerativo / deducción)
+
+    Usuario->>CGCtrl: GET /codigogrupo/ , GET /codigogrupo/{codigoId}
+    Usuario->>CGCtrl: GET /codigogrupo/remunerativo/{remunerativo} , /noremunerativo/{noRemunerativo} , /deduccion/{deduccion}
+    CGCtrl->>Svc: filtros por flag del grupo
+    Usuario->>CGCtrl: POST /codigogrupo/ , PUT /codigogrupo/{codigoId}
+
+    Note over Usuario,DB: Vínculo persona–facultad (alcance de visado por facultad)
+
+    Usuario->>PFCtrl: GET /personaFacultad/facultad/{facultadId} , GET /personaFacultad/persona/{legajoId}
+    Usuario->>PFCtrl: POST /personaFacultad/ , DELETE /personaFacultad/unique/{legajoId}/{facultadId}
+    Svc->>DB: SELECT/INSERT/DELETE maestro correspondiente

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.core.exception.AdicionalCursoRangoException;
-import um.haberes.core.kotlin.model.AdicionalCursoRango;
+import um.haberes.core.model.AdicionalCursoRangoEntity;
 import um.haberes.core.service.AdicionalCursoRangoService;
 
 /**
@@ -33,14 +33,14 @@ public class AdicionalCursoRangoController {
 	private AdicionalCursoRangoService service;
 
 	@GetMapping("/tabla/{adicionalCursoTablaId}")
-	public ResponseEntity<List<AdicionalCursoRango>> findAllByAdicionalCursoTabla(
+	public ResponseEntity<List<AdicionalCursoRangoEntity>> findAllByAdicionalCursoTabla(
 			@PathVariable Long adicionalCursoTablaId) {
 		return new ResponseEntity<>(
 				service.findAllByAdicionalCursoTabla(adicionalCursoTablaId), HttpStatus.OK);
 	}
 
 	@GetMapping("/{adicionalCursoRangoId}")
-	public ResponseEntity<AdicionalCursoRango> findByAdicionalCursoRangoId(@PathVariable Long adicionalCursoRangoId) {
+	public ResponseEntity<AdicionalCursoRangoEntity> findByAdicionalCursoRangoId(@PathVariable Long adicionalCursoRangoId) {
 		try {
 			return new ResponseEntity<>(service.findByAdicionalCursoRangoId(adicionalCursoRangoId),
 					HttpStatus.OK);
@@ -50,7 +50,7 @@ public class AdicionalCursoRangoController {
 	}
 
 	@PostMapping("/")
-	public ResponseEntity<AdicionalCursoRango> add(@RequestBody AdicionalCursoRango adicionalCursoRango) {
+	public ResponseEntity<AdicionalCursoRangoEntity> add(@RequestBody AdicionalCursoRangoEntity adicionalCursoRango) {
 		return new ResponseEntity<>(service.add(adicionalCursoRango), HttpStatus.OK);
 	}
 
