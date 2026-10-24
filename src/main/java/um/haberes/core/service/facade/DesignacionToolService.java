@@ -86,6 +86,73 @@ public class DesignacionToolService {
         desarraigoGradoByLegajo(legajoId, anho, mes);
     }
 
+    /**
+     * Proceso completo de re-fusión de un legajo para un período.
+     * Absorbe la secuencia que el cliente legacy ejecutaba en cuatro pasos
+     * (reset de legajo_control + fusionar + recalcular desarraigo):
+     * el flag "forzar" habilita la re-fusión de un legajo ya fusionado.
+     */
+    @Transactional
+    public void fusionarCompletoByLegajo(Long legajoId, Integer anho, Integer mes, boolean forzar,
+                                         Boolean aplicaExcepcion) {
+        log.debug("Fusionar Completo By Legajo -> legajoId={} periodo={}/{} forzar={}", legajoId, mes, anho, forzar);
+        if (forzar) {
+            LegajoControlEntity legajoControl;
+            try {
+                legajoControl = legajoControlService.findByUnique(legajoId, anho, mes);
+            } catch (LegajoControlException e) {
+                legajoControl = new LegajoControlEntity();
+                legajoControl.setLegajoId(legajoId);
+                legajoControl.setAnho(anho);
+                legajoControl.setMes(mes);
+            }
+            legajoControl.setFusionado((byte) 0);
+            legajoControlService.save(legajoControl);
+        }
+        fusionarGradoByLegajo(legajoId, anho, mes, null, aplicaExcepcion);
+        desarraigoGradoByLegajo(legajoId, anho, mes);
+    }
+
+    /**
+     * Elimina las designaciones fusionadas de un legajo cuando ya no le quedan
+     * cursos cargo en el período (equivalente a depuraFusion del cliente legacy).
+     */
+    @Transactional
+    public void depurarFusionByLegajo(Long legajoId, Integer anho, Integer mes) {
+        if (cursoCargoService.findAllByLegajo(legajoId, anho, mes).isEmpty()) {
+            log.debug("Depurando fusion sin cursos cargo -> legajoId={} periodo={}/{}", legajoId, mes, anho);
+            cursoFusionService.deleteAllByLegajoIdAndPeriodo(legajoId, anho, mes);
+        }
+    }
+
+    /**
+     * Marca como no fusionados todos los legajos con cargos en el curso, para que
+     * la próxima fusión tome los cambios del curso. Reemplaza el recorrido que el
+     * cliente legacy hacía cargo por cargo.
+     */
+    @Transactional
+    public void invalidarFusionByCurso(Long cursoId, Integer anho, Integer mes) {
+        List<Long> legajos = cursoCargoService.findAllByCurso(cursoId, anho, mes).stream()
+                .map(CursoCargo::getLegajoId)
+                .filter(java.util.Objects::nonNull)
+                .distinct()
+                .toList();
+        log.debug("Invalidando fusion del curso {} periodo {}/{} -> {} legajos", cursoId, mes, anho, legajos.size());
+        for (Long legajoId : legajos) {
+            LegajoControlEntity legajoControl;
+            try {
+                legajoControl = legajoControlService.findByUnique(legajoId, anho, mes);
+            } catch (LegajoControlException e) {
+                legajoControl = new LegajoControlEntity();
+                legajoControl.setLegajoId(legajoId);
+                legajoControl.setAnho(anho);
+                legajoControl.setMes(mes);
+            }
+            legajoControl.setFusionado((byte) 0);
+            legajoControlService.save(legajoControl);
+        }
+    }
+
     @Transactional
     public List<CursoCargo> redesignarGradoByLegajo(Long legajoId, Integer anho, Integer mes, Boolean aplicaExcepcion) {
         log.debug("Redesignar Grado By Legajo");

@@ -14,12 +14,14 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.exception.CursoCargoNovedadException;
 import um.haberes.core.model.CursoCargoNovedadEntity;
 import um.haberes.core.service.CursoCargoNovedadService;
+import um.haberes.core.service.facade.CursoCargoNovedadToolService;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -33,6 +35,9 @@ class CursoCargoNovedadControllerTest {
 
     @Mock
     private CursoCargoNovedadService service;
+
+    @Mock
+    private CursoCargoNovedadToolService toolService;
 
     @InjectMocks
     private CursoCargoNovedadController controller;
@@ -133,6 +138,16 @@ class CursoCargoNovedadControllerTest {
         when(service.findAllPendientes(2024, 6)).thenReturn(List.of(sample()));
 
         mockMvc.perform(get("/api/haberes/core/cursocargonovedad/pendiente/{anho}/{mes}", 2024, 6))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(novedadListJson(), JsonCompareMode.STRICT));
+    }
+
+    @Test
+    void findAllByPeriodo_returnsOkWithList() throws Exception {
+        when(service.findAllByPeriodo(2024, 6)).thenReturn(List.of(sample()));
+
+        mockMvc.perform(get("/api/haberes/core/cursocargonovedad/periodo/{anho}/{mes}", 2024, 6))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(novedadListJson(), JsonCompareMode.STRICT));
@@ -371,5 +386,41 @@ class CursoCargoNovedadControllerTest {
     void delete_returnsNoContent() throws Exception {
         mockMvc.perform(delete("/api/haberes/core/cursocargonovedad/{cursoCargoNovedadId}", 1L))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void autorizar_returnsNoContentAndDelegatesTheCascade() throws Exception {
+        mockMvc.perform(post("/api/haberes/core/cursocargonovedad/autorizar/{cursoCargoNovedadId}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"respuesta\":\"  Aprobado por Secretaría  \"}"))
+                .andExpect(status().isNoContent());
+
+        verify(toolService).autorizar(1L, "Aprobado por Secretaría");
+    }
+
+    @Test
+    void autorizar_whenRespuestaIsBlank_returnsBadRequest() throws Exception {
+        mockMvc.perform(post("/api/haberes/core/cursocargonovedad/autorizar/{cursoCargoNovedadId}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"respuesta\":\"   \"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void rechazar_returnsNoContentAndDelegates() throws Exception {
+        mockMvc.perform(post("/api/haberes/core/cursocargonovedad/rechazar/{cursoCargoNovedadId}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"respuesta\":\"Sin documentación\"}"))
+                .andExpect(status().isNoContent());
+
+        verify(toolService).rechazar(1L, "Sin documentación");
+    }
+
+    @Test
+    void anular_returnsNoContentAndDelegates() throws Exception {
+        mockMvc.perform(post("/api/haberes/core/cursocargonovedad/anular/{cursoCargoNovedadId}", 1L))
+                .andExpect(status().isNoContent());
+
+        verify(toolService).anular(1L);
     }
 }

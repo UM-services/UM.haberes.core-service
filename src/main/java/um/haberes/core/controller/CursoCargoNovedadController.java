@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 import um.haberes.core.exception.CursoCargoNovedadException;
 import um.haberes.core.model.CursoCargoNovedadEntity;
 import um.haberes.core.service.CursoCargoNovedadService;
+import um.haberes.core.service.facade.CursoCargoNovedadToolService;
 
 /**
  * @author daniel
@@ -31,14 +32,23 @@ public class CursoCargoNovedadController {
 
 	private final CursoCargoNovedadService service;
 
-	public CursoCargoNovedadController(CursoCargoNovedadService service) {
+	private final CursoCargoNovedadToolService toolService;
+
+	public CursoCargoNovedadController(CursoCargoNovedadService service, CursoCargoNovedadToolService toolService) {
 		this.service = service;
+		this.toolService = toolService;
 	}
 
 	@GetMapping("/pendiente/{anho}/{mes}")
 	public ResponseEntity<List<CursoCargoNovedadEntity>> findAllPendientes(@PathVariable Integer anho,
 																	 @PathVariable Integer mes) {
 		return new ResponseEntity<>(service.findAllPendientes(anho, mes), HttpStatus.OK);
+	}
+
+	@GetMapping("/periodo/{anho}/{mes}")
+	public ResponseEntity<List<CursoCargoNovedadEntity>> findAllByPeriodo(@PathVariable Integer anho,
+			@PathVariable Integer mes) {
+		return new ResponseEntity<>(service.findAllByPeriodo(anho, mes), HttpStatus.OK);
 	}
 
 	@GetMapping("/pendientealta/{anho}/{mes}")
@@ -188,6 +198,39 @@ public class CursoCargoNovedadController {
 	public ResponseEntity<Void> delete(@PathVariable Long cursoCargoNovedadId) {
 		service.delete(cursoCargoNovedadId);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	// --- Resolución de novedades (cascada atómica en el servidor) ---
+
+	@PostMapping("/autorizar/{cursoCargoNovedadId}")
+	public ResponseEntity<Void> autorizar(@PathVariable Long cursoCargoNovedadId,
+			@RequestBody RespuestaRequest request) {
+		toolService.autorizar(cursoCargoNovedadId, respuestaObligatoria(request));
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	@PostMapping("/rechazar/{cursoCargoNovedadId}")
+	public ResponseEntity<Void> rechazar(@PathVariable Long cursoCargoNovedadId,
+			@RequestBody RespuestaRequest request) {
+		toolService.rechazar(cursoCargoNovedadId, respuestaObligatoria(request));
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	@PostMapping("/anular/{cursoCargoNovedadId}")
+	public ResponseEntity<Void> anular(@PathVariable Long cursoCargoNovedadId) {
+		toolService.anular(cursoCargoNovedadId);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	private String respuestaObligatoria(RespuestaRequest request) {
+		String respuesta = request != null && request.respuesta() != null ? request.respuesta().trim() : "";
+		if (respuesta.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Falta RESPUESTA");
+		}
+		return respuesta;
+	}
+
+	public record RespuestaRequest(String respuesta) {
 	}
 
 }

@@ -14,11 +14,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.exception.AnotadorException;
 import um.haberes.core.model.AnotadorEntity;
 import um.haberes.core.service.AnotadorService;
+import um.haberes.core.util.ClientIpResolver;
 
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -31,6 +33,9 @@ class AnotadorControllerTest {
 
     @Mock
     private AnotadorService service;
+
+    @Mock
+    private ClientIpResolver clientIpResolver;
 
     @InjectMocks
     private AnotadorController controller;
@@ -216,5 +221,47 @@ class AnotadorControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(ANOTADOR_JSON, JsonCompareMode.STRICT));
+    }
+
+    @Test
+    void visar_autorizado_returnsNoContentAndResolvesClientIp() throws Exception {
+        when(clientIpResolver.resolve(any())).thenReturn("10.0.0.7");
+
+        mockMvc.perform(post("/api/haberes/core/anotador/visar/{anotadorId}", 10L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"autorizado\":true,\"respuesta\":\"  Conforme  \"}"))
+                .andExpect(status().isNoContent());
+
+        verify(service).visar(10L, true, "Conforme", "10.0.0.7");
+    }
+
+    @Test
+    void visar_rechazado_returnsNoContent() throws Exception {
+        when(clientIpResolver.resolve(any())).thenReturn("10.0.0.8");
+
+        mockMvc.perform(post("/api/haberes/core/anotador/visar/{anotadorId}", 10L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"autorizado\":false,\"respuesta\":\"Falta documentación\"}"))
+                .andExpect(status().isNoContent());
+
+        verify(service).visar(10L, false, "Falta documentación", "10.0.0.8");
+    }
+
+    @Test
+    void visar_whenRespuestaIsBlank_returnsBadRequest() throws Exception {
+        mockMvc.perform(post("/api/haberes/core/anotador/visar/{anotadorId}", 10L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"autorizado\":true,\"respuesta\":\"  \"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void visar_whenAnotadorDoesNotExist_returnsBadRequest() throws Exception {
+        when(service.visar(eq(99L), eq(true), any(), any())).thenThrow(new AnotadorException(99L));
+
+        mockMvc.perform(post("/api/haberes/core/anotador/visar/{anotadorId}", 99L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"autorizado\":true,\"respuesta\":\"Conforme\"}"))
+                .andExpect(status().isBadRequest());
     }
 }

@@ -20,6 +20,9 @@ import org.springframework.web.server.ResponseStatusException;
 import um.haberes.core.exception.AnotadorException;
 import um.haberes.core.model.AnotadorEntity;
 import um.haberes.core.service.AnotadorService;
+import um.haberes.core.util.ClientIpResolver;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * @author daniel
@@ -31,6 +34,8 @@ import um.haberes.core.service.AnotadorService;
 public class AnotadorController {
 
 	private final AnotadorService service;
+
+	private final ClientIpResolver clientIpResolver;
 
 	@GetMapping("/legajo/{legajoId}")
 	public ResponseEntity<List<AnotadorEntity>> findAllByLegajo(@PathVariable Long legajoId) {
@@ -102,6 +107,27 @@ public class AnotadorController {
 	@PutMapping("/{anotadorId}")
 	public ResponseEntity<AnotadorEntity> update(@RequestBody AnotadorEntity anotador, @PathVariable Long anotadorId) {
 		return new ResponseEntity<>(service.update(anotador, anotadorId), HttpStatus.OK);
+	}
+
+	/**
+	 * Visa la anotación (autorizar o rechazar) con la respuesta del revisor.
+	 */
+	@PostMapping("/visar/{anotadorId}")
+	public ResponseEntity<Void> visar(@PathVariable Long anotadorId, @RequestBody VisarRequest request,
+			HttpServletRequest httpRequest) {
+		String respuesta = request != null && request.respuesta() != null ? request.respuesta().trim() : "";
+		if (respuesta.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Falta RESPUESTA");
+		}
+		try {
+			service.visar(anotadorId, request.autorizado(), respuesta, clientIpResolver.resolve(httpRequest));
+		} catch (AnotadorException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	public record VisarRequest(boolean autorizado, String respuesta) {
 	}
 
 }
