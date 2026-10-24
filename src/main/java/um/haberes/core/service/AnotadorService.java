@@ -101,8 +101,23 @@ public class AnotadorService {
 		return anotador;
 	}
 
-	public AnotadorEntity update(AnotadorEntity newAnotador, Long anotadorId) {
-		return repository.findByAnotadorId(anotadorId).map(anotador -> {
+	/**
+	 * Visa una anotación de una facultad: deja la respuesta y el estado
+	 * (autorizada o rechazada) en una sola operación. La IP del revisor la
+	 * resuelve el servidor, igual que en la impresión de bonos.
+	 */
+	public AnotadorEntity visar(Long anotadorId, boolean autorizado, String respuesta, String ip) {
+		AnotadorEntity anotador = findByAnotadorId(anotadorId);
+		anotador.setRespuesta(respuesta);
+		anotador.setAutorizado(autorizado ? (byte) 1 : (byte) 0);
+		anotador.setRechazado(autorizado ? (byte) 0 : (byte) 1);
+		anotador.setVisado((byte) 1);
+		anotador.setIpVisado(ip == null ? "" : ip);
+		repository.save(anotador);
+		return anotador;
+	}
+
+	public AnotadorEntity update(AnotadorEntity newAnotador, Long anotadorId) {		return repository.findByAnotadorId(anotadorId).map(anotador -> {
 			anotador = new AnotadorEntity(anotadorId, newAnotador.getLegajoId(), newAnotador.getAnho(), newAnotador.getMes(),
 					newAnotador.getFacultadId(), newAnotador.getAnotacion(), newAnotador.getVisado(),
 					newAnotador.getIpVisado(), newAnotador.getUser(), newAnotador.getRespuesta(),
