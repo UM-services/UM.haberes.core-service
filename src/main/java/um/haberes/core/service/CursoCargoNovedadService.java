@@ -3,6 +3,7 @@
  */
 package um.haberes.core.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,6 +33,22 @@ public class CursoCargoNovedadService {
 
 	public List<CursoCargoNovedadEntity> findAllPendientes(Integer anho, Integer mes) {
 		return repository.findAllByAnhoAndMesAndAutorizadoAndRechazado(anho, mes, (byte) 0, (byte) 0);
+	}
+
+	/**
+	 * Todas las novedades del período: pendientes, autorizadas y rechazadas.
+	 * Es el padrón completo que imprimía el reporte del cliente legacy.
+	 */
+	public List<CursoCargoNovedadEntity> findAllByPeriodo(Integer anho, Integer mes) {
+		Sort sort = Sort.by("persona.apellido").ascending()
+				.and(Sort.by("persona.nombre")).ascending()
+				.and(Sort.by("curso.nombre")).ascending();
+		var novedades = new ArrayList<CursoCargoNovedadEntity>();
+		novedades.addAll(repository.findAllByAnhoAndMesAndAutorizadoAndRechazado(anho, mes, (byte) 0, (byte) 0, sort));
+		novedades.addAll(repository.findAllByAnhoAndMesAndAutorizado(anho, mes, (byte) 1, sort));
+		novedades.addAll(repository.findAllByAnhoAndMesAndRechazado(anho, mes, (byte) 1, sort));
+		log.debug("Novedades del período {}/{} -> {}", mes, anho, novedades.size());
+		return novedades;
 	}
 
 	public List<CursoCargoNovedadEntity> findAllPendientesAlta(Integer anho, Integer mes) {
