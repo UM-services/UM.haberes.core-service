@@ -9,6 +9,8 @@ sequenceDiagram
     participant AnoSvc as AnotadorService
     participant CCNCtrl as CursoCargoNovedadController
     participant CCNSvc as CursoCargoNovedadService
+    participant CCNTool as CursoCargoNovedadToolService (facade)
+    participant Cargos as CursoCargo / CursoFusion / LegajoControl (hexagonal)
     participant Tool as ToolController (validación de mail)
     participant Mail as MailingController / MailingService
     participant DB as MySQL
@@ -22,17 +24,38 @@ sequenceDiagram
     Director->>AnoCtrl: POST /anotador/ (anotar revisión con ipVisado)
     AnoCtrl->>AnoSvc: add(anotador) (marca revisado y valida ipVisado/respuesta)
 
+    Note over Director,DB: Visado en una sola operación (no requiere varios PUT del cliente)
+
+    Director->>AnoCtrl: POST /anotador/visar/{anotadorId} (VisarRequest: autorizado, respuesta)
+    AnoCtrl->>AnoCtrl: ClientIpResolver.resolve(httpRequest) (IP server-side)
+    AnoCtrl->>AnoSvc: visar(anotadorId, autorizado, respuesta, ip)
+    AnoSvc->>DB: UPDATE anotador (visado=1, autorizado/rechazado, respuesta, ip_visado)
+    AnoCtrl-->>Director: 204 No Content (400 si falta RESPUESTA o no existe la anotación)
+
+    Note over Director,Cargos: Resolución de la novedad con cascada atómica en el servidor
+
     alt aprobación
-        Director->>CCNCtrl: PUT /cursocargonovedad/{cursoCargoNovedadId} (estado autorizado)
-        CCNCtrl->>CCNSvc: update(...) → curso_cargo definitivamente afectado
+        Director->>CCNCtrl: POST /cursocargonovedad/autorizar/{cursoCargoNovedadId} (RespuestaRequest)
+        CCNCtrl->>CCNTool: autorizar(cursoCargoNovedadId, respuesta)
     else rechazo
-        Director->>CCNCtrl: PUT /cursocargonovedad/{cursoCargoNovedadId} (estado rechazado)
-        Director->>CCNCtrl: DELETE /cursocargonovedad/legajoPendiente/{legajoId}/{cursoId}/{anho}/{mes}
+        Director->>CCNCtrl: POST /cursocargonovedad/rechazar/{cursoCargoNovedadId} (RespuestaRequest)
+        CCNCtrl->>CCNTool: rechazar(cursoCargoNovedadId, respuesta)
+    else anulación
+        Director->>CCNCtrl: POST /cursocargonovedad/anular/{cursoCargoNovedadId}
+        CCNCtrl->>CCNTool: anular(cursoCargoNovedadId)
     end
 
+    CCNTool->>CCNSvc: findAllPendientesLegajo / findAllAutorizadosLegajo / findAllRechazadosLegajo
+    CCNTool->>DB: UPDATE curso_cargo_novedad (autorizado/rechazado + respuesta)
+    CCNTool->>Cargos: LegajoControl.fusionado=0 (el conteo de fusiones cambió)
+    CCNTool->>Cargos: alta/baja/cambio en curso_cargo (según la novedad)
+    CCNTool->>Cargos: depurarFusionByLegajo (borra curso_fusion si no quedan curso_cargo)
+
+    Secretario->>CCNCtrl: GET /cursocargonovedad/periodo/{anho}/{mes}
+    CCNCtrl->>CCNSvc: findAllByPeriodo(...) (pendientes + autorizadas + rechazadas, orden apellido/nombre/curso)
     Secretario->>AnoCtrl: GET /anotador/autorizadofacultad/{facultadId}/{anho}/{mes}
     AnoCtrl->>AnoSvc: findAutorizadosByFacultad(...) (reporte de visados)
     Tool-->>Mail: (vía POST /mailvalidate) contactos válidos de destinatarios
     Mail->>DB: notificar estados por mail (MailingService.mailing(List~MailInfo~))
 
-    Note over Secretario,DB: Vistas del circuito: pendiente/autorizado/rechazado por curso,<br/>legajo y facultad (GET /cursocargonovedad/*) y revisados (GET /anotador/revisado*)
+    Note over Secretario,DB: Vistas del circuito: pendiente/autorizado/rechazado por curso,<br/>legajo y facultad (GET /cursocargonovedad/*), padrón del período<br/>(GET /cursocargonovedad/periodo/*) y revisados (GET /anotador/revisado*)
