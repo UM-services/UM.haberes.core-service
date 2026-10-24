@@ -117,7 +117,8 @@ public class AnotadorService {
 		return anotador;
 	}
 
-	public AnotadorEntity update(AnotadorEntity newAnotador, Long anotadorId) {		return repository.findByAnotadorId(anotadorId).map(anotador -> {
+	public AnotadorEntity update(AnotadorEntity newAnotador, Long anotadorId) {
+		return repository.findByAnotadorId(anotadorId).map(anotador -> {
 			anotador = new AnotadorEntity(anotadorId, newAnotador.getLegajoId(), newAnotador.getAnho(), newAnotador.getMes(),
 					newAnotador.getFacultadId(), newAnotador.getAnotacion(), newAnotador.getVisado(),
 					newAnotador.getIpVisado(), newAnotador.getUser(), newAnotador.getRespuesta(),

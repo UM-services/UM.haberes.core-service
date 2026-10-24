@@ -117,7 +117,8 @@ public class PersonaDtoMapper {
                 .build();
     }
 
-    public PersonaResponse toResponse(Persona domain) {        if (domain == null) {
+    public PersonaResponse toResponse(Persona domain) {
+        if (domain == null) {
             return null;
         }
         return PersonaResponse.builder()
