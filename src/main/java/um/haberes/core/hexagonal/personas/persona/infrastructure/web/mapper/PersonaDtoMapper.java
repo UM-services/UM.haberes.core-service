@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 import um.haberes.core.hexagonal.personas.dependencia.infrastructure.web.mapper.DependenciaDtoMapper;
 import um.haberes.core.hexagonal.personas.persona.domain.model.Persona;
 import um.haberes.core.hexagonal.personas.persona.domain.model.PersonaSearch;
+import um.haberes.core.hexagonal.personas.persona.domain.model.PersonaPatch;
 import um.haberes.core.hexagonal.personas.persona.domain.model.UploadedFile;
+import um.haberes.core.hexagonal.personas.persona.infrastructure.web.dto.PersonaPatchRequest;
 import um.haberes.core.hexagonal.personas.persona.infrastructure.web.dto.PersonaRequest;
 import um.haberes.core.hexagonal.personas.persona.infrastructure.web.dto.PersonaResponse;
 import um.haberes.core.hexagonal.personas.persona.infrastructure.web.dto.PersonaSearchResponse;
@@ -82,8 +84,40 @@ public class PersonaDtoMapper {
         return builder.build();
     }
 
-    public PersonaResponse toResponse(Persona domain) {
-        if (domain == null) {
+    public PersonaPatch toDomain(PersonaPatchRequest request) {
+        if (request == null) {
+            return null;
+        }
+        return PersonaPatch.builder()
+                .documento(request.getDocumento())
+                .apellido(request.getApellido())
+                .nombre(request.getNombre())
+                .nacimiento(request.getNacimiento())
+                .altaDocente(request.getAltaDocente())
+                .ajusteDocente(request.getAjusteDocente())
+                .altaAdministrativa(request.getAltaAdministrativa())
+                .ajusteAdministrativo(request.getAjusteAdministrativo())
+                .estadoCivil(request.getEstadoCivil())
+                .situacionId(request.getSituacionId())
+                .reemplazoDesarraigo(request.getReemplazoDesarraigo())
+                .mitadDesarraigo(request.getMitadDesarraigo())
+                .cuil(request.getCuil())
+                .posgrado(request.getPosgrado())
+                .estado(request.getEstado())
+                .liquida(request.getLiquida())
+                .estadoAfip(request.getEstadoAfip())
+                .dependenciaId(request.getDependenciaId())
+                .salida(request.getSalida())
+                .obraSocial(request.getObraSocial())
+                .actividadAfip(request.getActividadAfip())
+                .localidadAfip(request.getLocalidadAfip())
+                .situacionAfip(request.getSituacionAfip())
+                .modeloContratacionAfip(request.getModeloContratacionAfip())
+                .directivoEtec(request.getDirectivoEtec())
+                .build();
+    }
+
+    public PersonaResponse toResponse(Persona domain) {        if (domain == null) {
             return null;
         }
         return PersonaResponse.builder()
