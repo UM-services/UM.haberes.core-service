@@ -28,11 +28,13 @@ import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.ports.in
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.ports.in.GetCargosNoDocentesHistoricosByLegajoUseCase;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.ports.in.SaveAllCargoLiquidacionesUseCase;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.ports.in.UpdateCargoLiquidacionUseCase;
+import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.ports.out.CargoLiquidacionRepository;
 
 @Service
 @RequiredArgsConstructor
 public class CargoLiquidacionService {
 
+    private final CargoLiquidacionRepository cargoLiquidacionRepository;
     private final GetCargoLiquidacionesByLegajoUseCase getCargosByLegajoUseCase;
     private final GetCargoLiquidacionesDocentesByLegajoUseCase getCargosDocentesByLegajoUseCase;
     private final GetCargosDocentesByLegajoAndFacultadUseCase getCargosDocentesByLegajoAndFacultadUseCase;
@@ -89,6 +91,11 @@ public class CargoLiquidacionService {
 
     public List<CargoLiquidacion> findAllActivosByPeriodo(Integer anho, Integer mes) {
         return getCargosActivosByPeriodoUseCase.getCargosActivosByPeriodo(anho, mes);
+    }
+
+    /** Todos los cargos del período, sin filtrar por situación (planilla de básicos). */
+    public List<CargoLiquidacion> findAllByPeriodo(Integer anho, Integer mes) {
+        return cargoLiquidacionRepository.findAllByAnhoAndMes(anho, mes);
     }
 
     public List<CargoLiquidacion> findAllActivosByLegajo(Long legajoId, Integer anho, Integer mes) {

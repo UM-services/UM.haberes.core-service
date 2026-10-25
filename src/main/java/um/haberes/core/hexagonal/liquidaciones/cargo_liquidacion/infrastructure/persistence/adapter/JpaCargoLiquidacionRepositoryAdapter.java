@@ -57,6 +57,11 @@ public class JpaCargoLiquidacionRepositoryAdapter implements CargoLiquidacionRep
     }
 
     @Override
+    public List<CargoLiquidacion> findAllByAnhoAndMes(Integer anho, Integer mes) {
+        return toDomainList(jpaCargoLiquidacionRepository.findAllByAnhoAndMes(anho, mes));
+    }
+
+    @Override
     public List<CargoLiquidacion> findAllByLegajoIdAndAnhoAndMesAndCategoriaDocente(Long legajoId, Integer anho,
             Integer mes, Byte docente) {
         return toDomainList(

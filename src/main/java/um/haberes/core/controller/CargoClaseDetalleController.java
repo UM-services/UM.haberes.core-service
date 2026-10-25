@@ -37,6 +37,12 @@ public class CargoClaseDetalleController {
 		return new ResponseEntity<>(service.findAllByLegajo(legajoId, anho, mes), HttpStatus.OK);
 	}
 
+	@GetMapping("/periodo/{anho}/{mes}")
+	public ResponseEntity<List<CargoClaseDetalleEntity>> findAllByPeriodo(@PathVariable Integer anho,
+																	 @PathVariable Integer mes) {
+		return new ResponseEntity<>(service.findAllByPeriodo(anho, mes), HttpStatus.OK);
+	}
+
 	@GetMapping("/legajo/{legajoId}/{anho}/{mes}/facultad/{facultadId}")
 	public ResponseEntity<List<CargoClaseDetalleEntity>> findAllByLegajoAndFacultad(@PathVariable Long legajoId, @PathVariable Integer anho, @PathVariable Integer mes, @PathVariable Integer facultadId) {
 		return new ResponseEntity<>(service.findAllByLegajoAndFacultad(legajoId, anho, mes, facultadId), HttpStatus.OK);

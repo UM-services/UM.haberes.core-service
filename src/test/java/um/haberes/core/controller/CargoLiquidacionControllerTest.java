@@ -155,6 +155,43 @@ class CargoLiquidacionControllerTest {
     }
 
     @Test
+    void findAllActivosByPeriodo_devuelveLosCargosActivosDelPeriodo() throws Exception {
+        when(service.findAllActivosByPeriodo(2024, 6)).thenReturn(List.of(sampleCargoLiquidacion()));
+
+        mockMvc.perform(get("/api/haberes/core/cargoliquidacion/periodo/{anho}/{mes}", 2024, 6))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("""
+                        [ {
+                          "cargoLiquidacionId": 1,
+                          "legajoId": 100,
+                          "anho": 2024,
+                          "mes": 6,
+                          "dependenciaId": 3,
+                          "categoriaId": 801,
+                          "categoriaNombre": "DOCENTE TITULAR",
+                          "situacion": "A"
+                        } ]
+                        """, JsonCompareMode.LENIENT));
+    }
+
+    @Test
+    void findAllByPeriodo_devuelveTodosLosCargosDelPeriodo() throws Exception {
+        when(service.findAllByPeriodo(2024, 6)).thenReturn(List.of(sampleCargoLiquidacion()));
+
+        mockMvc.perform(get("/api/haberes/core/cargoliquidacion/periodo/{anho}/{mes}/todos", 2024, 6))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("""
+                        [ {
+                          "legajoId": 100,
+                          "categoriaId": 801,
+                          "situacion": "A"
+                        } ]
+                        """, JsonCompareMode.LENIENT));
+    }
+
+    @Test
     void findAllDocenteByLegajo_returnsOkWithListOfCargoLiquidacion() throws Exception {
         when(service.findAllDocenteByLegajo(100L, 2024, 6)).thenReturn(List.of(sampleCargoLiquidacion()));
 

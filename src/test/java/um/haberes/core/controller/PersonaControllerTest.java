@@ -228,6 +228,15 @@ class PersonaControllerTest {
     }
 
     @Test
+    void findAllByLiquidado_returnsOkWithListOfPersona() throws Exception {
+        when(service.findAllByLiquidado(2024, 6)).thenReturn(List.of(samplePersona()));
+
+        mockMvc.perform(get("/api/haberes/core/persona/liquidado/{anho}/{mes}", 2024, 6))
+                .andExpect(status().isOk())
+                .andExpect(content().json("[" + PERSONA_JSON + "]", JsonCompareMode.STRICT));
+    }
+
+    @Test
     void findAllByFacultad_returnsOkWithListOfPersona() throws Exception {
         when(service.findAllByFacultad(1)).thenReturn(List.of(samplePersona()));
 
