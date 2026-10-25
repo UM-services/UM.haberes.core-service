@@ -12,6 +12,8 @@ import um.haberes.core.hexagonal.liquidaciones.bono.domain.model.EnvioBono;
 import um.haberes.core.hexagonal.liquidaciones.bono.domain.model.IntegridadBono;
 import um.haberes.core.hexagonal.liquidaciones.bono.domain.model.PeriodoBono;
 import um.haberes.core.hexagonal.liquidaciones.bono.domain.ports.in.ObtenerHistorialAuditoriaBonoUseCase;
+import um.haberes.core.hexagonal.liquidaciones.bono.domain.model.ResumenPreparacionBonos;
+import um.haberes.core.hexagonal.liquidaciones.bono.domain.ports.in.PrepararBonosDependenciaUseCase;
 import um.haberes.core.hexagonal.liquidaciones.bono.domain.ports.in.PrepararBonoUseCase;
 import um.haberes.core.hexagonal.liquidaciones.bono.domain.ports.in.PrepararEnvioBonoUseCase;
 import um.haberes.core.hexagonal.liquidaciones.bono.domain.ports.in.PrintPrepareBonoUseCase;
@@ -26,6 +28,7 @@ public class BonoService {
     private final PrepararBonoUseCase prepararBonoUseCase;
     private final RegistrarAuditoriaBonoUseCase registrarAuditoriaBonoUseCase;
     private final PrintPrepareBonoUseCase printPrepareBonoUseCase;
+    private final PrepararBonosDependenciaUseCase prepararBonosDependenciaUseCase;
     private final PrepararEnvioBonoUseCase prepararEnvioBonoUseCase;
     private final ObtenerHistorialAuditoriaBonoUseCase obtenerHistorialAuditoriaBonoUseCase;
 
@@ -43,6 +46,13 @@ public class BonoService {
 
     public BonoImpresion printPrepare(AuditoriaBono auditoria) {
         return printPrepareBonoUseCase.printPrepare(auditoria);
+    }
+
+    public ResumenPreparacionBonos prepararDependencia(Integer dependenciaId, Integer anho, Integer mes,
+                                                       String salida, Long legajoIdSolicitud,
+                                                       String ipAddress) {
+        return prepararBonosDependenciaUseCase.preparar(dependenciaId, anho, mes, salida,
+                legajoIdSolicitud, ipAddress);
     }
 
     public BonoImpresion prepararEnvio(EnvioBono envio) {
