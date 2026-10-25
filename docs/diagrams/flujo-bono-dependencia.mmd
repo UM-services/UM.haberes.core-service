@@ -1,0 +1,39 @@
+---
+title: "Bono por Dependencia: preparación masiva y auditoría antes de imprimir (slice liquidaciones/bono)"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant Ctrl as BonoDependenciaController
+    participant Svc as BonoService (application)
+    participant BatchUC as PrepararBonosDependenciaUseCaseImpl
+    participant QPort as LiquidacionQueryPort
+    participant PrintUC as PrintPrepareBonoUseCaseImpl
+    participant DB as MySQL
+
+    Note over Usuario,DB: E1 - Preparación del lote antes de pedir el PDF al report service (reemplaza el beforePrintBono legajo por legajo del cliente)
+
+    Usuario->>Ctrl: POST /api/haberes/core/bono/dependencia/{dependenciaId}/{anho}/{mes}/{salida}/print-prepare (header X-Legajo-Solicitante)
+    Ctrl->>Ctrl: ClientIpResolver: X-Forwarded-For → X-Real-IP → getRemoteAddr
+    alt header X-Legajo-Solicitante no numérico
+        Ctrl-->>Usuario: 400 BAD_REQUEST
+    end
+    Ctrl->>Svc: prepararDependencia(dependenciaId, anho, mes, salida, legajoIdSolicitud, ipAddress)
+    Svc->>BatchUC: preparar(...)
+    BatchUC->>QPort: findLegajoIdsByDependencia(dependenciaId, anho, mes, salida)
+    QPort->>DB: SELECT liquidacion del período por dependencia y salida (legajoId distinto)
+
+    Note over BatchUC,DB: E2 - Por cada legajo se ejecuta el mismo prepare individual (integridad, actividad y auditoría)
+
+    loop cada legajoId
+        BatchUC->>PrintUC: printPrepare(AuditoriaBono con legajoId, anho, mes, solicitante e IP)
+        PrintUC->>DB: integridad, UPSERT actividad e INSERT bono_impresion (vía use cases y adapters)
+        alt BonoException
+            BatchUC->>BatchUC: acumular Fallido(legajoId, motivo) y continuar con el siguiente
+        end
+    end
+
+    BatchUC-->>Ctrl: ResumenPreparacionBonos(total, preparados, fallidos)
+    Ctrl-->>Usuario: 200 con dependenciaId, anho, mes, salida, total, preparados y fallidos[legajoId, motivo]
+
+    Note over Usuario,DB: Un legajo fallido no corta el lote: el cliente informa los fallidos y recién después pide el PDF

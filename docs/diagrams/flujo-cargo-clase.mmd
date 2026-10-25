@@ -30,6 +30,8 @@ sequenceDiagram
 
     Usuario->>DCtrl: GET /cargoclasedetalle/legajo/{legajoId}/{anho}/{mes}
     DCtrl->>Svc: findAllByLegajo(...)
+    Usuario->>DCtrl: GET /cargoclasedetalle/periodo/{anho}/{mes}
+    DCtrl->>Svc: findAllByPeriodo(anho, mes)
     Usuario->>DCtrl: GET /cargoclasedetalle/legajo/{legajoId}/{anho}/{mes}/facultad/{facultadId}
     Usuario->>DCtrl: GET /cargoclasedetalle/facultad/{facultadId}/{anho}/{mes}
     Usuario->>DCtrl: GET /cargoclasedetalle/cargoclase/{cargoclaseId}/{anho}/{mes}

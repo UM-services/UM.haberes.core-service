@@ -82,6 +82,13 @@ public class PersonaController {
         return ResponseEntity.ok(toResponses(service.findAllLiquidables()));
     }
 
+    // Legajos con liquidación en el período, ordenados por nombre (planillas de consulta)
+    @GetMapping("/liquidado/{anho}/{mes}")
+    public ResponseEntity<List<PersonaResponse>> findAllByLiquidado(@PathVariable Integer anho,
+                                                                    @PathVariable Integer mes) {
+        return ResponseEntity.ok(toResponses(service.findAllByLiquidado(anho, mes)));
+    }
+
     @GetMapping("/facultad/{facultadId}")
     public ResponseEntity<List<PersonaResponse>> findAllByFacultad(@PathVariable Integer facultadId) {
         return ResponseEntity.ok(toResponses(service.findAllByFacultad(facultadId)));

@@ -29,6 +29,7 @@ sequenceDiagram
     Note over Usuario,DB: Fusion de cursos (cursos anuales que se fusionan por facultad)
 
     Usuario->>FusionSvc: (vía /cursofusion) findAllByLegajoIdAndFacultadId(...)
+    Usuario->>FusionSvc: (vía /cursofusion) findAllByAnhoAndMes(anho, mes) en GET /cursofusion/periodo/{anho}/{mes}
     Usuario->>FusionSvc: deleteAllByLegajoIdAndAnhoAndMesAndFacultadIdAndGeograficaId(...)
     FusionSvc->>Adapt: SELECT/DELETE curso_fusion
 

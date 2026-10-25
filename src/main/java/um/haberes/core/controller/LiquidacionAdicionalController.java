@@ -32,6 +32,11 @@ public class LiquidacionAdicionalController {
         return new ResponseEntity<>(service.findAllByLegajo(legajoId, anho, mes), HttpStatus.OK);
     }
 
+    @GetMapping("/periodo/{anho}/{mes}")
+    public ResponseEntity<List<LiquidacionAdicionalEntity>> findAllByPeriodo(@PathVariable Integer anho, @PathVariable Integer mes) {
+        return new ResponseEntity<>(service.findAllByPeriodo(anho, mes), HttpStatus.OK);
+    }
+
     @GetMapping("/dependencia/{legajoId}/{anho}/{mes}/{dependenciaId}")
     public ResponseEntity<LiquidacionAdicionalEntity> findByDependencia(@PathVariable Long legajoId, @PathVariable Integer anho, @PathVariable Integer mes, @PathVariable Integer dependenciaId) {
         try {

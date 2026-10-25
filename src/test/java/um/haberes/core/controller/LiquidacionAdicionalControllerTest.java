@@ -78,6 +78,16 @@ class LiquidacionAdicionalControllerTest {
     }
 
     @Test
+    void findAllByPeriodo_returnsOkWithListOfLiquidacionAdicional() throws Exception {
+        when(service.findAllByPeriodo(2024, 6)).thenReturn(List.of(sampleLiquidacionAdicional()));
+
+        mockMvc.perform(get("/api/haberes/core/liquidacion-adicional/periodo/{anho}/{mes}", 2024, 6))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("[" + expectedLiquidacionAdicional + "]", JsonCompareMode.STRICT));
+    }
+
+    @Test
     void findByDependencia_returnsOkWithLiquidacionAdicional() throws Exception {
         when(service.findByDependencia(100L, 2024, 6, 7)).thenReturn(sampleLiquidacionAdicional());
 

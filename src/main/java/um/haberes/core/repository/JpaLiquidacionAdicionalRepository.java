@@ -20,6 +20,8 @@ public interface JpaLiquidacionAdicionalRepository extends JpaRepository<Liquida
 
 	public List<LiquidacionAdicionalEntity> findAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
 
+	public List<LiquidacionAdicionalEntity> findAllByAnhoAndMes(Integer anho, Integer mes);
+
 	public Optional<LiquidacionAdicionalEntity> findByLegajoIdAndAnhoAndMesAndDependenciaId(Long legajoId, Integer anho, Integer mes, Integer dependenciaId);
 
 	@Modifying

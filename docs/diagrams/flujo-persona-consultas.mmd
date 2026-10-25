@@ -21,6 +21,8 @@ sequenceDiagram
     UC->>Adapt: legajos con curso_cargo o cargo del período
     Usuario->>Ctrl: GET /persona/liquidables
     Ctrl->>Svc: findAllLiquidables()
+    Usuario->>Ctrl: GET /persona/liquidado/{anho}/{mes}
+    Ctrl->>Svc: findAllByLiquidado(anho, mes) (legajos con liquidación, ordenados por nombre)
     Usuario->>Ctrl: GET /persona/semestre/{anho}/{semestre} o /desarraigo/{anho}/{mes}
     Ctrl->>Svc: findAllBySemestre(...) / findAllByDesarraigo(...)
 

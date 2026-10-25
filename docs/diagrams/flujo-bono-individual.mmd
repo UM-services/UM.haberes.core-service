@@ -79,3 +79,5 @@ sequenceDiagram
     Svc->>Legacy: findAllByLegajoIdAndAnhoAndMesOrderByFechaDesc
     Legacy->>DB: SELECT bono_impresion ORDER BY fecha DESC
     Svc-->>Usuario: List~BonoImpresionResponse~
+
+    Note over Usuario,DB: Impresión masiva por dependencia: ver flujo-bono-dependencia.mmd<br/>(POST /bono/dependencia/{dependenciaId}/{anho}/{mes}/{salida}/print-prepare)

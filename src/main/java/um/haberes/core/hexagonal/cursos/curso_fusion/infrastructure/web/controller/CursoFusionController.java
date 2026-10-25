@@ -42,6 +42,12 @@ public class CursoFusionController {
                 service.findAllByLegajoIdAndFacultadId(legajoId, anho, mes, facultadId)));
     }
 
+    @GetMapping("/periodo/{anho}/{mes}")
+    public ResponseEntity<List<CursoFusionResponse>> findAllByPeriodo(@PathVariable Integer anho,
+            @PathVariable Integer mes) {
+        return ResponseEntity.ok(toResponseList(service.findAllByAnhoAndMes(anho, mes)));
+    }
+
     @PostMapping("/")
     public ResponseEntity<CursoFusionResponse> add(@Valid @RequestBody CursoFusionRequest request) {
         return new ResponseEntity<>(
