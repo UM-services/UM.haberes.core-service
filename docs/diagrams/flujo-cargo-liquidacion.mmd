@@ -21,6 +21,8 @@ sequenceDiagram
     Ctrl->>Svc: findAllAdicionalHCSByLegajo(...)
     Usuario->>Ctrl: GET /cargoliquidacion/categorianodocente/{legajoId}/{anho}/{mes}/{categoriaId}
     Ctrl->>Svc: findByCategoriaNoDocente(...)
+    Usuario->>Ctrl: GET /cargoliquidacion/periodo/{anho}/{mes} (activos) o /periodo/{anho}/{mes}/todos
+    Ctrl->>Svc: findAllActivosByPeriodo(...) / findAllByPeriodo(...) (todos, sin filtro de situación)
 
     Note over Usuario,DB: Alta, actualización masiva con versión y baja
 

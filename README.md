@@ -47,6 +47,7 @@ Liquidaciones:
 - `docs/diagrams/flujo-cargo-clase.mmd`
 - `docs/diagrams/flujo-liquidacion-adicional.mmd`
 - `docs/diagrams/flujo-bono-individual.mmd`
+- `docs/diagrams/flujo-bono-dependencia.mmd`
 
 Personas y cursos:
 - `docs/diagrams/flujo-persona-consultas.mmd`
@@ -176,11 +177,22 @@ docker run -d \
 ### Personas
 - `GET /api/haberes/core/persona/` - Listar personas
 - `GET /api/haberes/core/persona/liquidables` - Listar personas liquidables
+- `GET /api/haberes/core/persona/liquidado/{anho}/{mes}` - Personas con liquidación en el período (ordenadas por nombre)
 - `POST /api/haberes/core/persona/upload` - Cargar contactos de personas desde Excel
+
+### Consultas por período
+- `GET /api/haberes/core/cargoliquidacion/periodo/{anho}/{mes}` - Cargos activos del período
+- `GET /api/haberes/core/cargoliquidacion/periodo/{anho}/{mes}/todos` - Todos los cargos del período (sin filtro de situación)
+- `GET /api/haberes/core/cargoclasedetalle/periodo/{anho}/{mes}` - Detalle de cargos de clase del período
+- `GET /api/haberes/core/liquidacion-adicional/periodo/{anho}/{mes}` - Liquidaciones adicionales del período
+- `GET /api/haberes/core/novedadacumulado/codigo/{codigoId}/{anho}/{mes}` - Novedades acumuladas por código y período
+- `GET /api/haberes/core/legajocursoCantidad/periodo/{anho}/{mes}` - Cantidad de cursos por legajo en el período
+- `GET /api/haberes/core/cursofusion/periodo/{anho}/{mes}` - Fusiones de cursos del período
 
 ### Reportes
 - `POST /api/haberes/core/libroSueldo/generate/{anho}/{mes}` - Generar libro de sueldo
 - `GET /api/haberes/core/sheet/generateitems/{anho}/{mes}` - Generar planilla de items
+- `POST /api/haberes/core/bono/dependencia/{dependenciaId}/{anho}/{mes}/{salida}/print-prepare` - Preparar y auditar la impresión masiva de bonos de una dependencia
 
 
 ## Arquitectura

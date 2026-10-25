@@ -4,7 +4,7 @@ title: "Vistas de Reporte (consultas agregadas de MySQL)"
 sequenceDiagram
     autonumber
     actor Usuario
-    participant Ctrl as Controladores de Vista (13)
+    participant Ctrl as Controladores de Vista (15)
     participant Svc as View Services
     participant Repo as Repositorios de Vista (Jpa*Repository)
     participant DB as MySQL (vistas materializadas)
@@ -15,4 +15,11 @@ sequenceDiagram
     Repo->>DB: SELECT sobre vista (totales, asignados, imputados)
     DB-->>Usuario: List~ViewEntity~ proyectado
 
-    Note over Usuario,DB: Vistas disponibles: TotalItem, TotalMensual, TotalNovedad,<br/>TotalSalida, ImputadoSueldo, ImputadoAporte, ImputadoTotal,<br/>AsignadoCategoria, AsignadoClase, DocenteDesignacion,<br/>CargoLiquidacionDocente, CargoLiquidacionNoDocente, NovedadExiste
+    Note over Usuario,DB: Consultas puntuales por período
+
+    Usuario->>Ctrl: GET /api/haberes/core/novedadacumulado/codigo/{codigoId}/{anho}/{mes}
+    Ctrl->>Svc: NovedadAcumuladoService.findAllByCodigo(codigoId, anho, mes)
+    Usuario->>Ctrl: GET /api/haberes/core/legajocursoCantidad/periodo/{anho}/{mes}
+    Ctrl->>Svc: LegajoCursoCantidadService.findAllByPeriodo(anho, mes)
+
+    Note over Usuario,DB: Vistas disponibles: TotalItem, TotalMensual, TotalNovedad,<br/>TotalSalida, ImputadoSueldo, ImputadoAporte, ImputadoTotal,<br/>AsignadoCategoria, AsignadoClase, DocenteDesignacion,<br/>CargoLiquidacionDocente, CargoLiquidacionNoDocente, NovedadExiste,<br/>NovedadAcumulado, LegajoCursoCantidad

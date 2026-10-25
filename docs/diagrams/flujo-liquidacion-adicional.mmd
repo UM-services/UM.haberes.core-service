@@ -26,6 +26,8 @@ sequenceDiagram
 
     Usuario->>Ctrl: GET /liquidacion-adicional/legajo/{legajoId}/{anho}/{mes}
     Ctrl->>Svc: findAllByLegajo(legajoId, anho, mes)
+    Usuario->>Ctrl: GET /liquidacion-adicional/periodo/{anho}/{mes}
+    Ctrl->>Svc: findAllByPeriodo(anho, mes)
     Usuario->>Ctrl: GET /liquidacion-adicional/dependencia/{legajoId}/{anho}/{mes}/{dependenciaId}
     Ctrl->>Svc: findByDependencia(...) (findByLegajoIdAndAnhoAndMesAndDependenciaId)
     alt sin registro
