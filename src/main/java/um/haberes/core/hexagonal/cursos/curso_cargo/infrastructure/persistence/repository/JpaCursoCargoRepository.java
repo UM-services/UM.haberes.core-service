@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import um.haberes.core.hexagonal.cursos.curso_cargo.infrastructure.persistence.entity.CursoCargoEntity;
 
@@ -57,10 +56,8 @@ public interface JpaCursoCargoRepository extends JpaRepository<CursoCargoEntity,
     Optional<CursoCargoEntity> findByCursoIdAndAnhoAndMesAndLegajoId(Long cursoId, Integer anho, Integer mes,
                                                                Long legajoId);
 
-    @Modifying
     void deleteByCursoCargoId(Long cursoCargoId);
 
-    @Modifying
     void deleteByCursoIdAndAnhoAndMesAndCargoTipoIdAndLegajoId(Long cursoId, Integer anho, Integer mes,
                                                                Integer cargoTipoId, Long legajoId);
 

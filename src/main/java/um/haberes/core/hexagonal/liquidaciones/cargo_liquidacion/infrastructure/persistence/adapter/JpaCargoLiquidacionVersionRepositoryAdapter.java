@@ -1,6 +1,7 @@
 package um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.infrastructure.persistence.adapter;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
@@ -32,6 +33,13 @@ public class JpaCargoLiquidacionVersionRepositoryAdapter implements CargoLiquida
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public Optional<CargoLiquidacionVersion> findLastVersion(Long legajoId, Integer anho, Integer mes) {
+        return jpaCargoLiquidacionVersionRepository
+                .findTopByLegajoIdAndAnhoAndMesOrderByVersionDesc(legajoId, anho, mes)
+                .map(this::toDomain);
+    }
+
     private CargoLiquidacionVersionEntity toEntity(CargoLiquidacionVersion domain) {
         if (domain == null) {
             return null;
@@ -42,14 +50,14 @@ public class JpaCargoLiquidacionVersionRepositoryAdapter implements CargoLiquida
                 domain.getMes(),
                 domain.getVersion(),
                 domain.getDependenciaId(),
+                domain.getFechaDesde(),
+                domain.getFechaHasta(),
                 domain.getCategoriaId(),
                 domain.getBasico(),
                 domain.getEstadoDocente(),
                 domain.getHorasJornada(),
                 domain.getJornada(),
                 domain.getPresentismo(),
-                domain.getFechaDesde(),
-                domain.getFechaHasta(),
                 domain.getSituacion());
     }
 
@@ -64,14 +72,14 @@ public class JpaCargoLiquidacionVersionRepositoryAdapter implements CargoLiquida
                 .mes(entity.getMes())
                 .version(entity.getVersion())
                 .dependenciaId(entity.getDependenciaId())
+                .fechaDesde(entity.getFechaDesde())
+                .fechaHasta(entity.getFechaHasta())
                 .categoriaId(entity.getCategoriaId())
                 .basico(entity.getBasico())
                 .estadoDocente(entity.getEstadoDocente())
                 .horasJornada(entity.getHorasJornada())
                 .jornada(entity.getJornada())
                 .presentismo(entity.getPresentismo())
-                .fechaDesde(entity.getFechaDesde())
-                .fechaHasta(entity.getFechaHasta())
                 .situacion(entity.getSituacion())
                 .build();
     }

@@ -159,6 +159,7 @@ jobs:
                   { file: 'diagrams/flujo-bono-dependencia.mmd', title: '🎫 Secuencia: Bono por Dependencia (preparación masiva y auditoría)' },
                   { file: 'diagrams/flujo-actividad-contacto.mmd', title: '📇 Secuencia: Actividad del Legajo y Contactos' },
                   { file: 'diagrams/flujo-integracion-externa.mmd', title: '🔌 Secuencia: Proxies de Integración Externa' },
+                  { file: 'diagrams/flujo-auditoria.mmd', title: '🧾 Secuencia: Auditoría de Operaciones (REQUEST, CHANGE y BULK)' },
                   { file: 'diagrams/despliegue.mmd', title: '🚀 Diagrama de Despliegue' }
               ];
               diagramsManifest.forEach(diagram => {

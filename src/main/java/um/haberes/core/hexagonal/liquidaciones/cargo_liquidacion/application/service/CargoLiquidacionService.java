@@ -139,8 +139,8 @@ public class CargoLiquidacionService {
                 .orElseThrow(() -> new CargoLiquidacionException(cargoLiquidacionId));
     }
 
-    public List<CargoLiquidacion> saveAll(List<CargoLiquidacion> cargos, Integer version, Boolean withVersion) {
-        return saveAllCargoLiquidacionesUseCase.saveAllCargoLiquidaciones(cargos, version, withVersion);
+    public List<CargoLiquidacion> saveAll(List<CargoLiquidacion> cargos, Integer version) {
+        return saveAllCargoLiquidacionesUseCase.saveAllCargoLiquidaciones(cargos, version);
     }
 
     public void deleteAllNotInByPeriodo(List<Long> legajos, Integer anho, Integer mes) {

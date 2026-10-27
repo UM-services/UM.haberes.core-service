@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import um.haberes.core.audit.AuditBulkScope;
+import um.haberes.core.audit.AuditBulkService;
+import um.haberes.core.audit.BulkContext;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.ports.in.DeleteCargosNoDocentesByLegajoUseCase;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.ports.out.CargoLiquidacionRepository;
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.Categoria;
@@ -20,6 +23,7 @@ public class DeleteCargosNoDocentesByLegajoUseCaseImpl implements DeleteCargosNo
 
     private final CargoLiquidacionRepository cargoLiquidacionRepository;
     private final CategoriaRepository categoriaRepository;
+    private final AuditBulkService auditBulk;
 
     @Transactional
     @Override
@@ -27,7 +31,10 @@ public class DeleteCargosNoDocentesByLegajoUseCaseImpl implements DeleteCargosNo
         List<Integer> categoriaIds = categoriaRepository.findAllByNoDocente((byte) 1).stream()
                 .map(Categoria::getCategoriaId)
                 .collect(Collectors.toList());
-        cargoLiquidacionRepository.deleteAllByLegajoIdAndAnhoAndMesAndSituacionAndCategoriaIdIn(legajoId, anho, mes,
-                SITUACION_ACTIVA, categoriaIds);
+        try (AuditBulkScope ignored = auditBulk.begin(
+                BulkContext.of("borrado-cargos-no-docentes", anho, mes, legajoId))) {
+            cargoLiquidacionRepository.deleteAllByLegajoIdAndAnhoAndMesAndSituacionAndCategoriaIdIn(legajoId, anho,
+                    mes, SITUACION_ACTIVA, categoriaIds);
+        }
     }
 }
