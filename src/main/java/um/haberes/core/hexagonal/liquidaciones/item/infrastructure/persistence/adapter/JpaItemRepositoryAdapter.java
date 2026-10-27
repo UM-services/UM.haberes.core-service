@@ -88,6 +88,13 @@ public class JpaItemRepositoryAdapter implements ItemRepository {
     }
 
     @Override
+    public void deleteAll(List<Item> items) {
+        jpaItemRepository.deleteAll(items.stream()
+                .map(itemMapper::toEntity)
+                .collect(Collectors.toList()));
+    }
+
+    @Override
     public void deleteAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes) {
         jpaItemRepository.deleteAllByLegajoIdAndAnhoAndMes(legajoId, anho, mes);
     }

@@ -36,6 +36,12 @@ public class CargoLiquidacionVersionEntity extends AuditableEntity {
 
     private Integer dependenciaId = null;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXX", timezone = "UTC")
+    private OffsetDateTime fechaDesde = null;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXX", timezone = "UTC")
+    private OffsetDateTime fechaHasta = null;
+
     private Integer categoriaId = null;
 
     private BigDecimal basico = BigDecimal.ZERO;
@@ -47,12 +53,6 @@ public class CargoLiquidacionVersionEntity extends AuditableEntity {
     private int jornada = 0;
 
     private int presentismo = 0;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXX", timezone = "UTC")
-    private OffsetDateTime fechaDesde = null;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXX", timezone = "UTC")
-    private OffsetDateTime fechaHasta = null;
 
     private String situacion = null;
 }

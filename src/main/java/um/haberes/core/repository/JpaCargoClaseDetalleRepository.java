@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import um.haberes.core.model.CargoClaseDetalleEntity;
 
@@ -39,10 +38,8 @@ public interface JpaCargoClaseDetalleRepository extends JpaRepository<CargoClase
 
     Optional<CargoClaseDetalleEntity> findByCargoClaseDetalleId(Long cargoClasePeriodoId);
 
-    @Modifying
     void deleteByCargoClaseDetalleId(Long cargoClasePeriodoId);
 
-    @Modifying
     void deleteAllByCargoClasePeriodoId(Long cargoClasePeriodoId);
 
 }

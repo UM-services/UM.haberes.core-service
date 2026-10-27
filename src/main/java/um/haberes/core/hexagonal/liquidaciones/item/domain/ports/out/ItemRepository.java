@@ -32,6 +32,8 @@ public interface ItemRepository {
 
     void deleteAllByAnhoAndMes(Integer anho, Integer mes);
 
+    void deleteAll(List<Item> items);
+
     void deleteAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
 
     void deleteAllByLegajoIdAndAnhoAndMesAndImporteAndCodigoIdLessThan(Long legajoId, Integer anho, Integer mes,

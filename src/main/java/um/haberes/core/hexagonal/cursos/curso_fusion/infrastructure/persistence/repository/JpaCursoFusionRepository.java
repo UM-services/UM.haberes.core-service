@@ -6,7 +6,6 @@ package um.haberes.core.hexagonal.cursos.curso_fusion.infrastructure.persistence
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import um.haberes.core.hexagonal.cursos.curso_fusion.infrastructure.persistence.entity.CursoFusionEntity;
 
@@ -24,16 +23,13 @@ public interface JpaCursoFusionRepository extends JpaRepository<CursoFusionEntit
 
 	List<CursoFusionEntity> findAllByAnhoAndMes(Integer anho, Integer mes);
 
-	@Modifying
 	void deleteAllByLegajoIdAndAnhoAndMesAndFacultadIdAndGeograficaId(Long legajoId, Integer anho, Integer mes,
 			Integer facultadId, Integer geograficaId);
 
 	void deleteByCursoFusionId(Long cursoFusionId);
 
-	@Modifying
 	void deleteAllByLegajoIdInAndAnhoAndMes(List<Long> ids, Integer anho, Integer mes);
 
-	@Modifying
 	void deleteAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
 
 }

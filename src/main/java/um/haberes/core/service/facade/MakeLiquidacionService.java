@@ -730,7 +730,7 @@ public class MakeLiquidacionService {
                     novedad.getDependencia(),
                     categoria));
         }
-        cargoLiquidacions = cargoLiquidacionService.saveAll(cargoLiquidacions, mes, false);
+        cargoLiquidacions = cargoLiquidacionService.saveAll(cargoLiquidacions, null);
     }
 
     @Transactional
@@ -761,7 +761,7 @@ public class MakeLiquidacionService {
                         categoria));
             }
         }
-        cargoLiquidacionService.saveAll(cargoLiquidacions, mes, false);
+        cargoLiquidacionService.saveAll(cargoLiquidacions, null);
     }
 
     @Transactional

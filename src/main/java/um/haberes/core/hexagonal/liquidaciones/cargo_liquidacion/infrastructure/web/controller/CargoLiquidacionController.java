@@ -145,7 +145,7 @@ public class CargoLiquidacionController {
 		List<CargoLiquidacion> cargos = requests.stream()
 				.map(cargoLiquidacionDtoMapper::toDomain)
 				.collect(Collectors.toList());
-		return new ResponseEntity<>(toResponseList(service.saveAll(cargos, version, true)), HttpStatus.OK);
+		return new ResponseEntity<>(toResponseList(service.saveAll(cargos, version)), HttpStatus.OK);
 	}
 
 	@DeleteMapping("/periodo/{anho}/{mes}")

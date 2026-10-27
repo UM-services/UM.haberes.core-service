@@ -28,6 +28,10 @@ public class CargoLiquidacionVersion {
 
     private Integer dependenciaId;
 
+    private OffsetDateTime fechaDesde;
+
+    private OffsetDateTime fechaHasta;
+
     private Integer categoriaId;
 
     @Builder.Default
@@ -44,10 +48,6 @@ public class CargoLiquidacionVersion {
 
     @Builder.Default
     private int presentismo = 0;
-
-    private OffsetDateTime fechaDesde;
-
-    private OffsetDateTime fechaHasta;
 
     private String situacion;
 }

@@ -453,7 +453,7 @@ class CargoLiquidacionControllerTest {
 
     @Test
     void saveall_returnsOkWithListOfCargoLiquidacion() throws Exception {
-        when(service.saveAll(anyList(), anyInt(), anyBoolean())).thenReturn(List.of(sampleCargoLiquidacion()));
+        when(service.saveAll(anyList(), anyInt())).thenReturn(List.of(sampleCargoLiquidacion()));
 
         mockMvc.perform(put("/api/haberes/core/cargoliquidacion/saveall/{version}", 1)
                         .contentType(MediaType.APPLICATION_JSON)

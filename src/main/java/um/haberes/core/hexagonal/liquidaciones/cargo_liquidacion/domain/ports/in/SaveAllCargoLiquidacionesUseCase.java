@@ -6,6 +6,9 @@ import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.model.Ca
 
 public interface SaveAllCargoLiquidacionesUseCase {
 
-    List<CargoLiquidacion> saveAllCargoLiquidaciones(List<CargoLiquidacion> cargos, Integer version,
-            Boolean withVersion);
+    /**
+     * Guarda los cargos y, siempre, una copia en {@code cargo_liquidacion_version}. Si
+     * {@code version} es {@code null} se usa el siguiente número por legajo/período.
+     */
+    List<CargoLiquidacion> saveAllCargoLiquidaciones(List<CargoLiquidacion> cargos, Integer version);
 }
