@@ -36,6 +36,13 @@ graph TD
         N[(MySQL)]
     end
 
+    subgraph "Auditoría (canal transversal)"
+        AU["AuditRequestFilter / AuditEntityListener<br/>AuditBulkScope"]
+        AO["audit_outbox<br/>(JDBC, misma transacción)"]
+        AS["AuditOutboxSender<br/>(@Scheduled)"]
+        AA["haberes-auditoria<br/>(API de ingesta)"]
+    end
+
     A --> B
     B --> C
     C --> D
@@ -46,6 +53,13 @@ graph TD
     H --> I
     I --> J
     J --> N
+    B --> AU
+    J --> AU
+    D --> AU
+    AU --> AO
+    AO --> AS
+    AO --> N
+    AS --> AA
     LQ --> D
     LQ --> LV
     LV --> N

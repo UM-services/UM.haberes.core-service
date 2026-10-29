@@ -30,6 +30,10 @@ public class LiquidacionAdicionalService {
 		return repository.findAllByLegajoIdAndAnhoAndMes(legajoId, anho, mes);
 	}
 
+	public List<LiquidacionAdicionalEntity> findAllByPeriodo(Integer anho, Integer mes) {
+		return repository.findAllByAnhoAndMes(anho, mes);
+	}
+
 	public LiquidacionAdicionalEntity findByDependencia(Long legajoId, Integer anho, Integer mes, Integer dependenciaId) {
 		return repository.findByLegajoIdAndAnhoAndMesAndDependenciaId(legajoId, anho, mes, dependenciaId).orElseThrow(() -> new LiquidacionAdicionalException(legajoId, anho, mes, dependenciaId));
 	}

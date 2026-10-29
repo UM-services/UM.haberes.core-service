@@ -16,6 +16,7 @@ import um.haberes.core.hexagonal.personas.persona.domain.model.Persona;
 import um.haberes.core.hexagonal.personas.persona.domain.model.PersonaSearch;
 import um.haberes.core.hexagonal.personas.persona.infrastructure.web.controller.PersonaController;
 import um.haberes.core.hexagonal.personas.persona.domain.model.UploadedFile;
+import um.haberes.core.hexagonal.personas.persona.domain.ports.in.PartialUpdatePersonaUseCase;
 import um.haberes.core.hexagonal.personas.dependencia.infrastructure.web.mapper.DependenciaDtoMapper;
 import um.haberes.core.hexagonal.personas.persona.infrastructure.web.mapper.PersonaDtoMapper;
 
@@ -24,8 +25,10 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -37,13 +40,17 @@ class PersonaControllerTest {
     @Mock
     private PersonaService service;
 
+    @Mock
+    private PartialUpdatePersonaUseCase partialUpdatePersonaUseCase;
+
     private PersonaController controller;
 
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
-        controller = new PersonaController(service, new PersonaDtoMapper(new DependenciaDtoMapper()));
+        controller = new PersonaController(service, new PersonaDtoMapper(new DependenciaDtoMapper()),
+                partialUpdatePersonaUseCase);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -221,6 +228,15 @@ class PersonaControllerTest {
     }
 
     @Test
+    void findAllByLiquidado_returnsOkWithListOfPersona() throws Exception {
+        when(service.findAllByLiquidado(2024, 6)).thenReturn(List.of(samplePersona()));
+
+        mockMvc.perform(get("/api/haberes/core/persona/liquidado/{anho}/{mes}", 2024, 6))
+                .andExpect(status().isOk())
+                .andExpect(content().json("[" + PERSONA_JSON + "]", JsonCompareMode.STRICT));
+    }
+
+    @Test
     void findAllByFacultad_returnsOkWithListOfPersona() throws Exception {
         when(service.findAllByFacultad(1)).thenReturn(List.of(samplePersona()));
 
@@ -322,5 +338,28 @@ class PersonaControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("[" + PERSONA_JSON + "]", JsonCompareMode.STRICT));
+    }
+
+    @Test
+    void partialUpdate_returnsOkWithUpdatedPersona() throws Exception {
+        when(partialUpdatePersonaUseCase.partialUpdatePersona(eq(100L), any()))
+                .thenReturn(samplePersona());
+
+        mockMvc.perform(patch("/api/haberes/core/persona/{legajoId}", 100L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"apellido\":\"Perez\"}"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(PERSONA_JSON, JsonCompareMode.STRICT));
+    }
+
+    @Test
+    void partialUpdate_whenPersonaDoesNotExist_returnsBadRequest() throws Exception {
+        when(partialUpdatePersonaUseCase.partialUpdatePersona(eq(100L), any()))
+                .thenThrow(new PersonaException(100L));
+
+        mockMvc.perform(patch("/api/haberes/core/persona/{legajoId}", 100L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"apellido\":\"Perez\"}"))
+                .andExpect(status().isBadRequest());
     }
 }

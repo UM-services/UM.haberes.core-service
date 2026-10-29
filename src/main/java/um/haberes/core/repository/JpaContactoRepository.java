@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import um.haberes.core.model.ContactoEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -22,7 +21,6 @@ public interface JpaContactoRepository extends JpaRepository<ContactoEntity, Lon
 
 	public Optional<ContactoEntity> findByLegajoId(Long legajoId);
 
-	@Modifying
 	public void deleteByLegajoId(Long legajoId);
 
 }

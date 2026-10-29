@@ -9,7 +9,6 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.infrastructure.persistence.entity.CargoLiquidacionEntity;
@@ -35,6 +34,8 @@ public interface JpaCargoLiquidacionRepository extends JpaRepository<CargoLiquid
     List<CargoLiquidacionEntity> findAllByLegajoIdAndAnhoAndMesAndSituacion(Long legajoId, Integer anho, Integer mes,
                                                                       String situacion);
 
+    List<CargoLiquidacionEntity> findAllByAnhoAndMes(Integer anho, Integer mes);
+
     List<CargoLiquidacionEntity> findAllByAnhoAndMesAndSituacion(Integer anho, Integer mes, String situacion,
                                                                  Sort sort);
 
@@ -58,13 +59,10 @@ public interface JpaCargoLiquidacionRepository extends JpaRepository<CargoLiquid
 
     Optional<CargoLiquidacionEntity> findByCargoLiquidacionId(Long cargoLiquidacionId);
 
-    @Modifying
     void deleteAllByLegajoIdNotInAndAnhoAndMes(List<Long> legajos, Integer anho, Integer mes);
 
-    @Modifying
     void deleteAllByAnhoAndMes(Integer anho, Integer mes);
 
-    @Modifying
     void deleteAllByLegajoIdAndAnhoAndMesAndSituacionAndCategoriaIdIn(Long legajoId, Integer anho, Integer mes,
                                                                       String string, List<Integer> categoriaIds);
 

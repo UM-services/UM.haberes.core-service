@@ -53,6 +53,18 @@ public class CargoLiquidacionController {
 		return new ResponseEntity<>(toResponseList(service.findAllByLegajo(legajoId, anho, mes)), HttpStatus.OK);
 	}
 
+	@GetMapping("/periodo/{anho}/{mes}")
+	public ResponseEntity<List<CargoLiquidacionResponse>> findAllActivosByPeriodo(@PathVariable Integer anho,
+																			  @PathVariable Integer mes) {
+		return new ResponseEntity<>(toResponseList(service.findAllActivosByPeriodo(anho, mes)), HttpStatus.OK);
+	}
+
+	@GetMapping("/periodo/{anho}/{mes}/todos")
+	public ResponseEntity<List<CargoLiquidacionResponse>> findAllByPeriodo(@PathVariable Integer anho,
+																	   @PathVariable Integer mes) {
+		return new ResponseEntity<>(toResponseList(service.findAllByPeriodo(anho, mes)), HttpStatus.OK);
+	}
+
 	@GetMapping("/legajodocente/{legajoId}/{anho}/{mes}")
 	public ResponseEntity<List<CargoLiquidacionResponse>> findAllDocenteByLegajo(@PathVariable Long legajoId, @PathVariable Integer anho,
 			@PathVariable Integer mes) {
@@ -133,7 +145,7 @@ public class CargoLiquidacionController {
 		List<CargoLiquidacion> cargos = requests.stream()
 				.map(cargoLiquidacionDtoMapper::toDomain)
 				.collect(Collectors.toList());
-		return new ResponseEntity<>(toResponseList(service.saveAll(cargos, version, true)), HttpStatus.OK);
+		return new ResponseEntity<>(toResponseList(service.saveAll(cargos, version)), HttpStatus.OK);
 	}
 
 	@DeleteMapping("/periodo/{anho}/{mes}")

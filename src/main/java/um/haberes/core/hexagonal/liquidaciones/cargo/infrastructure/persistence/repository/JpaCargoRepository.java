@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 
 import um.haberes.core.hexagonal.liquidaciones.cargo.infrastructure.persistence.entity.CargoEntity;
@@ -29,7 +28,6 @@ public interface JpaCargoRepository extends JpaRepository<CargoEntity, Long> {
 
     Optional<CargoEntity> findByCargoId(Long cargoId);
 
-    @Modifying
     void deleteByCargoId(Long cargoId);
 
 }

@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import um.haberes.core.hexagonal.liquidaciones.novedad.infrastructure.persistence.entity.NovedadEntity;
 
@@ -35,7 +34,6 @@ public interface JpaNovedadRepository extends JpaRepository<NovedadEntity, Long>
 
     Optional<NovedadEntity> findByLegajoIdAndAnhoAndMesAndCodigoIdAndDependenciaIdIsNull(Long legajoId, Integer anho, Integer mes, Integer codigoId);
 
-    @Modifying
     public void deleteAllByAnhoAndMes(Integer anho, Integer mes);
 
 }

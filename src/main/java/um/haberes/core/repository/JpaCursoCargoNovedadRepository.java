@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import um.haberes.core.model.CursoCargoNovedadEntity;
 
@@ -72,11 +71,9 @@ public interface JpaCursoCargoNovedadRepository extends JpaRepository<CursoCargo
     Optional<CursoCargoNovedadEntity> findByCursoIdAndAnhoAndMesAndCargoTipoIdAndLegajoId(Long cursoId, Integer anho,
                                                                                     Integer mes, Integer cargoTipoId, Long legajoId);
 
-    @Modifying
     void deleteAllByLegajoIdAndCursoIdAndAnhoAndMesAndAutorizadoAndRechazado(Long legajoId, Long cursoId,
                                                                              Integer anho, Integer mes, Byte autorizado, Byte rechazado);
 
-    @Modifying
     void deleteByCursoCargoNovedadId(Long cursoCargoNovedadId);
 
 }

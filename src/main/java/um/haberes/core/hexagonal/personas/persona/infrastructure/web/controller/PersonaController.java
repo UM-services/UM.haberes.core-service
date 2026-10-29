@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -20,6 +21,9 @@ import lombok.extern.slf4j.Slf4j;
 import um.haberes.core.hexagonal.personas.persona.application.exception.PersonaException;
 import um.haberes.core.hexagonal.personas.persona.application.service.PersonaService;
 import um.haberes.core.hexagonal.personas.persona.domain.model.Persona;
+import um.haberes.core.hexagonal.personas.persona.domain.model.PersonaPatch;
+import um.haberes.core.hexagonal.personas.persona.domain.ports.in.PartialUpdatePersonaUseCase;
+import um.haberes.core.hexagonal.personas.persona.infrastructure.web.dto.PersonaPatchRequest;
 import um.haberes.core.hexagonal.personas.persona.infrastructure.web.dto.PersonaRequest;
 import um.haberes.core.hexagonal.personas.persona.infrastructure.web.dto.PersonaResponse;
 import um.haberes.core.hexagonal.personas.persona.infrastructure.web.dto.PersonaSearchResponse;
@@ -35,6 +39,8 @@ public class PersonaController {
     private final PersonaService service;
 
     private final PersonaDtoMapper dtoMapper;
+
+    private final PartialUpdatePersonaUseCase partialUpdatePersonaUseCase;
 
     @GetMapping("/")
     public ResponseEntity<List<PersonaResponse>> findAll() {
@@ -74,6 +80,13 @@ public class PersonaController {
     @GetMapping("/liquidables")
     public ResponseEntity<List<PersonaResponse>> findAllLiquidables() {
         return ResponseEntity.ok(toResponses(service.findAllLiquidables()));
+    }
+
+    // Legajos con liquidación en el período, ordenados por nombre (planillas de consulta)
+    @GetMapping("/liquidado/{anho}/{mes}")
+    public ResponseEntity<List<PersonaResponse>> findAllByLiquidado(@PathVariable Integer anho,
+                                                                    @PathVariable Integer mes) {
+        return ResponseEntity.ok(toResponses(service.findAllByLiquidado(anho, mes)));
     }
 
     @GetMapping("/facultad/{facultadId}")
@@ -125,6 +138,18 @@ public class PersonaController {
                 .map(dtoMapper::toDomain)
                 .toList();
         return ResponseEntity.ok(toResponses(service.saveall(personas)));
+    }
+
+    @PatchMapping("/{legajoId}")
+    public ResponseEntity<PersonaResponse> partialUpdate(@RequestBody PersonaPatchRequest request,
+                                                         @PathVariable Long legajoId) {
+        try {
+            PersonaPatch patch = dtoMapper.toDomain(request);
+            return ResponseEntity.ok(dtoMapper.toResponse(
+                    partialUpdatePersonaUseCase.partialUpdatePersona(legajoId, patch)));
+        } catch (PersonaException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 
     @PostMapping("/upload")

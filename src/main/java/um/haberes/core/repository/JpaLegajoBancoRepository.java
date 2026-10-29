@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import um.haberes.core.model.LegajoBancoEntity;
 
@@ -46,10 +45,8 @@ public interface JpaLegajoBancoRepository extends JpaRepository<LegajoBancoEntit
 	Optional<LegajoBancoEntity> findByLegajoIdAndAnhoAndMesAndCbu(Long legajoId, Integer anho, Integer mes,
 			String cbu);
 
-	@Modifying
 	void deleteAllByAnhoAndMes(Integer anho, Integer mes);
 
-	@Modifying
 	void deleteByLegajoBancoId(Long legajoBancoId);
 
 }

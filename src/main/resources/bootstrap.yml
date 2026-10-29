@@ -32,6 +32,8 @@ spring:
       port: ${app.consul.port}
       discovery:
         prefer-ip-address: true
+        # Solo resolver instancias con los checks en passing (Feign/LoadBalancer).
+        query-passing: true
         # Consul: readiness (sin dependencias) + poda si queda critico.
         health-check-path: /actuator/health/readiness
         health-check-critical-timeout: 5m
@@ -45,6 +47,12 @@ spring:
     hibernate:
       ddl-auto: none
     open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 200
+        order_inserts: true
+        order_updates: true
   mail:
     host: smtp.gmail.com
     port: 587
@@ -70,7 +78,36 @@ logging:
         SQL: ${app.logging}
       springframework.cloud.config: ${app.logging}
 
+haberes:
+  audit:
+    # OFF = no captura | LOG = captura y mide sin enviar | SEND = outbox + HTTP
+    mode: ${HABERES_AUDIT_MODE:OFF}
+    request-events: ${HABERES_AUDIT_REQUEST_EVENTS:true}
+    change-events: ${HABERES_AUDIT_CHANGE_EVENTS:true}
+    url: ${HABERES_AUDIT_URL:http://localhost:8210}
+    api-key: ${HABERES_AUDIT_API_KEY:}
+    batch-size: ${HABERES_AUDIT_BATCH_SIZE:200}
+    sender-delay-ms: ${HABERES_AUDIT_SENDER_DELAY_MS:2000}
+    sender-initial-delay-ms: ${HABERES_AUDIT_SENDER_INITIAL_DELAY_MS:5000}
+    max-attempts: ${HABERES_AUDIT_MAX_ATTEMPTS:10}
+    max-payload-chars: ${HABERES_AUDIT_MAX_PAYLOAD_CHARS:32768}
+    mask-fields: ${HABERES_AUDIT_MASK_FIELDS:password,cbu,cuenta,documento}
+    excluded-entities: ${HABERES_AUDIT_EXCLUDED_ENTITIES:BuildEntity,ConversionLogEntity}
+    # RESUMEN de operaciones masivas (item/item_version). false = auditar fila por fila.
+    bulk-enabled: ${HABERES_AUDIT_BULK_ENABLED:true}
+    summary-entities: ${HABERES_AUDIT_SUMMARY_ENTITIES:ItemEntity,ItemVersionEntity,CargoLiquidacionEntity,CargoLiquidacionVersionEntity}
+
 management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      # readiness/liveness explicitos: Consul consulta /actuator/health/readiness.
+      probes:
+        enabled: true
+      show-details: never
   health:
     mail:
       enabled: false

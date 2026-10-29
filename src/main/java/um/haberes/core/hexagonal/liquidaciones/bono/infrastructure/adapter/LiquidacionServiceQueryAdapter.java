@@ -1,5 +1,7 @@
 package um.haberes.core.hexagonal.liquidaciones.bono.infrastructure.adapter;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
@@ -21,5 +23,14 @@ public class LiquidacionServiceQueryAdapter implements LiquidacionQueryPort {
         } catch (LiquidacionException e) {
             return false;
         }
+    }
+
+    @Override
+    public List<Long> findLegajoIdsByDependencia(Integer dependenciaId, Integer anho, Integer mes,
+                                                 String salida) {
+        return liquidacionService.getLiquidacionesByDependencia(dependenciaId, anho, mes, salida).stream()
+                .map(um.haberes.core.hexagonal.liquidaciones.liquidacion.domain.model.Liquidacion::getLegajoId)
+                .distinct()
+                .toList();
     }
 }

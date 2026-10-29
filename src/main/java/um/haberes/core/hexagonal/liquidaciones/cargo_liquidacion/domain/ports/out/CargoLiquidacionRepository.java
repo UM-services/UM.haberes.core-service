@@ -19,6 +19,8 @@ public interface CargoLiquidacionRepository {
 
     List<CargoLiquidacion> findAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
 
+    List<CargoLiquidacion> findAllByAnhoAndMes(Integer anho, Integer mes);
+
     List<CargoLiquidacion> findAllByLegajoIdAndAnhoAndMesAndCategoriaDocente(Long legajoId, Integer anho, Integer mes,
             Byte docente);
 

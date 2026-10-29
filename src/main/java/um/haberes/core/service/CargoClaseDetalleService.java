@@ -41,6 +41,10 @@ public class CargoClaseDetalleService {
 				Sort.by("geograficaId").ascending().and(Sort.by("legajoId").ascending()));
 	}
 
+	public List<CargoClaseDetalleEntity> findAllByPeriodo(Integer anho, Integer mes) {
+		return repository.findAllByAnhoAndMes(anho, mes);
+	}
+
 	public List<CargoClaseDetalleEntity> findAllByCargoClaseDetalleIdIn(List<Long> cargoClaseDetalleIds) {
 		return repository.findAllByCargoClaseDetalleIdIn(cargoClaseDetalleIds);
 	}

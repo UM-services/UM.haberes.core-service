@@ -17,6 +17,7 @@ import java.util.List;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -72,6 +73,36 @@ class DesignacionToolControllerTest {
     }
 
     @Test
+    void fusionarCompletoByLegajo_conForzar_ejecutaElProcesoDeServidor() throws Exception {
+        mockMvc.perform(post("/api/haberes/core/designaciontool/fusionar/{legajoId}/{anho}/{mes}", 100, 2024, 6)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"forzar\":true}"))
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+
+        verify(service).fusionarCompletoByLegajo(100L, 2024, 6, true, false);
+    }
+
+    @Test
+    void fusionarCompletoByLegajo_sinCuerpo_noFuerzaLaRefusion() throws Exception {
+        mockMvc.perform(post("/api/haberes/core/designaciontool/fusionar/{legajoId}/{anho}/{mes}", 100, 2024, 6))
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+
+        verify(service).fusionarCompletoByLegajo(100L, 2024, 6, false, false);
+    }
+
+    @Test
+    void fusionarCompletoByLegajo_whenPeriodoBefore201904_appliesExcepcion() throws Exception {
+        mockMvc.perform(post("/api/haberes/core/designaciontool/fusionar/{legajoId}/{anho}/{mes}", 100, 2019, 3)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"forzar\":false}"))
+                .andExpect(status().isNoContent());
+
+        verify(service).fusionarCompletoByLegajo(100L, 2019, 3, false, true);
+    }
+
+    @Test
     void desarraigoGradoByLegajo_returnsNoContent() throws Exception {
         mockMvc.perform(get("/api/haberes/core/designaciontool/desarraigobylegajo/{legajoId}/{anho}/{mes}", 100, 2024, 6))
                 .andExpect(status().isNoContent())
@@ -96,6 +127,24 @@ class DesignacionToolControllerTest {
                 .andExpect(content().string(""));
 
         verify(service).deleteZombies(2024, 6);
+    }
+
+    @Test
+    void depurarFusionByLegajo_returnsNoContent() throws Exception {
+        mockMvc.perform(post("/api/haberes/core/designaciontool/depurafusion/{legajoId}/{anho}/{mes}", 100, 2024, 6))
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+
+        verify(service).depurarFusionByLegajo(100L, 2024, 6);
+    }
+
+    @Test
+    void invalidarFusionByCurso_returnsNoContent() throws Exception {
+        mockMvc.perform(post("/api/haberes/core/designaciontool/invalidafusion/curso/{cursoId}/{anho}/{mes}", 55, 2024, 6))
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+
+        verify(service).invalidarFusionByCurso(55L, 2024, 6);
     }
 
     @Test

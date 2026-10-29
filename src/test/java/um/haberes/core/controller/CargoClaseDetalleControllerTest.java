@@ -99,6 +99,16 @@ class CargoClaseDetalleControllerTest {
     }
 
     @Test
+    void findAllByPeriodo_returnsOkWithListOfDetalle() throws Exception {
+        when(service.findAllByPeriodo(2024, 6)).thenReturn(List.of(sampleDetalle()));
+
+        mockMvc.perform(get("/api/haberes/core/cargoclasedetalle/periodo/{anho}/{mes}", 2024, 6))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("[" + DETALLE_JSON + "]", JsonCompareMode.STRICT));
+    }
+
+    @Test
     void findAllByLegajoAndFacultad_returnsOkWithListOfDetalle() throws Exception {
         when(service.findAllByLegajoAndFacultad(100L, 2024, 6, 4)).thenReturn(List.of(sampleDetalle()));
 

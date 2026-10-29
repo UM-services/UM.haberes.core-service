@@ -21,16 +21,21 @@ sequenceDiagram
     Ctrl->>Svc: findAllAdicionalHCSByLegajo(...)
     Usuario->>Ctrl: GET /cargoliquidacion/categorianodocente/{legajoId}/{anho}/{mes}/{categoriaId}
     Ctrl->>Svc: findByCategoriaNoDocente(...)
+    Usuario->>Ctrl: GET /cargoliquidacion/periodo/{anho}/{mes} (activos) o /periodo/{anho}/{mes}/todos
+    Ctrl->>Svc: findAllActivosByPeriodo(...) / findAllByPeriodo(...) (todos, sin filtro de situación)
 
-    Note over Usuario,DB: Alta, actualización masiva con versión y baja
+    Note over Usuario,DB: Alta, generación masiva con snapshot de versión y baja
 
     Usuario->>Ctrl: POST /cargoliquidacion/ (CargoLiquidacionRequest)
     Ctrl->>Svc: add(cargoLiquidacion)
-    Usuario->>Ctrl: PUT /cargoliquidacion/saveall/{version} (lista de cargos)
-    Ctrl->>Svc: saveAll(cargos, version, withVersion)
-    Svc->>UC: SaveAllCargoLiquidacionesUseCase
-    UC->>Adapt: saveAll + versionado (CargoLiquidacionVersion)
+    Usuario->>Ctrl: PUT /cargoliquidacion/saveall/{version} (versión explícita, cliente legacy)
+    Ctrl->>Svc: saveAll(cargos, version)
+    Svc->>UC: SaveAllCargoLiquidacionesUseCase (AuditBulkScope)
+    UC->>Adapt: saveAll de cargos + saveAll de cargo_liquidacion_version (siempre)
+    Adapt->>DB: MAX(version)+1 por legajo/período cuando version es null
     Usuario->>Ctrl: DELETE /cargoliquidacion/periodo/{anho}/{mes}
     Ctrl->>Svc: deleteByPeriodo(anho, mes)
+
+    Note over Svc,DB: Generación y borrados abren AuditBulkScope:<br/>se auditan como SUMMARY/BULK, no fila por fila
 
     Note over Ctrl,Svc: CargoLiquidacionResponse incluye relaciones anidadas:<br/>persona, dependencia y categoria (vía CargoLiquidacionDtoMapper)

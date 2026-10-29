@@ -6,6 +6,8 @@ sequenceDiagram
     actor Usuario
     participant DCtrl as DesignacionToolController
     participant DSvc as DesignacionToolService (facade)
+    participant PCtrl as FusionPeriodoController
+    participant PSvc as FusionPeriodoService (facade)
     participant CCtrl as CargoClaseToolController
     participant CSvc as CargoClaseToolService (facade)
     participant Cursos as CursoCargo/CursoFusion/CursoDesarraigo (hexagonal)
@@ -22,10 +24,29 @@ sequenceDiagram
     DSvc->>Cursos: alta/baja de curso_fusion según horarios coincidentes
     Usuario->>DCtrl: GET /designaciontool/desarraigobylegajo/{legajoId}/{anho}/{mes}
     DCtrl->>DSvc: desarraigoGradoByLegajo(...)
+    Usuario->>DCtrl: POST /designaciontool/fusionar/{legajoId}/{anho}/{mes} (FusionarRequest.forzar)
+    DCtrl->>DSvc: fusionarCompletoByLegajo(...) (reset legajo_control + fusionar + desarraigo, transaccional)
+    Usuario->>DCtrl: POST /designaciontool/depurafusion/{legajoId}/{anho}/{mes}
+    DCtrl->>DSvc: depurarFusionByLegajo(...) (borra curso_fusion si no quedan curso_cargo)
+    Usuario->>DCtrl: POST /designaciontool/invalidafusion/curso/{cursoId}/{anho}/{mes}
+    DCtrl->>DSvc: invalidarFusionByCurso(...) (fusionado=0 a los legajos con cargos del curso)
     Usuario->>DCtrl: GET /designaciontool/deletezombies/{anho}/{mes}
     DCtrl->>DSvc: deleteZombies(anho, mes) (limpia cargos sin designación vigente)
     Usuario->>DCtrl: GET /designaciontool/indiceantiguedad/{legajoId}/{anho}/{mes}
     DCtrl->>DSvc: indiceAntiguedad(...) → List~BigDecimal~ (usado por cierre contable y liquidación)
+
+    Note over Usuario,DB: Procesos masivos por período (el cliente pide lotes de legajos)
+
+    Usuario->>PCtrl: POST /designaciontool/periodo/fusionar/{anho}/{mes} (LoteRequest.legajos)
+    PCtrl->>PSvc: procesarFusion(legajos, anho, mes)
+    PSvc->>DSvc: por legajo: marcarNoFusionado + redesignar + fusionar + desarraigo
+    PSvc-->>PCtrl: ResumenLote(procesados, fallidos)
+    PCtrl-->>Usuario: 200 OK (los fallidos se informan sin cortar el lote)
+    Usuario->>PCtrl: POST /designaciontool/periodo/desarraigo/{anho}/{mes} o /duplicar/{anho}/{mes}
+    PCtrl->>PSvc: procesarDesarraigo(...) / procesarDuplicado(...)
+    Usuario->>PCtrl: POST /designaciontool/periodo/depurar/{anho}/{mes}
+    PCtrl->>PSvc: depurarZombies(anho, mes)
+    PCtrl-->>Usuario: 204 No Content
 
     Note over Usuario,DB: Cargos de clase ETEC (docentes con horas cátedra)
 

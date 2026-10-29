@@ -21,6 +21,8 @@ sequenceDiagram
     UC->>Adapt: legajos con curso_cargo o cargo del período
     Usuario->>Ctrl: GET /persona/liquidables
     Ctrl->>Svc: findAllLiquidables()
+    Usuario->>Ctrl: GET /persona/liquidado/{anho}/{mes}
+    Ctrl->>Svc: findAllByLiquidado(anho, mes) (legajos con liquidación, ordenados por nombre)
     Usuario->>Ctrl: GET /persona/semestre/{anho}/{semestre} o /desarraigo/{anho}/{mes}
     Ctrl->>Svc: findAllBySemestre(...) / findAllByDesarraigo(...)
 
@@ -33,5 +35,13 @@ sequenceDiagram
     Ctrl->>Svc: findAllLegajos(legajos)
     Usuario->>Ctrl: PUT /persona/ (saveall de personas)
     Ctrl->>Svc: saveall(personas)
+
+    Note over Usuario,DB: Actualización parcial (sólo los campos informados)
+
+    Usuario->>Ctrl: PATCH /persona/{legajoId} (PersonaPatchRequest)
+    Ctrl->>Ctrl: PersonaDtoMapper.toDomain(request) → PersonaPatch (null = no modificar)
+    Ctrl->>UC: PartialUpdatePersonaUseCase.partialUpdatePersona(legajoId, patch)
+    UC->>Adapt: findByLegajoId + update (los numéricos anulables en 0 quedan null)
+    Ctrl-->>Usuario: 200 OK (PersonaResponse) o 400 si el legajo no existe
 
     Note over Ctrl,Svc: PersonaResponse incluye la dependencia anidada<br/>(dependenciaDtoMapper.toResponse)
