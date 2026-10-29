@@ -23,6 +23,7 @@ public class LiquidacionState {
     private Persona persona;
     private List<BigDecimal> indices;
     private Map<Integer, Codigo> codigos;
+    @Builder.Default
     private Map<Integer, Item> items = new HashMap<>();
     private Map<Integer, Novedad> novedades;
     private List<CargoClaseDetalleEntity> cargoClases;

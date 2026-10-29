@@ -1,3 +1,6 @@
+## [1.22.1] - 2026-10-29
+- fix: `LiquidacionState.items` ahora declara `@Builder.Default` para que el builder de Lombok respete el `HashMap` inicializado del campo; antes Lombok descartaba esa inicialización y un `LiquidacionState.builder()` sin `items` dejaba el mapa en `null`, lo que rompía los accesos de `MakeLiquidacionService` (`state.getItems().computeIfAbsent(...)`, `get`, `containsKey`) al armar un estado sin pasar el mapa. El camino actual de `AfipContextService` sigue inyectando sus propios ítems (basado en `git diff HEAD -- src/main/java/um/haberes/core/service/facade/liquidaciones/LiquidacionState.java`, `MakeLiquidacionService.java` y `AfipContextService.java`)
+
 ## [1.22.0] - 2026-10-26
 - feat: auditoría de operaciones en `haberes-core` con eventos semánticos (INSERT/UPDATE/DELETE + REQUEST) capturados por listeners de Hibernate, con actor/IP/correlación por header y diff de campos enmascarado (`password`, `cbu`, `cuenta`, `documento`). Los eventos se escriben en `audit_outbox` dentro de la misma transacción del cambio y un sender programado los envía por lote a `haberes-auditoria` (`POST /api/haberes/auditoria/evento/lote`) con reintentos/backoff e idempotencia por `eventId`. Modos `OFF`/`LOG`/`SEND` por `HABERES_AUDIT_MODE`.
 - build: DDL del outbox versionado en `sql/001_audit_outbox.sql` (sin Flyway; `ddl-auto: none`).
