@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -55,6 +57,23 @@ public class DesignacionToolController {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
+	/**
+	 * Re-fusión completa del legajo en una sola operación de servidor.
+	 * Reemplaza la secuencia del cliente legacy: resetear legajo_control.fusionado,
+	 * fusionar los cursos y recalcular el desarraigo.
+	 */
+	@PostMapping("/fusionar/{legajoId}/{anho}/{mes}")
+	public ResponseEntity<Void> fusionarCompletoByLegajo(@PathVariable Long legajoId, @PathVariable Integer anho,
+			@PathVariable Integer mes, @RequestBody(required = false) FusionarRequest request) {
+		boolean aplicaExcepcion = (long) anho * 100L + mes < 201904;
+		boolean forzar = request != null && request.forzar();
+		service.fusionarCompletoByLegajo(legajoId, anho, mes, forzar, aplicaExcepcion);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	public record FusionarRequest(boolean forzar) {
+	}
+
 	@GetMapping("/desarraigobylegajo/{legajoId}/{anho}/{mes}")
 	public ResponseEntity<Void> desarraigoGradobylegajo(@PathVariable Long legajoId, @PathVariable Integer anho,
 			@PathVariable Integer mes) {
@@ -74,6 +93,26 @@ public class DesignacionToolController {
 		service.deleteZombies(anho, mes);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
+	}
+
+	/**
+	 * Depura las designaciones fusionadas de un legajo que ya no tiene cursos cargo.
+	 */
+	@PostMapping("/depurafusion/{legajoId}/{anho}/{mes}")
+	public ResponseEntity<Void> depurarFusionByLegajo(@PathVariable Long legajoId, @PathVariable Integer anho,
+			@PathVariable Integer mes) {
+		service.depurarFusionByLegajo(legajoId, anho, mes);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	/**
+	 * Marca como no fusionados los legajos con cargos en el curso (cambió el curso).
+	 */
+	@PostMapping("/invalidafusion/curso/{cursoId}/{anho}/{mes}")
+	public ResponseEntity<Void> invalidarFusionByCurso(@PathVariable Long cursoId, @PathVariable Integer anho,
+			@PathVariable Integer mes) {
+		service.invalidarFusionByCurso(cursoId, anho, mes);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 	@GetMapping("/indiceantiguedad/{legajoId}/{anho}/{mes}")

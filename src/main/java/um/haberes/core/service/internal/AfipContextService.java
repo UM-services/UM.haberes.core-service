@@ -1,17 +1,16 @@
 package um.haberes.core.service.internal;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import um.haberes.core.exception.NovedadException;
-import um.haberes.core.kotlin.model.internal.AfipContext;
-import um.haberes.core.kotlin.model.Control;
-import um.haberes.core.kotlin.model.Item;
-import um.haberes.core.kotlin.model.Liquidacion;
-import um.haberes.core.kotlin.model.Novedad;
+import um.haberes.core.hexagonal.liquidaciones.novedad.application.exception.NovedadException;
+import um.haberes.core.hexagonal.liquidaciones.item.domain.model.Item;
+import um.haberes.core.hexagonal.liquidaciones.liquidacion.domain.model.Liquidacion;
+import um.haberes.core.hexagonal.liquidaciones.novedad.domain.model.Novedad;
+import um.haberes.core.model.internal.AfipContext;
+import um.haberes.core.model.ControlEntity;
 import um.haberes.core.service.CargoClaseDetalleService;
-import um.haberes.core.service.ItemService;
-import um.haberes.core.service.NovedadService;
+import um.haberes.core.hexagonal.liquidaciones.item.application.service.ItemService;
+import um.haberes.core.hexagonal.liquidaciones.novedad.application.service.NovedadService;
 import um.haberes.core.service.facade.MakeLiquidacionService;
 import um.haberes.core.service.facade.liquidaciones.LiquidacionState;
 
@@ -30,7 +29,7 @@ public class AfipContextService {
     private final MakeLiquidacionService makeLiquidacionService;
     private final CargoClaseDetalleService cargoClaseDetalleService;
 
-    public AfipContext makeByLegajo(Liquidacion liquidacion, Control control) {
+    public AfipContext makeByLegajo(Liquidacion liquidacion, ControlEntity control) {
 
         int afipZona = 0;
         int afipHijos = 0;
@@ -107,7 +106,7 @@ public class AfipContextService {
         LiquidacionState state = LiquidacionState.builder()
                 .persona(liquidacion.getPersona())
                 .control(control)
-                .items(itemService.findAllByLegajo(legajoId, anho, mes).stream().collect(Collectors.toMap(Item::getCodigoId, item -> item)))
+                .items(itemService.getItemsByLegajo(legajoId, anho, mes).stream().collect(Collectors.toMap(Item::getCodigoId, item -> item)))
                 .cargoClases(cargoClaseDetalleService.findAllByLegajo(legajoId, anho, mes))
                 .build();
 

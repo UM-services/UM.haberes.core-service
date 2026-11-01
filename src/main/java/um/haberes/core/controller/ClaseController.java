@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.core.exception.ClaseException;
-import um.haberes.core.kotlin.model.Clase;
+import um.haberes.core.model.ClaseEntity;
 import um.haberes.core.service.ClaseService;
 
 /**
@@ -38,23 +38,23 @@ public class ClaseController {
 	}
 
 	@GetMapping("/")
-	public @ResponseBody ResponseEntity<List<Clase>> findAll() {
-		return new ResponseEntity<List<Clase>>(service.findAll(), HttpStatus.OK);
+	public @ResponseBody ResponseEntity<List<ClaseEntity>> findAll() {
+		return new ResponseEntity<List<ClaseEntity>>(service.findAll(), HttpStatus.OK);
 	}
 
 	@GetMapping("/{claseId}")
-	public @ResponseBody ResponseEntity<Clase> findByClaseId(@PathVariable Integer claseId) {
+	public @ResponseBody ResponseEntity<ClaseEntity> findByClaseId(@PathVariable Integer claseId) {
 		try {
-			return new ResponseEntity<Clase>(service.findByClaseId(claseId), HttpStatus.OK);
+			return new ResponseEntity<ClaseEntity>(service.findByClaseId(claseId), HttpStatus.OK);
 		} catch (ClaseException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
 
 	@GetMapping("/last")
-	public @ResponseBody ResponseEntity<Clase> findLast() {
+	public @ResponseBody ResponseEntity<ClaseEntity> findLast() {
 		try {
-			return new ResponseEntity<Clase>(service.findLast(), HttpStatus.OK);
+			return new ResponseEntity<ClaseEntity>(service.findLast(), HttpStatus.OK);
 		} catch (ClaseException e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
@@ -75,8 +75,8 @@ public class ClaseController {
 	 *
 	 */
 	@PostMapping("/")
-	public ResponseEntity<Clase> add(@RequestBody Clase clase) {
-		return new ResponseEntity<Clase>(service.add(clase), HttpStatus.OK);
+	public ResponseEntity<ClaseEntity> add(@RequestBody ClaseEntity clase) {
+		return new ResponseEntity<ClaseEntity>(service.add(clase), HttpStatus.OK);
 	}
 
 	/*
@@ -84,8 +84,8 @@ public class ClaseController {
 	 *
 	 */
 	@PutMapping("/{claseId}")
-	public ResponseEntity<Clase> update(@RequestBody Clase newClase, @PathVariable Integer claseId) {
-		return new ResponseEntity<Clase>(service.update(newClase, claseId), HttpStatus.OK);
+	public ResponseEntity<ClaseEntity> update(@RequestBody ClaseEntity newClase, @PathVariable Integer claseId) {
+		return new ResponseEntity<ClaseEntity>(service.update(newClase, claseId), HttpStatus.OK);
 	}
 
 }

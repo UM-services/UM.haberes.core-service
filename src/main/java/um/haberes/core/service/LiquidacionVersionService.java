@@ -8,8 +8,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.core.kotlin.model.LiquidacionVersion;
-import um.haberes.core.repository.LiquidacionVersionRepository;
+import um.haberes.core.model.LiquidacionVersionEntity;
+import um.haberes.core.repository.JpaLiquidacionVersionRepository;
 
 /**
  * @author daniel
@@ -18,13 +18,13 @@ import um.haberes.core.repository.LiquidacionVersionRepository;
 public class LiquidacionVersionService {
 
     @Autowired
-    private LiquidacionVersionRepository repository;
+    private JpaLiquidacionVersionRepository repository;
 
-    public LiquidacionVersion add(LiquidacionVersion liquidacionVersion) {
+    public LiquidacionVersionEntity add(LiquidacionVersionEntity liquidacionVersion) {
         return repository.save(liquidacionVersion);
     }
 
-    public List<LiquidacionVersion> saveAll(List<LiquidacionVersion> backups) {
+    public List<LiquidacionVersionEntity> saveAll(List<LiquidacionVersionEntity> backups) {
         return repository.saveAll(backups);
     }
 

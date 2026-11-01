@@ -3,7 +3,7 @@ package um.haberes.core.service.extern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import um.haberes.core.client.ProveedorMovimientoClient;
-import um.haberes.core.kotlin.model.extern.ProveedorMovimientoDto;
+import um.haberes.core.model.extern.ProveedorMovimientoDto;
 
 @Service
 public class ProveedorMovimientoService {

@@ -8,8 +8,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.core.kotlin.model.view.LegajoCursoCantidad;
-import um.haberes.core.repository.view.LegajoCursoCantidadRepository;
+import um.haberes.core.model.view.LegajoCursoCantidad;
+import um.haberes.core.repository.view.JpaLegajoCursoCantidadRepository;
 
 /**
  * @author daniel
@@ -19,7 +19,7 @@ import um.haberes.core.repository.view.LegajoCursoCantidadRepository;
 public class LegajoCursoCantidadService {
 
 	@Autowired
-	private LegajoCursoCantidadRepository repository;
+	private JpaLegajoCursoCantidadRepository repository;
 
 	public List<LegajoCursoCantidad> findAllByPeriodo(Integer anho, Integer mes) {
 		return repository.findAllByAnhoAndMes(anho, mes);

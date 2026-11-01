@@ -1,7 +1,7 @@
 package um.haberes.core.service.extern;
 
 import um.haberes.core.client.CuentaClient;
-import um.haberes.core.kotlin.model.extern.CuentaDto;
+import um.haberes.core.model.extern.CuentaDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

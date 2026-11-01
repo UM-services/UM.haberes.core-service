@@ -17,16 +17,16 @@ public class CursoCargoNovedadException extends RuntimeException {
 
 	public CursoCargoNovedadException(Long cursoId, Integer anho, Integer mes, Integer cargoTipoId,
 									  Long legajoId) {
-		super(MessageFormat.format("Cannot found CursoCargoNovedad {0}/{1}/{2}/{3}/{4}", cursoId, anho, mes,
+		super(MessageFormat.format("Cannot found CursoCargoNovedadEntity {0}/{1}/{2}/{3}/{4}", cursoId, anho, mes,
 				cargoTipoId, legajoId));
 	}
 
 	public CursoCargoNovedadException(Long cursocargonovedadId) {
-		super("Cannot found CursoCargoNovedad " + cursocargonovedadId);
+		super("Cannot found CursoCargoNovedadEntity " + cursocargonovedadId);
 	}
 
 	public CursoCargoNovedadException(Long legajoId, Long cursoId, Integer anho, Integer mes) {
-		super(MessageFormat.format("Cannot found CursoCargoNovedad {0}/{1}/{2}/{3}", legajoId, cursoId, anho, mes));
+		super(MessageFormat.format("Cannot found CursoCargoNovedadEntity {0}/{1}/{2}/{3}", legajoId, cursoId, anho, mes));
 	}
 
 }

@@ -4,7 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
-import um.haberes.core.kotlin.model.Auditable;
+import um.haberes.core.model.AuditableEntity;
 
 @Getter
 @Setter
@@ -14,7 +14,7 @@ import um.haberes.core.kotlin.model.Auditable;
 @Table(name = "facultad")
 @EqualsAndHashCode(callSuper = true)
 @Builder
-public class FacultadEntity extends Auditable {
+public class FacultadEntity extends AuditableEntity {
 
     @Id
     private Integer facultadId;

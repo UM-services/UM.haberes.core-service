@@ -1,0 +1,34 @@
+---
+title: "Acreditación: Período de Pago y Confirmación Bancaria"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant AcrCtrl as AcreditacionController
+    participant AcrSvc as AcreditacionService (hexagonal)
+    participant LiqCtrl as LiquidacionController
+    participant LiqSvc as LiquidacionService (hexagonal)
+    participant PagoCtrl as AcreditacionPagoController
+    participant PagoSvc as AcreditacionPagoService (hexagonal)
+    participant DB as MySQL
+
+    Usuario->>AcrCtrl: GET /acreditacion/periodo/{anho}/{mes}
+    AcrCtrl->>AcrSvc: findByPeriodo(anho, mes)
+    AcrSvc->>DB: SELECT acreditacion (limiteNovedades, fechaContable, ordenContable)
+    Usuario->>AcrCtrl: POST /acreditacion/ (nuevo período de pago)
+    AcrCtrl->>AcrSvc: add(acreditacion)
+    Usuario->>AcrCtrl: PUT /acreditacion/{acreditacionId} (ajuste de montos del período)
+
+    Note over Usuario,DB: Marcar y consultar liquidaciones acreditadas del período
+
+    Usuario->>LiqCtrl: POST /liquidacion/acreditado/{fecha}
+    LiqCtrl->>LiqSvc: acreditarLiquidacion(...) (AcreditarLiquidacionUseCase)
+    Usuario->>LiqCtrl: GET /liquidacion/acreditado/{anho}/{mes}
+    LiqCtrl->>LiqSvc: getLiquidacionesByAcreditado(anho, mes)
+
+    Note over PagoCtrl,DB: Constancia del pago efectivamente realizado
+
+    Usuario->>PagoCtrl: GET /acreditacionpago/unique/{anho}/{mes}/{fechapago}
+    PagoCtrl->>PagoSvc: findByUnique(anho, mes, fechaPago)
+    Usuario->>PagoCtrl: POST /acreditacionpago/ , PUT /acreditacionpago/{acreditacionpagoId}
+    PagoSvc->>DB: INSERT/UPDATE acreditacion_pago<br/>(totalSantander, totalOtrosBancos, comprobante)

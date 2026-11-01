@@ -1,0 +1,37 @@
+---
+title: "Catálogos de Liquidación: Códigos, Categorías y Cargos"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant CodCtrl as CodigoController
+    participant CodSvc as CodigoService (hexagonal)
+    participant CatCtrl as CategoriaController
+    participant CatSvc as CategoriaService (hexagonal)
+    participant Upload as UploadCategoriasUseCase
+    participant Excel as ExcelCategoriaUploadFileReader
+    participant CargCtrl as CargoController
+    participant CargSvc as CargoService (hexagonal)
+    participant DB as MySQL
+
+    Usuario->>CodCtrl: GET /codigo/search/{chain} o /periodo/{anho}/{mes}
+    CodCtrl->>CodSvc: findAllSearch(chain) / findAllByPeriodo(...)
+    CodSvc->>DB: SELECT codigo (+CodigoSearchRepository)
+    Usuario->>CodCtrl: PUT /codigo/ (saveall) y POST /codigo/
+    CodCtrl->>CodSvc: saveAll(codigos) / add(codigo)
+
+    Usuario->>CatCtrl: GET /categoria/nogrado o /nodocente/{anho}/{mes}
+    CatCtrl->>CatSvc: findAllNoDocentes() / findAllNoDocenteByPeriodo(...)
+    Usuario->>CatCtrl: POST /categoria/{anho}/{mes} (CategoriaRequest)
+    CatCtrl->>CatSvc: add(categoria, anho, mes) (alta con período)
+    Usuario->>CatCtrl: POST /categoria/upload/{anho}/{mes} (planilla Excel)
+    CatCtrl->>CatSvc: upload(file, anho, mes)
+    CatSvc->>Upload: UploadCategoriasUseCase
+    Upload->>Excel: readCategorias(file)
+    Excel-->>Upload: List~Categoria~ parseada
+    Upload->>DB: saveAll categorias + categoria_periodo
+
+    Usuario->>CargCtrl: GET /cargo/legajo/{legajoId}
+    CargCtrl->>CargSvc: findAllByLegajoId(legajoId)
+    CargSvc->>DB: SELECT cargo
+    Usuario->>CargCtrl: POST /cargo/ , PUT /cargo/{cargoId} , DELETE /cargo/{cargoId}

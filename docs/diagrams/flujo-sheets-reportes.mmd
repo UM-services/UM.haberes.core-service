@@ -1,0 +1,29 @@
+---
+title: "Generación de Planillas Excel (SheetService)"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant Ctrl as SheetController
+    participant Svc as SheetService (facade)
+    participant Data as Servicios de datos (hexagonal + vistas)
+    participant POI as Apache POI (Workbook)
+    participant FS as Sistema de archivos
+
+    Usuario->>Ctrl: GET /sheet/generatecargos/{anho}/{mes}
+    Ctrl->>Svc: generateCargos(anho, mes)
+    Svc->>Data: cargoLiquidacionService + personaService + dependenciaService
+    Data-->>Svc: legajos con cargos del período
+    Svc->>POI: construir hojas y estilos
+    POI->>FS: escribir archivo xlsx en path.files
+    FS-->>Usuario: ruta del archivo generado
+
+    Note over Usuario,FS: Otras planillas del mismo patrón (todas devuelven ruta del archivo)
+
+    Usuario->>Ctrl: GET /sheet/generateitems/{anho}/{mes} (ítems por legajo)
+    Usuario->>Ctrl: GET /sheet/generatecodigosnodoc/{anho}/{mes} y /generatecategoriasnodoc/{anho}/{mes}
+    Usuario->>Ctrl: GET /sheet/comparativocodigo/{codigoId}/{anho}/{mes} (novedadAcumuladoService)
+    Usuario->>Ctrl: GET /sheet/generatelegajocursocantidad/{anho}/{mes} (legajoCursoCantidadService)
+    Usuario->>Ctrl: GET /sheet/generateLiquidables , /generateCategorias , /generateBasicos/{anho}/{mes} , /generatePersonales
+    Usuario->>Ctrl: GET /sheet/simulasac/{anho}/{semestre} (simulación SAC)
+    Usuario->>Ctrl: GET /sheet/generasac/{anho}/{semestre}/{adelanto} (SAC con adelanto,<br/>usa liquidacionService, novedadService, acreditacionService, contactoService)

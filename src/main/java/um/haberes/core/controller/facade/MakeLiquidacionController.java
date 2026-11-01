@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import um.haberes.core.kotlin.model.Item;
+import um.haberes.core.hexagonal.liquidaciones.item.domain.model.Item;
 import um.haberes.core.service.facade.MakeLiquidacionService;
 import um.haberes.core.util.Tool;
 

@@ -11,16 +11,18 @@ import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.LegajoBancoException;
-import um.haberes.core.kotlin.model.Item;
-import um.haberes.core.kotlin.model.LegajoBanco;
-import um.haberes.core.kotlin.model.Liquidacion;
-import um.haberes.core.kotlin.model.Novedad;
-import um.haberes.core.repository.LegajoBancoRepository;
+import um.haberes.core.hexagonal.liquidaciones.item.application.service.ItemService;
+import um.haberes.core.hexagonal.liquidaciones.item.domain.model.Item;
+import um.haberes.core.hexagonal.liquidaciones.liquidacion.application.service.LiquidacionService;
+import um.haberes.core.hexagonal.liquidaciones.liquidacion.domain.model.Liquidacion;
+import um.haberes.core.hexagonal.liquidaciones.novedad.application.service.NovedadService;
+import um.haberes.core.hexagonal.liquidaciones.novedad.domain.model.Novedad;
+import um.haberes.core.model.LegajoBancoEntity;
+import um.haberes.core.repository.JpaLegajoBancoRepository;
 import um.haberes.core.util.Jsonifier;
 
 /**
@@ -32,17 +34,17 @@ import um.haberes.core.util.Jsonifier;
 @RequiredArgsConstructor
 public class LegajoBancoService {
 
-	private final LegajoBancoRepository repository;
+	private final JpaLegajoBancoRepository repository;
 	private final ItemService itemService;
 	private final LiquidacionService liquidacionService;
     private final NovedadService novedadService;
 
-    public List<LegajoBanco> findAllSantander(String salida, Integer anho, Integer mes, Integer dependenciaId) {
+    public List<LegajoBancoEntity> findAllSantander(String salida, Integer anho, Integer mes, Integer dependenciaId) {
 		List<Long> legajoIds = liquidacionService
-				.findAllByLegajoIdInAndAnhoAndMes(itemService.findAllByNetoPositivo(anho, mes).stream()
+				.getLiquidacionesByLegajoIdsAndPeriodo(itemService.getItemsByNetoPositivo(anho, mes).stream()
 						.map(Item::getLegajoId).toList(), anho, mes)
 				.stream().map(Liquidacion::getLegajoId).toList();
-		List<LegajoBanco> legajoBancos = repository.findAllByLegajoIdInAndAnhoAndMesAndCbuLike(legajoIds, anho, mes,
+		List<LegajoBancoEntity> legajoBancos = repository.findAllByLegajoIdInAndAnhoAndMesAndCbuLike(legajoIds, anho, mes,
 				"072%");
 		if (salida.equals("T")) {
 			if (dependenciaId == 0) {
@@ -62,11 +64,11 @@ public class LegajoBancoService {
 				.toList();
 	}
 
-    public List<LegajoBanco> findAllSantanderConCodigo(String salida, Integer anho, Integer mes, Integer dependenciaId, Integer codigoId) {
+    public List<LegajoBancoEntity> findAllSantanderConCodigo(String salida, Integer anho, Integer mes, Integer dependenciaId, Integer codigoId) {
         List<Long> legajoIds = novedadService.findAllByCodigo(codigoId, anho, mes)
                 .stream()
                 .map(Novedad::getLegajoId).toList();
-        List<LegajoBanco> legajoBancos = repository.findAllByLegajoIdInAndAnhoAndMesAndCbuLike(legajoIds, anho, mes,
+        List<LegajoBancoEntity> legajoBancos = repository.findAllByLegajoIdInAndAnhoAndMesAndCbuLike(legajoIds, anho, mes,
                 "072%");
         if (salida.equals("T")) {
             if (dependenciaId == 0) {
@@ -86,12 +88,12 @@ public class LegajoBancoService {
                 .toList();
     }
 
-    public List<LegajoBanco> findAllOtrosBancos(String salida, Integer anho, Integer mes, Integer dependenciaId) {
+    public List<LegajoBancoEntity> findAllOtrosBancos(String salida, Integer anho, Integer mes, Integer dependenciaId) {
 		List<Long> legajoIds = liquidacionService
-				.findAllByLegajoIdInAndAnhoAndMes(itemService.findAllByNetoPositivo(anho, mes).stream()
+				.getLiquidacionesByLegajoIdsAndPeriodo(itemService.getItemsByNetoPositivo(anho, mes).stream()
 						.map(Item::getLegajoId).collect(Collectors.toList()), anho, mes)
 				.stream().map(Liquidacion::getLegajoId).collect(Collectors.toList());
-		List<LegajoBanco> legajoBancos = repository.findAllByLegajoIdInAndAnhoAndMesAndCbuNotLike(legajoIds, anho, mes,
+		List<LegajoBancoEntity> legajoBancos = repository.findAllByLegajoIdInAndAnhoAndMesAndCbuNotLike(legajoIds, anho, mes,
 				"072%");
 		if (salida.equals("T")) {
 			if (dependenciaId == 0) {
@@ -111,11 +113,11 @@ public class LegajoBancoService {
 				.toList();
 	}
 
-    public List<LegajoBanco> findAllOtrosBancosConCodigo(String salida, Integer anho, Integer mes, Integer dependenciaId, Integer codigoId) {
+    public List<LegajoBancoEntity> findAllOtrosBancosConCodigo(String salida, Integer anho, Integer mes, Integer dependenciaId, Integer codigoId) {
         List<Long> legajoIds = novedadService.findAllByCodigo(codigoId, anho, mes)
                 .stream()
                 .map(Novedad::getLegajoId).toList();
-        List<LegajoBanco> legajoBancos = repository.findAllByLegajoIdInAndAnhoAndMesAndCbuNotLike(legajoIds, anho, mes,
+        List<LegajoBancoEntity> legajoBancos = repository.findAllByLegajoIdInAndAnhoAndMesAndCbuNotLike(legajoIds, anho, mes,
                 "072%");
         if (salida.equals("T")) {
             if (dependenciaId == 0) {
@@ -135,46 +137,46 @@ public class LegajoBancoService {
                 .toList();
     }
 
-    public List<LegajoBanco> findAllByLegajoId(Long legajoId) {
+    public List<LegajoBancoEntity> findAllByLegajoId(Long legajoId) {
 		return repository.findAllByLegajoId(legajoId,
 				Sort.by("anho").descending().and(Sort.by("mes").descending().and(Sort.by("cbu").ascending())));
 	}
 
-	public List<LegajoBanco> findAllPeriodoSantander(Long legajoId, Integer anho, Integer mes) {
+	public List<LegajoBancoEntity> findAllPeriodoSantander(Long legajoId, Integer anho, Integer mes) {
 		return repository.findAllByLegajoIdAndAnhoAndMesAndCbuLike(legajoId, anho, mes, "072%");
 	}
 
-	public List<LegajoBanco> findAllPeriodoOtrosBancos(Long legajoId, Integer anho, Integer mes) {
+	public List<LegajoBancoEntity> findAllPeriodoOtrosBancos(Long legajoId, Integer anho, Integer mes) {
 		return repository.findAllByLegajoIdAndAnhoAndMesAndCbuNotLike(legajoId, anho, mes, "072%");
 	}
 
-	public List<LegajoBanco> findAllPeriodo(Integer anho, Integer mes) {
+	public List<LegajoBancoEntity> findAllPeriodo(Integer anho, Integer mes) {
 		return repository.findAllByAnhoAndMes(anho, mes);
 	}
 
-	public List<LegajoBanco> findAllByLegajoPeriodo(Long legajoId, Integer anho, Integer mes) {
+	public List<LegajoBancoEntity> findAllByLegajoPeriodo(Long legajoId, Integer anho, Integer mes) {
         log.debug("Processing LegajoBancoService.findAllByLegajoIdAndAnhoAndMes with legajoId: {}, anho: {}, mes: {}", legajoId, anho, mes);
         var legajoBancoList = repository.findAllByLegajoIdAndAnhoAndMes(legajoId, anho, mes);
-        log.debug("LegajoBanco[] -> {}", Jsonifier.builder(legajoBancoList).build());
+        log.debug("LegajoBancoEntity[] -> {}", Jsonifier.builder(legajoBancoList).build());
 		return legajoBancoList;
 	}
 
-	public LegajoBanco findLegajoCbuPrincipal(Long legajoId, Integer anho, Integer mes) {
+	public LegajoBancoEntity findLegajoCbuPrincipal(Long legajoId, Integer anho, Integer mes) {
 		return repository.findByLegajoIdAndAnhoAndMesAndResto(legajoId, anho, mes, (byte) 1)
 				.orElseThrow(() -> new LegajoBancoException(legajoId, anho, mes));
 	}
 
-	public LegajoBanco findByLegajoBancoId(Long legajoBancoId) {
+	public LegajoBancoEntity findByLegajoBancoId(Long legajoBancoId) {
 		return repository.findByLegajoBancoId(legajoBancoId)
 				.orElseThrow(() -> new LegajoBancoException(legajoBancoId));
 	}
 
-	public LegajoBanco findByUnique(Long legajoId, Integer anho, Integer mes, String cbu) {
+	public LegajoBancoEntity findByUnique(Long legajoId, Integer anho, Integer mes, String cbu) {
 		return repository.findByLegajoIdAndAnhoAndMesAndCbu(legajoId, anho, mes, cbu)
 				.orElseThrow(() -> new LegajoBancoException(legajoId, anho, mes, cbu));
 	}
 
-	public LegajoBanco findLastByLegajoId(Long legajoId) {
+	public LegajoBancoEntity findLastByLegajoId(Long legajoId) {
 		return repository.findTopByLegajoIdOrderByAnhoDescMesDesc(legajoId)
 				.orElseThrow(() -> new LegajoBancoException(legajoId));
 	}
@@ -184,14 +186,14 @@ public class LegajoBancoService {
 		repository.deleteAllByAnhoAndMes(anho, mes);
 	}
 
-	public LegajoBanco add(LegajoBanco legajoBanco) {
+	public LegajoBancoEntity add(LegajoBancoEntity legajoBanco) {
 		repository.save(legajoBanco);
 		return legajoBanco;
 	}
 
-	public LegajoBanco update(LegajoBanco newLegajoBanco, Long legajoBancoId) {
+	public LegajoBancoEntity update(LegajoBancoEntity newLegajoBanco, Long legajoBancoId) {
 		return repository.findByLegajoBancoId(legajoBancoId).map(legajoBanco -> {
-			legajoBanco = new LegajoBanco(newLegajoBanco.getLegajoBancoId(), newLegajoBanco.getLegajoId(),
+			legajoBanco = new LegajoBancoEntity(newLegajoBanco.getLegajoBancoId(), newLegajoBanco.getLegajoId(),
 					newLegajoBanco.getAnho(), newLegajoBanco.getMes(), newLegajoBanco.getCbu(),
 					newLegajoBanco.getFijo(), newLegajoBanco.getPorcentaje(), newLegajoBanco.getResto(),
 					newLegajoBanco.getAcreditado(), newLegajoBanco.getPersona(), newLegajoBanco.getLiquidacion());

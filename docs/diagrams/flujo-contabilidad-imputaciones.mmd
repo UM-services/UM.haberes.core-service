@@ -1,0 +1,31 @@
+---
+title: "Contabilidad: Imputaciones por legajo y cierres"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant Ctrl as Legajo*ImputacionController + Catálogos
+    participant Svc as Servicios de imputación (hexagonal)
+    participant LegCtrl as LegajoContabilidadController
+    participant LegSvc as LegajoContabilidadService (hexagonal)
+    participant Adapt as Jpa*RepositoryAdapter (hexagonal)
+    participant DB as MySQL
+
+    Note over Usuario,DB: Catálogos de imputación (configuración por dependencia/facultad/geográfica)
+
+    Usuario->>Ctrl: GET /codigoimputacion/unique/{dependenciaId}/{facultadId}/{geograficaId}/{codigoId}
+    Ctrl->>Svc: getCodigoImputacionByUnique(...)
+    Svc->>Adapt: findByUnique (codigo / categoria / cargo_clase)
+    Usuario->>Ctrl: POST y PUT en /codigoimputacion, /categoriaimputacion, /cargoclaseimputacion
+    Ctrl->>Svc: create / update del catálogo de imputación
+
+    Note over Usuario,DB: Imputaciones generadas por legajo y período (resultado del cierre)
+
+    Usuario->>Ctrl: GET /legajocodigoimputacion/legajo/{legajoId}/{anho}/{mes}
+    Ctrl->>Svc: findAllByLegajo(legajoId, anho, mes)
+    Usuario->>LegCtrl: GET /legajocontabilidad/unique/{legajoId}/{anho}/{mes}
+    LegCtrl->>LegSvc: findByUnique(legajoId, anho, mes)
+    LegSvc->>Adapt: consulta de diferencia contable del legajo
+    Usuario->>LegCtrl: GET /legajocontabilidad/diferencia/{anho}/{mes}
+    LegCtrl->>LegSvc: findAllDiferenciaByPeriodo(anho, mes)
+    Usuario->>LegCtrl: POST , PUT /{id} , DELETE /{id}

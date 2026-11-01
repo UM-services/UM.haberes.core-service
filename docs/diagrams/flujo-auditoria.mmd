@@ -1,0 +1,40 @@
+---
+title: "Auditoría de Operaciones (REQUEST, CHANGE y SUMMARY/BULK)"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant Filtro as AuditRequestFilter
+    participant Ctrl as Controller / Use Case
+    participant Repo as Repository Adapter (JPA)
+    participant Listener as AuditEntityListener / AuditFlushListener
+    participant Buffer as AuditBuffer
+    participant Writer as AuditOutboxWriter
+    participant DB as MySQL (audit_outbox)
+    participant Sender as AuditOutboxSender (@Scheduled)
+    participant Aud as haberes-auditoria
+
+    Usuario->>Filtro: POST / PUT / PATCH / DELETE (headers de actor y correlación)
+    Filtro->>Buffer: abre contexto (actor, IP, X-Request-Id)
+    Filtro->>Ctrl: continúa la operación
+    Ctrl->>Repo: save / saveAll / delete (entidades JPA, sin SQL que saltee listeners)
+    Repo->>Listener: post-insert / post-update / post-delete
+    Listener->>Buffer: CHANGE con diff enmascarado (password, cbu, cuenta, documento)
+    Note over Ctrl,Buffer: Un AuditBulkScope abierto por el caso de uso<br/>resume al cerrar en un evento SUMMARY/BULK por entidad y operación
+    Listener->>Buffer: flush / beforeCommit, drena el buffer
+    Buffer-->>Listener: eventos pendientes
+    Listener->>Writer: escribe el lote
+    Writer->>DB: INSERT PENDING (misma transacción y conexión del cambio)
+    Ctrl-->>Filtro: respuesta (2xx / 4xx / 5xx)
+    Filtro->>Writer: REQUEST con outcome, status y cantidad de cambios
+    Writer->>DB: INSERT PENDING (transacción nueva, también tras rollback)
+
+    Sender->>DB: reclama PENDING por lote (claim_token + lease de 60 s)
+    Sender->>Aud: POST /api/haberes/auditoria/evento/lote (X-API-Key)
+    alt 2xx
+        Sender->>DB: marca SENT
+    else 400 / 401 / 403 / 422
+        Sender->>DB: marca FAILED (rechazo permanente)
+    else 5xx o error de red
+        Sender->>DB: reintenta con backoff (máximo HABERES_AUDIT_MAX_ATTEMPTS)
+    end

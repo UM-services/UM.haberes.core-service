@@ -10,9 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import um.haberes.core.kotlin.model.view.CategoriaByPeriodo;
-import um.haberes.core.repository.CategoriaRepository;
-import um.haberes.core.repository.view.CategoriaByPeriodoRepository;
+import um.haberes.core.model.view.CategoriaByPeriodo;
+import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.persistence.repository.JpaCategoriaRepository;
+import um.haberes.core.repository.view.JpaCategoriaByPeriodoRepository;
 
 /**
  * @author daniel
@@ -22,10 +22,10 @@ import um.haberes.core.repository.view.CategoriaByPeriodoRepository;
 public class CategoriaByPeriodoService {
 
 	@Autowired
-	private CategoriaByPeriodoRepository repository;
+	private JpaCategoriaByPeriodoRepository repository;
 
 	@Autowired
-	private CategoriaRepository categoriaRepository;
+	private JpaCategoriaRepository categoriaRepository;
 
 	public List<CategoriaByPeriodo> findAllNoDocente(Integer anho, Integer mes) {
 		return repository.findAllByAnhoAndMesAndCategoriaIdIn(anho, mes,

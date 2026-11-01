@@ -14,7 +14,7 @@ public class DesignacionException extends RuntimeException {
 	private static final long serialVersionUID = 4861586180029856359L;
 
 	public DesignacionException(Integer designaciontipoId, Integer cargotipoId, Byte anual, Byte semestral) {
-		super("Cannot find Designacion " + designaciontipoId + "/" + cargotipoId + "/" + anual + "/" + semestral);
+		super("Cannot find DesignacionEntity " + designaciontipoId + "/" + cargotipoId + "/" + anual + "/" + semestral);
 	}
 
 }

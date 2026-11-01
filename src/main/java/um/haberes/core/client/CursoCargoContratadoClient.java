@@ -1,9 +1,8 @@
 package um.haberes.core.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import um.haberes.core.kotlin.model.extern.CursoCargoContratadoDto;
+import um.haberes.core.model.extern.CursoCargoContratadoDto;
 
 import java.math.BigDecimal;
 import java.util.List;

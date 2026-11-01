@@ -1,0 +1,63 @@
+---
+title: Contextos Acotados Hexagonales
+---
+flowchart TD
+    ROOT["um.haberes.core.hexagonal"]
+
+    subgraph PERSONAS ["personas"]
+        SL_PERSONA["persona"]
+        SL_DEPENDENCIA["dependencia"]
+    end
+
+    subgraph CURSOS ["cursos"]
+        SL_CURSO["curso"]
+        SL_CURSOCARGO["curso_cargo"]
+        SL_CARGOTIPO["cargo_tipo"]
+        SL_CURSODESARRAIGO["curso_desarraigo"]
+        SL_CURSOFUSION["curso_fusion"]
+        SL_DESIGNACIONTIPO["designacion_tipo"]
+    end
+
+    subgraph LIQUIDACIONES ["liquidaciones"]
+        SL_LIQUIDACION["liquidacion"]
+        SL_CARGOLIQUIDACION["cargo_liquidacion"]
+        SL_ITEM["item"]
+        SL_NOVEDAD["novedad"]
+        SL_CODIGO["codigo"]
+        SL_CATEGORIA["categoria"]
+        SL_LETRA["letra"]
+        SL_CARGO["cargo"]
+        SL_ACREDITACION["acreditacion"]
+        SL_ACREDITACIONPAGO["acreditacion_pago"]
+        SL_LIQADICIONAL["liquidacion_adicional (planificación)"]:::plan
+        SL_NOVEDADUPLOAD["novedad_upload (planificación)"]:::plan
+    end
+
+    subgraph CONTABILIDAD ["contabilidad"]
+        SL_CCCONTABLE["legajo_contabilidad"]
+        SL_CCCIMPUTACION["legajo_cargo_clase_imputacion"]
+        SL_CCATIMPUTACION["legajo_categoria_imputacion"]
+        SL_CCODIMPUTACION["legajo_codigo_imputacion"]
+        SL_CARGOCLASEIMP["cargo_clase_imputacion"]
+        SL_CATEGORIAIMP["categoria_imputacion"]
+        SL_CODIGOIMP["codigo_imputacion"]
+        SL_CONTABLE["contable (planificación)"]:::plan
+    end
+
+    subgraph OTROS ["contextos simples"]
+        SL_FACULTAD["facultad"]
+        SL_GEOGRAFICA["geografica"]
+    end
+
+    ROOT --> PERSONAS
+    ROOT --> CURSOS
+    ROOT --> LIQUIDACIONES
+    ROOT --> CONTABILIDAD
+    ROOT --> OTROS
+
+    PERSONAS --- CURSOS
+    PERSONAS --- LIQUIDACIONES
+    LIQUIDACIONES --- CONTABILIDAD
+    CURSOS --- LIQUIDACIONES
+
+    classDef plan stroke-dasharray: 5 5

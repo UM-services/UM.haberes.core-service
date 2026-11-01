@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import um.haberes.core.kotlin.model.internal.OrdenPagoRequest;
+import um.haberes.core.model.internal.OrdenPagoRequest;
 import um.haberes.core.service.facade.OrdenPagoService;
 
 @RestController

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.core.exception.view.TotalSalidaException;
-import um.haberes.core.kotlin.model.view.TotalSalida;
+import um.haberes.core.model.view.TotalSalida;
 import um.haberes.core.service.view.TotalSalidaService;
 
 /**

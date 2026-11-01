@@ -46,4 +46,4 @@ RUN chown -R appuser:appgroup /app
 USER appuser
 
 # Comando para ejecutar la aplicación
-ENTRYPOINT ["java", "-jar", "um.haberes.core-service.jar"]
+ENTRYPOINT ["java", "-Duser.timezone=UTC", "-jar", "um.haberes.core-service.jar"]

@@ -1,0 +1,39 @@
+---
+title: "Carga Masiva de Novedades desde Excel (upload / import / transfer)"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant Ctrl as NovedadFileController
+    participant Svc as NovedadFileService (facade)
+    participant UploadSvc as NovedadUploadService
+    participant CodSvc as CodigoService (hexagonal)
+    participant PerSvc as PersonaService (hexagonal)
+    participant NovSvc as NovedadService (hexagonal)
+    participant DB as MySQL
+
+    Usuario->>Ctrl: POST /novedadfile/upload/{anho}/{mes}/{stepByStep} (FileInfo con ruta Excel)
+    Ctrl->>Svc: upload(fileInfo, anho, mes, stepByStep)
+    Svc->>UploadSvc: deleteAllByPendiente(1) (limpia pendientes previos)
+    Svc->>PerSvc: findAll() (índice de legajos válidos)
+    Svc->>Svc: parsea planilla por POI y valida codigoId por fila
+    Svc->>UploadSvc: saveAll(novedades staging, pendiente=1)
+
+    Usuario->>Ctrl: GET /novedadfile/import/{anho}/{mes}
+    Ctrl->>Svc: importNews(anho, mes)
+    Svc->>UploadSvc: findAllByPendiente(anho, mes, 1)
+    loop cada novedad subido pendiente
+        Svc->>NovSvc: findByUnique(legajoId, anho, mes, codigoId, dependenciaId)
+        alt novedad ya existente
+            Svc->>Svc: lanza ImportNewsException (informativo de duplicados)
+        end
+    end
+    Svc->>NovSvc: saveAll(novedades creadas/actualizadas)
+
+    Usuario->>Ctrl: GET /novedadfile/transfer/{anho}/{mes}
+    Ctrl->>Svc: transfer(anho, mes)
+    Svc->>CodSvc: findAllByTransferible(1) (códigos transferibles)
+    loop por cada código transferible
+        Svc->>NovSvc: findAllByCodigo(codigoId, período anterior)
+    end
+    Svc->>NovSvc: saveAll(novedades traídas al período nuevo)

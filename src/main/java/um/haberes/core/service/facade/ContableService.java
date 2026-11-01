@@ -12,19 +12,51 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import lombok.RequiredArgsConstructor;
 import um.haberes.core.client.CuentaMovimientoClient;
 import um.haberes.core.exception.LiquidacionAdicionalException;
-import um.haberes.core.kotlin.model.*;
-import um.haberes.core.kotlin.model.extern.CuentaMovimientoDto;
+import um.haberes.core.hexagonal.contabilidad.cargo_clase_imputacion.application.service.CargoClaseImputacionService;
+import um.haberes.core.hexagonal.contabilidad.cargo_clase_imputacion.domain.model.CargoClaseImputacion;
+import um.haberes.core.hexagonal.contabilidad.categoria_imputacion.application.service.CategoriaImputacionService;
+import um.haberes.core.hexagonal.contabilidad.categoria_imputacion.domain.model.CategoriaImputacion;
+import um.haberes.core.hexagonal.contabilidad.codigo_imputacion.application.service.CodigoImputacionService;
+import um.haberes.core.hexagonal.contabilidad.codigo_imputacion.domain.model.CodigoImputacion;
+import um.haberes.core.hexagonal.contabilidad.legajo_cargo_clase_imputacion.application.service.LegajoCargoClaseImputacionService;
+import um.haberes.core.hexagonal.contabilidad.legajo_cargo_clase_imputacion.domain.model.LegajoCargoClaseImputacion;
+import um.haberes.core.hexagonal.contabilidad.legajo_categoria_imputacion.application.service.LegajoCategoriaImputacionService;
+import um.haberes.core.hexagonal.contabilidad.legajo_categoria_imputacion.domain.model.LegajoCategoriaImputacion;
+import um.haberes.core.hexagonal.contabilidad.legajo_codigo_imputacion.application.service.LegajoCodigoImputacionService;
+import um.haberes.core.hexagonal.contabilidad.legajo_codigo_imputacion.domain.model.LegajoCodigoImputacion;
+import um.haberes.core.hexagonal.contabilidad.legajo_contabilidad.application.service.LegajoContabilidadService;
+import um.haberes.core.hexagonal.contabilidad.legajo_contabilidad.infrastructure.persistence.entity.LegajoContabilidadEntity;
+import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.application.service.CargoLiquidacionService;
+import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.model.CargoLiquidacion;
+import um.haberes.core.hexagonal.liquidaciones.codigo.application.service.CodigoService;
+import um.haberes.core.hexagonal.liquidaciones.codigo.domain.model.Codigo;
+import um.haberes.core.hexagonal.liquidaciones.item.application.service.ItemService;
+import um.haberes.core.hexagonal.liquidaciones.item.domain.model.Item;
+import um.haberes.core.hexagonal.liquidaciones.liquidacion.application.service.LiquidacionService;
+import um.haberes.core.hexagonal.liquidaciones.liquidacion.domain.model.Liquidacion;
+import um.haberes.core.hexagonal.liquidaciones.categoria.application.service.CategoriaService;
+import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.Categoria;
+import um.haberes.core.hexagonal.facultad.application.service.FacultadService;
+import um.haberes.core.hexagonal.facultad.domain.model.Facultad;
+import um.haberes.core.hexagonal.geografica.application.service.GeograficaService;
+import um.haberes.core.hexagonal.geografica.domain.model.Geografica;
+import um.haberes.core.hexagonal.personas.dependencia.application.service.DependenciaService;
+import um.haberes.core.hexagonal.personas.dependencia.domain.model.Dependencia;
+import um.haberes.core.hexagonal.personas.dependencia.infrastructure.persistence.entity.DependenciaEntity;
+import um.haberes.core.model.*;
+import um.haberes.core.model.dto.imputacion.*;
+import um.haberes.core.model.extern.CuentaMovimientoDto;
 import um.haberes.core.service.*;
 import jakarta.transaction.Transactional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import um.haberes.core.exception.ItemException;
-import um.haberes.core.exception.LegajoContabilidadException;
-import um.haberes.core.exception.LiquidacionException;
+import um.haberes.core.hexagonal.liquidaciones.item.application.exception.ItemException;
+import um.haberes.core.hexagonal.contabilidad.legajo_contabilidad.application.exception.LegajoContabilidadException;
+import um.haberes.core.hexagonal.liquidaciones.liquidacion.application.exception.LiquidacionException;
 import um.haberes.core.util.Proporcion;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,80 +66,45 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ContableService {
 
     private final LegajoCargoClaseImputacionService legajoCargoClaseImputacionService;
-
     private final LegajoCategoriaImputacionService legajoCategoriaImputacionService;
-
     private final LegajoCodigoImputacionService legajoCodigoImputacionService;
-
     private final ItemService itemService;
-
     private final DesignacionToolService designacionToolService;
-
     private final LiquidacionService liquidacionService;
-
     private final CargoLiquidacionService cargoLiquidacionService;
-
     private final CategoriaImputacionService categoriaImputacionService;
-
     private final CargoClaseDetalleService cargoClaseDetalleService;
-
     private final CargoClaseImputacionService cargoClaseImputacionService;
-
     private final ActividadService actividadService;
-
     private final CodigoService codigoService;
-
     private final CodigoImputacionService codigoImputacionService;
-
     private final LegajoContabilidadService legajoContabilidadService;
-
     private final CodigoGrupoService codigoGrupoService;
-
     private final LiquidacionAdicionalService liquidacionAdicionalService;
     private final CuentaMovimientoClient cuentaMovimientoClient;
-
-    @Autowired
-    public ContableService(LegajoCargoClaseImputacionService legajoCargoClaseImputacionService, LegajoCategoriaImputacionService legajoCategoriaImputacionService,
-                           LegajoCodigoImputacionService legajoCodigoImputacionService, ItemService itemService, DesignacionToolService designacionToolService,
-                           LiquidacionService liquidacionService, CargoLiquidacionService cargoLiquidacionService, CategoriaImputacionService categoriaImputacionService,
-                           CargoClaseDetalleService cargoClaseDetalleService, CargoClaseImputacionService cargoClaseImputacionService, ActividadService actividadService,
-                           CodigoService codigoService, CodigoImputacionService codigoImputacionService, LegajoContabilidadService legajoContabilidadService,
-                           CodigoGrupoService codigoGrupoService, LiquidacionAdicionalService liquidacionAdicionalService, CuentaMovimientoClient cuentaMovimientoClient) {
-        this.legajoCargoClaseImputacionService = legajoCargoClaseImputacionService;
-        this.legajoCategoriaImputacionService = legajoCategoriaImputacionService;
-        this.legajoCodigoImputacionService = legajoCodigoImputacionService;
-        this.itemService = itemService;
-        this.designacionToolService = designacionToolService;
-        this.liquidacionService = liquidacionService;
-        this.cargoLiquidacionService = cargoLiquidacionService;
-        this.categoriaImputacionService = categoriaImputacionService;
-        this.cargoClaseDetalleService = cargoClaseDetalleService;
-        this.cargoClaseImputacionService = cargoClaseImputacionService;
-        this.actividadService = actividadService;
-        this.codigoService = codigoService;
-        this.codigoImputacionService = codigoImputacionService;
-        this.legajoContabilidadService = legajoContabilidadService;
-        this.codigoGrupoService = codigoGrupoService;
-        this.liquidacionAdicionalService = liquidacionAdicionalService;
-        this.cuentaMovimientoClient = cuentaMovimientoClient;
-    }
+    private final CategoriaService categoriaService;
+    private final CargoClaseService cargoClaseService;
+    private final FacultadService facultadService;
+    private final GeograficaService geograficaService;
+    private final DependenciaService dependenciaService;
 
     @Transactional
     public void generateByLegajo(Long legajoId, Integer anho, Integer mes) {
         Liquidacion liquidacion = null;
         try {
-            liquidacion = liquidacionService.findByLegajoIdAndAnhoAndMes(legajoId, anho, mes);
+            liquidacion = liquidacionService.getLiquidacionByUniqueKey(legajoId, anho, mes);
         } catch (LiquidacionException e) {
             liquidacion = new Liquidacion();
         }
-        Map<String, CategoriaImputacion> categoriaImputaciones = categoriaImputacionService.findAll().stream()
+        Map<String, CategoriaImputacion> categoriaImputaciones = categoriaImputacionService.getAllCategoriaImputaciones().stream()
                 .collect(Collectors.toMap(CategoriaImputacion::key, imputacion -> imputacion));
-        Map<String, CargoClaseImputacion> cargoClaseImputaciones = cargoClaseImputacionService.findAll().stream()
+        Map<String, CargoClaseImputacion> cargoClaseImputaciones = cargoClaseImputacionService.getAllCargoClaseImputaciones().stream()
                 .collect(Collectors.toMap(CargoClaseImputacion::key, imputacion -> imputacion));
-        Map<String, CodigoImputacion> codigoImputaciones = codigoImputacionService.findAll().stream()
+        Map<String, CodigoImputacion> codigoImputaciones = codigoImputacionService.getAllCodigoImputaciones().stream()
                 .collect(Collectors.toMap(CodigoImputacion::key, imputacion -> imputacion));
         Map<Integer, Codigo> codigos = codigoService.findAll().stream()
                 .collect(Collectors.toMap(Codigo::getCodigoId, codigo -> codigo));
@@ -142,8 +139,8 @@ public class ContableService {
         if (remunerativo.compareTo(BigDecimal.ZERO) == 0)
             return;
 
-        // Control de adicional horario para aplicar una sola vez
-        Map<String, LiquidacionAdicional> liquidacionAdicionalMap = new HashMap<>();
+        // ControlEntity de adicional horario para aplicar una sola vez
+        Map<String, LiquidacionAdicionalEntity> liquidacionAdicionalMap = new HashMap<>();
 
         for (CargoLiquidacion cargoLiquidacion : cargoLiquidacionService.findAllByLegajo(legajoId, anho, mes)) {
             Dependencia dependencia = cargoLiquidacion.getDependencia();
@@ -152,16 +149,16 @@ public class ContableService {
                     + dependencia.getGeograficaId() + "." + cargoLiquidacion.getCategoriaId();
             if (!categoriaImputaciones.containsKey(key)) {
                 CategoriaImputacion imputacion = categoriaImputacionService
-                        .add(new CategoriaImputacion(null, dependencia.getDependenciaId(), dependencia.getFacultadId(),
+                        .createCategoriaImputacion(new CategoriaImputacion(null, dependencia.getDependenciaId(), dependencia.getFacultadId(),
                                 dependencia.getGeograficaId(), cargoLiquidacion.getCategoriaId(), null, null));
                 categoriaImputaciones.put(key,
-                        categoriaImputacionService.update(
+                        categoriaImputacionService.updateCategoriaImputacion(imputacion.getCategoriaImputacionId(),
                                 new CategoriaImputacion(imputacion.getCategoriaImputacionId(),
                                         dependencia.getDependenciaId(), dependencia.getFacultadId(),
                                         dependencia.getGeograficaId(), cargoLiquidacion.getCategoriaId(),
                                         new BigDecimal(imputacion.getCategoriaImputacionId()),
-                                        new BigDecimal(imputacion.getCategoriaImputacionId())),
-                                imputacion.getCategoriaImputacionId()));
+                                        new BigDecimal(imputacion.getCategoriaImputacionId()))
+                                ));
             }
             CategoriaImputacion categoriaImputacion = categoriaImputaciones.get(key);
 
@@ -206,7 +203,7 @@ public class ContableService {
                     categoriaImputacion.getCuentaSueldos(),
                     cargoLiquidacion.getCategoriaBasico().multiply(multiplicador)
                             .setScale(2, RoundingMode.HALF_UP),
-                    BigDecimal.ZERO, categoriaImputacion.getCuentaAportes(), null, null, null, null, null);
+                    BigDecimal.ZERO, categoriaImputacion.getCuentaAportes());
 
             BigDecimal basico = imputacion.getBasico();
             if (cargoLiquidacion.getCategoria().getDocente() == 1) {
@@ -218,7 +215,7 @@ public class ContableService {
             String keyAdicional = legajoId + "." + anho + "." + mes + "." + dependencia.getDependenciaId();
             try {
                 if (!liquidacionAdicionalMap.containsKey(keyAdicional)) {
-                    LiquidacionAdicional liquidacionAdicional = liquidacionAdicionalService.findByDependencia(legajoId, anho, mes, dependencia.getDependenciaId());
+                    LiquidacionAdicionalEntity liquidacionAdicional = liquidacionAdicionalService.findByDependencia(legajoId, anho, mes, dependencia.getDependenciaId());
                     liquidacionAdicionalMap.put(keyAdicional, liquidacionAdicional);
                     basico = basico.add(liquidacionAdicional.getAdicional()).setScale(2, RoundingMode.HALF_UP);
                     imputacion.setBasico(basico);
@@ -247,20 +244,20 @@ public class ContableService {
             totalRemunerativo = totalRemunerativo.add(basico).add(imputacion.getAntiguedad());
         }
 
-        for (CargoClaseDetalle detalle : cargoClaseDetalleService.findAllByLegajo(legajoId, anho, mes)) {
+        for (CargoClaseDetalleEntity detalle : cargoClaseDetalleService.findAllByLegajo(legajoId, anho, mes)) {
             CargoClaseImputacion cargoClaseImputacion = null;
             String key = detalle.getDependenciaId() + "." + detalle.getFacultadId() + "." + detalle.getGeograficaId()
                     + "." + detalle.getCargoClaseId();
             if (!cargoClaseImputaciones.containsKey(key)) {
                 CargoClaseImputacion imputacion = cargoClaseImputacionService
-                        .add(new CargoClaseImputacion(null, detalle.getDependenciaId(), detalle.getFacultadId(),
+                        .createCargoClaseImputacion(new CargoClaseImputacion(null, detalle.getDependenciaId(), detalle.getFacultadId(),
                                 detalle.getGeograficaId(), detalle.getCargoClaseId(), null, null));
-                cargoClaseImputaciones.put(key, cargoClaseImputacionService.update(
+                cargoClaseImputaciones.put(key, cargoClaseImputacionService.updateCargoClaseImputacion(
+                        imputacion.getCargoClaseImputacionId(),
                         new CargoClaseImputacion(imputacion.getCargoClaseImputacionId(), detalle.getDependenciaId(),
                                 detalle.getFacultadId(), detalle.getGeograficaId(), detalle.getCargoClaseId(),
                                 new BigDecimal(imputacion.getCargoClaseImputacionId()),
-                                new BigDecimal(imputacion.getCargoClaseImputacionId())),
-                        imputacion.getCargoClaseImputacionId()));
+                                new BigDecimal(imputacion.getCargoClaseImputacionId()))                        ));
             }
             cargoClaseImputacion = cargoClaseImputaciones.get(key);
 
@@ -299,7 +296,7 @@ public class ContableService {
             }
         }
         if (proporciones.isEmpty() && proporcionesDocente.isEmpty() && proporcionesAdministrativo.isEmpty()) {
-            Actividad actividad = actividadService.findByUnique(legajoId, anho, mes);
+            ActividadEntity actividad = actividadService.findByUnique(legajoId, anho, mes);
             if (actividad.getDependenciaId() == null) {
                 if (docenteEtec) {
                     actividad.setDependenciaId(46);
@@ -308,7 +305,7 @@ public class ContableService {
                 }
                 actividad = actividadService.update(actividad, actividad.getActividadId());
             }
-            Dependencia dependencia = actividad.getDependencia();
+            DependenciaEntity dependencia = actividad.getDependencia();
             if (dependencia.getFacultadId() > 0) {
                 String key = dependencia.getDependenciaId() + "." + dependencia.getFacultadId() + "."
                         + dependencia.getGeograficaId() + ".0";
@@ -345,14 +342,14 @@ public class ContableService {
             }
         }
 
-        List<Integer> codigoIdRemunerativos = codigoGrupoService.findAllByRemunerativo((byte) 1).stream().map(CodigoGrupo::getCodigoId).toList();
-        List<Integer> codigoIdNoRemunerativos = codigoGrupoService.findAllByNoRemunerativo((byte) 1).stream().map(CodigoGrupo::getCodigoId).toList();
+        List<Integer> codigoIdRemunerativos = codigoGrupoService.findAllByRemunerativo((byte) 1).stream().map(CodigoGrupoEntity::getCodigoId).toList();
+        List<Integer> codigoIdNoRemunerativos = codigoGrupoService.findAllByNoRemunerativo((byte) 1).stream().map(CodigoGrupoEntity::getCodigoId).toList();
         List<Integer> codigoIds = Stream.concat(codigoIdRemunerativos.stream(), codigoIdNoRemunerativos.stream()).collect(Collectors.toList());
         if (sinBasico) {
             codigoIds.removeIf(codigoId -> codigoId < 3);
         }
 
-        for (Item item : itemService.findAllCodigoIdsByLegajo(legajoId, anho, mes, codigoIds)) {
+        for (Item item : itemService.getItemsByLegajoAndCodigos(legajoId, anho, mes, codigoIds)) {
             Codigo codigo = new Codigo();
             if (codigos.containsKey(item.getCodigoId())) {
                 codigo = codigos.get(item.getCodigoId());
@@ -366,17 +363,17 @@ public class ContableService {
                     String key = proporcion.getDependenciaId() + "." + proporcion.getFacultadId() + "."
                             + proporcion.getGeograficaId() + "." + item.getCodigoId();
                     if (!codigoImputaciones.containsKey(key)) {
-                        CodigoImputacion imputacion = codigoImputacionService.add(
+                        CodigoImputacion imputacion = codigoImputacionService.createCodigoImputacion(
                                 new CodigoImputacion(null, proporcion.getDependenciaId(), proporcion.getFacultadId(),
                                         proporcion.getGeograficaId(), item.getCodigoId(), null, null, null, null));
-                        codigoImputaciones.put(key, codigoImputacionService.update(
+                        codigoImputaciones.put(key, codigoImputacionService.updateCodigoImputacion(imputacion.getCodigoImputacionId(),
                                 new CodigoImputacion(imputacion.getCodigoImputacionId(), imputacion.getDependenciaId(),
                                         imputacion.getFacultadId(), imputacion.getGeograficaId(),
                                         imputacion.getCodigoId(), new BigDecimal(imputacion.getCodigoImputacionId()),
                                         new BigDecimal(imputacion.getCodigoImputacionId()),
                                         new BigDecimal(imputacion.getCodigoImputacionId()),
-                                        new BigDecimal(imputacion.getCodigoImputacionId())),
-                                imputacion.getCodigoImputacionId()));
+                                        new BigDecimal(imputacion.getCodigoImputacionId()))
+                                ));
 
                     }
 
@@ -411,17 +408,17 @@ public class ContableService {
                     String key = proporcion.getDependenciaId() + "." + proporcion.getFacultadId() + "."
                             + proporcion.getGeograficaId() + "." + item.getCodigoId();
                     if (!codigoImputaciones.containsKey(key)) {
-                        CodigoImputacion imputacion = codigoImputacionService.add(
+                        CodigoImputacion imputacion = codigoImputacionService.createCodigoImputacion(
                                 new CodigoImputacion(null, proporcion.getDependenciaId(), proporcion.getFacultadId(),
                                         proporcion.getGeograficaId(), item.getCodigoId(), null, null, null, null));
-                        codigoImputaciones.put(key, codigoImputacionService.update(
+                        codigoImputaciones.put(key, codigoImputacionService.updateCodigoImputacion(imputacion.getCodigoImputacionId(),
                                 new CodigoImputacion(imputacion.getCodigoImputacionId(), imputacion.getDependenciaId(),
                                         imputacion.getFacultadId(), imputacion.getGeograficaId(),
                                         imputacion.getCodigoId(), new BigDecimal(imputacion.getCodigoImputacionId()),
                                         new BigDecimal(imputacion.getCodigoImputacionId()),
                                         new BigDecimal(imputacion.getCodigoImputacionId()),
-                                        new BigDecimal(imputacion.getCodigoImputacionId())),
-                                imputacion.getCodigoImputacionId()));
+                                        new BigDecimal(imputacion.getCodigoImputacionId()))
+                                ));
 
                     }
 
@@ -450,17 +447,17 @@ public class ContableService {
                     String key = proporcion.getDependenciaId() + "." + proporcion.getFacultadId() + "."
                             + proporcion.getGeograficaId() + "." + item.getCodigoId();
                     if (!codigoImputaciones.containsKey(key)) {
-                        CodigoImputacion imputacion = codigoImputacionService.add(
+                        CodigoImputacion imputacion = codigoImputacionService.createCodigoImputacion(
                                 new CodigoImputacion(null, proporcion.getDependenciaId(), proporcion.getFacultadId(),
                                         proporcion.getGeograficaId(), item.getCodigoId(), null, null, null, null));
-                        codigoImputaciones.put(key, codigoImputacionService.update(
+                        codigoImputaciones.put(key, codigoImputacionService.updateCodigoImputacion(imputacion.getCodigoImputacionId(),
                                 new CodigoImputacion(imputacion.getCodigoImputacionId(), imputacion.getDependenciaId(),
                                         imputacion.getFacultadId(), imputacion.getGeograficaId(),
                                         imputacion.getCodigoId(), new BigDecimal(imputacion.getCodigoImputacionId()),
                                         new BigDecimal(imputacion.getCodigoImputacionId()),
                                         new BigDecimal(imputacion.getCodigoImputacionId()),
-                                        new BigDecimal(imputacion.getCodigoImputacionId())),
-                                imputacion.getCodigoImputacionId()));
+                                        new BigDecimal(imputacion.getCodigoImputacionId()))
+                                ));
 
                     }
 
@@ -493,9 +490,9 @@ public class ContableService {
                         .findByUnique(liquidacion.getLegajoId(), liquidacion.getAnho(), liquidacion.getMes())
                         .getLegajoContabilidadId();
             } catch (LegajoContabilidadException e) {
-                legajoContabilidadId = null;
+                log.error(e.getMessage());
             }
-            legajoContabilidadService.save(new LegajoContabilidad(legajoContabilidadId, liquidacion.getLegajoId(),
+            legajoContabilidadService.save(new LegajoContabilidadEntity(legajoContabilidadId, liquidacion.getLegajoId(),
                     liquidacion.getAnho(), liquidacion.getMes(), (byte) 1, totalRemunerativo, totalNoRemunerativo));
         }
 
@@ -513,6 +510,141 @@ public class ContableService {
         legajoCargoClaseImputacionService.deleteAllByPeriodo(anho, mes);
         legajoCategoriaImputacionService.deleteAllByPeriodo(anho, mes);
         legajoCodigoImputacionService.deleteAllByPeriodo(anho, mes);
+    }
+
+    public ImputacionIndividualResponse getImputacionIndividual(Long legajoId, Integer anho, Integer mes) {
+        List<LegajoCategoriaImputacion> categoriaImputaciones = legajoCategoriaImputacionService.findAllByLegajo(legajoId, anho, mes);
+        List<LegajoCargoClaseImputacion> cargoClaseImputaciones = legajoCargoClaseImputacionService.findAllByLegajo(legajoId, anho, mes);
+        List<LegajoCodigoImputacion> codigoImputaciones = legajoCodigoImputacionService.findAllByLegajo(legajoId, anho, mes);
+
+        Map<Integer, String> categoriasMap = categoriaService.findAll().stream()
+                .collect(Collectors.toMap(Categoria::getCategoriaId, Categoria::getNombre, (k1, k2) -> k1));
+        Map<Long, String> cargoClasesMap = cargoClaseService.findAll().stream()
+                .collect(Collectors.toMap(CargoClaseEntity::getCargoClaseId, CargoClaseEntity::getNombre, (k1, k2) -> k1));
+        Map<Integer, String> codigosMap = codigoService.findAll().stream()
+                .collect(Collectors.toMap(Codigo::getCodigoId, Codigo::getNombre, (k1, k2) -> k1));
+        Map<Integer, String> facultadesMap = facultadService.getAllFacultades().stream()
+                .collect(Collectors.toMap(Facultad::getFacultadId, Facultad::getNombre, (k1, k2) -> k1));
+        Map<Integer, String> geograficasMap = geograficaService.getAllGeograficas().stream()
+                .collect(Collectors.toMap(Geografica::getGeograficaId, Geografica::getNombre, (k1, k2) -> k1));
+        Map<Integer, String> dependenciasMap = dependenciaService.findAll().stream()
+                .collect(Collectors.toMap(Dependencia::getDependenciaId, d -> (d.getAcronimo() != null && !d.getAcronimo().isBlank()) ? d.getAcronimo() : d.getNombre(), (k1, k2) -> k1));
+
+        List<Integer> codigoIdRemunerativos = codigoGrupoService.findAllByRemunerativo((byte) 1).stream()
+                .map(CodigoGrupoEntity::getCodigoId).toList();
+
+        BigDecimal totalCargosBasico = BigDecimal.ZERO;
+        BigDecimal totalCargosAntiguedad = BigDecimal.ZERO;
+        List<CargoImputacionDto> cargosDto = new java.util.ArrayList<>();
+        for (LegajoCategoriaImputacion item : categoriaImputaciones) {
+            BigDecimal basico = item.getBasico() != null ? item.getBasico() : BigDecimal.ZERO;
+            BigDecimal antiguedad = item.getAntiguedad() != null ? item.getAntiguedad() : BigDecimal.ZERO;
+            totalCargosBasico = totalCargosBasico.add(basico);
+            totalCargosAntiguedad = totalCargosAntiguedad.add(antiguedad);
+
+            cargosDto.add(CargoImputacionDto.builder()
+                    .categoriaId(item.getCategoriaId())
+                    .categoriaNombre(categoriasMap.getOrDefault(item.getCategoriaId(), ""))
+                    .dependenciaId(item.getDependenciaId())
+                    .dependenciaAcronimo(dependenciasMap.getOrDefault(item.getDependenciaId(), ""))
+                    .facultadId(item.getFacultadId())
+                    .facultadNombre(facultadesMap.getOrDefault(item.getFacultadId(), ""))
+                    .geograficaId(item.getGeograficaId())
+                    .geograficaNombre(geograficasMap.getOrDefault(item.getGeograficaId(), ""))
+                    .basico(basico)
+                    .antiguedad(antiguedad)
+                    .cuentaSueldos(item.getCuentaSueldos())
+                    .build());
+        }
+
+        BigDecimal totalClasesBasico = BigDecimal.ZERO;
+        BigDecimal totalClasesAntiguedad = BigDecimal.ZERO;
+        List<CargoClaseImputacionDto> cargosClaseDto = new java.util.ArrayList<>();
+        for (LegajoCargoClaseImputacion item : cargoClaseImputaciones) {
+            BigDecimal basico = item.getBasico() != null ? item.getBasico() : BigDecimal.ZERO;
+            BigDecimal antiguedad = item.getAntiguedad() != null ? item.getAntiguedad() : BigDecimal.ZERO;
+            totalClasesBasico = totalClasesBasico.add(basico);
+            totalClasesAntiguedad = totalClasesAntiguedad.add(antiguedad);
+
+            cargosClaseDto.add(CargoClaseImputacionDto.builder()
+                    .cargoClaseId(item.getCargoClaseId())
+                    .cargoClaseNombre(cargoClasesMap.getOrDefault(item.getCargoClaseId(), ""))
+                    .dependenciaId(item.getDependenciaId())
+                    .dependenciaAcronimo(dependenciasMap.getOrDefault(item.getDependenciaId(), ""))
+                    .facultadId(item.getFacultadId())
+                    .facultadNombre(facultadesMap.getOrDefault(item.getFacultadId(), ""))
+                    .geograficaId(item.getGeograficaId())
+                    .geograficaNombre(geograficasMap.getOrDefault(item.getGeograficaId(), ""))
+                    .basico(basico)
+                    .antiguedad(antiguedad)
+                    .cuentaSueldos(item.getCuentaSueldos())
+                    .build());
+        }
+
+        BigDecimal totalCodigosImporte = BigDecimal.ZERO;
+        BigDecimal totalCodigosRemunerativo = BigDecimal.ZERO;
+        BigDecimal totalCodigosNoRemunerativo = BigDecimal.ZERO;
+        List<CodigoImputacionDetalleDto> codigosDto = new java.util.ArrayList<>();
+        for (LegajoCodigoImputacion item : codigoImputaciones) {
+            BigDecimal importe = item.getImporte() != null ? item.getImporte() : BigDecimal.ZERO;
+            totalCodigosImporte = totalCodigosImporte.add(importe);
+            boolean esRemunerativo = codigoIdRemunerativos.contains(item.getCodigoId());
+            if (esRemunerativo) {
+                totalCodigosRemunerativo = totalCodigosRemunerativo.add(importe);
+            } else {
+                totalCodigosNoRemunerativo = totalCodigosNoRemunerativo.add(importe);
+            }
+
+            codigosDto.add(CodigoImputacionDetalleDto.builder()
+                    .codigoId(item.getCodigoId())
+                    .codigoNombre(codigosMap.getOrDefault(item.getCodigoId(), ""))
+                    .dependenciaId(item.getDependenciaId())
+                    .dependenciaAcronimo(dependenciasMap.getOrDefault(item.getDependenciaId(), ""))
+                    .facultadId(item.getFacultadId())
+                    .facultadNombre(facultadesMap.getOrDefault(item.getFacultadId(), ""))
+                    .geograficaId(item.getGeograficaId())
+                    .geograficaNombre(geograficasMap.getOrDefault(item.getGeograficaId(), ""))
+                    .importe(importe)
+                    .cuentaSueldos(item.getCuentaSueldos())
+                    .remunerativo(esRemunerativo)
+                    .build());
+        }
+
+        BigDecimal totalBruto = totalCargosBasico
+                .add(totalCargosAntiguedad)
+                .add(totalClasesBasico)
+                .add(totalClasesAntiguedad)
+                .add(totalCodigosRemunerativo);
+
+        BigDecimal totalNoRemunerativo = totalCodigosNoRemunerativo;
+
+        TotalesImputacionDto totalesDto = TotalesImputacionDto.builder()
+                .totalCargosBasico(totalCargosBasico)
+                .totalCargosAntiguedad(totalCargosAntiguedad)
+                .totalClasesBasico(totalClasesBasico)
+                .totalClasesAntiguedad(totalClasesAntiguedad)
+                .totalCodigosImporte(totalCodigosImporte)
+                .totalBruto(totalBruto)
+                .totalNoRemunerativo(totalNoRemunerativo)
+                .build();
+
+        Byte diferencia = 0;
+        try {
+            diferencia = legajoContabilidadService.findByUnique(legajoId, anho, mes).getDiferencia();
+        } catch (LegajoContabilidadException e) {
+            log.debug("Sin registro en legajoContabilidad para legajoId={}, anho={}, mes={}", legajoId, anho, mes);
+        }
+
+        return ImputacionIndividualResponse.builder()
+                .legajoId(legajoId)
+                .anho(anho)
+                .mes(mes)
+                .cargos(cargosDto)
+                .cargosClase(cargosClaseDto)
+                .codigos(codigosDto)
+                .totales(totalesDto)
+                .diferencia(diferencia)
+                .build();
     }
 
     public List<CuentaMovimientoDto> findAllByAsiento(OffsetDateTime fechaContable, Integer ordenContable) {

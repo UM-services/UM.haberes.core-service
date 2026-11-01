@@ -1,14 +1,20 @@
 package um.haberes.core.service.facade;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import um.haberes.core.exception.LegajoBancoException;
-import um.haberes.core.kotlin.model.internal.AfipContext;
-import um.haberes.core.kotlin.model.*;
+import um.haberes.core.hexagonal.liquidaciones.item.application.service.ItemService;
+import um.haberes.core.hexagonal.liquidaciones.item.domain.model.Item;
+import um.haberes.core.hexagonal.liquidaciones.item.infrastructure.persistence.entity.ItemEntity;
+import um.haberes.core.hexagonal.liquidaciones.liquidacion.application.service.LiquidacionService;
+import um.haberes.core.hexagonal.liquidaciones.liquidacion.domain.model.Liquidacion;
+import um.haberes.core.hexagonal.liquidaciones.liquidacion.infrastructure.persistence.entity.LiquidacionEntity;
+import um.haberes.core.model.*;
+import um.haberes.core.model.internal.AfipContext;
 import um.haberes.core.service.*;
 import um.haberes.core.service.internal.AfipContextService;
 
@@ -25,43 +31,20 @@ import java.util.zip.ZipOutputStream;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class LibroSueldoService {
 
     private List<Liquidacion> empleadosLiquidados;
-
-    Map<Long, LegajoControl> legajoControls;
-
-    private Control control;
-
+    private Map<Long, LegajoControlEntity> legajoControls;
+    private ControlEntity control;
     private final Environment environment;
-
     private final LiquidacionService liquidacionService;
-
     private final LegajoBancoService legajoBancoservice;
-
     private final ControlService controlService;
-
     private final ItemService itemService;
-
     private final LegajoControlService legajoControlService;
-
     private final AfipContextService afipContextService;
-
     private final CodigoGrupoService codigoGrupoService;
-
-    @Autowired
-    public LibroSueldoService(Environment environment, LiquidacionService liquidacionService, LegajoBancoService legajoBancoService,
-                              ControlService controlService, ItemService itemService, LegajoControlService legajoControlService,
-                              AfipContextService afipContextService, CodigoGrupoService codigoGrupoService) {
-        this.environment = environment;
-        this.liquidacionService = liquidacionService;
-        this.legajoBancoservice = legajoBancoService;
-        this.controlService = controlService;
-        this.itemService = itemService;
-        this.legajoControlService = legajoControlService;
-        this.afipContextService = afipContextService;
-        this.codigoGrupoService = codigoGrupoService;
-    }
 
     public String generate(Integer anho, Integer mes, List<Long> legajoIds) throws IOException {
         String path = environment.getProperty("path.files");
@@ -85,17 +68,17 @@ public class LibroSueldoService {
         styleBold.setFont(fontBold);
 
         // pull empleados liquidados
-        this.legajoControls = legajoControlService.findAllByPeriodo(anho, mes).stream().collect(Collectors.toMap(LegajoControl::getLegajoId, legajoControl -> legajoControl));
+        this.legajoControls = legajoControlService.findAllByPeriodo(anho, mes).stream().collect(Collectors.toMap(LegajoControlEntity::getLegajoId, legajoControl -> legajoControl));
 
-        if (legajoIds.size() == 0) {
-            this.empleadosLiquidados = liquidacionService.findAllByPeriodo(anho, mes, 0).stream().filter(empleado -> {
+        if (legajoIds.isEmpty()) {
+            this.empleadosLiquidados = liquidacionService.getLiquidacionesByPeriodo(anho, mes, 0).stream().filter(empleado -> {
                 boolean liquidado = false;
                 if (this.legajoControls.containsKey(empleado.getLegajoId()))
                     liquidado = this.legajoControls.get(empleado.getLegajoId()).getLiquidado() == 1;
                 return liquidado;
             }).toList();
         } else {
-            this.empleadosLiquidados = liquidacionService.findAllByPeriodoAndLegajoIds(anho, mes, legajoIds).stream().filter(empleado -> {
+            this.empleadosLiquidados = liquidacionService.getLiquidacionesByPeriodoAndLegajoIds(anho, mes, legajoIds).stream().filter(empleado -> {
                 boolean liquidado = false;
                 if (this.legajoControls.containsKey(empleado.getLegajoId()))
                     liquidado = this.legajoControls.get(empleado.getLegajoId()).getLiquidado() == 1;
@@ -162,7 +145,7 @@ public class LibroSueldoService {
         line += new DecimalFormat("00").format(mes);
         line += "M"; // Mensual
         int numeroLiquidacion = 1;
-        line += new DecimalFormat("00000").format(numeroLiquidacion); // Numero Liquidacion
+        line += new DecimalFormat("00000").format(numeroLiquidacion); // Numero LiquidacionEntity
         line += "30"; // Dias base
         line += new DecimalFormat("000000").format(this.empleadosLiquidados.size());
         bufferedWriter.write(line);
@@ -204,7 +187,7 @@ public class LibroSueldoService {
         setCellString(row, 0, "Identificador de Registro", styleBold);
         setCellString(row, 1, "CUIL", styleBold);
         setCellString(row, 2, "Legajo", styleBold);
-        setCellString(row, 3, "Dependencia en Revista", styleBold);
+        setCellString(row, 3, "DependenciaEntity en Revista", styleBold);
         setCellString(row, 4, "CBU", styleBold);
         setCellString(row, 5, "Cantidad de días tope", styleBold);
         setCellString(row, 6, "Fecha Pago", styleBold);
@@ -221,7 +204,7 @@ public class LibroSueldoService {
             line += String.format("%50s", ""); // dependencia
             String cbu = "";
             try {
-                LegajoBanco legajoBanco = legajoBancoservice.findLegajoCbuPrincipal(legajoId, liquidacion.getAnho(), liquidacion.getMes());
+                LegajoBancoEntity legajoBanco = legajoBancoservice.findLegajoCbuPrincipal(legajoId, liquidacion.getAnho(), liquidacion.getMes());
                 cbu = legajoBanco.getCbu();
                 log.info("cbu try={}", cbu);
             } catch (LegajoBancoException e) {
@@ -270,12 +253,12 @@ public class LibroSueldoService {
         if (mes > 6) {
             semestre = 2;
         }
-        Map<Integer, CodigoGrupo> grupos = codigoGrupoService.findAll().stream().collect(Collectors.toMap(CodigoGrupo::getCodigoId, codigo -> codigo));
+        Map<Integer, CodigoGrupoEntity> grupos = codigoGrupoService.findAll().stream().collect(Collectors.toMap(CodigoGrupoEntity::getCodigoId, codigo -> codigo));
         for (Liquidacion liquidacion : empleadosLiquidados) {
             Long legajoId = liquidacion.getPersona().getLegajoId();
             String cuil = liquidacion.getPersona().getCuil();
-            for (Item item : itemService.findAllByLegajo(legajoId, liquidacion.getAnho(), liquidacion.getMes())) {
-                log.debug("Item={}", item);
+            for (Item item : itemService.getItemsByLegajo(legajoId, liquidacion.getAnho(), liquidacion.getMes())) {
+                log.debug("ItemEntity={}", item);
                 if (item.getCodigo().getAfipConceptoSueldoIdPrimerSemestre() != null) {
                     bufferedWriter.write("\r\n");
                     String line = "03";
@@ -293,7 +276,7 @@ public class LibroSueldoService {
                     }
                     // if item is deduction
                     if (grupos.containsKey(item.getCodigoId())) {
-                        CodigoGrupo codigoGrupo = grupos.get(item.getCodigoId());
+                        CodigoGrupoEntity codigoGrupo = grupos.get(item.getCodigoId());
                         if (codigoGrupo.getDeduccion() == 1) {
                             tipoMovimiento = "D";
                             if (item.getImporte().compareTo(BigDecimal.ZERO) < 0) {
@@ -341,7 +324,7 @@ public class LibroSueldoService {
         setCellString(row, 8, "Tipo Operación", styleBold);
         setCellString(row, 9, "Código Situación", styleBold);
         setCellString(row, 10, "Código Condición", styleBold);
-        setCellString(row, 11, "Código Actividad", styleBold);
+        setCellString(row, 11, "Código ActividadEntity", styleBold);
         setCellString(row, 12, "Código Modalidad Contratación", styleBold);
         setCellString(row, 13, "Código Siniestrado", styleBold);
         setCellString(row, 14, "Código Localidad", styleBold);

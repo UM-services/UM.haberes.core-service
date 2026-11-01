@@ -1,0 +1,26 @@
+---
+title: "Generación de Orden de Pago del Período"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant Ctrl as OrdenPagoController
+    participant Svc as OrdenPagoService (facade)
+    participant EjeSvc as EjercicioService
+    participant AcrSvc as AcreditacionPagoService (hexagonal)
+    participant ProvSvc as ProveedorMovimientoService (externo)
+    participant ProvCli as ProveedorMovimientoClient (OpenFeign)
+
+    Usuario->>Ctrl: POST /ordenPago/generate (OrdenPagoRequest: anho, mes, fechaPago)
+    Ctrl->>Svc: generateOrdenPago(ordenPagoRequest)
+    Svc->>EjeSvc: ejercicioService.findByFecha(fechaPago)
+    EjeSvc-->>Svc: EjercicioDto (ejercicio contable vigente)
+    Svc->>AcrSvc: acreditacionPagoService.findByUnique(anho, mes, fechaPago)
+    AcrSvc-->>Svc: AcreditacionPago (punto venta y comprobante del pago)
+    Svc->>ProvSvc: buscar orden de pago previa del período
+    alt no existe orden previa
+        Svc->>ProvSvc: findLastOrdenPago(ejercicioId) (numeración siguiente)
+        Svc->>Svc: construir ProveedorMovimientoDto "Sueldos mes M/A"
+    end
+    Svc->>ProvCli: registrar movimiento de proveedor (orden de pago)
+    ProvCli-->>Usuario: confirmación externa (orden de pago generada)

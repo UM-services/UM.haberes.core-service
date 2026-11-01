@@ -1,0 +1,37 @@
+---
+title: "Ciclo de vida de la Liquidación: consultas, versiones y acreditación"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant Ctrl as LiquidacionController
+    participant Svc as LiquidacionService (hexagonal)
+    participant UC as Use Cases (ports/in)
+    participant Adapt as JpaLiquidacionRepositoryAdapter
+    participant Repo as JpaLiquidacionRepository / Version
+    participant DB as MySQL
+
+    Usuario->>Ctrl: GET /liquidacion/periodo/{anho}/{mes}/{limit} o /unique/{legajoId}/{anho}/{mes}
+    Ctrl->>Svc: getLiquidacionesByPeriodo(...) / getLiquidacionByUniqueKey(...)
+    Svc->>UC: GetLiquidacionesByPeriodoUseCase / GetLiquidacionByUniqueKeyUseCase
+    UC->>Adapt: findAllByPeriodo(...)
+    Adapt->>Repo: derived queries
+    Repo->>DB: SELECT
+    DB-->>Usuario: List~LiquidacionResponse~
+
+    Note over Usuario,DB: Versionado de liquidaciones
+
+    Usuario->>Ctrl: POST /liquidacion/version/{version} (LiquidacionRequest)
+    Ctrl->>Svc: addVersion(liquidacion, version)
+    Svc->>UC: CreateLiquidacionWithVersionUseCase
+    UC->>Adapt: save + saveVersion(LiquidacionVersion)
+    Usuario->>Ctrl: PUT /liquidacion/saveall/{version} (lista de liquidaciones)
+    Ctrl->>Svc: saveAll(liquidaciones, version)
+    Svc->>UC: SaveAllLiquidacionesUseCase
+
+    Note over Usuario,DB: Acreditación del período
+
+    Usuario->>Ctrl: POST /liquidacion/acreditado/{fecha} (ids de liquidaciones)
+    Ctrl->>Svc: acreditarLiquidacion(...)
+    Svc->>UC: AcreditarLiquidacionUseCase
+    UC->>Adapt: marcar acreditadas con fechaAcreditacion

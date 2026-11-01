@@ -13,10 +13,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.AntiguedadException;
-import um.haberes.core.kotlin.model.Antiguedad;
-import um.haberes.core.kotlin.model.Persona;
-import um.haberes.core.kotlin.model.view.AntiguedadPeriodo;
-import um.haberes.core.repository.AntiguedadRepository;
+import um.haberes.core.hexagonal.personas.persona.application.service.PersonaService;
+import um.haberes.core.hexagonal.personas.persona.domain.model.Persona;
+import um.haberes.core.model.AntiguedadEntity;
+import um.haberes.core.model.view.AntiguedadPeriodo;
+import um.haberes.core.repository.JpaAntiguedadRepository;
 import um.haberes.core.service.view.AntiguedadPeriodoService;
 import um.haberes.core.util.Periodo;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AntiguedadService {
 
 	@Autowired
-	private AntiguedadRepository repository;
+	private JpaAntiguedadRepository repository;
 
 	@Autowired
 	private AntiguedadPeriodoService antiguedadPeriodoService;
@@ -38,11 +39,11 @@ public class AntiguedadService {
 	@Autowired
 	private PersonaService personaService;
 
-	public List<Antiguedad> findAllByPeriodo(Integer anho, Integer mes, Integer limit) {
+	public List<AntiguedadEntity> findAllByPeriodo(Integer anho, Integer mes, Integer limit) {
 		return repository.findAllByAnhoAndMes(anho, mes, PageRequest.of(0, limit));
 	}
 
-	public Antiguedad findByUnique(Long legajoId, Integer anho, Integer mes) {
+	public AntiguedadEntity findByUnique(Long legajoId, Integer anho, Integer mes) {
 		return repository.findByLegajoIdAndAnhoAndMes(legajoId, anho, mes)
 				.orElseThrow(() -> new AntiguedadException(legajoId, anho, mes));
 	}
@@ -51,15 +52,15 @@ public class AntiguedadService {
 		return antiguedadPeriodoService.findLastByUnique(legajoId, anho, mes);
 	}
 
-	public Antiguedad add(Antiguedad antiguedad) {
+	public AntiguedadEntity add(AntiguedadEntity antiguedad) {
 		repository.save(antiguedad);
 		log.debug(antiguedad.toString());
 		return antiguedad;
 	}
 
-	public Antiguedad update(Antiguedad newAntiguedad, Long antiguedadId) {
+	public AntiguedadEntity update(AntiguedadEntity newAntiguedad, Long antiguedadId) {
 		return repository.findByAntiguedadId(antiguedadId).map(antiguedad -> {
-			antiguedad = new Antiguedad(antiguedadId, newAntiguedad.getLegajoId(), newAntiguedad.getAnho(),
+			antiguedad = new AntiguedadEntity(antiguedadId, newAntiguedad.getLegajoId(), newAntiguedad.getAnho(),
 					newAntiguedad.getMes(), newAntiguedad.getMesesDocentes(), newAntiguedad.getMesesAdministrativos(),
 					newAntiguedad.getPersona());
 			antiguedad = repository.save(antiguedad);
@@ -68,7 +69,7 @@ public class AntiguedadService {
 	}
 
 	@Transactional
-	public List<Antiguedad> saveAll(List<Antiguedad> antiguedades) {
+	public List<AntiguedadEntity> saveAll(List<AntiguedadEntity> antiguedades) {
 		repository.saveAll(antiguedades);
 		return antiguedades;
 	}
@@ -78,8 +79,8 @@ public class AntiguedadService {
 		Persona persona = personaService.findByLegajoId(legajoId);
 		Periodo ingresoDocente = null;
 		Periodo ingresoAdministrativo = null;
-		Integer mesesDocentes = 0;
-		Integer mesesAdministrativos = 0;
+		int mesesDocentes = 0;
+		int mesesAdministrativos = 0;
 		if (persona.getAltaDocente() != null) {
 			OffsetDateTime alta = persona.getAltaDocente().plusHours(3);
 			ingresoDocente = Periodo.builder().anho(alta.getYear()).mes(alta.getMonthValue()).build();
@@ -92,19 +93,19 @@ public class AntiguedadService {
 					+ Periodo.diffMonth(ingresoAdministrativo, Periodo.builder().anho(anho).mes(mes).build());
 		}
 		Long antiguedadId = null;
-		Antiguedad antiguedad = null;
+		AntiguedadEntity antiguedad = null;
 		try {
 			antiguedad = this.findByUnique(legajoId, anho, mes);
 			antiguedadId = antiguedad.getAntiguedadId();
 		} catch (AntiguedadException e) {
 		}
-		antiguedad = new Antiguedad(antiguedadId, legajoId, anho, mes, mesesDocentes, mesesAdministrativos, null);
+		antiguedad = new AntiguedadEntity(antiguedadId, legajoId, anho, mes, mesesDocentes, mesesAdministrativos, null);
 		if (antiguedadId == null) {
 			antiguedad = this.add(antiguedad);
 		} else {
 			antiguedad = this.update(antiguedad, antiguedadId);
 		}
-		log.debug("Antiguedad -> {}", antiguedad);
+		log.debug("AntiguedadEntity -> {}", antiguedad);
 	}
 
 }

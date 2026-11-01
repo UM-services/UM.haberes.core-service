@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.core.exception.LegajoBancoException;
-import um.haberes.core.kotlin.model.LegajoBanco;
+import um.haberes.core.model.LegajoBancoEntity;
 import um.haberes.core.service.LegajoBancoService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,7 +36,7 @@ public class LegajoBancoController {
 	private final LegajoBancoService service;
 
 	@GetMapping("/{legajoBancoId}")
-	public ResponseEntity<LegajoBanco> findByLegajoBancoId(@PathVariable Long legajoBancoId) {
+	public ResponseEntity<LegajoBancoEntity> findByLegajoBancoId(@PathVariable Long legajoBancoId) {
 		try {
             return ResponseEntity.ok(service.findByLegajoBancoId(legajoBancoId));
 		} catch (LegajoBancoException e) {
@@ -45,7 +45,7 @@ public class LegajoBancoController {
 	}
 
 	@GetMapping("/unique/{legajoId}/{anho}/{mes}/{cbu}")
-	public ResponseEntity<LegajoBanco> findByUnique(@PathVariable Long legajoId, @PathVariable Integer anho,
+	public ResponseEntity<LegajoBancoEntity> findByUnique(@PathVariable Long legajoId, @PathVariable Integer anho,
 			@PathVariable Integer mes, @PathVariable String cbu) {
 		try {
             return ResponseEntity.ok(service.findByUnique(legajoId, anho, mes, cbu));
@@ -55,7 +55,7 @@ public class LegajoBancoController {
 	}
 
 	@GetMapping("/lastlegajo/{legajoId}")
-	public ResponseEntity<LegajoBanco> findLastByLegajoId(@PathVariable Long legajoId) {
+	public ResponseEntity<LegajoBancoEntity> findLastByLegajoId(@PathVariable Long legajoId) {
 		try {
             return ResponseEntity.ok(service.findLastByLegajoId(legajoId));
 		} catch (LegajoBancoException e) {
@@ -64,12 +64,12 @@ public class LegajoBancoController {
 	}
 
 	@GetMapping("/legajo/{legajoId}")
-	public ResponseEntity<List<LegajoBanco>> findAllByLegajoId(@PathVariable Long legajoId) {
+	public ResponseEntity<List<LegajoBancoEntity>> findAllByLegajoId(@PathVariable Long legajoId) {
         return ResponseEntity.ok(service.findAllByLegajoId(legajoId));
 	}
 
 	@GetMapping("/legajoperiodo/{legajoId}/{anho}/{mes}")
-	public ResponseEntity<List<LegajoBanco>> findAllByLegajoPeriodo(
+	public ResponseEntity<List<LegajoBancoEntity>> findAllByLegajoPeriodo(
             @PathVariable Long legajoId,
 			@PathVariable Integer anho,
             @PathVariable Integer mes) {
@@ -77,7 +77,7 @@ public class LegajoBancoController {
 	}
 
 	@GetMapping("/cbuprincipal/{legajoId}/{anho}/{mes}")
-	public ResponseEntity<LegajoBanco> findLegajoCbuPrincipal(@PathVariable Long legajoId, @PathVariable Integer anho, @PathVariable Integer mes) {
+	public ResponseEntity<LegajoBancoEntity> findLegajoCbuPrincipal(@PathVariable Long legajoId, @PathVariable Integer anho, @PathVariable Integer mes) {
 		try {
             return ResponseEntity.ok(service.findLegajoCbuPrincipal(legajoId, anho, mes));
 		} catch (LegajoBancoException e) {
@@ -86,35 +86,35 @@ public class LegajoBancoController {
 	}
 
 	@GetMapping("/periodo/{anho}/{mes}")
-	public ResponseEntity<List<LegajoBanco>> findAllPeriodo(@PathVariable Integer anho, @PathVariable Integer mes) {
+	public ResponseEntity<List<LegajoBancoEntity>> findAllPeriodo(@PathVariable Integer anho, @PathVariable Integer mes) {
         return ResponseEntity.ok(service.findAllPeriodo(anho, mes));
 	}
 
 	@GetMapping("/periodosantander/{legajoId}/{anho}/{mes}")
-	public ResponseEntity<List<LegajoBanco>> findAllPeriodoSantander(@PathVariable Long legajoId,
+	public ResponseEntity<List<LegajoBancoEntity>> findAllPeriodoSantander(@PathVariable Long legajoId,
 			@PathVariable Integer anho, @PathVariable Integer mes) {
         return ResponseEntity.ok(service.findAllPeriodoSantander(legajoId, anho, mes));
 	}
 
 	@GetMapping("/periodootrosbancos/{legajoId}/{anho}/{mes}")
-	public ResponseEntity<List<LegajoBanco>> findAllPeriodoOtrosBancos(@PathVariable Long legajoId,
+	public ResponseEntity<List<LegajoBancoEntity>> findAllPeriodoOtrosBancos(@PathVariable Long legajoId,
 			@PathVariable Integer anho, @PathVariable Integer mes) {
         return ResponseEntity.ok(service.findAllPeriodoOtrosBancos(legajoId, anho, mes));
 	}
 
 	@PostMapping("/")
-	public ResponseEntity<LegajoBanco> add(@RequestBody LegajoBanco legajobanco) {
+	public ResponseEntity<LegajoBancoEntity> add(@RequestBody LegajoBancoEntity legajobanco) {
         return ResponseEntity.ok(service.add(legajobanco));
 	}
 
 	@PutMapping("/{legajobancoId}")
-	public ResponseEntity<LegajoBanco> update(@RequestBody LegajoBanco legajobanco,
+	public ResponseEntity<LegajoBancoEntity> update(@RequestBody LegajoBancoEntity legajobanco,
                                               @PathVariable Long legajobancoId) {
         return ResponseEntity.ok(service.update(legajobanco, legajobancoId));
 	}
 
 	@GetMapping("/santander/{salida}/{anho}/{mes}/{dependenciaId}")
-	public ResponseEntity<List<LegajoBanco>> findAllSantander(@PathVariable String salida,
+	public ResponseEntity<List<LegajoBancoEntity>> findAllSantander(@PathVariable String salida,
                                                               @PathVariable Integer anho,
                                                               @PathVariable Integer mes,
                                                               @PathVariable Integer dependenciaId) {
@@ -122,7 +122,7 @@ public class LegajoBancoController {
 	}
 
     @GetMapping("/santander/{salida}/{anho}/{mes}/{dependenciaId}/codigo/{codigoId}")
-    public ResponseEntity<List<LegajoBanco>> findAllSantanderConCodigo(@PathVariable String salida,
+    public ResponseEntity<List<LegajoBancoEntity>> findAllSantanderConCodigo(@PathVariable String salida,
                                                               @PathVariable Integer anho,
                                                               @PathVariable Integer mes,
                                                               @PathVariable Integer dependenciaId,
@@ -131,7 +131,7 @@ public class LegajoBancoController {
     }
 
     @GetMapping("/otrosbancos/{salida}/{anho}/{mes}/{dependenciaId}")
-	public ResponseEntity<List<LegajoBanco>> findAllOtrosBancos(@PathVariable String salida,
+	public ResponseEntity<List<LegajoBancoEntity>> findAllOtrosBancos(@PathVariable String salida,
                                                                 @PathVariable Integer anho,
                                                                 @PathVariable Integer mes,
                                                                 @PathVariable Integer dependenciaId) {
@@ -139,7 +139,7 @@ public class LegajoBancoController {
 	}
 
     @GetMapping("/otrosbancos/{salida}/{anho}/{mes}/{dependenciaId}/codigo/{codigoId}")
-    public ResponseEntity<List<LegajoBanco>> findAllOtrosBancosConCodigo(@PathVariable String salida,
+    public ResponseEntity<List<LegajoBancoEntity>> findAllOtrosBancosConCodigo(@PathVariable String salida,
                                                                         @PathVariable Integer anho,
                                                                         @PathVariable Integer mes,
                                                                         @PathVariable Integer dependenciaId,

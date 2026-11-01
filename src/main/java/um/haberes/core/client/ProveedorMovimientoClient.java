@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import um.haberes.core.kotlin.model.extern.ProveedorMovimientoDto;
+import um.haberes.core.model.extern.ProveedorMovimientoDto;
 
 import java.time.OffsetDateTime;
 import java.util.List;

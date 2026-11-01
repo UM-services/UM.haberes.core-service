@@ -17,16 +17,40 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import um.haberes.core.client.CuentaMovimientoClient;
 import um.haberes.core.exception.ContactoException;
+import um.haberes.core.hexagonal.contabilidad.legajo_cargo_clase_imputacion.application.service.LegajoCargoClaseImputacionService;
+import um.haberes.core.hexagonal.contabilidad.legajo_cargo_clase_imputacion.domain.model.LegajoCargoClaseImputacion;
+import um.haberes.core.hexagonal.contabilidad.legajo_categoria_imputacion.application.service.LegajoCategoriaImputacionService;
+import um.haberes.core.hexagonal.contabilidad.legajo_categoria_imputacion.domain.model.LegajoCategoriaImputacion;
+import um.haberes.core.hexagonal.contabilidad.legajo_codigo_imputacion.application.service.LegajoCodigoImputacionService;
+import um.haberes.core.hexagonal.contabilidad.legajo_codigo_imputacion.domain.model.LegajoCodigoImputacion;
 import um.haberes.core.hexagonal.facultad.application.service.FacultadService;
 import um.haberes.core.hexagonal.facultad.domain.model.Facultad;
 import um.haberes.core.hexagonal.geografica.application.service.GeograficaService;
 import um.haberes.core.hexagonal.geografica.domain.model.Geografica;
-import um.haberes.core.hexagonal.geografica.infrastructure.persistence.entity.GeograficaEntity;
-import um.haberes.core.kotlin.model.*;
-import um.haberes.core.kotlin.model.extern.CuentaDto;
-import um.haberes.core.kotlin.model.extern.CuentaMovimientoDto;
-import um.haberes.core.kotlin.model.view.LegajoCursoCantidad;
-import um.haberes.core.kotlin.model.view.NovedadAcumulado;
+import um.haberes.core.hexagonal.liquidaciones.acreditacion.application.service.AcreditacionService;
+import um.haberes.core.hexagonal.liquidaciones.acreditacion.domain.model.Acreditacion;
+import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.application.service.CargoLiquidacionService;
+import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.model.CargoLiquidacion;
+import um.haberes.core.hexagonal.liquidaciones.categoria.application.service.CategoriaService;
+import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.Categoria;
+import um.haberes.core.hexagonal.liquidaciones.codigo.application.service.CodigoService;
+import um.haberes.core.hexagonal.liquidaciones.codigo.domain.model.Codigo;
+import um.haberes.core.hexagonal.liquidaciones.item.application.service.ItemService;
+import um.haberes.core.hexagonal.liquidaciones.item.domain.model.Item;
+import um.haberes.core.hexagonal.liquidaciones.liquidacion.application.service.LiquidacionService;
+import um.haberes.core.hexagonal.liquidaciones.liquidacion.domain.model.Liquidacion;
+import um.haberes.core.hexagonal.liquidaciones.novedad.application.service.NovedadService;
+import um.haberes.core.hexagonal.liquidaciones.novedad.domain.model.Novedad;
+import um.haberes.core.hexagonal.liquidaciones.novedad.infrastructure.persistence.entity.NovedadEntity;
+import um.haberes.core.hexagonal.personas.dependencia.application.service.DependenciaService;
+import um.haberes.core.hexagonal.personas.dependencia.domain.model.Dependencia;
+import um.haberes.core.hexagonal.personas.persona.application.service.PersonaService;
+import um.haberes.core.hexagonal.personas.persona.domain.model.Persona;
+import um.haberes.core.model.*;
+import um.haberes.core.model.extern.CuentaDto;
+import um.haberes.core.model.extern.CuentaMovimientoDto;
+import um.haberes.core.model.view.LegajoCursoCantidad;
+import um.haberes.core.model.view.NovedadAcumulado;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
@@ -37,9 +61,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import um.haberes.core.exception.AcreditacionException;
+import um.haberes.core.hexagonal.liquidaciones.acreditacion.application.exception.AcreditacionException;
 import um.haberes.core.exception.LegajoBancoException;
-import um.haberes.core.exception.NovedadException;
+import um.haberes.core.hexagonal.liquidaciones.novedad.application.exception.NovedadException;
 import um.haberes.core.service.view.LegajoCursoCantidadService;
 import um.haberes.core.service.view.NovedadAcumuladoService;
 import um.haberes.core.util.Periodo;
@@ -100,8 +124,8 @@ public class SheetService {
         this.setCellString(row, 0, "Legajo", style_bold);
         this.setCellString(row, 1, "Apellido, Nombre", style_bold);
         this.setCellString(row, 2, "Estado", style_bold);
-        this.setCellString(row, 3, "#Dependencia", style_bold);
-        this.setCellString(row, 4, "Dependencia", style_bold);
+        this.setCellString(row, 3, "#DependenciaEntity", style_bold);
+        this.setCellString(row, 4, "DependenciaEntity", style_bold);
 
         for (Persona persona : personaService.findAllLiquidables()) {
             row = sheet.createRow(++fila);
@@ -128,7 +152,7 @@ public class SheetService {
             log.debug(file.getAbsolutePath());
             book.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
         return filename;
     }
@@ -190,7 +214,7 @@ public class SheetService {
 
     public String generateCargos(Integer anho, Integer mes) {
         // Depurar los cargos de legajos no liquidados
-        List<Long> legajos = liquidacionService.findAllByPeriodo(anho, mes, 0).stream()
+        List<Long> legajos = liquidacionService.getLiquidacionesByPeriodo(anho, mes, 0).stream()
                 .map(Liquidacion::getLegajoId).collect(Collectors.toList());
         log.debug("Legajos" + legajos);
         cargoLiquidacionService.deleteAllNotInByPeriodo(legajos, anho, mes);
@@ -216,10 +240,10 @@ public class SheetService {
         this.setCellString(row, 0, "Legajo", style_bold);
         this.setCellString(row, 1, "Apellido, Nombre", style_bold);
         this.setCellString(row, 2, "Periodo", style_bold);
-        this.setCellString(row, 3, "#Dependencia", style_bold);
-        this.setCellString(row, 4, "Dependencia", style_bold);
-        this.setCellString(row, 5, "#Categoria", style_bold);
-        this.setCellString(row, 6, "Categoria", style_bold);
+        this.setCellString(row, 3, "#DependenciaEntity", style_bold);
+        this.setCellString(row, 4, "DependenciaEntity", style_bold);
+        this.setCellString(row, 5, "#CategoriaEntity", style_bold);
+        this.setCellString(row, 6, "CategoriaEntity", style_bold);
 
         Map<Long, Persona> personas = personaService.findAllLegajos(legajos).stream()
                 .collect(Collectors.toMap(Persona::getLegajoId, persona -> persona));
@@ -264,7 +288,7 @@ public class SheetService {
     }
 
     public String generateItems(Integer anho, Integer mes) {
-        List<Item> items = itemService.findAllByPeriodo(anho, mes, 1000000);
+        List<Item> items = itemService.getItemsByPeriodo(anho, mes, 1000000);
         List<Long> legajos = items.stream().map(Item::getLegajoId).collect(Collectors.toList());
         List<Codigo> codigos = codigoService
                 .findAllByCodigoIds(items.stream().map(Item::getCodigoId).collect(Collectors.toList()));
@@ -359,7 +383,7 @@ public class SheetService {
             this.setCellLong(row, 0, persona.getLegajoId(), style_normal);
             this.setCellString(row, 1, persona.getApellido() + ", " + persona.getNombre(), style_normal);
             Map<Integer, BigDecimal> items = itemService
-                    .findAllByLegajo(persona.getLegajoId(), anho, mes).stream()
+                    .getItemsByLegajo(persona.getLegajoId(), anho, mes).stream()
                     .collect(Collectors.toMap(Item::getCodigoId, Item::getImporte));
             columna = 1;
             for (Codigo codigo : codigos) {
@@ -461,10 +485,10 @@ public class SheetService {
         this.setCellString(row, 0, "Legajo", style_normal);
         this.setCellString(row, 1, "Apellido, Nombre", style_normal);
         this.setCellString(row, 2, "Liquidado", style_normal);
-        this.setCellString(row, 3, "Novedad", style_normal);
+        this.setCellString(row, 3, "NovedadEntity", style_normal);
         this.setCellString(row, 4, "#Cantidad", style_normal);
 
-        Map<Long, BigDecimal> items = itemService.findAllByCodigo(codigoId, anho, mes).stream()
+        Map<Long, BigDecimal> items = itemService.getItemsByCodigo(codigoId, anho, mes).stream()
                 .collect(Collectors.toMap(Item::getLegajoId, Item::getImporte));
         List<NovedadAcumulado> novedades = novedadAcumuladoService.findAllByCodigo(codigoId, anho, mes);
         Map<Long, BigDecimal> importes = novedades.stream()
@@ -510,7 +534,7 @@ public class SheetService {
         int mesDesde = (semestre - 1) * 6 + 1;
         int mesHasta = semestre * 6;
         boolean simulaUltimo = false;
-        if (liquidacionService.findAllByPeriodo(anho, mesHasta, 1).isEmpty()) {
+        if (liquidacionService.getLiquidacionesByPeriodo(anho, mesHasta, 1).isEmpty()) {
             simulaUltimo = true;
             mesHasta--;
         }
@@ -546,7 +570,7 @@ public class SheetService {
 
         for (Persona persona : personaService.findAllBySemestre(anho, semestre)) {
             Map<Integer, Liquidacion> liquidaciones = liquidacionService
-                    .findAllBySemestreLegajo(anho, semestre, persona.getLegajoId(), 0).stream()
+                    .getLiquidacionesBySemestreLegajo(anho, semestre, persona.getLegajoId(), 0).stream()
                     .collect(Collectors.toMap(Liquidacion::getMes, liquidacion -> liquidacion));
             int cantidadMeses = 0;
             row = sheet.createRow(++fila);
@@ -562,7 +586,7 @@ public class SheetService {
             for (int mes = mesDesde; mes <= mesHasta; mes++) {
                 Map<Integer, Item> items = new HashMap<>();
                 if (liquidaciones.containsKey(mes)) {
-                    items = itemService.findAllByLegajo(persona.getLegajoId(), anho, mes).stream()
+                    items = itemService.getItemsByLegajo(persona.getLegajoId(), anho, mes).stream()
                             .collect(Collectors.toMap(Item::getCodigoId, item -> item));
                 }
                 bruto = BigDecimal.ZERO;
@@ -671,7 +695,7 @@ public class SheetService {
         int mesDesde = (semestre - 1) * 6 + 1;
         int mesHasta = semestre * 6;
         boolean simulaUltimo = false;
-        if (liquidacionService.findAllByPeriodo(anho, mesHasta, 1).isEmpty()) {
+        if (liquidacionService.getLiquidacionesByPeriodo(anho, mesHasta, 1).isEmpty()) {
             simulaUltimo = true;
             mesHasta--;
         }
@@ -679,7 +703,7 @@ public class SheetService {
         List<Novedad> novedades = new ArrayList<>();
         for (Persona persona : personaService.findAllBySemestre(anho, semestre)) {
             Map<Integer, Liquidacion> liquidaciones = liquidacionService
-                    .findAllBySemestreLegajo(anho, semestre, persona.getLegajoId(), 0).stream()
+                    .getLiquidacionesBySemestreLegajo(anho, semestre, persona.getLegajoId(), 0).stream()
                     .collect(Collectors.toMap(Liquidacion::getMes, liquidacion -> liquidacion));
             int cantidadMeses = 0;
             BigDecimal mejorBruto = BigDecimal.ZERO;
@@ -692,7 +716,7 @@ public class SheetService {
             for (int mes = mesDesde; mes <= mesHasta; mes++) {
                 Map<Integer, Item> items = new HashMap<>();
                 if (liquidaciones.containsKey(mes)) {
-                    items = itemService.findAllByLegajo(persona.getLegajoId(), anho, mes).stream()
+                    items = itemService.getItemsByLegajo(persona.getLegajoId(), anho, mes).stream()
                             .collect(Collectors.toMap(Item::getCodigoId, item -> item));
                 }
                 bruto = BigDecimal.ZERO;
@@ -775,7 +799,7 @@ public class SheetService {
                     importe = BigDecimal.valueOf(-0.83).multiply(aguinaldo).setScale(2, RoundingMode.HALF_UP);
                 }
                 novedades.add(new Novedad(novedadId, persona.getLegajoId(), anho, semestre * 6, codigoId, null, importe,
-                        "", "Generación Externa", (byte) 0, null, null, null, null));
+                        "", "Generación Externa", (byte) 0, null, null));
             }
         }
         novedadService.saveAll(novedades);
@@ -818,7 +842,7 @@ public class SheetService {
                 .collect(Collectors.toList());
         Map<Long, Persona> legajos = personaService.findAllLegajos(legajoIds).stream()
                 .collect(Collectors.toMap(Persona::getLegajoId, persona -> persona));
-        Map<Long, Item> items = itemService.findAllByCodigo(96, anho, mes).stream()
+        Map<Long, Item> items = itemService.getItemsByCodigo(96, anho, mes).stream()
                 .collect(Collectors.toMap(Item::getLegajoId, item -> item));
         for (LegajoCursoCantidad legajoCurso : legajoCursos) {
             row = sheet.createRow(++fila);
@@ -875,14 +899,14 @@ public class SheetService {
         row = sheet.createRow(++fila);
         this.setCellString(row, 0, "Legajo", style_bold);
         this.setCellString(row, 1, "Apellido, Nombre", style_bold);
-        this.setCellString(row, 2, "Dependencia", style_bold);
-        this.setCellString(row, 3, "#/Clase", style_bold);
-        this.setCellString(row, 4, "Categoría/Cargo", style_bold);
+        this.setCellString(row, 2, "DependenciaEntity", style_bold);
+        this.setCellString(row, 3, "#/ClaseEntity", style_bold);
+        this.setCellString(row, 4, "Categoría/CargoEntity", style_bold);
         this.setCellString(row, 5, "Básico/Valor Hora", style_bold);
         this.setCellString(row, 6, "Horas Jornada", style_bold);
         this.setCellString(row, 7, "Jornada/Horas", style_bold);
 
-        for (Liquidacion liquidacion : liquidacionService.findAllByPeriodo(anho, mes, 0)) {
+        for (Liquidacion liquidacion : liquidacionService.getLiquidacionesByPeriodo(anho, mes, 0)) {
             for (CargoLiquidacion cargoLiquidacion : cargoLiquidacionService.findAllByLegajo(liquidacion.getLegajoId(),
                     anho, mes)) {
                 row = sheet.createRow(++fila);
@@ -898,7 +922,7 @@ public class SheetService {
                     this.setCellInteger(row, 7, cargoLiquidacion.getJornada(), style_normal);
                 }
             }
-            for (CargoClaseDetalle cargoClaseDetalle : cargoClaseDetalleService
+            for (CargoClaseDetalleEntity cargoClaseDetalle : cargoClaseDetalleService
                     .findAllByLegajo(liquidacion.getLegajoId(), anho, mes)) {
                 row = sheet.createRow(++fila);
                 this.setCellLong(row, 0, liquidacion.getLegajoId(), style_normal);
@@ -913,7 +937,7 @@ public class SheetService {
                 this.setCellInteger(row, 7, cargoClaseDetalle.getHoras(), style_normal);
             }
             Codigo codigo = codigoService.findByCodigoId(981);
-            for (LiquidacionAdicional liquidacionAdicional : liquidacionAdicionalService
+            for (LiquidacionAdicionalEntity liquidacionAdicional : liquidacionAdicionalService
                     .findAllByLegajo(liquidacion.getLegajoId(), anho, mes)) {
                 row = sheet.createRow(++fila);
                 this.setCellLong(row, 0, liquidacion.getLegajoId(), style_normal);
@@ -964,7 +988,7 @@ public class SheetService {
         row = sheet.createRow(++fila);
         this.setCellString(row, 0, MessageFormat.format("Periodo Actual: {0}/{1}", mes, anho), style_bold);
         row = sheet.createRow(++fila);
-        this.setCellString(row, 0, "Dependencia", style_bold);
+        this.setCellString(row, 0, "DependenciaEntity", style_bold);
         this.setCellString(row, 1, "Legajo", style_bold);
         this.setCellString(row, 2, "Apellido, Nombre", style_bold);
         this.setCellString(row, 3, "Bruto Anterior", style_bold);
@@ -978,15 +1002,15 @@ public class SheetService {
         this.setCellString(row, 11, "Neto Actual", style_bold);
         this.setCellString(row, 12, "1/2 SAC Actual (Est)", style_bold);
         this.setCellString(row, 13, "Neto Diferencia", style_bold);
-        Map<String, Liquidacion> liquidacionMap = liquidacionService.findAllByPeriodo(anho, mes, 0).stream()
+        Map<String, Liquidacion> liquidacionMap = liquidacionService.getLiquidacionesByPeriodo(anho, mes, 0).stream()
                 .collect(Collectors.toMap(Liquidacion::key, liquidacion -> liquidacion));
-        Map<String, Item> aguinaldoMap = itemService.findAllByCodigo(3, anho, mes).stream()
+        Map<String, Item> aguinaldoMap = itemService.getItemsByCodigo(3, anho, mes).stream()
                 .collect(Collectors.toMap(Item::legajoKey, item -> item));
         Periodo periodo = Periodo.prevMonth(anho, mes);
         Map<String, Liquidacion> liquidacionAnteriorMap = liquidacionService
-                .findAllByPeriodo(periodo.getAnho(), periodo.getMes(), 0).stream()
+                .getLiquidacionesByPeriodo(periodo.getAnho(), periodo.getMes(), 0).stream()
                 .collect(Collectors.toMap(Liquidacion::key, liquidacion -> liquidacion));
-        Map<String, Item> aguinaldoAnteriorMap = itemService.findAllByCodigo(3, periodo.getAnho(), periodo.getMes())
+        Map<String, Item> aguinaldoAnteriorMap = itemService.getItemsByCodigo(3, periodo.getAnho(), periodo.getMes())
                 .stream().collect(Collectors.toMap(Item::legajoKey, item -> item));
 
         for (Persona persona : personaService.findAllOrderByDependencia()) {
@@ -1108,12 +1132,12 @@ public class SheetService {
         this.setCellString(row, 13, "Estado", style_bold);
         this.setCellString(row, 14, "Liquida", style_bold);
         this.setCellString(row, 15, "Estado AFIP", style_bold);
-        this.setCellString(row, 16, "Dependencia", style_bold);
+        this.setCellString(row, 16, "DependenciaEntity", style_bold);
         this.setCellString(row, 17, "Salida", style_bold);
         this.setCellString(row, 18, "Obra Social", style_bold);
-        this.setCellString(row, 19, "Actividad AFIP", style_bold);
+        this.setCellString(row, 19, "ActividadEntity AFIP", style_bold);
         this.setCellString(row, 20, "Localidad AFIP", style_bold);
-        this.setCellString(row, 21, "Situacion AFIP", style_bold);
+        this.setCellString(row, 21, "SituacionEntity AFIP", style_bold);
         this.setCellString(row, 22, "Modelo Contratación AFIP", style_bold);
         this.setCellString(row, 23, "CBU", style_bold);
         this.setCellString(row, 24, "Fijo", style_bold);
@@ -1123,11 +1147,11 @@ public class SheetService {
         this.setCellString(row, 28, "e-mail Institucional", style_bold);
 
         for (Persona persona : personaService.findAll()) {
-            Contacto contacto = null;
+            ContactoEntity contacto = null;
             try {
                 contacto = contactoService.findByLegajoId(persona.getLegajoId());
             } catch (ContactoException e) {
-                contacto = new Contacto();
+                contacto = new ContactoEntity();
             }
             row = sheet.createRow(++fila);
             this.setCellLong(row, 0, persona.getLegajoId(), style_normal);
@@ -1171,8 +1195,8 @@ public class SheetService {
             }
             try {
                 boolean first = true;
-                LegajoBanco legajoBanco = legajoBancoService.findLastByLegajoId(persona.getLegajoId());
-                for (LegajoBanco banco : legajoBancoService.findAllByLegajoPeriodo(persona.getLegajoId(),
+                LegajoBancoEntity legajoBanco = legajoBancoService.findLastByLegajoId(persona.getLegajoId());
+                for (LegajoBancoEntity banco : legajoBancoService.findAllByLegajoPeriodo(persona.getLegajoId(),
                         legajoBanco.getAnho(), legajoBanco.getMes())) {
                     String flecha = "---> ";
                     if (first) {
@@ -1322,8 +1346,8 @@ public class SheetService {
         style_bold.setFont(font_bold);
 
         // Codigos Remunerativos
-        List<Integer> codigoIdRemunerativos = codigoGrupoService.findAllByRemunerativo((byte) 1).stream().map(CodigoGrupo::getCodigoId).collect(Collectors.toList());
-        List<Integer> codigoIdNoRemunerativos = codigoGrupoService.findAllByNoRemunerativo((byte) 1).stream().map(CodigoGrupo::getCodigoId).collect(Collectors.toList());
+        List<Integer> codigoIdRemunerativos = codigoGrupoService.findAllByRemunerativo((byte) 1).stream().map(CodigoGrupoEntity::getCodigoId).collect(Collectors.toList());
+        List<Integer> codigoIdNoRemunerativos = codigoGrupoService.findAllByNoRemunerativo((byte) 1).stream().map(CodigoGrupoEntity::getCodigoId).collect(Collectors.toList());
 
         Sheet sheet = book.createSheet("Acreditados");
         Row row = null;
@@ -1334,24 +1358,24 @@ public class SheetService {
         this.setCellString(row, 2, "Cargos", style_bold);
         this.setCellString(row, 3, "Cargos Imputacion Basico", style_bold);
         this.setCellString(row, 4, "Cargos Imputacion Antigüedad", style_bold);
-        this.setCellString(row, 5, "Cargos Clase", style_bold);
-        this.setCellString(row, 6, "Cargos Clase Imputacion Basico", style_bold);
-        this.setCellString(row, 7, "Cargos Clase Imputacion Antigüedad", style_bold);
-        this.setCellString(row, 8, "Basico Liquidacion", style_bold);
+        this.setCellString(row, 5, "Cargos ClaseEntity", style_bold);
+        this.setCellString(row, 6, "Cargos ClaseEntity Imputacion Basico", style_bold);
+        this.setCellString(row, 7, "Cargos ClaseEntity Imputacion Antigüedad", style_bold);
+        this.setCellString(row, 8, "Basico LiquidacionEntity", style_bold);
         this.setCellString(row, 9, "Diferencia Basico", style_bold);
-        this.setCellString(row, 10, "Antigüedad Liquidacion", style_bold);
+        this.setCellString(row, 10, "Antigüedad LiquidacionEntity", style_bold);
         this.setCellString(row, 11, "Diferencia Antigüedad", style_bold);
         this.setCellString(row, 12, "Codigos Imputacion Remunerativos", style_bold);
         this.setCellString(row, 13, "Codigos Imputacion No Remunerativos", style_bold);
-        this.setCellString(row, 14, "Remunerativos Liquidacion", style_bold);
+        this.setCellString(row, 14, "Remunerativos LiquidacionEntity", style_bold);
         this.setCellString(row, 15, "Diferencia Remunerativos", style_bold);
-        this.setCellString(row, 16, "No Remunerativos Liquidacion", style_bold);
+        this.setCellString(row, 16, "No Remunerativos LiquidacionEntity", style_bold);
         this.setCellString(row, 17, "Diferencia No Remunerativos", style_bold);
 
-        for (Liquidacion liquidacion : liquidacionService.findAllByAcreditado(anho, mes)) {
+        for (Liquidacion liquidacion : liquidacionService.getLiquidacionesByAcreditado(anho, mes)) {
 //        Long[] valores = {54L, 57L, 725L, 1515L};
-//        for (Liquidacion liquidacion : liquidacionService.findAllAcreditadoByLegajoIdIn(anho, mes, Arrays.asList(valores))) {
-            Map<Integer, Item> itemMap = itemService.findAllByLegajo(liquidacion.getLegajoId(), anho, mes).stream().collect(Collectors.toMap(Item::getCodigoId, item -> item));
+//        for (LiquidacionEntity liquidacion : liquidacionService.findAllAcreditadoByLegajoIdIn(anho, mes, Arrays.asList(valores))) {
+            Map<Integer, Item> itemMap = itemService.getItemsByLegajo(liquidacion.getLegajoId(), anho, mes).stream().collect(Collectors.toMap(Item::getCodigoId, item -> item));
             BigDecimal totalCargos = BigDecimal.ZERO;
             for (CargoLiquidacion cargoLiquidacion : cargoLiquidacionService.findAllByLegajo(liquidacion.getLegajoId(), anho, mes)) {
                 BigDecimal multiplicador = new BigDecimal(cargoLiquidacion.getJornada());
@@ -1367,7 +1391,7 @@ public class SheetService {
                 totalCargosAntiguedadImputacion = totalCargosAntiguedadImputacion.add(legajoCategoriaImputacion.getAntiguedad()).setScale(2, RoundingMode.HALF_UP);
             }
             BigDecimal totalCargosClase = BigDecimal.ZERO;
-            for (CargoClaseDetalle cargoClaseDetalle : cargoClaseDetalleService.findAllByLegajo(liquidacion.getLegajoId(), anho, mes)) {
+            for (CargoClaseDetalleEntity cargoClaseDetalle : cargoClaseDetalleService.findAllByLegajo(liquidacion.getLegajoId(), anho, mes)) {
                 totalCargosClase = totalCargosClase.add(cargoClaseDetalle.getValorHora().multiply(new BigDecimal(cargoClaseDetalle.getHoras()))).setScale(2, RoundingMode.HALF_UP);
             }
             BigDecimal totalCargosClaseBasicoImputacion = BigDecimal.ZERO;
@@ -1392,7 +1416,7 @@ public class SheetService {
             // Calcula los items remunerativos liquidados excepto basico y antiguedad
             codigoIdRemunerativos = codigoIdRemunerativos.stream().filter(codigoId -> codigoId > 2).collect(Collectors.toList());
             BigDecimal totalRemunerativosLiquidacion = BigDecimal.ZERO;
-            for (Item item : itemService.findAllCodigoIdsByLegajo(liquidacion.getLegajoId(), anho, mes, codigoIdRemunerativos)) {
+            for (Item item : itemService.getItemsByLegajoAndCodigos(liquidacion.getLegajoId(), anho, mes, codigoIdRemunerativos)) {
                 totalRemunerativosLiquidacion = totalRemunerativosLiquidacion.add(item.getImporte()).setScale(2, RoundingMode.HALF_UP);
             }
 
@@ -1403,7 +1427,7 @@ public class SheetService {
 
             // Calcula los items no remunerativos liquidados
             BigDecimal totalNoRemunerativosLiquidacion = BigDecimal.ZERO;
-            for (Item item : itemService.findAllCodigoIdsByLegajo(liquidacion.getLegajoId(), anho, mes, codigoIdNoRemunerativos)) {
+            for (Item item : itemService.getItemsByLegajoAndCodigos(liquidacion.getLegajoId(), anho, mes, codigoIdNoRemunerativos)) {
                 totalNoRemunerativosLiquidacion = totalNoRemunerativosLiquidacion.add(item.getImporte()).setScale(2, RoundingMode.HALF_UP);
             }
 

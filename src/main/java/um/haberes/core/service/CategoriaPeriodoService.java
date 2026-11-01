@@ -10,9 +10,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.CategoriaPeriodoException;
-import um.haberes.core.kotlin.model.CategoriaPeriodo;
+import um.haberes.core.model.CategoriaPeriodoEntity;
 import java.util.Set;
-import um.haberes.core.repository.CategoriaPeriodoRepository;
+import um.haberes.core.repository.JpaCategoriaPeriodoRepository;
 
 /**
  * @author daniel
@@ -21,33 +21,33 @@ import um.haberes.core.repository.CategoriaPeriodoRepository;
 @Service
 public class CategoriaPeriodoService {
 
-	private final CategoriaPeriodoRepository repository;
+	private final JpaCategoriaPeriodoRepository repository;
 
-	public CategoriaPeriodoService(CategoriaPeriodoRepository repository) {
+	public CategoriaPeriodoService(JpaCategoriaPeriodoRepository repository) {
 		this.repository = repository;
 	}
 
-	public List<CategoriaPeriodo> findAllByAnhoAndMes(Integer anho, Integer mes) {
+	public List<CategoriaPeriodoEntity> findAllByAnhoAndMes(Integer anho, Integer mes) {
 		return repository.findAllByAnhoAndMes(anho, mes);
 	}
 
-	public List<CategoriaPeriodo> findAllByCategoriaIdsAndPeriodo(Set<Integer> categoriaIds, Integer anho, Integer mes) {
+	public List<CategoriaPeriodoEntity> findAllByCategoriaIdsAndPeriodo(Set<Integer> categoriaIds, Integer anho, Integer mes) {
 		return repository.findAllByCategoriaIdInAndAnhoAndMes(categoriaIds, anho, mes);
 	}
 
-	public CategoriaPeriodo findByUnique(Integer categoriaId, Integer anho, Integer mes) {
+	public CategoriaPeriodoEntity findByUnique(Integer categoriaId, Integer anho, Integer mes) {
 		return repository.findByCategoriaIdAndAnhoAndMes(categoriaId, anho, mes)
 				.orElseThrow(() -> new CategoriaPeriodoException(categoriaId, anho, mes));
 	}
 
-	public CategoriaPeriodo add(CategoriaPeriodo categoriaPeriodo) {
+	public CategoriaPeriodoEntity add(CategoriaPeriodoEntity categoriaPeriodo) {
 		categoriaPeriodo = repository.save(categoriaPeriodo);
 		return categoriaPeriodo;
 	}
 
-	public CategoriaPeriodo update(CategoriaPeriodo newCategoriaPeriodo, Long categoriaPeriodoId) {
+	public CategoriaPeriodoEntity update(CategoriaPeriodoEntity newCategoriaPeriodo, Long categoriaPeriodoId) {
 		return repository.findByCategoriaPeriodoId(categoriaPeriodoId).map(categoriaPeriodo -> {
-			categoriaPeriodo = new CategoriaPeriodo(categoriaPeriodoId, newCategoriaPeriodo.getCategoriaId(),
+			categoriaPeriodo = new CategoriaPeriodoEntity(categoriaPeriodoId, newCategoriaPeriodo.getCategoriaId(),
 					newCategoriaPeriodo.getAnho(), newCategoriaPeriodo.getMes(), newCategoriaPeriodo.getNombre(),
 					newCategoriaPeriodo.getBasico(), newCategoriaPeriodo.getDocente(),
 					newCategoriaPeriodo.getNoDocente(), newCategoriaPeriodo.getLiquidaPorHora(), newCategoriaPeriodo.getEstadoDocente());
@@ -57,7 +57,7 @@ public class CategoriaPeriodoService {
 	}
 
 	@Transactional
-	public List<CategoriaPeriodo> saveAll(List<CategoriaPeriodo> categoriaPeriodos) {
+	public List<CategoriaPeriodoEntity> saveAll(List<CategoriaPeriodoEntity> categoriaPeriodos) {
 		categoriaPeriodos = repository.saveAll(categoriaPeriodos);
 		return categoriaPeriodos;
 	}

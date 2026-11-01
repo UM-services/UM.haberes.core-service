@@ -1,21 +1,32 @@
+---
+title: Secuencia de Liquidación Individual de Haberes
+---
 sequenceDiagram
-    participant Usuario
-    participant AcreditacionController
-    participant LiquidacionService
-    participant CargoRepository
-    participant PersonaClient
-    participant CuentaClient
+    autonumber
+    actor Usuario
+    participant Controller as MakeLiquidacionController
+    participant Service as MakeLiquidacionService (facade)
+    participant Liquidacion as LiquidacionService (hexagonal)
+    participant CargoLiq as CargoLiquidacionService (hexagonal)
+    participant Novedad as NovedadService (hexagonal)
+    participant Estado as LiquidacionState
+    participant Item as ItemService (hexagonal)
+    participant Persist as ActividadService / LetraService
 
-    Usuario->>AcreditacionController: POST /api/acreditaciones (iniciar liquidación)
-    AcreditacionController->>LiquidacionService: liquidarSueldos(parametros)
-    LiquidacionService->>CargoRepository: findCargosActivos()
-    CargoRepository-->>LiquidacionService: Lista de Cargos
-    loop por cada cargo
-        LiquidacionService->>PersonaClient: getPersona(cargo.personaId)
-        PersonaClient-->>LiquidacionService: Datos Persona
-        LiquidacionService->>LiquidacionService: calcularHaber(cargo, persona)
-        LiquidacionService->>CuentaClient: acreditarSueldo(persona.cbu, monto)
-        CuentaClient-->>LiquidacionService: Confirmación de Pago
-    end
-    LiquidacionService-->>AcreditacionController: ResultadoLiquidacion
-    AcreditacionController-->>Usuario: Liquidación completada
+    Usuario->>Controller: GET /api/haberes/core/makeLiquidacion/legajo/{legajoId}/{anho}/{mes}/{force}
+    Controller->>Service: liquidacionByLegajoId(legajoId, anho, mes, force)
+    Service->>Liquidacion: getLiquidacionByUniqueKey(legajoId, anho, mes)
+    Liquidacion-->>Service: Liquidacion (verifica bloqueado)
+    Service->>CargoLiq: cargos del legajo en el período
+    Service->>Novedad: novedades del legajo en el período
+    Novedad-->>Service: List~Novedad~
+    Service->>Estado: makeContext(legajoId, anho, mes)
+    Note over Service,Estado: calcula básicos y antigüedad, conceptos generales,<br/>descuentos por ausencia, aportes y deducciones
+    Service->>Service: aplicarAjusteNeto y calcularNetoFinal(state)
+    Service->>Item: saveAllItems(items del estado)
+    Service->>Liquidacion: add(Liquidacion con totales)
+    Service->>Persist: registra Actividad y Letra del legajo
+    Service-->>Controller: void
+    Controller-->>Usuario: 200 OK
+
+    Note over Usuario,Persist: Liquidación masiva: GET /api/haberes/core/makeLiquidacionGeneral/general/{anho}/{mes}/{force} (ver flujo-liquidacion-general.mmd)

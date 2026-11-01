@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import um.haberes.core.kotlin.model.BonoImpresion;
+import um.haberes.core.model.BonoImpresionEntity;
 import um.haberes.core.service.BonoImpresionService;
 
 /**
@@ -28,7 +28,7 @@ public class BonoImpresionController {
 	}
 
 	@PostMapping("/")
-	public ResponseEntity<BonoImpresion> add(@RequestBody BonoImpresion bonoimpresion) {
+	public ResponseEntity<BonoImpresionEntity> add(@RequestBody BonoImpresionEntity bonoimpresion) {
 		return new ResponseEntity<>(service.add(bonoimpresion), HttpStatus.OK);
 	}
 

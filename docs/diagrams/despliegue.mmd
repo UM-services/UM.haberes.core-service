@@ -1,16 +1,27 @@
 flowchart TD
-    Admin([Administrador de Sistema])
-    Cloud["Servidor Cloud (ej. AWS, GCP)"]
-    K8s["Kubernetes Cluster"]
-    Docker["Docker Image"]
-    Container["Contenedor: um.haberes.core-service.jar"]
-    DB["Base de Datos (MySQL)"]
-    ExternalServices["Servicios Externos UM"]
+    Dev([Desarrollador]) -- "push a develop / staging" --> CI["GitHub Actions"]
 
-    Admin -- "Gestiona despliegue" --> K8s
-    Cloud --> K8s
-    K8s --> Docker
-    Docker --> Container
-    K8s --> DB
-    Container -- "JDBC" --> DB
-    Container -- "API REST" --> ExternalServices
+    subgraph GHA ["GitHub Actions (ubuntu-latest)"]
+        Verify["Job verify: mvn -B verify"]
+        Build["Job build-image: docker buildx push"]
+        Verify --> Build
+    end
+
+    CI --> Verify
+    Build -- "tag GITHUB_SHA" --> Registry["Docker Hub<br/>vars.DOCKER_IMAGE_NAME"]
+
+    subgraph Runners ["Runners self-hosted (linux)"]
+        Develop["develop<br/>deploy-haberes-core-develop.sh"]
+        Staging["staging<br/>deploy-haberes-core-staging.sh"]
+        StagingNew["staging-new<br/>deploy-haberes-core-staging.sh"]
+    end
+
+    Registry --> Develop
+    Registry --> Staging
+    Registry --> StagingNew
+
+    Develop --> Container["Contenedor: um.haberes.core-service.jar"]
+    Staging --> Container
+    StagingNew --> Container
+    Container -- "JDBC" --> DB["Base de Datos (MySQL)"]
+    Container -- "API REST / OpenFeign" --> External["Servicios Externos UM"]

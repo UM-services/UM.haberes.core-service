@@ -11,8 +11,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import um.haberes.core.exception.LegajoControlException;
-import um.haberes.core.kotlin.model.LegajoControl;
-import um.haberes.core.repository.LegajoControlRepository;
+import um.haberes.core.model.LegajoControlEntity;
+import um.haberes.core.repository.JpaLegajoControlRepository;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -24,17 +24,17 @@ import lombok.extern.slf4j.Slf4j;
 public class LegajoControlService {
 
 	@Autowired
-	private LegajoControlRepository repository;
+	private JpaLegajoControlRepository repository;
 
-	public List<LegajoControl> findAllByPeriodo(Integer anho, Integer mes) {
+	public List<LegajoControlEntity> findAllByPeriodo(Integer anho, Integer mes) {
 		return repository.findAllByAnhoAndMes(anho, mes);
 	}
 
-	public List<LegajoControl> findAllLiquidadoByPeriodo(Integer anho, Integer mes) {
+	public List<LegajoControlEntity> findAllLiquidadoByPeriodo(Integer anho, Integer mes) {
 		return repository.findAllByAnhoAndMesAndLiquidadoOrderByLegajoId(anho, mes, (byte) 1);
 	}
 
-	public List<LegajoControl> findAllDependenciaByPeriodo(Integer anho, Integer mes, Integer dependenciaId,
+	public List<LegajoControlEntity> findAllDependenciaByPeriodo(Integer anho, Integer mes, Integer dependenciaId,
 			String filtro) {
 		return repository
 				.findAllByAnhoAndMes(anho, mes,
@@ -44,34 +44,34 @@ public class LegajoControlService {
 				.collect(Collectors.toList());
 	}
 
-	public LegajoControl findByUnique(Long legajoId, Integer anho, Integer mes) {
+	public LegajoControlEntity findByUnique(Long legajoId, Integer anho, Integer mes) {
 		return repository.findByLegajoIdAndAnhoAndMes(legajoId, anho, mes)
 				.orElseThrow(() -> new LegajoControlException(legajoId, anho, mes));
 	}
 
-	public LegajoControl add(LegajoControl legajoControl) {
+	public LegajoControlEntity add(LegajoControlEntity legajoControl) {
 		repository.save(legajoControl);
-		log.debug(String.format("LegajoControl -> %s", legajoControl));
+		log.debug(String.format("LegajoControlEntity -> %s", legajoControl));
 		return legajoControl;
 	}
 
-	public LegajoControl update(LegajoControl newLegajoControl, Long legajoControlId) {
+	public LegajoControlEntity update(LegajoControlEntity newLegajoControl, Long legajoControlId) {
 		return repository.findByLegajoControlId(legajoControlId).map(legajoControl -> {
-			legajoControl = new LegajoControl(newLegajoControl.getLegajoControlId(), newLegajoControl.getLegajoId(),
+			legajoControl = new LegajoControlEntity(newLegajoControl.getLegajoControlId(), newLegajoControl.getLegajoId(),
 					newLegajoControl.getAnho(), newLegajoControl.getMes(), newLegajoControl.getLiquidado(),
 					newLegajoControl.getFusionado(), newLegajoControl.getBonoEnviado(), newLegajoControl.getPersona());
 			repository.save(legajoControl);
-			log.debug(String.format("LegajoControl -> %s", legajoControl));
+			log.debug(String.format("LegajoControlEntity -> %s", legajoControl));
 			return legajoControl;
 		}).orElseThrow(() -> new LegajoControlException(legajoControlId));
 	}
 
-	public LegajoControl save(LegajoControl control) {
+	public LegajoControlEntity save(LegajoControlEntity control) {
 		control = repository.save(control);
 		return control;
 	}
 
-	public List<LegajoControl> saveAll(List<LegajoControl> legajos) {
+	public List<LegajoControlEntity> saveAll(List<LegajoControlEntity> legajos) {
 		legajos = repository.saveAll(legajos);
 		return legajos;
 	}

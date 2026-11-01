@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import um.haberes.core.exception.ActividadException;
-import um.haberes.core.kotlin.model.Actividad;
-import um.haberes.core.kotlin.model.view.ActividadPeriodo;
+import um.haberes.core.model.ActividadEntity;
+import um.haberes.core.model.view.ActividadPeriodo;
 import um.haberes.core.service.ActividadService;
 
 /**
@@ -33,12 +33,12 @@ public class ActividadController {
 	private ActividadService service;
 
 	@GetMapping("/legajo/{legajoId}")
-	public ResponseEntity<List<Actividad>> findAllByLegajoId(@PathVariable Long legajoId) {
+	public ResponseEntity<List<ActividadEntity>> findAllByLegajoId(@PathVariable Long legajoId) {
 		return new ResponseEntity<>(service.findAllByLegajoId(legajoId), HttpStatus.OK);
 	}
 
 	@GetMapping("/unique/{legajoId}/{anho}/{mes}")
-	public ResponseEntity<Actividad> findByUnique(@PathVariable Long legajoId, @PathVariable Integer anho,
+	public ResponseEntity<ActividadEntity> findByUnique(@PathVariable Long legajoId, @PathVariable Integer anho,
 			@PathVariable Integer mes) {
 		try {
 			return new ResponseEntity<>(service.findByUnique(legajoId, anho, mes), HttpStatus.OK);
@@ -54,12 +54,12 @@ public class ActividadController {
 	}
 
 	@PostMapping("/")
-	public ResponseEntity<Actividad> add(@RequestBody Actividad actividad) {
+	public ResponseEntity<ActividadEntity> add(@RequestBody ActividadEntity actividad) {
 		return new ResponseEntity<>(service.add(actividad), HttpStatus.OK);
 	}
 
 	@PutMapping("/{actividadId}")
-	public ResponseEntity<Actividad> update(@RequestBody Actividad actividad, @PathVariable Long actividadId) {
+	public ResponseEntity<ActividadEntity> update(@RequestBody ActividadEntity actividad, @PathVariable Long actividadId) {
 		return new ResponseEntity<>(service.update(actividad, actividadId), HttpStatus.OK);
 	}
 

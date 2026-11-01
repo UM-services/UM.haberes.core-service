@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import um.haberes.core.exception.AfipSituacionException;
-import um.haberes.core.kotlin.model.AfipSituacion;
+import um.haberes.core.model.AfipSituacionEntity;
 import um.haberes.core.service.AfipSituacionService;
 
 import java.util.List;
@@ -24,12 +24,12 @@ public class AfipSituacionController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<AfipSituacion>> findAll() {
+    public ResponseEntity<List<AfipSituacionEntity>> findAll() {
         return new ResponseEntity<>(service.findAll(), HttpStatus.OK);
     }
 
     @GetMapping("/{afipSituacionId}")
-    public ResponseEntity<AfipSituacion> findByAfipSituacionId(@PathVariable Integer afipSituacionId) {
+    public ResponseEntity<AfipSituacionEntity> findByAfipSituacionId(@PathVariable Integer afipSituacionId) {
         try {
             return new ResponseEntity<>(service.findByAfipSituacionId(afipSituacionId), HttpStatus.OK);
         } catch (AfipSituacionException e) {

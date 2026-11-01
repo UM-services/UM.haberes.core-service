@@ -3,7 +3,7 @@ package um.haberes.core.service.extern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import um.haberes.core.client.ContratadoPersonaClient;
-import um.haberes.core.kotlin.model.extern.ContratadoPersonaDto;
+import um.haberes.core.model.extern.ContratadoPersonaDto;
 
 import java.util.List;
 
