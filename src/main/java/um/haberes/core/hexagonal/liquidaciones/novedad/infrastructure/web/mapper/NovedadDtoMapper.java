@@ -2,12 +2,23 @@ package um.haberes.core.hexagonal.liquidaciones.novedad.infrastructure.web.mappe
 
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
+import um.haberes.core.hexagonal.liquidaciones.codigo.infrastructure.web.mapper.CodigoDtoMapper;
 import um.haberes.core.hexagonal.liquidaciones.novedad.domain.model.Novedad;
 import um.haberes.core.hexagonal.liquidaciones.novedad.infrastructure.web.dto.NovedadRequest;
 import um.haberes.core.hexagonal.liquidaciones.novedad.infrastructure.web.dto.NovedadResponse;
+import um.haberes.core.hexagonal.personas.dependencia.infrastructure.web.mapper.DependenciaDtoMapper;
+import um.haberes.core.hexagonal.personas.persona.infrastructure.web.mapper.PersonaDtoMapper;
 
 @Component
+@RequiredArgsConstructor
 public class NovedadDtoMapper {
+
+    private final PersonaDtoMapper personaDtoMapper;
+
+    private final CodigoDtoMapper codigoDtoMapper;
+
+    private final DependenciaDtoMapper dependenciaDtoMapper;
 
     public Novedad toDomain(NovedadRequest request) {
         if (request == null) {
@@ -47,6 +58,9 @@ public class NovedadDtoMapper {
                 .observaciones(domain.getObservaciones())
                 .importado(domain.getImportado())
                 .novedadUploadId(domain.getNovedadUploadId())
+                .persona(personaDtoMapper.toResponse(domain.getPersona()))
+                .codigo(codigoDtoMapper.toResponse(domain.getCodigo()))
+                .dependencia(dependenciaDtoMapper.toResponse(domain.getDependencia()))
                 .build();
     }
 }

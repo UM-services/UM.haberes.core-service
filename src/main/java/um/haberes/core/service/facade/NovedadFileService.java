@@ -234,7 +234,7 @@ public class NovedadFileService {
             }
             novedades.add(new Novedad(novedadId, novedadUpload.getLegajoId(), anho, mes, novedadUpload.getCodigoId(),
                     novedadUpload.getDependenciaId(), novedadUpload.getImporte(), novedadUpload.getValue(),
-                    "Importado Excel", (byte) 1, novedadUpload.getNovedadUploadId(), null));
+                    "Importado Excel", (byte) 1, novedadUpload.getNovedadUploadId(), null, null, null));
         }
         novedadService.saveAll(novedades);
     }
@@ -257,7 +257,7 @@ public class NovedadFileService {
                 }
                 novedades.add(
                         new Novedad(novedadId, old.getLegajoId(), anho, mes, old.getCodigoId(), old.getDependenciaId(),
-                                old.getImporte(), old.getValue(), "Transferido", (byte) 1, null,null));
+                                old.getImporte(), old.getValue(), "Transferido", (byte) 1, null, null, null, null));
             }
         }
         novedadService.saveAll(novedades);

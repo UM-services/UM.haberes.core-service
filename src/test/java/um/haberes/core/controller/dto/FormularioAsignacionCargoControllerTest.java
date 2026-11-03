@@ -121,6 +121,8 @@ class FormularioAsignacionCargoControllerTest {
                               "acronimo": "SECG",
                               "facultadId": 1,
                               "geograficaId": 2,
+                              "facultad": null,
+                              "geografica": null,
                               "sedeKey": "1.2"
                             }
                           ],

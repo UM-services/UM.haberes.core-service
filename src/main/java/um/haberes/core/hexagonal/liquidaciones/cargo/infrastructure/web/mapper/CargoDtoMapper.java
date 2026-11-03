@@ -2,12 +2,23 @@ package um.haberes.core.hexagonal.liquidaciones.cargo.infrastructure.web.mapper;
 
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
 import um.haberes.core.hexagonal.liquidaciones.cargo.domain.model.Cargo;
 import um.haberes.core.hexagonal.liquidaciones.cargo.infrastructure.web.dto.CargoRequest;
 import um.haberes.core.hexagonal.liquidaciones.cargo.infrastructure.web.dto.CargoResponse;
+import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.web.mapper.CategoriaDtoMapper;
+import um.haberes.core.hexagonal.personas.dependencia.infrastructure.web.mapper.DependenciaDtoMapper;
+import um.haberes.core.hexagonal.personas.persona.infrastructure.web.mapper.PersonaDtoMapper;
 
 @Component
+@RequiredArgsConstructor
 public class CargoDtoMapper {
+
+    private final PersonaDtoMapper personaDtoMapper;
+
+    private final DependenciaDtoMapper dependenciaDtoMapper;
+
+    private final CategoriaDtoMapper categoriaDtoMapper;
 
     public Cargo toDomain(CargoRequest request) {
         if (request == null) {
@@ -41,6 +52,9 @@ public class CargoDtoMapper {
                 .jornada(domain.getJornada())
                 .presentismo(domain.getPresentismo())
                 .horasJornada(domain.getHorasJornada())
+                .persona(personaDtoMapper.toResponse(domain.getPersona()))
+                .dependencia(dependenciaDtoMapper.toResponse(domain.getDependencia()))
+                .categoria(categoriaDtoMapper.toResponse(domain.getCategoria()))
                 .dependenciaNombre(domain.getDependencia() != null ? domain.getDependencia().getNombre() : null)
                 .categoriaNombre(domain.getCategoria() != null ? domain.getCategoria().getNombre() : null)
                 .personaApellido(domain.getPersona() != null ? domain.getPersona().getApellido() : null)

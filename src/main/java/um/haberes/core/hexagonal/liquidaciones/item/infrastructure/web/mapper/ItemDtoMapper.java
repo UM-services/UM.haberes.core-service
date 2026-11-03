@@ -2,12 +2,20 @@ package um.haberes.core.hexagonal.liquidaciones.item.infrastructure.web.mapper;
 
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
+import um.haberes.core.hexagonal.liquidaciones.codigo.infrastructure.web.mapper.CodigoDtoMapper;
 import um.haberes.core.hexagonal.liquidaciones.item.domain.model.Item;
 import um.haberes.core.hexagonal.liquidaciones.item.infrastructure.web.dto.ItemRequest;
 import um.haberes.core.hexagonal.liquidaciones.item.infrastructure.web.dto.ItemResponse;
+import um.haberes.core.hexagonal.personas.persona.infrastructure.web.mapper.PersonaDtoMapper;
 
 @Component
+@RequiredArgsConstructor
 public class ItemDtoMapper {
+
+    private final CodigoDtoMapper codigoDtoMapper;
+
+    private final PersonaDtoMapper personaDtoMapper;
 
     public Item toDomain(ItemRequest request) {
         if (request == null) {
@@ -37,6 +45,8 @@ public class ItemDtoMapper {
                 .codigoId(domain.getCodigoId())
                 .codigoNombre(domain.getCodigoNombre())
                 .importe(domain.getImporte())
+                .codigo(codigoDtoMapper.toResponse(domain.getCodigo()))
+                .persona(personaDtoMapper.toResponse(domain.getPersona()))
                 .build();
     }
 }

@@ -23,7 +23,7 @@ sequenceDiagram
     Usuario->>ItemCtrl: DELETE /item/legajo/{legajoId}/{anho}/{mes}/deleteallbyzero
     ItemCtrl->>ItemSvc: deleteAllByZero(...) (elimina items con importe cero)
 
-    Note over ItemSvc,DB: El dominio Item incluye la relación anidada persona (ItemMapper -> PersonaMapper),<br/>expuesta en las respuestas de makeLiquidacion (p. ej. GET /makeLiquidacion/basicoAndAntiguedad)
+    Note over ItemSvc,DB: ItemResponse expone codigo (con sus conceptos AFIP) y persona anidados (ItemDtoMapper -> CodigoDtoMapper / PersonaDtoMapper),<br/>también en las respuestas de makeLiquidacion (p. ej. GET /makeLiquidacion/basicoAndAntiguedad)
 
     Note over Usuario,DB: Letras: neto del legajo expresado en texto por período
 

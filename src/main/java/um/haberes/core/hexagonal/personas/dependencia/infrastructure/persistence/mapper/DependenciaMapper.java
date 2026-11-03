@@ -2,12 +2,20 @@ package um.haberes.core.hexagonal.personas.dependencia.infrastructure.persistenc
 
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
+import um.haberes.core.hexagonal.facultad.infrastructure.persistence.mapper.FacultadMapper;
+import um.haberes.core.hexagonal.geografica.infrastructure.persistence.mapper.GeograficaMapper;
 import um.haberes.core.hexagonal.personas.dependencia.domain.model.Dependencia;
 import um.haberes.core.hexagonal.personas.dependencia.infrastructure.persistence.entity.DependenciaEntity;
 import um.haberes.core.hexagonal.personas.dependencia.infrastructure.persistence.entity.DependenciaEntity.DependenciaEntityBuilder;
 
 @Component
+@RequiredArgsConstructor
 public class DependenciaMapper {
+
+    private final FacultadMapper facultadMapper;
+
+    private final GeograficaMapper geograficaMapper;
 
     public DependenciaEntity toEntity(Dependencia domain) {
         if (domain == null) {
@@ -33,7 +41,9 @@ public class DependenciaMapper {
         Dependencia.DependenciaBuilder builder = Dependencia.builder()
                 .dependenciaId(entity.getDependenciaId())
                 .facultadId(entity.getFacultadId())
-                .geograficaId(entity.getGeograficaId());
+                .geograficaId(entity.getGeograficaId())
+                .facultad(facultadMapper.toDomainModel(entity.getFacultad()))
+                .geografica(geograficaMapper.toDomainModel(entity.getGeografica()));
         if (entity.getNombre() != null) {
             builder.nombre(entity.getNombre());
         }

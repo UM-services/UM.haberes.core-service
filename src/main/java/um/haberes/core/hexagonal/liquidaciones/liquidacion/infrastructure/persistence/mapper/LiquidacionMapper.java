@@ -2,13 +2,18 @@ package um.haberes.core.hexagonal.liquidaciones.liquidacion.infrastructure.persi
 
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
 import um.haberes.core.hexagonal.liquidaciones.liquidacion.domain.model.Liquidacion;
 import um.haberes.core.hexagonal.liquidaciones.liquidacion.infrastructure.persistence.entity.LiquidacionEntity;
+import um.haberes.core.hexagonal.personas.dependencia.infrastructure.persistence.mapper.DependenciaMapper;
 import um.haberes.core.hexagonal.personas.persona.domain.model.Persona;
 import um.haberes.core.hexagonal.personas.persona.infrastructure.persistence.entity.PersonaEntity;
 
 @Component
+@RequiredArgsConstructor
 public class LiquidacionMapper {
+
+    private final DependenciaMapper dependenciaMapper;
 
     public LiquidacionEntity toEntity(Liquidacion domain) {
         if (domain == null) {
@@ -85,6 +90,9 @@ public class LiquidacionMapper {
         }
         if (entity.getPersona() != null) {
             builder.persona(toDomainPersona(entity.getPersona()));
+        }
+        if (entity.getDependencia() != null) {
+            builder.dependencia(dependenciaMapper.toDomain(entity.getDependencia()));
         }
         return builder.build();
     }

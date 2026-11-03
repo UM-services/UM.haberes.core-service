@@ -3,6 +3,7 @@ package um.haberes.core.hexagonal.liquidaciones.item.infrastructure.persistence.
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
+import um.haberes.core.hexagonal.liquidaciones.afip_concepto_sueldo.infrastructure.persistence.mapper.AfipConceptoSueldoMapper;
 import um.haberes.core.hexagonal.liquidaciones.codigo.domain.model.Codigo;
 import um.haberes.core.hexagonal.liquidaciones.codigo.infrastructure.persistence.entity.CodigoEntity;
 import um.haberes.core.hexagonal.liquidaciones.item.domain.model.Item;
@@ -14,6 +15,8 @@ import um.haberes.core.hexagonal.personas.persona.infrastructure.persistence.map
 public class ItemMapper {
 
     private final PersonaMapper personaMapper;
+
+    private final AfipConceptoSueldoMapper afipConceptoSueldoMapper;
 
     public ItemEntity toEntity(Item domain) {
         if (domain == null) {
@@ -69,7 +72,11 @@ public class ItemMapper {
         Codigo.CodigoBuilder builder = Codigo.builder()
                 .codigoId(entity.getCodigoId())
                 .afipConceptoSueldoIdPrimerSemestre(entity.getAfipConceptoSueldoIdPrimerSemestre())
-                .afipConceptoSueldoIdSegundoSemestre(entity.getAfipConceptoSueldoIdSegundoSemestre());
+                .afipConceptoSueldoIdSegundoSemestre(entity.getAfipConceptoSueldoIdSegundoSemestre())
+                .afipConceptoSueldoPrimerSemestre(
+                        afipConceptoSueldoMapper.toDomain(entity.getAfipConceptoSueldoPrimerSemestre()))
+                .afipConceptoSueldoSegundoSemestre(
+                        afipConceptoSueldoMapper.toDomain(entity.getAfipConceptoSueldoSegundoSemestre()));
         if (entity.getNombre() != null) {
             builder.nombre(entity.getNombre());
         }
