@@ -3,15 +3,30 @@ package um.haberes.core.hexagonal.cursos.curso_fusion.infrastructure.persistence
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
+import um.haberes.core.hexagonal.cursos.cargo_tipo.infrastructure.persistence.mapper.CargoTipoMapper;
 import um.haberes.core.hexagonal.cursos.curso_fusion.domain.model.CursoFusion;
 import um.haberes.core.hexagonal.cursos.curso_fusion.infrastructure.persistence.entity.CursoFusionEntity;
+import um.haberes.core.hexagonal.cursos.designacion_tipo.infrastructure.persistence.mapper.DesignacionTipoMapper;
+import um.haberes.core.hexagonal.facultad.infrastructure.persistence.mapper.FacultadMapper;
+import um.haberes.core.hexagonal.geografica.infrastructure.persistence.mapper.GeograficaMapper;
 import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.persistence.mapper.CategoriaMapper;
+import um.haberes.core.hexagonal.personas.persona.infrastructure.persistence.mapper.PersonaMapper;
 
 @Component
 @RequiredArgsConstructor
 public class CursoFusionMapper {
 
     private final CategoriaMapper categoriaMapper;
+
+    private final PersonaMapper personaMapper;
+
+    private final FacultadMapper facultadMapper;
+
+    private final GeograficaMapper geograficaMapper;
+
+    private final CargoTipoMapper cargoTipoMapper;
+
+    private final DesignacionTipoMapper designacionTipoMapper;
 
     public CursoFusionEntity toEntity(CursoFusion domain) {
         if (domain == null) {
@@ -52,6 +67,11 @@ public class CursoFusionMapper {
                 .designacionTipoId(entity.getDesignacionTipoId())
                 .anual(entity.getAnual())
                 .categoriaId(entity.getCategoriaId())
+                .persona(personaMapper.toDomain(entity.getPersona()))
+                .facultad(facultadMapper.toDomainModel(entity.getFacultad()))
+                .geografica(geograficaMapper.toDomainModel(entity.getGeografica()))
+                .cargoTipo(cargoTipoMapper.toDomain(entity.getCargoTipo()))
+                .designacionTipo(designacionTipoMapper.toDomain(entity.getDesignacionTipo()))
                 .categoria(categoriaMapper.toDomain(entity.getCategoria()))
                 .build();
     }

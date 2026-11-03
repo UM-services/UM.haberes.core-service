@@ -10,13 +10,20 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import um.haberes.core.hexagonal.facultad.domain.model.Facultad;
+import um.haberes.core.hexagonal.facultad.infrastructure.web.mapper.FacultadDtoMapper;
+import um.haberes.core.hexagonal.geografica.domain.model.Geografica;
+import um.haberes.core.hexagonal.geografica.infrastructure.web.mapper.GeograficaDtoMapper;
 import um.haberes.core.hexagonal.personas.dependencia.application.service.DependenciaService;
 import um.haberes.core.hexagonal.personas.dependencia.domain.model.Dependencia;
 import um.haberes.core.hexagonal.personas.dependencia.infrastructure.web.controller.DependenciaController;
+import um.haberes.core.hexagonal.personas.dependencia.infrastructure.web.dto.DependenciaResponse;
 import um.haberes.core.hexagonal.personas.dependencia.infrastructure.web.mapper.DependenciaDtoMapper;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -35,7 +42,8 @@ class DependenciaControllerTest {
 
     @BeforeEach
     void setUp() {
-        controller = new DependenciaController(service, new DependenciaDtoMapper());
+        controller = new DependenciaController(service,
+                new DependenciaDtoMapper(new FacultadDtoMapper(), new GeograficaDtoMapper()));
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -57,9 +65,26 @@ class DependenciaControllerTest {
                   "acronimo": "SEA",
                   "facultadId": 2,
                   "geograficaId": 3,
+                  "facultad": null,
+                  "geografica": null,
                   "sedeKey": "2.3"
                 }
                 """;
+    }
+
+    @Test
+    void toResponse_includesNestedFacultadAndGeograficaForLegacyClients() {
+        Dependencia dependencia = sampleDependencia();
+        dependencia.setFacultad(Facultad.builder().facultadId(2).nombre("Rectorado").reducido("REC").build());
+        dependencia.setGeografica(Geografica.builder().geograficaId(3).nombre("San Rafael").reducido("SR").build());
+
+        DependenciaDtoMapper mapper = new DependenciaDtoMapper(new FacultadDtoMapper(), new GeograficaDtoMapper());
+        DependenciaResponse response = mapper.toResponse(dependencia);
+
+        assertNotNull(response.getFacultad());
+        assertEquals("Rectorado", response.getFacultad().getNombre());
+        assertNotNull(response.getGeografica());
+        assertEquals("San Rafael", response.getGeografica().getNombre());
     }
 
     @Test

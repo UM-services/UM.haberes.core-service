@@ -446,22 +446,21 @@ public class MakeLiquidacionService {
     private void persistirResultadosLiquidacion(Long legajoId, Integer anho, Integer mes, LiquidacionState state) {
         itemService.saveAllItems(new ArrayList<>(state.getItems().values()));
 
-        Liquidacion liquidacion = new Liquidacion(null,
-                legajoId,
-                anho,
-                mes,
-                Tool.dateAbsoluteArgentina(),
-                null,
-                state.getPersona().getDependenciaId(),
-                state.getPersona().getSalida(),
-                getItemValue(CODIGO_TOTAL_REMUNERATIVO, state),
-                getItemValue(CODIGO_TOTAL_NO_REMUNERATIVO, state),
-                getItemValue(CODIGO_TOTAL_DEDUCCIONES, state),
-                getItemValue(CODIGO_NETO, state),
-                (byte) 0,
-                state.getPersona().getEstado(),
-                state.getPersona().getLiquida(),
-                null);
+        Liquidacion liquidacion = Liquidacion.builder()
+                .legajoId(legajoId)
+                .anho(anho)
+                .mes(mes)
+                .fechaLiquidacion(Tool.dateAbsoluteArgentina())
+                .dependenciaId(state.getPersona().getDependenciaId())
+                .salida(state.getPersona().getSalida())
+                .totalRemunerativo(getItemValue(CODIGO_TOTAL_REMUNERATIVO, state))
+                .totalNoRemunerativo(getItemValue(CODIGO_TOTAL_NO_REMUNERATIVO, state))
+                .totalDeduccion(getItemValue(CODIGO_TOTAL_DEDUCCIONES, state))
+                .totalNeto(getItemValue(CODIGO_NETO, state))
+                .bloqueado((byte) 0)
+                .estado(state.getPersona().getEstado())
+                .liquida(state.getPersona().getLiquida())
+                .build();
         liquidacionService.add(liquidacion);
 
         try {

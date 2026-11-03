@@ -300,22 +300,22 @@ public class DesignacionToolService {
 
         List<CursoFusion> fusiones = new ArrayList<>();
         for (Integer designacionTipoId : designaciones) {
-            fusiones.add(new CursoFusion(null,
-                    legajoId,
-                    anho,
-                    mes,
-                    facultadId,
-                    geograficaId,
-                    cargoTipoId,
-                    designacionTipoId,
-                    (byte) 1,
-                    this.calcularCategoriaId(facultadId,
+            fusiones.add(CursoFusion.builder()
+                    .legajoId(legajoId)
+                    .anho(anho)
+                    .mes(mes)
+                    .facultadId(facultadId)
+                    .geograficaId(geograficaId)
+                    .cargoTipoId(cargoTipoId)
+                    .designacionTipoId(designacionTipoId)
+                    .anual((byte) 1)
+                    .categoriaId(this.calcularCategoriaId(facultadId,
                             designacionTipoId,
                             cargoTipoId,
                             (byte) 1,
                             (byte) 0,
-                            aplicaExcepcion),
-                    null));
+                            aplicaExcepcion))
+                    .build());
         }
         fusiones = cursoFusionService.saveAll(fusiones);
     }
@@ -342,10 +342,18 @@ public class DesignacionToolService {
 
         List<CursoFusion> fusiones = new ArrayList<>();
         for (Integer designacionTipoId : designaciones) {
-            fusiones.add(new CursoFusion(null, legajoId, anho, mes, facultadId, geograficaId, cargoTipoId,
-                    designacionTipoId, (byte) 0,
-                    this.calcularCategoriaId(facultadId, designacionTipoId, cargoTipoId, (byte) 0, (byte) 1, false),
-                    null));
+            fusiones.add(CursoFusion.builder()
+                    .legajoId(legajoId)
+                    .anho(anho)
+                    .mes(mes)
+                    .facultadId(facultadId)
+                    .geograficaId(geograficaId)
+                    .cargoTipoId(cargoTipoId)
+                    .designacionTipoId(designacionTipoId)
+                    .anual((byte) 0)
+                    .categoriaId(this.calcularCategoriaId(facultadId, designacionTipoId, cargoTipoId, (byte) 0, (byte) 1,
+                            false))
+                    .build());
         }
         fusiones = cursoFusionService.saveAll(fusiones);
     }

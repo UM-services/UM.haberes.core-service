@@ -25,4 +25,6 @@ sequenceDiagram
     Ctrl->>Svc: findAllByFacultadIdAndGeograficaId(...)
     Svc->>UC: GetDependenciasByFacultadAndGeograficaUseCase
 
+    Note over Ctrl,DB: DependenciaResponse incluye facultad y geografica anidadas<br/>(además de facultadId/geograficaId y sedeKey)
+
     Note over Usuario,DB: Las dependencias son estáticas (solo lectura, sin endpoints de escritura)

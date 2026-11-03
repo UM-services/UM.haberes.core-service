@@ -799,7 +799,7 @@ public class SheetService {
                     importe = BigDecimal.valueOf(-0.83).multiply(aguinaldo).setScale(2, RoundingMode.HALF_UP);
                 }
                 novedades.add(new Novedad(novedadId, persona.getLegajoId(), anho, semestre * 6, codigoId, null, importe,
-                        "", "Generación Externa", (byte) 0, null, null));
+                        "", "Generación Externa", (byte) 0, null, null, null, null));
             }
         }
         novedadService.saveAll(novedades);

@@ -14,8 +14,14 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.hexagonal.cursos.curso.application.service.CursoService;
 import um.haberes.core.hexagonal.cursos.curso.domain.model.Curso;
 import um.haberes.core.hexagonal.cursos.curso.infrastructure.web.controller.CursoController;
+import um.haberes.core.hexagonal.cursos.curso.infrastructure.web.dto.CursoRequest;
 import um.haberes.core.hexagonal.cursos.curso.infrastructure.web.mapper.CursoDtoMapper;
+import um.haberes.core.hexagonal.facultad.domain.model.Facultad;
+import um.haberes.core.hexagonal.facultad.infrastructure.web.mapper.FacultadDtoMapper;
+import um.haberes.core.hexagonal.geografica.domain.model.Geografica;
+import um.haberes.core.hexagonal.geografica.infrastructure.web.mapper.GeograficaDtoMapper;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -43,7 +49,8 @@ class CursoControllerTest {
 
     @BeforeEach
     void setUp() {
-        controller = new CursoController(service, new CursoDtoMapper());
+        controller = new CursoController(service,
+                new CursoDtoMapper(new FacultadDtoMapper(), new GeograficaDtoMapper()));
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -58,7 +65,45 @@ class CursoControllerTest {
         curso.setSemestre2((byte) 0);
         curso.setNivelId(4);
         curso.setAdicionalCargaHoraria((byte) 2);
+        curso.setFacultad(sampleFacultad());
+        curso.setGeografica(sampleGeografica());
         return curso;
+    }
+
+    private Facultad sampleFacultad() {
+        return Facultad.builder()
+                .facultadId(2)
+                .nombre("Facultad 2")
+                .reducido("F2")
+                .server("server")
+                .backendServer("backend")
+                .backendPort(8080)
+                .dbName("db")
+                .dsn("fac2")
+                .build();
+    }
+
+    private Geografica sampleGeografica() {
+        return Geografica.builder()
+                .geograficaId(3)
+                .nombre("Sede 3")
+                .reducido("S3")
+                .desarraigo(BigDecimal.ZERO)
+                .geograficaIdReemplazo(0)
+                .build();
+    }
+
+    private CursoRequest sampleCursoRequest() {
+        return CursoRequest.builder()
+                .nombre("Curso 1")
+                .facultadId(2)
+                .geograficaId(3)
+                .anual((byte) 1)
+                .semestre1((byte) 1)
+                .semestre2((byte) 0)
+                .nivelId(4)
+                .adicionalCargaHoraria((byte) 2)
+                .build();
     }
 
     private String cursoJson() {
@@ -72,8 +117,25 @@ class CursoControllerTest {
                   "semestre1": 1,
                   "semestre2": 0,
                   "nivelId": 4,
-                  "adicionalCargaHoraria": 2
-                                                    }
+                  "adicionalCargaHoraria": 2,
+                  "facultad": {
+                    "facultadId": 2,
+                    "nombre": "Facultad 2",
+                    "reducido": "F2",
+                    "server": "server",
+                    "backendServer": "backend",
+                    "backendPort": 8080,
+                    "dbName": "db",
+                    "dsn": "fac2"
+                  },
+                  "geografica": {
+                    "geograficaId": 3,
+                    "nombre": "Sede 3",
+                    "reducido": "S3",
+                    "desarraigo": 0.00,
+                    "geograficaIdReemplazo": 0
+                  }
+                }
                 """;
     }
 
@@ -89,8 +151,25 @@ class CursoControllerTest {
                     "semestre1": 1,
                     "semestre2": 0,
                     "nivelId": 4,
-                    "adicionalCargaHoraria": 2
-                                                          }
+                    "adicionalCargaHoraria": 2,
+                    "facultad": {
+                      "facultadId": 2,
+                      "nombre": "Facultad 2",
+                      "reducido": "F2",
+                      "server": "server",
+                      "backendServer": "backend",
+                      "backendPort": 8080,
+                      "dbName": "db",
+                      "dsn": "fac2"
+                    },
+                    "geografica": {
+                      "geograficaId": 3,
+                      "nombre": "Sede 3",
+                      "reducido": "S3",
+                      "desarraigo": 0.00,
+                      "geograficaIdReemplazo": 0
+                    }
+                  }
                 ]
                 """;
     }
@@ -153,7 +232,7 @@ class CursoControllerTest {
 
         mockMvc.perform(post("/api/haberes/core/curso/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(sampleCurso())))
+                        .content(objectMapper.writeValueAsString(sampleCursoRequest())))
                 .andExpect(status().isOk())
                 .andExpect(content().json(cursoJson(), JsonCompareMode.STRICT));
     }
@@ -164,7 +243,7 @@ class CursoControllerTest {
 
         mockMvc.perform(put("/api/haberes/core/curso/{cursoId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(sampleCurso())))
+                        .content(objectMapper.writeValueAsString(sampleCursoRequest())))
                 .andExpect(status().isOk())
                 .andExpect(content().json(cursoJson(), JsonCompareMode.STRICT));
     }

@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import um.haberes.core.hexagonal.personas.dependencia.domain.model.Dependencia;
 import um.haberes.core.hexagonal.personas.persona.domain.model.Persona;
 
 @Getter
@@ -55,6 +56,8 @@ public class Liquidacion {
     private String liquida = "";
 
     private Persona persona;
+
+    private Dependencia dependencia;
 
     public String key() {
         return String.valueOf(legajoId) + "." + anho + "." + mes;

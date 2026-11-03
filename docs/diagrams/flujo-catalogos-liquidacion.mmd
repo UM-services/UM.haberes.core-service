@@ -17,6 +17,7 @@ sequenceDiagram
     Usuario->>CodCtrl: GET /codigo/search/{chain} o /periodo/{anho}/{mes}
     CodCtrl->>CodSvc: findAllSearch(chain) / findAllByPeriodo(...)
     CodSvc->>DB: SELECT codigo (+CodigoSearchRepository)
+    Note over CodCtrl,CodSvc: CodigoResponse incluye afipConceptoSueldoPrimerSemestre y<br/>afipConceptoSueldoSegundoSemestre anidados (CodigoDtoMapper)
     Usuario->>CodCtrl: PUT /codigo/ (saveall) y POST /codigo/
     CodCtrl->>CodSvc: saveAll(codigos) / add(codigo)
 
@@ -34,4 +35,5 @@ sequenceDiagram
     Usuario->>CargCtrl: GET /cargo/legajo/{legajoId}
     CargCtrl->>CargSvc: findAllByLegajoId(legajoId)
     CargSvc->>DB: SELECT cargo
+    Note over CargCtrl,CargSvc: CargoResponse incluye persona, dependencia y categoria anidadas (CargoDtoMapper)
     Usuario->>CargCtrl: POST /cargo/ , PUT /cargo/{cargoId} , DELETE /cargo/{cargoId}

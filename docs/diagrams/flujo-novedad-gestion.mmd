@@ -31,6 +31,8 @@ sequenceDiagram
     Usuario->>Ctrl: DELETE /novedad/periodo/{anho}/{mes}
     Ctrl->>Svc: deleteAllByPeriodo(anho, mes)
 
+    Note over Ctrl,Svc: NovedadResponse incluye persona, codigo y dependencia anidados (NovedadDtoMapper)
+
     Note over UpCtrl,DB: Carga masiva: pendientes importados desde planilla
 
     Usuario->>UpCtrl: GET /novedadupload/pendiente/{anho}/{mes}/{pendiente}

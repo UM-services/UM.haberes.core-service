@@ -2,12 +2,19 @@ package um.haberes.core.hexagonal.cursos.curso.infrastructure.web.mapper;
 
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
 import um.haberes.core.hexagonal.cursos.curso.domain.model.Curso;
 import um.haberes.core.hexagonal.cursos.curso.infrastructure.web.dto.CursoRequest;
 import um.haberes.core.hexagonal.cursos.curso.infrastructure.web.dto.CursoResponse;
+import um.haberes.core.hexagonal.facultad.infrastructure.web.mapper.FacultadDtoMapper;
+import um.haberes.core.hexagonal.geografica.infrastructure.web.mapper.GeograficaDtoMapper;
 
 @Component
+@RequiredArgsConstructor
 public class CursoDtoMapper {
+
+    private final FacultadDtoMapper facultadDtoMapper;
+    private final GeograficaDtoMapper geograficaDtoMapper;
 
     public Curso toDomain(CursoRequest request) {
         if (request == null) {
@@ -49,6 +56,9 @@ public class CursoDtoMapper {
                 .semestre2(domain.getSemestre2())
                 .nivelId(domain.getNivelId())
                 .adicionalCargaHoraria(domain.getAdicionalCargaHoraria())
+                .facultad(facultadDtoMapper.toResponse(domain.getFacultad()))
+                .geografica(geograficaDtoMapper.toResponse(domain.getGeografica()))
                 .build();
     }
+
 }

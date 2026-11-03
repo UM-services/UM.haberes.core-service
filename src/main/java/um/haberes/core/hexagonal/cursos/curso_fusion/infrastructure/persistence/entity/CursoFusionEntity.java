@@ -13,6 +13,7 @@ import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.persiste
 import um.haberes.core.hexagonal.personas.persona.infrastructure.persistence.entity.PersonaEntity;
 import um.haberes.core.model.AuditableEntity;
 import um.haberes.core.hexagonal.cursos.cargo_tipo.infrastructure.persistence.entity.CargoTipoEntity;
+import um.haberes.core.hexagonal.cursos.designacion_tipo.infrastructure.persistence.entity.DesignacionTipoEntity;
 
 @Entity
 @Table(name = "curso_fusion")
@@ -63,7 +64,7 @@ public class CursoFusionEntity extends AuditableEntity {
 
     @OneToOne(optional = true)
     @JoinColumn(name = "designacionTipoId", insertable = false, updatable = false)
-    private CargoTipoEntity designacionTipo = null;
+    private DesignacionTipoEntity designacionTipo = null;
 
     @OneToOne(optional = true)
     @JoinColumn(name = "categoriaId", insertable = false, updatable = false)

@@ -2,6 +2,8 @@ package um.haberes.core.hexagonal.liquidaciones.codigo.infrastructure.web.mapper
 
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
+import um.haberes.core.hexagonal.liquidaciones.afip_concepto_sueldo.infrastructure.web.mapper.AfipConceptoSueldoDtoMapper;
 import um.haberes.core.hexagonal.liquidaciones.codigo.domain.model.Codigo;
 import um.haberes.core.hexagonal.liquidaciones.codigo.domain.model.CodigoSearchResult;
 import um.haberes.core.hexagonal.liquidaciones.codigo.infrastructure.web.dto.CodigoRequest;
@@ -9,7 +11,10 @@ import um.haberes.core.hexagonal.liquidaciones.codigo.infrastructure.web.dto.Cod
 import um.haberes.core.hexagonal.liquidaciones.codigo.infrastructure.web.dto.CodigoSearchResponse;
 
 @Component
+@RequiredArgsConstructor
 public class CodigoDtoMapper {
+
+    private final AfipConceptoSueldoDtoMapper afipConceptoSueldoDtoMapper;
 
     public Codigo toDomain(CodigoRequest request) {
         if (request == null) {
@@ -50,6 +55,10 @@ public class CodigoDtoMapper {
                 .incluidoEtec(domain.getIncluidoEtec())
                 .afipConceptoSueldoIdPrimerSemestre(domain.getAfipConceptoSueldoIdPrimerSemestre())
                 .afipConceptoSueldoIdSegundoSemestre(domain.getAfipConceptoSueldoIdSegundoSemestre())
+                .afipConceptoSueldoPrimerSemestre(
+                        afipConceptoSueldoDtoMapper.toResponse(domain.getAfipConceptoSueldoPrimerSemestre()))
+                .afipConceptoSueldoSegundoSemestre(
+                        afipConceptoSueldoDtoMapper.toResponse(domain.getAfipConceptoSueldoSegundoSemestre()))
                 .build();
     }
 
