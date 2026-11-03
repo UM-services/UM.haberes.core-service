@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import um.haberes.core.hexagonal.facultad.infrastructure.web.dto.FacultadResponse;
+import um.haberes.core.hexagonal.geografica.infrastructure.web.dto.GeograficaResponse;
 
 @Getter
 @Setter
@@ -30,4 +32,8 @@ public class CursoResponse {
     private Integer nivelId;
 
     private Byte adicionalCargaHoraria;
+
+    private FacultadResponse facultad;
+
+    private GeograficaResponse geografica;
 }

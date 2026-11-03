@@ -7,7 +7,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import um.haberes.core.hexagonal.liquidaciones.codigo.domain.model.Codigo;
 import um.haberes.core.hexagonal.personas.dependencia.domain.model.Dependencia;
+import um.haberes.core.hexagonal.personas.persona.domain.model.Persona;
 
 @Getter
 @Setter
@@ -39,6 +41,10 @@ public class Novedad {
     private Byte importado;
 
     private Long novedadUploadId;
+
+    private Persona persona;
+
+    private Codigo codigo;
 
     private Dependencia dependencia;
 

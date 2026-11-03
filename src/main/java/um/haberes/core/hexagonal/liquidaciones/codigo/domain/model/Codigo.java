@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import um.haberes.core.hexagonal.liquidaciones.afip_concepto_sueldo.domain.model.AfipConceptoSueldo;
 
 @Getter
 @Setter
@@ -33,4 +34,8 @@ public class Codigo {
     private Long afipConceptoSueldoIdPrimerSemestre;
 
     private Long afipConceptoSueldoIdSegundoSemestre;
+
+    private AfipConceptoSueldo afipConceptoSueldoPrimerSemestre;
+
+    private AfipConceptoSueldo afipConceptoSueldoSegundoSemestre;
 }

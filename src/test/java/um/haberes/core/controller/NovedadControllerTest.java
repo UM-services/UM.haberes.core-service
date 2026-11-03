@@ -10,11 +10,20 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import um.haberes.core.hexagonal.facultad.infrastructure.web.mapper.FacultadDtoMapper;
+import um.haberes.core.hexagonal.geografica.infrastructure.web.mapper.GeograficaDtoMapper;
+import um.haberes.core.hexagonal.liquidaciones.afip_concepto_sueldo.infrastructure.web.mapper.AfipConceptoSueldoDtoMapper;
+import um.haberes.core.hexagonal.liquidaciones.codigo.infrastructure.web.mapper.CodigoDtoMapper;
 import um.haberes.core.hexagonal.liquidaciones.novedad.application.exception.NovedadException;
 import um.haberes.core.hexagonal.liquidaciones.novedad.application.service.NovedadService;
 import um.haberes.core.hexagonal.liquidaciones.novedad.domain.model.Novedad;
 import um.haberes.core.hexagonal.liquidaciones.novedad.infrastructure.web.mapper.NovedadDtoMapper;
 import um.haberes.core.hexagonal.liquidaciones.novedad.infrastructure.web.controller.NovedadController;
+import um.haberes.core.hexagonal.liquidaciones.codigo.domain.model.Codigo;
+import um.haberes.core.hexagonal.personas.dependencia.domain.model.Dependencia;
+import um.haberes.core.hexagonal.personas.dependencia.infrastructure.web.mapper.DependenciaDtoMapper;
+import um.haberes.core.hexagonal.personas.persona.domain.model.Persona;
+import um.haberes.core.hexagonal.personas.persona.infrastructure.web.mapper.PersonaDtoMapper;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -26,6 +35,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -40,7 +50,12 @@ class NovedadControllerTest {
 
     @BeforeEach
     void setUp() {
-        controller = new NovedadController(service, new NovedadDtoMapper());
+        DependenciaDtoMapper dependenciaDtoMapper = new DependenciaDtoMapper(new FacultadDtoMapper(),
+                new GeograficaDtoMapper());
+        PersonaDtoMapper personaDtoMapper = new PersonaDtoMapper(dependenciaDtoMapper);
+        CodigoDtoMapper codigoDtoMapper = new CodigoDtoMapper(new AfipConceptoSueldoDtoMapper());
+        controller = new NovedadController(service,
+                new NovedadDtoMapper(personaDtoMapper, codigoDtoMapper, dependenciaDtoMapper));
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -64,6 +79,34 @@ class NovedadControllerTest {
         return new ObjectMapper().writeValueAsString(sampleNovedad());
     }
 
+    private Novedad sampleNovedadWithRelations() {
+        Novedad novedad = sampleNovedad();
+        Dependencia dependencia = Dependencia.builder()
+                .dependenciaId(20)
+                .nombre("Facultad de Arquitectura, Urbanismo y Diseno - Sede Rio Cuarto")
+                .acronimo("FAUD-RC")
+                .facultadId(2)
+                .geograficaId(5)
+                .build();
+        Codigo codigo = Codigo.builder()
+                .codigoId(10)
+                .nombre("Sueldo Basico")
+                .docente((byte) 1)
+                .noDocente((byte) 1)
+                .build();
+        Persona persona = Persona.builder()
+                .legajoId(100L)
+                .documento(new BigDecimal("28173651"))
+                .apellido("GIGENA CURCHOD")
+                .nombre("MARTIN ALEJANDRO")
+                .dependencia(dependencia)
+                .build();
+        novedad.setPersona(persona);
+        novedad.setCodigo(codigo);
+        novedad.setDependencia(dependencia);
+        return novedad;
+    }
+
     private static final String NOVEDAD_JSON = """
             {
               "novedadId": 1,
@@ -76,7 +119,10 @@ class NovedadControllerTest {
               "value": "A",
               "observaciones": "obs",
               "importado": 1,
-              "novedadUploadId": 7
+              "novedadUploadId": 7,
+              "persona": null,
+              "codigo": null,
+              "dependencia": null
                                                                     }
             """;
 
@@ -118,6 +164,21 @@ class NovedadControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(NOVEDAD_JSON, JsonCompareMode.STRICT));
+    }
+
+    @Test
+    void findByNovedadId_includesNestedRelationsForLegacyClients() throws Exception {
+        when(service.findByNovedadId(1L)).thenReturn(sampleNovedadWithRelations());
+
+        mockMvc.perform(get("/api/haberes/core/novedad/{novedadId}", 1))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.codigo.codigoId").value(10))
+                .andExpect(jsonPath("$.codigo.nombre").value("Sueldo Basico"))
+                .andExpect(jsonPath("$.persona.legajoId").value(100))
+                .andExpect(jsonPath("$.persona.apellido").value("GIGENA CURCHOD"))
+                .andExpect(jsonPath("$.persona.nombre").value("MARTIN ALEJANDRO"))
+                .andExpect(jsonPath("$.dependencia.dependenciaId").value(20))
+                .andExpect(jsonPath("$.dependencia.acronimo").value("FAUD-RC"));
     }
 
     @Test

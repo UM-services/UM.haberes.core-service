@@ -11,12 +11,14 @@
 ![Springdoc OpenAPI](https://img.shields.io/badge/Springdoc%20OpenAPI-3.1.1-85EA2D?logo=swagger&logoColor=black)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?logo=githubactions&logoColor=white)
+![Maven](https://img.shields.io/badge/Maven-C71A36?logo=apachemaven&logoColor=white)
+![JUnit](https://img.shields.io/badge/JUnit-25A162?logo=junit5&logoColor=white)
 
 Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permite la gestión integral de liquidaciones individuales y masivas, acreditaciones, reportes y administración de personal docente y no docente.
 
 ## Versión
 
-**1.22.1** (2026-10-29)
+**1.23.0** (2026-11-03)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
@@ -101,6 +103,7 @@ La documentación y los diagramas se generan automáticamente en cada push a la 
 - Procesamiento de acreditaciones
 - Generación de reportes en PDF y Excel
 - API REST documentada con OpenAPI
+- Respuestas REST con relaciones anidadas (persona, dependencia, facultad, geográfica, categoría, código y conceptos AFIP) para los clientes que antes resolvían esos datos con consultas adicionales
 - Auditoría y logs de operaciones
 - Integración con Consul y OpenFeign para servicios distribuidos
 

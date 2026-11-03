@@ -19,6 +19,8 @@ sequenceDiagram
     Repo->>DB: SELECT
     DB-->>Usuario: List~LiquidacionResponse~
 
+    Note over Ctrl,DB: LiquidacionResponse incluye persona y dependencia anidadas<br/>(la dependencia a su vez expone facultad y geografica)
+
     Note over Usuario,DB: Versionado de liquidaciones
 
     Usuario->>Ctrl: POST /liquidacion/version/{version} (LiquidacionRequest)

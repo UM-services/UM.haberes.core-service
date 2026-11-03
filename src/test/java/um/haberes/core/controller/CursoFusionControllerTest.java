@@ -10,14 +10,30 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import um.haberes.core.hexagonal.cursos.cargo_tipo.domain.model.CargoTipo;
+import um.haberes.core.hexagonal.cursos.cargo_tipo.infrastructure.web.mapper.CargoTipoDtoMapper;
 import um.haberes.core.hexagonal.cursos.curso_fusion.application.service.CursoFusionService;
 import um.haberes.core.hexagonal.cursos.curso_fusion.domain.model.CursoFusion;
 import um.haberes.core.hexagonal.cursos.curso_fusion.infrastructure.web.controller.CursoFusionController;
 import um.haberes.core.hexagonal.cursos.curso_fusion.infrastructure.web.dto.CursoFusionResponse;
 import um.haberes.core.hexagonal.cursos.curso_fusion.infrastructure.web.mapper.CursoFusionDtoMapper;
+import um.haberes.core.hexagonal.cursos.designacion_tipo.domain.model.DesignacionTipo;
+import um.haberes.core.hexagonal.cursos.designacion_tipo.infrastructure.web.mapper.DesignacionTipoDtoMapper;
+import um.haberes.core.hexagonal.facultad.domain.model.Facultad;
+import um.haberes.core.hexagonal.facultad.infrastructure.web.mapper.FacultadDtoMapper;
+import um.haberes.core.hexagonal.geografica.domain.model.Geografica;
+import um.haberes.core.hexagonal.geografica.infrastructure.web.mapper.GeograficaDtoMapper;
+import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.Categoria;
+import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.web.mapper.CategoriaDtoMapper;
+import um.haberes.core.hexagonal.personas.dependencia.infrastructure.web.mapper.DependenciaDtoMapper;
+import um.haberes.core.hexagonal.personas.persona.domain.model.Persona;
+import um.haberes.core.hexagonal.personas.persona.infrastructure.web.mapper.PersonaDtoMapper;
 
+import java.math.BigDecimal;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -87,7 +103,13 @@ class CursoFusionControllerTest {
                   "cargoTipoId": 5,
                   "designacionTipoId": 6,
                   "anual": 1,
-                  "categoriaId": 7
+                  "categoriaId": 7,
+                  "persona": null,
+                  "facultad": null,
+                  "geografica": null,
+                  "cargoTipo": null,
+                  "designacionTipo": null,
+                  "categoria": null
                 }
                 """;
     }
@@ -110,6 +132,32 @@ class CursoFusionControllerTest {
                   "categoriaId": 7
                 }
                 """;
+    }
+
+    @Test
+    void toResponse_includesNestedRelationsForLegacyClients() {
+        CursoFusion fusion = sample();
+        fusion.setPersona(Persona.builder().legajoId(2L).apellido("Perez").nombre("Juan").build());
+        fusion.setFacultad(Facultad.builder().facultadId(3).nombre("Rectorado").build());
+        fusion.setGeografica(Geografica.builder().geograficaId(4).nombre("San Rafael").build());
+        fusion.setCargoTipo(CargoTipo.builder().cargoTipoId(5).nombre("Docente").build());
+        fusion.setDesignacionTipo(DesignacionTipo.builder().designacionTipoId(6).nombre("Titular").build());
+        fusion.setCategoria(Categoria.builder().categoriaId(7).nombre("PROFESOR TITULAR")
+                .basico(new BigDecimal("100.00")).build());
+
+        CursoFusionDtoMapper mapper = new CursoFusionDtoMapper(
+                new PersonaDtoMapper(new DependenciaDtoMapper(new FacultadDtoMapper(), new GeograficaDtoMapper())),
+                new FacultadDtoMapper(), new GeograficaDtoMapper(), new CargoTipoDtoMapper(),
+                new DesignacionTipoDtoMapper(), new CategoriaDtoMapper());
+        CursoFusionResponse response = mapper.toResponse(fusion);
+
+        assertNotNull(response.getPersona());
+        assertEquals(2L, response.getPersona().getLegajoId());
+        assertEquals("Rectorado", response.getFacultad().getNombre());
+        assertEquals("San Rafael", response.getGeografica().getNombre());
+        assertEquals("Docente", response.getCargoTipo().getNombre());
+        assertEquals("Titular", response.getDesignacionTipo().getNombre());
+        assertEquals("PROFESOR TITULAR", response.getCategoria().getNombre());
     }
 
     @Test
