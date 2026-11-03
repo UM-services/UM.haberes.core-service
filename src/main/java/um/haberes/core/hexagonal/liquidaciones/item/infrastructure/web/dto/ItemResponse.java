@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import um.haberes.core.hexagonal.liquidaciones.codigo.infrastructure.web.dto.CodigoResponse;
+import um.haberes.core.hexagonal.personas.persona.infrastructure.web.dto.PersonaResponse;
 
 @Getter
 @Setter
@@ -28,4 +30,8 @@ public class ItemResponse {
     private String codigoNombre;
 
     private BigDecimal importe;
+
+    private CodigoResponse codigo;
+
+    private PersonaResponse persona;
 }

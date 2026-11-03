@@ -11,15 +11,26 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import um.haberes.core.hexagonal.liquidaciones.codigo.domain.model.Codigo;
+import um.haberes.core.hexagonal.liquidaciones.afip_concepto_sueldo.infrastructure.web.mapper.AfipConceptoSueldoDtoMapper;
+import um.haberes.core.hexagonal.liquidaciones.codigo.infrastructure.web.mapper.CodigoDtoMapper;
 import um.haberes.core.hexagonal.liquidaciones.item.application.exception.ItemException;
 import um.haberes.core.hexagonal.liquidaciones.item.application.service.ItemService;
 import um.haberes.core.hexagonal.liquidaciones.item.domain.model.Item;
 import um.haberes.core.hexagonal.liquidaciones.item.infrastructure.web.controller.ItemController;
+import um.haberes.core.hexagonal.liquidaciones.item.infrastructure.web.dto.ItemResponse;
 import um.haberes.core.hexagonal.liquidaciones.item.infrastructure.web.mapper.ItemDtoMapper;
+import um.haberes.core.hexagonal.facultad.infrastructure.web.mapper.FacultadDtoMapper;
+import um.haberes.core.hexagonal.geografica.infrastructure.web.mapper.GeograficaDtoMapper;
+import um.haberes.core.hexagonal.personas.dependencia.infrastructure.web.mapper.DependenciaDtoMapper;
+import um.haberes.core.hexagonal.personas.persona.domain.model.Persona;
+import um.haberes.core.hexagonal.personas.persona.infrastructure.web.mapper.PersonaDtoMapper;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -44,7 +55,8 @@ class ItemControllerTest {
 
     @BeforeEach
     void setUp() {
-        controller = new ItemController(service, new ItemDtoMapper());
+        controller = new ItemController(service, new ItemDtoMapper(new CodigoDtoMapper(new AfipConceptoSueldoDtoMapper()),
+                new PersonaDtoMapper(new DependenciaDtoMapper(new FacultadDtoMapper(), new GeograficaDtoMapper()))));
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -69,9 +81,27 @@ class ItemControllerTest {
                   "mes": 6,
                   "codigoId": 5,
                   "codigoNombre": "Básico",
-                  "importe": 100.50
+                  "importe": 100.50,
+                  "codigo": null,
+                  "persona": null
                                                     }
                 """;
+    }
+
+    @Test
+    void toResponse_includesNestedCodigoAndPersonaForLegacyClients() {
+        Item item = sampleItem();
+        item.setCodigo(Codigo.builder().codigoId(5).nombre("Básico").build());
+        item.setPersona(Persona.builder().legajoId(123L).apellido("Perez").nombre("Juan").build());
+
+        ItemDtoMapper mapper = new ItemDtoMapper(new CodigoDtoMapper(new AfipConceptoSueldoDtoMapper()),
+                new PersonaDtoMapper(new DependenciaDtoMapper(new FacultadDtoMapper(), new GeograficaDtoMapper())));
+        ItemResponse response = mapper.toResponse(item);
+
+        assertNotNull(response.getCodigo());
+        assertEquals("Básico", response.getCodigo().getNombre());
+        assertNotNull(response.getPersona());
+        assertEquals(123L, response.getPersona().getLegajoId());
     }
 
     @Test

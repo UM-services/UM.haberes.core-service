@@ -26,6 +26,8 @@ sequenceDiagram
 
     Note over CCtrl,CSvc: CursoCargoResponse incluye relaciones anidadas:<br/>curso, cargoTipo, persona, designacionTipo y categoria (vía CursoCargoDtoMapper)
 
+    Note over CursoCtrl,FusionSvc: CursoResponse incluye facultad y geografica anidadas (CursoDtoMapper),<br/>CursoFusionResponse suma persona, facultad, geografica, cargoTipo, designacionTipo y categoria
+
     Note over Usuario,DB: Fusion de cursos (cursos anuales que se fusionan por facultad)
 
     Usuario->>FusionSvc: (vía /cursofusion) findAllByLegajoIdAndFacultadId(...)

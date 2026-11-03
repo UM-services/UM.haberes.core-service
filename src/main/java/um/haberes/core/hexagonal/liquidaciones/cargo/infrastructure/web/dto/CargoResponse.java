@@ -10,6 +10,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.web.dto.CategoriaResponse;
+import um.haberes.core.hexagonal.personas.dependencia.infrastructure.web.dto.DependenciaResponse;
+import um.haberes.core.hexagonal.personas.persona.infrastructure.web.dto.PersonaResponse;
 
 @Getter
 @Setter
@@ -37,6 +40,12 @@ public class CargoResponse {
     private int presentismo;
 
     private BigDecimal horasJornada;
+
+    private PersonaResponse persona;
+
+    private DependenciaResponse dependencia;
+
+    private CategoriaResponse categoria;
 
     private String dependenciaNombre;
 

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import um.haberes.core.hexagonal.liquidaciones.afip_concepto_sueldo.infrastructure.web.dto.AfipConceptoSueldoResponse;
 
 @Getter
 @Setter
@@ -28,4 +29,8 @@ public class CodigoResponse {
     private Long afipConceptoSueldoIdPrimerSemestre;
 
     private Long afipConceptoSueldoIdSegundoSemestre;
+
+    private AfipConceptoSueldoResponse afipConceptoSueldoPrimerSemestre;
+
+    private AfipConceptoSueldoResponse afipConceptoSueldoSegundoSemestre;
 }

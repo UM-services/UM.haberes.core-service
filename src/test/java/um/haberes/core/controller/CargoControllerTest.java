@@ -11,10 +11,18 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import um.haberes.core.hexagonal.facultad.infrastructure.web.mapper.FacultadDtoMapper;
+import um.haberes.core.hexagonal.geografica.infrastructure.web.mapper.GeograficaDtoMapper;
 import um.haberes.core.hexagonal.liquidaciones.cargo.application.service.CargoService;
 import um.haberes.core.hexagonal.liquidaciones.cargo.domain.model.Cargo;
 import um.haberes.core.hexagonal.liquidaciones.cargo.infrastructure.web.controller.CargoController;
 import um.haberes.core.hexagonal.liquidaciones.cargo.infrastructure.web.mapper.CargoDtoMapper;
+import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.Categoria;
+import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.web.mapper.CategoriaDtoMapper;
+import um.haberes.core.hexagonal.personas.dependencia.domain.model.Dependencia;
+import um.haberes.core.hexagonal.personas.dependencia.infrastructure.web.mapper.DependenciaDtoMapper;
+import um.haberes.core.hexagonal.personas.persona.domain.model.Persona;
+import um.haberes.core.hexagonal.personas.persona.infrastructure.web.mapper.PersonaDtoMapper;
 import um.haberes.core.hexagonal.liquidaciones.cargo.application.exception.CargoException;
 
 import java.math.BigDecimal;
@@ -28,6 +36,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,7 +52,9 @@ class CargoControllerTest {
 
     @BeforeEach
     void setUp() {
-        controller = new CargoController(service, new CargoDtoMapper());
+        controller = new CargoController(service, new CargoDtoMapper(
+                new PersonaDtoMapper(new DependenciaDtoMapper(new FacultadDtoMapper(), new GeograficaDtoMapper())),
+                new DependenciaDtoMapper(new FacultadDtoMapper(), new GeograficaDtoMapper()), new CategoriaDtoMapper()));
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -70,6 +81,9 @@ class CargoControllerTest {
               "jornada": 1,
               "presentismo": 2,
               "horasJornada": 8.50,
+              "persona": null,
+              "dependencia": null,
+              "categoria": null,
               "dependenciaNombre": null,
               "categoriaNombre": null,
               "personaApellido": null,
@@ -145,6 +159,38 @@ class CargoControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(CARGO_JSON, JsonCompareMode.STRICT));
+    }
+
+    @Test
+    void findByCargoId_includesNestedCategoriaDependenciaAndPersona() throws Exception {
+        Cargo cargo = sampleCargo();
+        cargo.setCategoria(Categoria.builder()
+                .categoriaId(3)
+                .nombre("ADMINISTRATIVO CLASE 5")
+                .basico(new BigDecimal("178219.00"))
+                .noDocente((byte) 1)
+                .liquidaPorHora((byte) 1)
+                .build());
+        cargo.setDependencia(Dependencia.builder()
+                .dependenciaId(2)
+                .nombre("Sede San Rafael (Rectorado)")
+                .acronimo("SEDE-SR")
+                .build());
+        cargo.setPersona(Persona.builder()
+                .legajoId(100L)
+                .apellido("CASTILLO")
+                .nombre("MARICEL CARINA")
+                .build());
+
+        when(service.findByCargoId(1L)).thenReturn(cargo);
+
+        mockMvc.perform(get("/api/haberes/core/cargo/{cargoId}", 1))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.categoria.categoriaId").value(3))
+                .andExpect(jsonPath("$.categoria.nombre").value("ADMINISTRATIVO CLASE 5"))
+                .andExpect(jsonPath("$.categoria.basico").value(178219.00))
+                .andExpect(jsonPath("$.dependencia.acronimo").value("SEDE-SR"))
+                .andExpect(jsonPath("$.persona.legajoId").value(100));
     }
 
     @Test

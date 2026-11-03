@@ -10,6 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import um.haberes.core.hexagonal.facultad.infrastructure.web.mapper.FacultadDtoMapper;
+import um.haberes.core.hexagonal.geografica.infrastructure.web.mapper.GeograficaDtoMapper;
 import um.haberes.core.hexagonal.personas.persona.application.exception.PersonaException;
 import um.haberes.core.hexagonal.personas.persona.application.service.PersonaService;
 import um.haberes.core.hexagonal.personas.persona.domain.model.Persona;
@@ -49,7 +51,8 @@ class PersonaControllerTest {
 
     @BeforeEach
     void setUp() {
-        controller = new PersonaController(service, new PersonaDtoMapper(new DependenciaDtoMapper()),
+        controller = new PersonaController(service,
+                new PersonaDtoMapper(new DependenciaDtoMapper(new FacultadDtoMapper(), new GeograficaDtoMapper())),
                 partialUpdatePersonaUseCase);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }

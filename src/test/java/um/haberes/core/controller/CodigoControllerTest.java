@@ -11,6 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import um.haberes.core.hexagonal.liquidaciones.afip_concepto_sueldo.domain.model.AfipConceptoSueldo;
+import um.haberes.core.hexagonal.liquidaciones.afip_concepto_sueldo.infrastructure.web.mapper.AfipConceptoSueldoDtoMapper;
 import um.haberes.core.hexagonal.liquidaciones.codigo.application.service.CodigoService;
 import um.haberes.core.hexagonal.liquidaciones.codigo.domain.model.Codigo;
 import um.haberes.core.hexagonal.liquidaciones.codigo.domain.model.CodigoSearchResult;
@@ -21,6 +23,8 @@ import um.haberes.core.hexagonal.liquidaciones.codigo.infrastructure.web.mapper.
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -89,13 +93,33 @@ class CodigoControllerTest {
                   "transferible": 0,
                   "incluidoEtec": 1,
                   "afipConceptoSueldoIdPrimerSemestre": 11,
-                  "afipConceptoSueldoIdSegundoSemestre": 12
+                  "afipConceptoSueldoIdSegundoSemestre": 12,
+                  "afipConceptoSueldoPrimerSemestre": null,
+                  "afipConceptoSueldoSegundoSemestre": null
                 }
                 """;
     }
 
     private String codigoArrayJson() {
         return "[ " + codigoJson() + " ]";
+    }
+
+    @Test
+    void toResponse_includesNestedAfipConceptosForLegacyClients() {
+        Codigo codigo = sampleCodigo();
+        codigo.setAfipConceptoSueldoPrimerSemestre(AfipConceptoSueldo.builder()
+                .afipConceptoSueldoId(11L).descripcion("Sueldo").asignado((byte) 1).build());
+        codigo.setAfipConceptoSueldoSegundoSemestre(AfipConceptoSueldo.builder()
+                .afipConceptoSueldoId(12L).descripcion("Sueldo 2do").asignado((byte) 0).build());
+
+        CodigoDtoMapper mapper = new CodigoDtoMapper(new AfipConceptoSueldoDtoMapper());
+        CodigoResponse response = mapper.toResponse(codigo);
+
+        assertNotNull(response.getAfipConceptoSueldoPrimerSemestre());
+        assertEquals(11L, response.getAfipConceptoSueldoPrimerSemestre().getAfipConceptoSueldoId());
+        assertEquals("Sueldo", response.getAfipConceptoSueldoPrimerSemestre().getDescripcion());
+        assertNotNull(response.getAfipConceptoSueldoSegundoSemestre());
+        assertEquals("Sueldo 2do", response.getAfipConceptoSueldoSegundoSemestre().getDescripcion());
     }
 
     @Test

@@ -44,4 +44,4 @@ sequenceDiagram
     UC->>Adapt: findByLegajoId + update (los numéricos anulables en 0 quedan null)
     Ctrl-->>Usuario: 200 OK (PersonaResponse) o 400 si el legajo no existe
 
-    Note over Ctrl,Svc: PersonaResponse incluye la dependencia anidada<br/>(dependenciaDtoMapper.toResponse)
+    Note over Ctrl,Svc: PersonaResponse incluye la dependencia anidada<br/>(con facultad y geografica) vía dependenciaDtoMapper.toResponse

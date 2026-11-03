@@ -10,6 +10,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import um.haberes.core.hexagonal.facultad.domain.model.Facultad;
+import um.haberes.core.hexagonal.facultad.infrastructure.web.mapper.FacultadDtoMapper;
+import um.haberes.core.hexagonal.geografica.domain.model.Geografica;
+import um.haberes.core.hexagonal.geografica.infrastructure.web.mapper.GeograficaDtoMapper;
 import um.haberes.core.hexagonal.liquidaciones.liquidacion.application.exception.LiquidacionException;
 import um.haberes.core.hexagonal.liquidaciones.liquidacion.application.service.LiquidacionService;
 import um.haberes.core.hexagonal.liquidaciones.liquidacion.domain.model.Liquidacion;
@@ -19,12 +23,18 @@ import um.haberes.core.hexagonal.liquidaciones.liquidacion.infrastructure.web.dt
 import um.haberes.core.hexagonal.liquidaciones.liquidacion.infrastructure.web.dto.LiquidacionRequest;
 import um.haberes.core.hexagonal.liquidaciones.liquidacion.infrastructure.web.dto.LiquidacionResponse;
 import um.haberes.core.hexagonal.liquidaciones.liquidacion.infrastructure.web.mapper.LiquidacionDtoMapper;
+import um.haberes.core.hexagonal.personas.dependencia.domain.model.Dependencia;
+import um.haberes.core.hexagonal.personas.dependencia.infrastructure.web.mapper.DependenciaDtoMapper;
+import um.haberes.core.hexagonal.personas.persona.domain.model.Persona;
+import um.haberes.core.hexagonal.personas.persona.infrastructure.web.mapper.PersonaDtoMapper;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -146,6 +156,8 @@ class LiquidacionControllerTest {
               "bloqueado": 0,
               "estado": 1,
               "liquida": "USER",
+              "persona": null,
+              "dependencia": null,
               "key": "100.2024.6"
             }
             """;
@@ -170,6 +182,31 @@ class LiquidacionControllerTest {
 
     private String liquidacionRequestJson() throws Exception {
         return objectMapper.writeValueAsString(sampleRequest());
+    }
+
+    @Test
+    void toResponse_includesNestedPersonaAndDependenciaForLegacyClients() {
+        Liquidacion liquidacion = sampleLiquidacion();
+        liquidacion.setPersona(Persona.builder().legajoId(100L).apellido("Perez").nombre("Juan").build());
+        liquidacion.setDependencia(Dependencia.builder()
+                .dependenciaId(7)
+                .nombre("Secretaría Académica")
+                .acronimo("SEA")
+                .facultad(Facultad.builder().facultadId(2).nombre("Rectorado").build())
+                .geografica(Geografica.builder().geograficaId(3).nombre("San Rafael").build())
+                .build());
+
+        LiquidacionDtoMapper mapper = new LiquidacionDtoMapper(
+                new PersonaDtoMapper(new DependenciaDtoMapper(new FacultadDtoMapper(), new GeograficaDtoMapper())),
+                new DependenciaDtoMapper(new FacultadDtoMapper(), new GeograficaDtoMapper()));
+        LiquidacionResponse response = mapper.toResponse(liquidacion);
+
+        assertNotNull(response.getPersona());
+        assertEquals("Perez", response.getPersona().getApellido());
+        assertNotNull(response.getDependencia());
+        assertEquals("SEA", response.getDependencia().getAcronimo());
+        assertEquals("Rectorado", response.getDependencia().getFacultad().getNombre());
+        assertEquals("San Rafael", response.getDependencia().getGeografica().getNombre());
     }
 
     @Test

@@ -11,6 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import um.haberes.core.hexagonal.facultad.infrastructure.web.mapper.FacultadDtoMapper;
+import um.haberes.core.hexagonal.geografica.infrastructure.web.mapper.GeograficaDtoMapper;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.application.exception.CargoLiquidacionException;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.application.service.CargoLiquidacionService;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.model.CargoLiquidacion;
@@ -57,7 +59,8 @@ class CargoLiquidacionControllerTest {
     @BeforeEach
     void setUp() {
         controller = new CargoLiquidacionController(service, new CargoLiquidacionDtoMapper(
-                new PersonaDtoMapper(new DependenciaDtoMapper()), new DependenciaDtoMapper(), new CategoriaDtoMapper()),
+                new PersonaDtoMapper(new DependenciaDtoMapper(new FacultadDtoMapper(), new GeograficaDtoMapper())),
+                new DependenciaDtoMapper(new FacultadDtoMapper(), new GeograficaDtoMapper()), new CategoriaDtoMapper()),
                 cargoLiquidacionPeriodoService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }

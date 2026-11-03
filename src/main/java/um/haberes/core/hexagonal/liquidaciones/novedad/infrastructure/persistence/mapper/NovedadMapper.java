@@ -3,13 +3,19 @@ package um.haberes.core.hexagonal.liquidaciones.novedad.infrastructure.persisten
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
+import um.haberes.core.hexagonal.liquidaciones.codigo.infrastructure.persistence.mapper.CodigoMapper;
 import um.haberes.core.hexagonal.liquidaciones.novedad.domain.model.Novedad;
 import um.haberes.core.hexagonal.liquidaciones.novedad.infrastructure.persistence.entity.NovedadEntity;
 import um.haberes.core.hexagonal.personas.dependencia.infrastructure.persistence.mapper.DependenciaMapper;
+import um.haberes.core.hexagonal.personas.persona.infrastructure.persistence.mapper.PersonaMapper;
 
 @Component
 @RequiredArgsConstructor
 public class NovedadMapper {
+
+    private final PersonaMapper personaMapper;
+
+    private final CodigoMapper codigoMapper;
 
     private final DependenciaMapper dependenciaMapper;
 
@@ -51,6 +57,8 @@ public class NovedadMapper {
                 .mes(entity.getMes())
                 .codigoId(entity.getCodigoId())
                 .dependenciaId(entity.getDependenciaId())
+                .persona(personaMapper.toDomain(entity.getPersona()))
+                .codigo(codigoMapper.toDomain(entity.getCodigo()))
                 .dependencia(dependenciaMapper.toDomain(entity.getDependencia()))
                 .observaciones(entity.getObservaciones())
                 .importado(entity.getImportado())

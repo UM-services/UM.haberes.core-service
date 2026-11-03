@@ -2,14 +2,22 @@ package um.haberes.core.hexagonal.liquidaciones.liquidacion.infrastructure.web.m
 
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
 import um.haberes.core.hexagonal.liquidaciones.liquidacion.domain.model.Liquidacion;
 import um.haberes.core.hexagonal.liquidaciones.liquidacion.domain.model.LiquidacionPeriodoForward;
 import um.haberes.core.hexagonal.liquidaciones.liquidacion.infrastructure.web.dto.LiquidacionPeriodoResponse;
 import um.haberes.core.hexagonal.liquidaciones.liquidacion.infrastructure.web.dto.LiquidacionRequest;
 import um.haberes.core.hexagonal.liquidaciones.liquidacion.infrastructure.web.dto.LiquidacionResponse;
+import um.haberes.core.hexagonal.personas.dependencia.infrastructure.web.mapper.DependenciaDtoMapper;
+import um.haberes.core.hexagonal.personas.persona.infrastructure.web.mapper.PersonaDtoMapper;
 
 @Component
+@RequiredArgsConstructor
 public class LiquidacionDtoMapper {
+
+    private final PersonaDtoMapper personaDtoMapper;
+
+    private final DependenciaDtoMapper dependenciaDtoMapper;
 
     public Liquidacion toDomain(LiquidacionRequest request) {
         if (request == null) {
@@ -68,6 +76,8 @@ public class LiquidacionDtoMapper {
                 .bloqueado(domain.getBloqueado())
                 .estado(domain.getEstado())
                 .liquida(domain.getLiquida())
+                .persona(personaDtoMapper.toResponse(domain.getPersona()))
+                .dependencia(dependenciaDtoMapper.toResponse(domain.getDependencia()))
                 .key(domain.key())
                 .build();
     }
