@@ -31,10 +31,15 @@ sequenceDiagram
 
     Sender->>DB: reclama PENDING por lote (claim_token + lease de 60 s)
     Sender->>Aud: POST /api/haberes/auditoria/evento/lote (X-API-Key)
-    alt 2xx
-        Sender->>DB: marca SENT
+    alt 2xx con accepted, duplicates y rejected que cubren todo el lote
+        Sender->>DB: marca SENT (y FAILED por índice rechazado)
+    else 2xx con cuerpo vacío, no interpretable o incompleto
+        Sender->>DB: reintenta el lote (no se da por entregado)
     else 400 / 401 / 403 / 422
         Sender->>DB: marca FAILED (rechazo permanente)
     else 5xx o error de red
         Sender->>DB: reintenta con backoff (máximo HABERES_AUDIT_MAX_ATTEMPTS)
     end
+
+    Note over Sender,DB: Limpieza cada hora: purga SENT (7 días) y FAILED (30 días desde el fallo)
+    Note over Sender,DB: PENDING viejo (24 h) sólo genera warning y nunca se borra
