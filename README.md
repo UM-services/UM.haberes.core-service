@@ -18,7 +18,7 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**1.23.0** (2026-11-03)
+**1.23.1** (2026-11-04)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
@@ -158,7 +158,12 @@ logging:
 - **Captura**: listeners de Hibernate (`post-insert`/`post-update`/`post-delete`) + un evento
   `REQUEST` por operación HTTP (incluye intentos fallidos).
 - **Entrega**: tabla `audit_outbox` en la base `haberes`, escrita en la **misma transacción**
-  del cambio; un sender programado la envía por lote con reintentos/backoff.
+  del cambio; un sender programado la envía por lote con reintentos/backoff. Una fila sólo
+  pasa a `SENT` cuando la respuesta confirma qué pasó con **cada** evento del lote
+  (`accepted`/`duplicates`/`rejected`); un cuerpo vacío, no interpretable o incompleto se
+  reintenta.
+- **Retención**: una limpieza programada (cada hora) purga `SENT` y `FAILED` según su
+  retención; `PENDING` nunca se borra y, si envejece, se avisa por log.
 - **Esquema**: `sql/001_audit_outbox.sql` se aplica a mano (la app no migra: `ddl-auto: none`).
 - **Identidad**: headers `X-Usuario-Legajo` (o `X-Legajo-Solicitante`) y `X-Usuario-Login`.
   Sin JWT todavía, el evento se marca con `actor_trust=CLIENT`.
@@ -177,6 +182,11 @@ logging:
 | `HABERES_AUDIT_SENDER_DELAY_MS` | `2000` | Espera entre corridas del sender |
 | `HABERES_AUDIT_SENDER_INITIAL_DELAY_MS` | `5000` | Espera inicial antes de la primera corrida |
 | `HABERES_AUDIT_MAX_PAYLOAD_CHARS` | `32768` | Tope del payload serializado por evento |
+| `HABERES_AUDIT_SENT_RETENTION_DAYS` | `7` | Días que se conservan las filas `SENT` antes de purgarlas |
+| `HABERES_AUDIT_FAILED_RETENTION_DAYS` | `30` | Días que se conservan las `FAILED` desde el fallo (para inspección) |
+| `HABERES_AUDIT_PENDING_WARN_HOURS` | `24` | Antigüedad a partir de la cual se avisa que hay `PENDING` sin entregar |
+| `HABERES_AUDIT_CLEANUP_DELAY_MS` | `3600000` | Espera entre corridas de la limpieza (cada hora) |
+| `HABERES_AUDIT_CLEANUP_INITIAL_DELAY_MS` | `60000` | Espera inicial antes de la primera limpieza |
 | `HABERES_AUDIT_BULK_ENABLED` | `true` | Resume operaciones masivas (`SUMMARY/BULK`); `false` = fila por fila |
 | `HABERES_AUDIT_SUMMARY_ENTITIES` | `ItemEntity,ItemVersionEntity,CargoLiquidacionEntity,CargoLiquidacionVersionEntity` | Entidades elegibles para resumirse dentro de un scope |
 
