@@ -20,6 +20,12 @@ public interface JpaCursoCargoRepository extends JpaRepository<CursoCargoEntity,
 
     List<CursoCargoEntity> findAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes, Sort sort);
 
+    List<CursoCargoEntity> findAllByLegajoIdInAndAnhoAndMes(List<Long> legajoIds, Integer anho, Integer mes,
+                                                            Sort sort);
+
+    List<CursoCargoEntity> findAllByLegajoIdInAndAnhoAndMesAndCursoNivelId(List<Long> legajoIds, Integer anho,
+                                                                          Integer mes, Integer nivelId, Sort sort);
+
     List<CursoCargoEntity> findAllByLegajoIdAndAnhoAndMesAndDesarraigo(Long legajoId, Integer anho, Integer mes,
                                                                  Byte desarraigo);
 

@@ -38,6 +38,9 @@ public interface JpaLegajoBancoRepository extends JpaRepository<LegajoBancoEntit
 
 	Optional<LegajoBancoEntity> findByLegajoIdAndAnhoAndMesAndResto(Long legajoId, Integer anho, Integer mes, Byte resto);
 
+	List<LegajoBancoEntity> findAllByLegajoIdInAndAnhoAndMesAndResto(List<Long> legajoIds, Integer anho, Integer mes,
+			Byte resto);
+
 	Optional<LegajoBancoEntity> findByLegajoBancoId(Long legajoBancoId);
 
 	Optional<LegajoBancoEntity> findTopByLegajoIdOrderByAnhoDescMesDesc(Long legajoId);

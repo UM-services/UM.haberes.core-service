@@ -1,15 +1,17 @@
 package um.haberes.core.hexagonal.liquidaciones.bono.infrastructure.web.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import um.haberes.core.hexagonal.liquidaciones.bono.application.exception.BonoException;
 import um.haberes.core.hexagonal.liquidaciones.bono.application.service.BonoService;
 import um.haberes.core.hexagonal.liquidaciones.bono.infrastructure.web.dto.BonoDependenciaPrintPrepareResponse;
 import um.haberes.core.hexagonal.liquidaciones.bono.infrastructure.web.mapper.BonoDependenciaDtoMapper;
@@ -40,6 +42,23 @@ public class BonoDependenciaController {
         return ResponseEntity.ok(mapper.toPrintPrepareResponse(bonoService.prepararDependencia(
                 dependenciaId, anho, mes, salida,
                 resolveLegajoIdSolicitante(httpRequest), clientIpResolver.resolve(httpRequest))));
+    }
+
+    /**
+     * Datos completos del lote para generar los recibos de una sola pasada (lo consume
+     * haberes-report). Los catálogos viajan una sola vez y no se audita: la auditoría de la
+     * impresión sigue siendo responsabilidad de {@code print-prepare}.
+     */
+    @PostMapping("/{dependenciaId}/{anho}/{mes}/{salida}/lote")
+    public ResponseEntity<?> lote(@PathVariable Integer dependenciaId,
+                                  @PathVariable Integer anho, @PathVariable Integer mes,
+                                  @PathVariable String salida) {
+        try {
+            return ResponseEntity.ok(bonoService.obtenerLote(dependenciaId, anho, mes, salida));
+        } catch (BonoException e) {
+            return ResponseEntity.badRequest().body(ProblemDetail
+                    .forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage()));
+        }
     }
 
     private Long resolveLegajoIdSolicitante(HttpServletRequest httpRequest) {

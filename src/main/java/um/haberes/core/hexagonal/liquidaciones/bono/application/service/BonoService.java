@@ -8,10 +8,12 @@ import lombok.RequiredArgsConstructor;
 import um.haberes.core.hexagonal.liquidaciones.bono.domain.model.Actividad;
 import um.haberes.core.hexagonal.liquidaciones.bono.domain.model.AuditoriaBono;
 import um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoImpresion;
+import um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoLote;
 import um.haberes.core.hexagonal.liquidaciones.bono.domain.model.EnvioBono;
 import um.haberes.core.hexagonal.liquidaciones.bono.domain.model.IntegridadBono;
 import um.haberes.core.hexagonal.liquidaciones.bono.domain.model.PeriodoBono;
 import um.haberes.core.hexagonal.liquidaciones.bono.domain.ports.in.ObtenerHistorialAuditoriaBonoUseCase;
+import um.haberes.core.hexagonal.liquidaciones.bono.domain.ports.in.ObtenerBonoLoteUseCase;
 import um.haberes.core.hexagonal.liquidaciones.bono.domain.model.ResumenPreparacionBonos;
 import um.haberes.core.hexagonal.liquidaciones.bono.domain.ports.in.PrepararBonosDependenciaUseCase;
 import um.haberes.core.hexagonal.liquidaciones.bono.domain.ports.in.PrepararBonoUseCase;
@@ -31,6 +33,7 @@ public class BonoService {
     private final PrepararBonosDependenciaUseCase prepararBonosDependenciaUseCase;
     private final PrepararEnvioBonoUseCase prepararEnvioBonoUseCase;
     private final ObtenerHistorialAuditoriaBonoUseCase obtenerHistorialAuditoriaBonoUseCase;
+    private final ObtenerBonoLoteUseCase obtenerBonoLoteUseCase;
 
     public IntegridadBono verificarIntegridad(PeriodoBono periodo) {
         return verificarIntegridadBonoUseCase.verificarIntegridad(periodo);
@@ -61,5 +64,9 @@ public class BonoService {
 
     public List<BonoImpresion> getHistorial(PeriodoBono periodo) {
         return obtenerHistorialAuditoriaBonoUseCase.getHistorial(periodo);
+    }
+
+    public BonoLote obtenerLote(Integer dependenciaId, Integer anho, Integer mes, String salida) {
+        return obtenerBonoLoteUseCase.obtener(dependenciaId, anho, mes, salida);
     }
 }

@@ -53,6 +53,7 @@ spring:
           batch_size: 200
         order_inserts: true
         order_updates: true
+        default_batch_fetch_size: 100
   mail:
     host: smtp.gmail.com
     port: 587
