@@ -66,6 +66,52 @@ class BonoDependenciaControllerTest {
     }
 
     @Test
+    void loteDevuelveLosDatosCompletosDeLaDependencia() throws Exception {
+        java.math.BigDecimal cero = java.math.BigDecimal.ZERO;
+        um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoLote lote =
+                new um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoLote(2026, 9, 7, "A",
+                        new um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoLote.Control(
+                                null, null, null, null, "11%", cero),
+                        new um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoLote.Catalogo(
+                                List.of(new um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoLote.Dependencia(7, "ACRO")),
+                                new um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoLote.Codigo(981, "Adicional"),
+                                List.of(new um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoLote.Grupo(1, "Básico")),
+                                List.of(), List.of()),
+                        List.of(new um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoLote.Legajo(
+                                1001L,
+                                new um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoLote.Persona(
+                                        1001L, "Gómez", "Ana", "30111222", "20-30111222-3", 7, null,
+                                        (byte) 0),
+                                new um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoLote.Antiguedad(10, 0),
+                                List.of(cero), "CBU",
+                                List.of(new um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoLote.Item(99, cero)),
+                                List.of(), List.of(), List.of(), List.of(), List.of(), List.of(), cero,
+                                "ana@um.edu.ar", 1L, false)));
+        when(bonoService.obtenerLote(7, 2026, 9, "A")).thenReturn(lote);
+
+        mockMvc.perform(post("/api/haberes/core/bono/dependencia/7/2026/9/A/lote"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.dependenciaId").value(7))
+                .andExpect(jsonPath("$.salida").value("A"))
+                .andExpect(jsonPath("$.control.aporteJubilatorio").value("11%"))
+                .andExpect(jsonPath("$.catalogo.codigo981.codigoId").value(981))
+                .andExpect(jsonPath("$.legajos[0].legajoId").value(1001))
+                .andExpect(jsonPath("$.legajos[0].persona.apellido").value("Gómez"));
+    }
+
+    @Test
+    void loteSinLiquidacionesDevuelve400ConElDetalleDeNegocio() throws Exception {
+        when(bonoService.obtenerLote(31, 2026, 9, "A"))
+                .thenThrow(new um.haberes.core.hexagonal.liquidaciones.bono.application.exception.BonoException(
+                        "No hay liquidaciones para la dependencia 31 en 9/2026"));
+
+        mockMvc.perform(post("/api/haberes/core/bono/dependencia/31/2026/9/A/lote"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail")
+                        .value("No hay liquidaciones para la dependencia 31 en 9/2026"));
+    }
+
+    @Test
     void printPrepareConHeaderInvalidoDevuelve400() throws Exception {
         mockMvc.perform(post("/api/haberes/core/bono/dependencia/7/2026/9/A/print-prepare")
                         .header("X-Legajo-Solicitante", "no-es-numero"))

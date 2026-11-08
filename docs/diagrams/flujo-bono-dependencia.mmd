@@ -1,17 +1,47 @@
 ---
-title: "Bono por Dependencia: preparación masiva y auditoría antes de imprimir (slice liquidaciones/bono)"
+title: "Bono por Dependencia: lectura del lote, preparación masiva y auditoría antes de imprimir (slice liquidaciones/bono)"
 ---
 sequenceDiagram
     autonumber
     actor Usuario
     participant Ctrl as BonoDependenciaController
     participant Svc as BonoService (application)
+    participant LoteUC as ObtenerBonoLoteUseCaseImpl
+    participant LotePort as BonoLoteDataPort
     participant BatchUC as PrepararBonosDependenciaUseCaseImpl
     participant QPort as LiquidacionQueryPort
+    participant CleanUC as DeleteZeroItemsByLegajoUseCase
     participant PrintUC as PrintPrepareBonoUseCaseImpl
     participant DB as MySQL
 
-    Note over Usuario,DB: E1 - Preparación del lote antes de pedir el PDF al report service (reemplaza el beforePrintBono legajo por legajo del cliente)
+    Note over Usuario,DB: E1 - El report service pide el lote completo en una sola lectura (reemplaza el recorrido de ~24 endpoints HTTP por legajo)
+
+    Usuario->>Ctrl: POST /api/haberes/core/bono/dependencia/{dependenciaId}/{anho}/{mes}/{salida}/lote
+    Ctrl->>Svc: obtenerLote(dependenciaId, anho, mes, salida)
+    Svc->>LoteUC: obtener(dependenciaId, anho, mes, salida)
+    LoteUC->>QPort: findLegajoIdsByDependencia(dependenciaId, anho, mes, salida)
+    QPort->>DB: SELECT liquidaciones del período por dependencia y salida
+    alt no hay liquidaciones
+        LoteUC-->>Ctrl: BonoException
+        Ctrl-->>Usuario: 400 ProblemDetail con el detalle de negocio
+    end
+
+    loop cada legajoId
+        LoteUC->>CleanUC: deleteZeroItemsByLegajo(legajoId, anho, mes)
+        CleanUC->>DB: borra los items en cero del legajo/período
+    end
+
+    LoteUC->>LotePort: cargar(legajoIds, anho, mes, dependenciaId, salida)
+    LotePort->>DB: consultas IN por agregado (persona, antigüedad, items, cursos, cargos, clases, adicionales, banco, contacto y control)
+    LotePort->>DB: catálogos compartidos una sola vez (dependencias, código 981 y grupos) y control del período
+    alt sin control del período
+        LoteUC-->>Ctrl: BonoException
+        Ctrl-->>Usuario: 400 ProblemDetail con el detalle de negocio
+    end
+    LoteUC-->>Ctrl: BonoLote(control, catalogo, legajos)
+    Ctrl-->>Usuario: 200 con control, catálogos compartidos y legajos[]
+
+    Note over Usuario,DB: E2 - Preparación del lote antes de pedir el PDF al report service (reemplaza el beforePrintBono legajo por legajo del cliente)
 
     Usuario->>Ctrl: POST /api/haberes/core/bono/dependencia/{dependenciaId}/{anho}/{mes}/{salida}/print-prepare (header X-Legajo-Solicitante)
     Ctrl->>Ctrl: ClientIpResolver: X-Forwarded-For → X-Real-IP → getRemoteAddr
@@ -23,7 +53,7 @@ sequenceDiagram
     BatchUC->>QPort: findLegajoIdsByDependencia(dependenciaId, anho, mes, salida)
     QPort->>DB: SELECT liquidacion del período por dependencia y salida (legajoId distinto)
 
-    Note over BatchUC,DB: E2 - Por cada legajo se ejecuta el mismo prepare individual (integridad, actividad y auditoría)
+    Note over BatchUC,DB: E3 - Por cada legajo se ejecuta el mismo prepare individual (integridad, actividad y auditoría)
 
     loop cada legajoId
         BatchUC->>PrintUC: printPrepare(AuditoriaBono con legajoId, anho, mes, solicitante e IP)
