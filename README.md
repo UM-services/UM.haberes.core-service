@@ -18,7 +18,7 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**1.23.1** (2026-11-04)
+**1.24.0** (2026-11-08)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
@@ -316,6 +316,7 @@ docker run -d \
 - `POST /api/haberes/core/libroSueldo/generate/{anho}/{mes}` - Generar libro de sueldo
 - `GET /api/haberes/core/sheet/generateitems/{anho}/{mes}` - Generar planilla de items
 - `POST /api/haberes/core/bono/dependencia/{dependenciaId}/{anho}/{mes}/{salida}/print-prepare` - Preparar y auditar la impresión masiva de bonos de una dependencia
+- `POST /api/haberes/core/bono/dependencia/{dependenciaId}/{anho}/{mes}/{salida}/lote` - Obtener en una sola lectura el lote completo de bonos de la dependencia (legajos y catálogos compartidos)
 
 
 ## Arquitectura
