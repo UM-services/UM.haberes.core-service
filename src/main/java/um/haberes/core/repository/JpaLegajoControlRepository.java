@@ -29,4 +29,7 @@ public interface JpaLegajoControlRepository extends JpaRepository<LegajoControlE
 
 	public Optional<LegajoControlEntity> findByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
 
+	public List<LegajoControlEntity> findAllByLegajoIdInAndAnhoAndMes(List<Long> legajoIds, Integer anho,
+			Integer mes);
+
 }
