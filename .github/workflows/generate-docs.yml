@@ -129,6 +129,7 @@ jobs:
                   { file: 'diagrams/flujo-liquidacion-sueldos.mmd', title: '🔄 Secuencia: Liquidación Individual de Sueldos' },
                   { file: 'diagrams/flujo-liquidacion-general.mmd', title: '🔄 Flujo: Liquidación General Masiva' },
                   { file: 'diagrams/flujo-liquidacion-ciclo.mmd', title: '🔄 Secuencia: Ciclo de Vida de la Liquidación' },
+                  { file: 'diagrams/flujo-liquidacion-individual.mmd', title: '🔄 Secuencia: Liquidación Individual por Legajo (reglas y motor)' },
                   { file: 'diagrams/flujo-cargo-liquidacion.mmd', title: '🔄 Secuencia: Cargos de Liquidación' },
                   { file: 'diagrams/flujo-item-letra.mmd', title: '🔄 Secuencia: Items y Letras' },
                   { file: 'diagrams/flujo-novedad-gestion.mmd', title: '🔄 Secuencia: Gestión de Novedades' },
