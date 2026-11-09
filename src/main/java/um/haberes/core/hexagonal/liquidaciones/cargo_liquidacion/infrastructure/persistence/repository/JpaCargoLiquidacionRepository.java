@@ -28,6 +28,8 @@ public interface JpaCargoLiquidacionRepository extends JpaRepository<CargoLiquid
     List<CargoLiquidacionEntity> findAllByLegajoIdAndAnhoAndMesAndCategoriaDocente(Long legajoId, Integer anho,
             Integer mes, Byte docente);
 
+    List<CargoLiquidacionEntity> findAllByLegajoIdInAndAnhoAndMes(List<Long> legajoIds, Integer anho, Integer mes);
+
     List<CargoLiquidacionEntity> findAllByLegajoIdAndAnhoAndMesAndCategoriaNoDocente(Long legajoId, Integer anho,
             Integer mes, Byte noDocente);
 

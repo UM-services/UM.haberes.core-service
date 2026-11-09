@@ -20,6 +20,8 @@ public interface JpaAntiguedadRepository extends JpaRepository<AntiguedadEntity,
 
 	public Optional<AntiguedadEntity> findByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
 
+	public List<AntiguedadEntity> findAllByLegajoIdInAndAnhoAndMes(List<Long> legajoIds, Integer anho, Integer mes);
+
 	public Optional<AntiguedadEntity> findByAntiguedadId(Long antiguedadId);
 
 }
