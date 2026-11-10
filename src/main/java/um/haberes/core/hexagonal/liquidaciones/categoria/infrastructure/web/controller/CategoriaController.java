@@ -46,6 +46,11 @@ public class CategoriaController {
         return ResponseEntity.ok(toResponseList(service.findAllNoDocentes()));
     }
 
+    @GetMapping("/asignables")
+    public ResponseEntity<List<CategoriaResponse>> findAllAsignables() {
+        return ResponseEntity.ok(toResponseList(service.findAllAsignables()));
+    }
+
     @GetMapping("/search/{chain}")
     public ResponseEntity<List<CategoriaSearchResponse>> findAllSearch(@PathVariable String chain) {
         return ResponseEntity.ok(service.findAllSearch(chain).stream()
