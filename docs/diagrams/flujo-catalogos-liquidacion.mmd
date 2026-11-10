@@ -23,6 +23,8 @@ sequenceDiagram
 
     Usuario->>CatCtrl: GET /categoria/nogrado o /nodocente/{anho}/{mes}
     CatCtrl->>CatSvc: findAllNoDocentes() / findAllNoDocenteByPeriodo(...)
+    Usuario->>CatCtrl: GET /categoria/asignables
+    CatCtrl->>CatSvc: findAllAsignables()
     Usuario->>CatCtrl: POST /categoria/{anho}/{mes} (CategoriaRequest)
     CatCtrl->>CatSvc: add(categoria, anho, mes) (alta con período)
     Usuario->>CatCtrl: POST /categoria/upload/{anho}/{mes} (planilla Excel)
