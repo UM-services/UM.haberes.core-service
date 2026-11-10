@@ -18,7 +18,7 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**1.24.0** (2026-11-08)
+**1.26.0** (2026-11-09)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
@@ -49,6 +49,7 @@ Liquidaciones:
 - `docs/diagrams/flujo-liquidacion-sueldos.mmd`
 - `docs/diagrams/flujo-liquidacion-general.mmd`
 - `docs/diagrams/flujo-liquidacion-ciclo.mmd`
+- `docs/diagrams/flujo-liquidacion-individual.mmd`
 - `docs/diagrams/flujo-cargo-liquidacion.mmd`
 - `docs/diagrams/flujo-item-letra.mmd`
 - `docs/diagrams/flujo-novedad-gestion.mmd`
@@ -281,8 +282,16 @@ docker run -d \
 - `POST /api/haberes/core/liquidacion/` - Crear liquidación
 - `PUT /api/haberes/core/liquidacion/{liquidacionId}` - Actualizar liquidación
 - `DELETE /api/haberes/core/liquidacion/periodo/{anho}/{mes}` - Eliminar liquidaciones del período
-- `GET /api/haberes/core/makeLiquidacion/legajo/{legajoId}/{anho}/{mes}/{force}` - Liquidar un legajo
+- `GET /api/haberes/core/makeLiquidacion/legajo/{legajoId}/{anho}/{mes}/{force}` - Liquidar un legajo (legacy)
 - `GET /api/haberes/core/makeLiquidacionGeneral/general/{anho}/{mes}/{force}` - Liquidación general masiva
+
+### Liquidación individual (slice hexagonal)
+- `GET /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}` - Ficha agregada del legajo/período con las acciones habilitadas
+- `POST /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/cargos` - Regenerar cargos docentes y no docentes
+- `POST /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/liquidar` - Liquidar el legajo/período (body opcional `{"forzar": true}`)
+- `DELETE /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/{forzar}` - Eliminar la liquidación del legajo/período
+- `POST /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/novedad` - Alta o actualización de una novedad
+- `DELETE /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/novedad/{novedadId}/{forzar}` - Eliminar una novedad del legajo/período
 
 ### Cargos
 - `GET /api/haberes/core/cargo/legajo/{legajoId}` - Obtener cargos por legajo

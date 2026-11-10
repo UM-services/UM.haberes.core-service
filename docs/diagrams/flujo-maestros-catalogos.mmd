@@ -9,6 +9,7 @@ sequenceDiagram
     participant Adic as AdicionalCursoTabla / AdicionalCursoRango Controllers
     participant CGCtrl as CodigoGrupoController
     participant PFCtrl as PersonaFacultadController
+    participant PFSvc as PersonaFacultadService (hexagonal)
     participant Svc as Servicios legacy (Jpa*Repository)
     participant DB as MySQL
 
@@ -52,4 +53,6 @@ sequenceDiagram
 
     Usuario->>PFCtrl: GET /personaFacultad/facultad/{facultadId} , GET /personaFacultad/persona/{legajoId}
     Usuario->>PFCtrl: POST /personaFacultad/ , DELETE /personaFacultad/unique/{legajoId}/{facultadId}
+    PFCtrl->>PFSvc: casos de uso (consulta, alta, baja por legajo/facultad)
+    PFSvc->>DB: SELECT/INSERT/DELETE persona_facultad (entidad auditada)
     Svc->>DB: SELECT/INSERT/DELETE maestro correspondiente

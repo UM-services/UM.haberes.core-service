@@ -113,6 +113,15 @@ class CategoriaControllerTest {
     }
 
     @Test
+    void findAllAsignables_returnsOkWithListOfCategoria() throws Exception {
+        when(service.findAllAsignables()).thenReturn(List.of(sampleCategoria()));
+
+        mockMvc.perform(get("/api/haberes/core/categoria/asignables"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(categoriaArrayJson(), JsonCompareMode.STRICT));
+    }
+
+    @Test
     void findAllSearch_returnsOkWithListOfCategoriaSearch() throws Exception {
         CategoriaSearchResult categoriaSearch = new CategoriaSearchResult();
         categoriaSearch.setCategoriaId(5);
