@@ -1,5 +1,6 @@
 package um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.persistence.adapter;
 
+import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,11 @@ public class JpaCategoriaRepositoryAdapter implements CategoriaRepository {
     @Override
     public List<Categoria> findAll() {
         return toDomainList(jpaCategoriaRepository.findAll(Sort.by("categoriaId").ascending()));
+    }
+
+    @Override
+    public List<Categoria> findAllByPuntosGreaterThan(BigDecimal puntos) {
+        return toDomainList(jpaCategoriaRepository.findAllByPuntosGreaterThan(puntos, Sort.by("categoriaId").ascending()));
     }
 
     @Override

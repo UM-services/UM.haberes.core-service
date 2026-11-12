@@ -18,6 +18,7 @@ import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.in.GetAllC
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.in.GetCategoriaByCategoriaIdUseCase;
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.in.GetCategoriasAsignablesUseCase;
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.in.GetCategoriasByCategoriaIdsUseCase;
+import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.in.GetCategoriasConPuntosUseCase;
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.in.GetCategoriasDocentesUseCase;
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.in.GetCategoriasNoDocentesByLegajoUseCase;
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.in.GetCategoriasNoDocentesByPeriodoUseCase;
@@ -38,6 +39,7 @@ public class CategoriaService {
     private final GetCategoriasDocentesUseCase getCategoriasDocentesUseCase;
     private final GetCategoriasNoDocentesUseCase getCategoriasNoDocentesUseCase;
     private final GetCategoriasAsignablesUseCase getCategoriasAsignablesUseCase;
+    private final GetCategoriasConPuntosUseCase getCategoriasConPuntosUseCase;
     private final GetCategoriasNoDocentesByPeriodoUseCase getCategoriasNoDocentesByPeriodoUseCase;
     private final GetCategoriasNoDocentesByLegajoUseCase getCategoriasNoDocentesByLegajoUseCase;
     private final GetCategoriaByCategoriaIdUseCase getCategoriaByCategoriaIdUseCase;
@@ -50,6 +52,10 @@ public class CategoriaService {
 
     public List<Categoria> findAll() {
         return getAllCategoriasUseCase.getAllCategorias();
+    }
+
+    public List<Categoria> findAllConPuntos() {
+        return getCategoriasConPuntosUseCase.getCategoriasConPuntos();
     }
 
     public List<Categoria> findAllByIds(Set<Integer> categoriaIds) {

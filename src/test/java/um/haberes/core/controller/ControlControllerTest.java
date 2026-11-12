@@ -12,10 +12,13 @@ import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import um.haberes.core.exception.ControlException;
+import um.haberes.core.exception.ControlOrigenException;
+import um.haberes.core.exception.ControlYaExisteException;
 import um.haberes.core.model.ControlEntity;
 import um.haberes.core.service.ControlService;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -24,6 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -109,6 +113,7 @@ class ControlControllerTest {
                   "estadoDocenteAuxiliar": 0,
                   "adicionalHoraCargoClase": 0,
                   "horaReferenciaEtec": 0,
+                  "valorPuntoEtec": 0,
                   "modoLiquidacionId": 3,
                   "modoLiquidacion": null,
                   "created": null,
@@ -156,4 +161,50 @@ class ControlControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(controlJson(), JsonCompareMode.STRICT));
     }
+
+    @Test
+    void findByPeriodoOpcional_whenPeriodoExists_returnsOkWithControlBody() throws Exception {
+        when(service.findByPeriodoOpcional(2024, 6)).thenReturn(Optional.of(sampleControl()));
+
+        mockMvc.perform(get("/api/haberes/core/control/periodo/{anho}/{mes}/opcional", 2024, 6))
+                .andExpect(status().isOk())
+                .andExpect(content().json(controlJson(), JsonCompareMode.STRICT));
+    }
+
+    @Test
+    void findByPeriodoOpcional_whenPeriodoIsNew_returnsOkWithEmptyBody() throws Exception {
+        when(service.findByPeriodoOpcional(2024, 1)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/api/haberes/core/control/periodo/{anho}/{mes}/opcional", 2024, 1))
+                .andExpect(status().isOk())
+                .andExpect(content().string(""));
+    }
+
+    @Test
+    void copiarPeriodo_returnsOkWithControlBody() throws Exception {
+        when(service.copiarPeriodo(2024, 6)).thenReturn(sampleControl());
+
+        mockMvc.perform(post("/api/haberes/core/control/copiar/{anho}/{mes}", 2024, 6))
+                .andExpect(status().isOk())
+                .andExpect(content().json(controlJson(), JsonCompareMode.STRICT));
+    }
+
+    @Test
+    void copiarPeriodo_whenPeriodoAlreadyExists_returnsConflict() throws Exception {
+        when(service.copiarPeriodo(2024, 6)).thenThrow(new ControlYaExisteException(2024, 6));
+
+        mockMvc.perform(post("/api/haberes/core/control/copiar/{anho}/{mes}", 2024, 6))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.detail").value("Ya existen datos de control para 2024/6"));
+    }
+
+    @Test
+    void copiarPeriodo_whenPreviousPeriodHasNoData_returnsNotFound() throws Exception {
+        when(service.copiarPeriodo(2024, 6)).thenThrow(new ControlOrigenException(2024, 5));
+
+        mockMvc.perform(post("/api/haberes/core/control/copiar/{anho}/{mes}", 2024, 6))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.detail").value("No existen datos de control para el período anterior 2024/5"));
+    }
+
 }

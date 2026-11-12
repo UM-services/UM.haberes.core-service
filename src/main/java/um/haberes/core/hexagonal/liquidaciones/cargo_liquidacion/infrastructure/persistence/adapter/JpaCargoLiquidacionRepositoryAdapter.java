@@ -155,6 +155,24 @@ public class JpaCargoLiquidacionRepositoryAdapter implements CargoLiquidacionRep
     }
 
     @Override
+    public void deleteAllByAnhoAndMesAndCategoriaIdIn(Integer anho, Integer mes, List<Integer> categoriaIds) {
+        if (categoriaIds == null || categoriaIds.isEmpty()) {
+            return;
+        }
+        jpaCargoLiquidacionRepository.deleteAllByAnhoAndMesAndCategoriaIdIn(anho, mes, categoriaIds);
+    }
+
+    @Override
+    public void deleteAllByLegajoIdAndAnhoAndMesAndCategoriaIdIn(Long legajoId, Integer anho, Integer mes,
+            List<Integer> categoriaIds) {
+        if (categoriaIds == null || categoriaIds.isEmpty()) {
+            return;
+        }
+        jpaCargoLiquidacionRepository.deleteAllByLegajoIdAndAnhoAndMesAndCategoriaIdIn(legajoId, anho, mes,
+                categoriaIds);
+    }
+
+    @Override
     public void deleteAllByLegajoIdAndAnhoAndMesAndSituacionAndCategoriaIdIn(Long legajoId, Integer anho, Integer mes,
             String situacion, List<Integer> categoriaIds) {
         jpaCargoLiquidacionRepository.deleteAllByLegajoIdAndAnhoAndMesAndSituacionAndCategoriaIdIn(legajoId, anho, mes,

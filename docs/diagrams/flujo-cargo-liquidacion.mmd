@@ -33,6 +33,10 @@ sequenceDiagram
     Svc->>UC: SaveAllCargoLiquidacionesUseCase (AuditBulkScope)
     UC->>Adapt: saveAll de cargos + saveAll de cargo_liquidacion_version (siempre)
     Adapt->>DB: MAX(version)+1 por legajo/período cuando version es null
+    Usuario->>Ctrl: POST /cargoliquidacion/reemplazar/periodo/{anho}/{mes}
+    Ctrl->>Svc: replaceByPeriodo(anho, mes, categoriaIds, cargos)
+    Svc->>UC: ReplaceCargosByCategoriaUseCase (valida alcance + AuditBulkScope)
+    UC->>DB: DELETE cargos de las categorías + saveAll con version null
     Usuario->>Ctrl: DELETE /cargoliquidacion/periodo/{anho}/{mes}
     Ctrl->>Svc: deleteByPeriodo(anho, mes)
 

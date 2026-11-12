@@ -1,0 +1,43 @@
+---
+title: "Cargos ETEC por Puntos y Reemplazo de Cargos"
+---
+sequenceDiagram
+    autonumber
+    actor Cliente as haberes-etec (API)
+    participant EtecCtrl as EtecAsignacionCargoController
+    participant EtecSvc as EtecAsignacionCargoService
+    participant EtecUC as Use Cases (ports/in)
+    participant EtecRepo as JpaEtecAsignacionCargoRepositoryAdapter
+    participant CatCtrl as CategoriaController
+    participant CargCtrl as CargoLiquidacionController
+    participant CargSvc as CargoLiquidacionService
+    participant DB as MySQL
+
+    Note over Cliente,DB: haberes-etec no abre conexión a la base: opera por API contra core
+
+    Cliente->>EtecCtrl: POST /etec/asignacion-cargo/ (legajoId, categoriaId, fechaAlta)
+    EtecCtrl->>EtecSvc: add(asignacion)
+    EtecSvc->>EtecUC: CreateEtecAsignacionCargoUseCase
+    EtecUC->>EtecRepo: save(asignacion)
+    EtecRepo->>DB: INSERT etec_asignacion_cargo (alta/baja por fechas)
+    Cliente->>EtecCtrl: PUT /{asignacionCargoId} , DELETE /{asignacionCargoId}
+    EtecCtrl->>EtecSvc: update(...) / delete(...)
+    EtecSvc->>DB: UPDATE / DELETE (entidad auditada, sin @Modifying)
+
+    Cliente->>EtecCtrl: GET /legajo/{legajoId}/periodo/{anho}/{mes}
+    EtecCtrl->>EtecSvc: findAllVigentesByLegajoAndPeriodo(...)
+    EtecSvc->>DB: SELECT asignaciones vigentes en el período
+    EtecSvc-->>Cliente: legajo, categoría, dependencia y persona
+
+    Cliente->>CatCtrl: GET /categoria/puntos
+    CatCtrl->>DB: SELECT categoria WHERE puntos > 0 (categorías ETEC)
+
+    Cliente->>CargCtrl: POST /cargoliquidacion/reemplazar/periodo/{anho}/{mes}
+    CargCtrl->>CargSvc: replaceByPeriodo(anho, mes, categoriaIds, cargos)
+    CargSvc->>DB: DELETE cargos de las categorías ETEC del período
+    CargSvc->>DB: INSERT lote + snapshot MAX(version)+1 por legajo/período
+    CargSvc-->>Cliente: cargos guardados
+
+    Note over CargSvc,DB: El reemplazo valida período, legajo y alcance de categorías<br/>antes de borrar, abre AuditBulkScope (SUMMARY/BULK) y usa version null<br/>para que SaveAllCargoLiquidacionesUseCase escriba la versión.
+
+    Note over CatCtrl,DB: El valor del punto se carga en control.valorPuntoEtec<br/>(sql/004) y el puntaje del cargo en categoria.puntos (sql/005).<br/>MakeLiquidacionService omite las categorías con puntos para no<br/>generar filas en cero que dupliquen el cargo ETEC.

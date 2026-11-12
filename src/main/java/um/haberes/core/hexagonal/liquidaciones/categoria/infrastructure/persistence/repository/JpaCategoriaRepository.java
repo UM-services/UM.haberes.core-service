@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.Set;
+import java.math.BigDecimal;
 import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.persistence.entity.CategoriaEntity;
 
 /**
@@ -20,6 +21,8 @@ import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.persiste
 public interface JpaCategoriaRepository extends JpaRepository<CategoriaEntity, Integer> {
 
 	List<CategoriaEntity> findAllByDocente(Byte docente, Sort sort);
+
+	List<CategoriaEntity> findAllByPuntosGreaterThan(BigDecimal puntos, Sort sort);
 
 	List<CategoriaEntity> findAllByNoDocente(Byte noDocente, Sort sort);
 

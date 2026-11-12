@@ -34,4 +34,8 @@ public class Categoria {
 
     @Builder.Default
     private BigDecimal estadoDocente = BigDecimal.ZERO;
+
+    /** Puntaje del cargo ETEC. 0 = categoría común. */
+    @Builder.Default
+    private BigDecimal puntos = BigDecimal.ZERO;
 }

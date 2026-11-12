@@ -37,4 +37,7 @@ public class CategoriaEntity extends AuditableEntity {
     private Byte liquidaPorHora = 0;
 
     private BigDecimal estadoDocente = BigDecimal.ZERO;
+
+    /** Puntaje del cargo ETEC. 0 = categoría común. */
+    private BigDecimal puntos = BigDecimal.ZERO;
 }

@@ -25,8 +25,12 @@ sequenceDiagram
     CatCtrl->>CatSvc: findAllNoDocentes() / findAllNoDocenteByPeriodo(...)
     Usuario->>CatCtrl: GET /categoria/asignables
     CatCtrl->>CatSvc: findAllAsignables()
+    Usuario->>CatCtrl: GET /categoria/puntos
+    CatCtrl->>CatSvc: findAllConPuntos() (categorías ETEC con puntos > 0)
+    Note over CatCtrl,CatSvc: /asignables excluye las categorías con puntos porque<br/>se asignan por el circuito ETEC (ver flujo-etec-cargo-puntos.mmd)
     Usuario->>CatCtrl: POST /categoria/{anho}/{mes} (CategoriaRequest)
     CatCtrl->>CatSvc: add(categoria, anho, mes) (alta con período)
+    Note over CatCtrl,CatSvc: el alta exige un categoriaId nuevo,<br/>un id existente responde 400 (CategoriaException)
     Usuario->>CatCtrl: POST /categoria/upload/{anho}/{mes} (planilla Excel)
     CatCtrl->>CatSvc: upload(file, anho, mes)
     CatSvc->>Upload: UploadCategoriasUseCase
