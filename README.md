@@ -18,7 +18,7 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**1.26.0** (2026-11-09)
+**1.27.0** (2026-11-12)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
@@ -58,6 +58,7 @@ Liquidaciones:
 - `docs/diagrams/flujo-orden-pago.mmd`
 - `docs/diagrams/flujo-catalogos-liquidacion.mmd`
 - `docs/diagrams/flujo-etec-antiguedad.mmd`
+- `docs/diagrams/flujo-etec-cargo-puntos.mmd`
 - `docs/diagrams/flujo-cargo-clase.mmd`
 - `docs/diagrams/flujo-liquidacion-adicional.mmd`
 - `docs/diagrams/flujo-bono-individual.mmd`
@@ -299,18 +300,39 @@ docker run -d \
 - `POST /api/haberes/core/cargo/` - Crear cargo
 - `PUT /api/haberes/core/cargo/{cargoId}` - Actualizar cargo
 - `DELETE /api/haberes/core/cargo/{cargoId}` - Eliminar cargo
+- `POST /api/haberes/core/cargoliquidacion/reemplazar/periodo/{anho}/{mes}` - Reemplazar atómicamente los cargos del período para un conjunto de categorías
+- `POST /api/haberes/core/cargoliquidacion/reemplazar/legajo/{legajoId}/{anho}/{mes}` - Reemplazar atómicamente los cargos de un legajo para un conjunto de categorías
 
 ### Categorías
 - `GET /api/haberes/core/categoria/` - Listar categorías
 - `GET /api/haberes/core/categoria/{categoriaId}` - Obtener categoría
+- `GET /api/haberes/core/categoria/puntos` - Listar categorías ETEC con puntos (`puntos > 0`)
 - `POST /api/haberes/core/categoria/upload/{anho}/{mes}` - Cargar categorías desde Excel
 - `GET /api/haberes/core/categoria/nogrado` - Listar categorías sin grado
+
+### ETEC (cargos por puntos)
+- `GET /api/haberes/core/etec/asignacion-cargo/legajo/{legajoId}` - Asignaciones del legajo
+- `GET /api/haberes/core/etec/asignacion-cargo/legajo/{legajoId}/periodo/{anho}/{mes}` - Asignaciones vigentes del legajo en el período
+- `GET /api/haberes/core/etec/asignacion-cargo/periodo/{anho}/{mes}` - Asignaciones vigentes del período
+- `GET /api/haberes/core/etec/asignacion-cargo/categorias` - Categorías con asignaciones
+- `GET /api/haberes/core/etec/asignacion-cargo/categoria/{categoriaId}/exists` - Indica si la categoría tiene asignaciones
+- `POST /api/haberes/core/etec/asignacion-cargo/` - Alta (`legajoId`, `categoriaId` y `fechaAlta` obligatorios)
+- `PUT /api/haberes/core/etec/asignacion-cargo/{asignacionCargoId}` - Actualización
+- `DELETE /api/haberes/core/etec/asignacion-cargo/{asignacionCargoId}` - Baja
+
+### Control de período
+- `GET /api/haberes/core/control/periodo/{anho}/{mes}/opcional` - Control del período (`200` con cuerpo vacío si todavía no existe)
+- `POST /api/haberes/core/control/copiar/{anho}/{mes}` - Crear el período copiando el mes anterior (`409` si el destino existe, `404` si no hay origen)
 
 ### Personas
 - `GET /api/haberes/core/persona/` - Listar personas
 - `GET /api/haberes/core/persona/liquidables` - Listar personas liquidables
 - `GET /api/haberes/core/persona/liquidado/{anho}/{mes}` - Personas con liquidación en el período (ordenadas por nombre)
 - `POST /api/haberes/core/persona/upload` - Cargar contactos de personas desde Excel
+
+### Usuarios
+- `GET /api/haberes/core/usuario/` - Listar usuarios sin hash de clave (`UsuarioResumenResponse`)
+- `PUT /api/haberes/core/usuario/{legajoId}/administrador/{administrador}` - Habilitar (`1`) o revocar (`0`) el flag administrador (sólo usuarios sin facultad y sin dejar el sistema sin administradores)
 
 ### Consultas por período
 - `GET /api/haberes/core/cargoliquidacion/periodo/{anho}/{mes}` - Cargos activos del período

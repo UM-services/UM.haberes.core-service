@@ -20,6 +20,11 @@ sequenceDiagram
     Usuario->>UCtrl: PUT /usuario/setpassword (cambio de contraseña)
     Usuario->>UCtrl: PUT /usuario/cambiarclave (anterior + nueva + re-entrada)
     UCtrl->>USvc: cambiarClave(request) → verifica SHA-256 de la anterior y persiste la nueva
+    Usuario->>UCtrl: GET /usuario/ (listado del módulo Administrador)
+    UCtrl->>USvc: findAll() → UsuarioResumenResponse (sin hash de clave)
+    Usuario->>UCtrl: PUT /usuario/{legajoId}/administrador/{administrador}
+    UCtrl->>USvc: setAdministrador(legajoId, 1 o 0)
+    Note over UCtrl,USvc: sólo usuarios sin facultad pueden ser administradores,<br/>no se puede revocar el último administrador (400)
     Usuario->>BCtrl: GET /build/last (versión de cliente exigida)
 
     Usuario->>FCtrl: GET /formularioAsignacionCargo/ (datos para formulario de asignación)

@@ -147,6 +147,7 @@ jobs:
                   { file: 'diagrams/flujo-designacion-tool.mmd', title: '🧰 Secuencia: Herramientas de Designación y Cargos de Clase' },
                   { file: 'diagrams/flujo-anotacion-aprobacion.mmd', title: '✍️ Secuencia: Anotación y Aprobación Docente' },
                   { file: 'diagrams/flujo-etec-antiguedad.mmd', title: '🎒 Secuencia: ETEC, Antigüedad y Bonos' },
+                  { file: 'diagrams/flujo-etec-cargo-puntos.mmd', title: '🎯 Secuencia: Cargos ETEC por Puntos y Reemplazo de Cargos' },
                   { file: 'diagrams/flujo-legajobanco-filtro-codigo.mmd', title: '🏦 Secuencia: LegajoBanco con Filtro por Código' },
                   { file: 'diagrams/flujo-vistas-reporte.mmd', title: '📊 Secuencia: Vistas de Reporte' },
                   { file: 'diagrams/flujo-sheets-reportes.mmd', title: '📑 Secuencia: Planillas Excel' },
