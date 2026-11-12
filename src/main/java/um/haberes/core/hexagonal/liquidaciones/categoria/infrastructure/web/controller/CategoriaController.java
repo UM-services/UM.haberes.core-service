@@ -41,6 +41,11 @@ public class CategoriaController {
         return ResponseEntity.ok(toResponseList(service.findAll()));
     }
 
+    @GetMapping("/puntos")
+    public ResponseEntity<List<CategoriaResponse>> findAllConPuntos() {
+        return ResponseEntity.ok(toResponseList(service.findAllConPuntos()));
+    }
+
     @GetMapping("/nogrado")
     public ResponseEntity<List<CategoriaResponse>> findAllNoGrado() {
         return ResponseEntity.ok(toResponseList(service.findAllNoDocentes()));
@@ -97,8 +102,12 @@ public class CategoriaController {
     @PostMapping("/{anho}/{mes}")
     public ResponseEntity<CategoriaResponse> add(@Valid @RequestBody CategoriaRequest request,
             @PathVariable Integer anho, @PathVariable Integer mes) {
-        Categoria created = service.add(categoriaDtoMapper.toDomain(request), anho, mes);
-        return new ResponseEntity<>(categoriaDtoMapper.toResponse(created), HttpStatus.OK);
+        try {
+            Categoria created = service.add(categoriaDtoMapper.toDomain(request), anho, mes);
+            return new ResponseEntity<>(categoriaDtoMapper.toResponse(created), HttpStatus.OK);
+        } catch (CategoriaException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 
     @PutMapping("/{categoriaId}/{anho}/{mes}")
