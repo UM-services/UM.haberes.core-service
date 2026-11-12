@@ -126,6 +126,9 @@ public class ControlEntity extends AuditableEntity {
 
     private BigDecimal horaReferenciaEtec = BigDecimal.ZERO;
 
+    /** Valor del punto de referencia ETEC (puente hasta que haberes-etec gestione etec_valor_punto). */
+    private BigDecimal valorPuntoEtec = BigDecimal.ZERO;
+
     private Integer modoLiquidacionId = null;
 
     @OneToOne
