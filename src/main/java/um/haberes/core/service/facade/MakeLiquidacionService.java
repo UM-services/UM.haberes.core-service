@@ -629,6 +629,15 @@ public class MakeLiquidacionService {
         }
     }
 
+    /**
+     * Las categorías con puntos (> 0) son cargos ETEC y las genera haberes-etec; el
+     * generador legacy de core no debe crearles filas en cero.
+     */
+    private boolean esCargoConPuntos(Categoria categoria) {
+        return categoria != null && categoria.getPuntos() != null
+                && categoria.getPuntos().compareTo(BigDecimal.ZERO) > 0;
+    }
+
     @Transactional
     public void generateCargosDocentes(Long legajoId, Integer anho, Integer mes) {
         cargoLiquidacionService.deleteAllCargosDocentes(legajoId, anho, mes);
@@ -636,7 +645,7 @@ public class MakeLiquidacionService {
         List<CargoLiquidacion> cargoLiquidacions = new ArrayList<>();
         for (Cargo cargo : cargoService.findAllDocenteByPeriodo(legajoId, anho, mes)) {
             Categoria categoria = cargo.getCategoria();
-            if (categoria.getCategoriaId() != CODIGO_NOVEDAD_AJUSTE_BASICO) {
+            if (categoria.getCategoriaId() != CODIGO_NOVEDAD_AJUSTE_BASICO && !esCargoConPuntos(categoria)) {
                 cargoLiquidacions.add(new CargoLiquidacion(null,
                         legajoId,
                         anho,
@@ -739,7 +748,7 @@ public class MakeLiquidacionService {
         for (Cargo cargo : cargoService.findAllNoDocenteByPeriodo(legajoId, anho, mes)) {
             log.debug("Cargo -> {}", cargo.jsonify());
             Categoria categoria = cargo.getCategoria();
-            if (categoria.getCategoriaId() != CODIGO_NOVEDAD_AJUSTE_BASICO) {
+            if (categoria.getCategoriaId() != CODIGO_NOVEDAD_AJUSTE_BASICO && !esCargoConPuntos(categoria)) {
                 cargoLiquidacions.add(new CargoLiquidacion(null,
                         legajoId,
                         anho,

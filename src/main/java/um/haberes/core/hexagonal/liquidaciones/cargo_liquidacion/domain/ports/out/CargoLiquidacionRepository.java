@@ -57,6 +57,11 @@ public interface CargoLiquidacionRepository {
 
     void deleteAllByAnhoAndMes(Integer anho, Integer mes);
 
+    void deleteAllByAnhoAndMesAndCategoriaIdIn(Integer anho, Integer mes, List<Integer> categoriaIds);
+
+    void deleteAllByLegajoIdAndAnhoAndMesAndCategoriaIdIn(Long legajoId, Integer anho, Integer mes,
+            List<Integer> categoriaIds);
+
     void deleteAllByLegajoIdAndAnhoAndMesAndSituacionAndCategoriaIdIn(Long legajoId, Integer anho, Integer mes,
             String situacion, List<Integer> categoriaIds);
 }

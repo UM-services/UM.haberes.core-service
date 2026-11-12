@@ -26,6 +26,7 @@ import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.ports.in
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.ports.in.GetCargosNoDocentesByLegajoAndFacultadUseCase;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.ports.in.GetCargoLiquidacionesNoDocentesByLegajoUseCase;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.ports.in.GetCargosNoDocentesHistoricosByLegajoUseCase;
+import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.ports.in.ReplaceCargosByCategoriaUseCase;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.ports.in.SaveAllCargoLiquidacionesUseCase;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.ports.in.UpdateCargoLiquidacionUseCase;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.ports.out.CargoLiquidacionRepository;
@@ -52,6 +53,7 @@ public class CargoLiquidacionService {
     private final CreateCargoLiquidacionUseCase createCargoLiquidacionUseCase;
     private final UpdateCargoLiquidacionUseCase updateCargoLiquidacionUseCase;
     private final SaveAllCargoLiquidacionesUseCase saveAllCargoLiquidacionesUseCase;
+    private final ReplaceCargosByCategoriaUseCase replaceCargosByCategoriaUseCase;
     private final DeleteCargosNotInByPeriodoUseCase deleteCargosNotInByPeriodoUseCase;
     private final DeleteCargosByPeriodoUseCase deleteCargosByPeriodoUseCase;
     private final DeleteCargosDocentesByLegajoUseCase deleteCargosDocentesByLegajoUseCase;
@@ -141,6 +143,16 @@ public class CargoLiquidacionService {
 
     public List<CargoLiquidacion> saveAll(List<CargoLiquidacion> cargos, Integer version) {
         return saveAllCargoLiquidacionesUseCase.saveAllCargoLiquidaciones(cargos, version);
+    }
+
+    public List<CargoLiquidacion> replaceByPeriodo(Integer anho, Integer mes, List<Integer> categoriaIds,
+            List<CargoLiquidacion> cargos) {
+        return replaceCargosByCategoriaUseCase.replaceByPeriodo(anho, mes, categoriaIds, cargos);
+    }
+
+    public List<CargoLiquidacion> replaceByLegajo(Long legajoId, Integer anho, Integer mes,
+            List<Integer> categoriaIds, List<CargoLiquidacion> cargos) {
+        return replaceCargosByCategoriaUseCase.replaceByLegajo(legajoId, anho, mes, categoriaIds, cargos);
     }
 
     public void deleteAllNotInByPeriodo(List<Long> legajos, Integer anho, Integer mes) {

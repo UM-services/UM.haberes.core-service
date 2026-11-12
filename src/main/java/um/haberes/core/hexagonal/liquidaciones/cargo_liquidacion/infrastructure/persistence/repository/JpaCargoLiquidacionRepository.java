@@ -65,6 +65,11 @@ public interface JpaCargoLiquidacionRepository extends JpaRepository<CargoLiquid
 
     void deleteAllByAnhoAndMes(Integer anho, Integer mes);
 
+    void deleteAllByAnhoAndMesAndCategoriaIdIn(Integer anho, Integer mes, List<Integer> categoriaIds);
+
+    void deleteAllByLegajoIdAndAnhoAndMesAndCategoriaIdIn(Long legajoId, Integer anho, Integer mes,
+            List<Integer> categoriaIds);
+
     void deleteAllByLegajoIdAndAnhoAndMesAndSituacionAndCategoriaIdIn(Long legajoId, Integer anho, Integer mes,
                                                                       String string, List<Integer> categoriaIds);
 

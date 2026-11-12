@@ -21,4 +21,8 @@ public class CargoLiquidacionException extends RuntimeException {
 		super("Cannot find CargoEntity " + cargoId);
 	}
 
+	public CargoLiquidacionException(String message) {
+		super(message);
+	}
+
 }
