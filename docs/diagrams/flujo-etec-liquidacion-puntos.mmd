@@ -1,0 +1,47 @@
+---
+title: "Liquidación ETEC por Puntos: Conceptos 985 a 989"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant Make as MakeLiquidacionService
+    participant State as LiquidacionState
+    participant CtlSvc as ControlEtecService
+    participant AntiSvc as AntiguedadService
+    participant Escala as EscalaArraigoEtecService
+    participant Acum as AcumuladorEtecCargo
+    participant Calc as EtecLiquidacionCalculator
+    participant DB as MySQL
+
+    Usuario->>Make: liquidacionByLegajoId(legajoId, anho, mes)
+    Make->>DB: makeContext: control, persona, índices, códigos y novedades
+    Make->>CtlSvc: findByPeriodo(anho, mes)
+    CtlSvc-->>Make: control_etec (valor del punto, monto fijo, porcentajes, garantía y horas)
+    Make->>State: copiarContexto(estado nuevo)
+    Note over State: Sin esta copia el estado de trabajo queda sin control_etec
+
+    Make->>AntiSvc: calculate(legajoId, anho, mes) y findByUnique(...)
+    AntiSvc-->>Make: mesesDocentes
+    Make->>Escala: porcentajeParaAnios(mesesDocentes / 12)
+    Escala-->>Make: porcentaje de arraigo (0 si no alcanza el tramo de 2 años)
+    Make->>State: setPorcentajeArraigoEtec(porcentaje)
+    Make->>DB: borra ítems, adicionales y liquidación del legajo/período
+
+    loop Cada cargo del legajo
+        Make->>DB: básico y antigüedad del cargo
+        alt Categoría con puntos y control_etec del período
+            Make->>Acum: acumular(cargo, antigüedad, %presentismo, %adicional, %arraigo)
+        else Categoría sin puntos
+            Note over Make: sigue el circuito general docente o no docente
+        end
+    end
+
+    Make->>Calc: calcular(acumulado, control_etec)
+    alt Sin cargos con puntos
+        Calc-->>Make: mapa vacío (no genera ítems ETEC)
+    else Con cargos acumulados
+        Calc-->>Make: 985, 986, 987, 988 y 989 con importe distinto de cero
+    end
+    Make->>DB: agrega los ítems cuyo código existe en el catálogo, antes de los totales
+
+    Note over Calc,DB: 985 presentismo = cargo x %presentismo.<br/>986 adicional carrera = (cargo + antigüedad) x %adicional.<br/>987 garantía = max(0, garantía - (cargo + antigüedad + presentismo)).<br/>988 carga horaria = horas adicionales x valor hora.<br/>989 arraigo = cargo x porcentaje de la escala.<br/>Todo con HALF_UP a 2 decimales.

@@ -12,8 +12,13 @@ import um.haberes.core.hexagonal.cursos.curso_desarraigo.application.service.Cur
 import um.haberes.core.hexagonal.cursos.curso_desarraigo.domain.model.CursoDesarraigo;
 import um.haberes.core.hexagonal.cursos.curso_fusion.application.service.CursoFusionService;
 import um.haberes.core.hexagonal.cursos.curso_fusion.domain.model.CursoFusion;
+import um.haberes.core.hexagonal.etec.arraigo_escala.application.service.EscalaArraigoEtecService;
+import um.haberes.core.hexagonal.etec.control_etec.application.service.ControlEtecService;
+import um.haberes.core.hexagonal.etec.liquidacion.application.service.EtecLiquidacionCalculator;
 import um.haberes.core.hexagonal.liquidaciones.cargo.application.service.CargoService;
 import um.haberes.core.hexagonal.liquidaciones.cargo.domain.model.Cargo;
+import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.model.UniversoCargos;
+import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.ports.in.GenerarCargosLegajoUseCase;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.application.service.CargoLiquidacionService;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.model.CargoLiquidacion;
 import um.haberes.core.hexagonal.liquidaciones.categoria.application.service.CategoriaService;
@@ -110,6 +115,10 @@ public class MakeLiquidacionService {
     private final AdicionalCursoTablaService adicionalCursoTablaService;
     private final CategoriaPeriodoService categoriaPeriodoService;
     private final LiquidacionAdicionalService liquidacionAdicionalService;
+    private final GenerarCargosLegajoUseCase generarCargosLegajoUseCase;
+    private final ControlEtecService controlEtecService;
+    private final EscalaArraigoEtecService escalaArraigoEtecService;
+    private final EtecLiquidacionCalculator etecLiquidacionCalculator;
 
     @Transactional
     public LiquidacionState makeContext(Long legajoId, Integer anho, Integer mes) {
@@ -124,6 +133,7 @@ public class MakeLiquidacionService {
             legajoControlService.add(new LegajoControlEntity(null, legajoId, anho, mes, (byte) 0, (byte) 0, (byte) 0, null));
         }
         state.setCodigos(codigoService.findAll().stream().collect(Collectors.toMap(Codigo::getCodigoId, codigo -> codigo)));
+        state.setControlEtec(controlEtecService.findByPeriodo(anho, mes).orElse(null));
         state.setNovedades(novedadService.findAllByLegajo(legajoId, anho, mes).stream().filter(novedad -> !Objects.equals(novedad.getCodigoId(), CODIGO_NOVEDAD_AJUSTE_BASICO)).collect(Collectors.toMap(Novedad::getCodigoId, novedad -> novedad)));
         return state;
     }
@@ -156,6 +166,7 @@ public class MakeLiquidacionService {
 
         // --- Start Calculation Flow ---
         calculaBasicoAndAntiguedad(legajoId, anho, mes, state);
+        calcularConceptosEtec(legajoId, anho, mes, state);
         calcularConceptosGenerales(legajoId, anho, mes, remunerativosGrupos, noRemunerativosGrupos, state);
         calcularTotalesParciales(legajoId, anho, mes, remunerativosGrupos, noRemunerativosGrupos, state);
         calcularDescuentosPorAusencia(legajoId, anho, mes, state);
@@ -211,16 +222,28 @@ public class MakeLiquidacionService {
 
     private void inicializarLiquidacion(Long legajoId, Integer anho, Integer mes, LiquidacionState state) {
         LiquidacionState freshState = makeContext(legajoId, anho, mes);
-        state.setControl(freshState.getControl());
-        state.setPersona(freshState.getPersona());
-        state.setIndices(freshState.getIndices());
-        state.setCodigos(freshState.getCodigos());
-        state.setNovedades(freshState.getNovedades());
+        state.copiarContexto(freshState);
 
         antiguedadService.calculate(legajoId, anho, mes);
+        cargarPorcentajeArraigo(legajoId, anho, mes, state);
         liquidacionAdicionalService.deleteAllByLegajo(legajoId, anho, mes);
         itemService.deleteAllByLegajo(legajoId, anho, mes);
         liquidacionService.deleteByLegajo(legajoId, anho, mes);
+    }
+
+    /**
+     * Resuelve el porcentaje de arraigo ETEC según la antigüedad docente del legajo. Se ejecuta
+     * después de {@code antiguedadService.calculate}, así que el registro del período está al día.
+     * Sin antigüedad docente, o con menos de dos años, el porcentaje queda en cero.
+     */
+    private void cargarPorcentajeArraigo(Long legajoId, Integer anho, Integer mes, LiquidacionState state) {
+        int anios = 0;
+        try {
+            anios = Math.max(0, antiguedadService.findByUnique(legajoId, anho, mes).getMesesDocentes() / 12);
+        } catch (AntiguedadException e) {
+            log.debug("Sin antigüedad para el legajo {} en {}/{}: {}", legajoId, anho, mes, e.getMessage());
+        }
+        state.setPorcentajeArraigoEtec(escalaArraigoEtecService.porcentajeParaAnios(anios));
     }
 
     private boolean esPeriodoLiquidable(Long legajoId, Integer anho, Integer mes, LiquidacionState state) {
@@ -610,6 +633,13 @@ public class MakeLiquidacionService {
             addItem(legajoId, anho, mes, CODIGO_ANTIGUEDAD, antiguedad, state);
         }
 
+        if (esCargoEtec(categoria) && state.getControlEtec() != null) {
+            state.getEtecAcumulado().acumular(basico, antiguedad,
+                    state.getControlEtec().getPorcentajePresentismo(),
+                    state.getControlEtec().getPorcentajeAdicionalCarrera(),
+                    state.getPorcentajeArraigoEtec());
+        }
+
         if (categoria.getNoDocente() == 1) {
             BigDecimal presentismo = basico.multiply(new BigDecimal(cargoLiquidacion.getPresentismo()).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP)).setScale(2, RoundingMode.HALF_UP);
             addItem(legajoId, anho, mes, CODIGO_PRESENTISMO, presentismo, state);
@@ -630,146 +660,42 @@ public class MakeLiquidacionService {
     }
 
     /**
-     * Las categorías con puntos (> 0) son cargos ETEC y las genera haberes-etec; el
-     * generador legacy de core no debe crearles filas en cero.
+     * Agrega los conceptos propios de la ETEC por puntos (985 a 988) calculados sobre los cargos
+     * con {@code categoria.puntos > 0}. Corre después del básico y la antigüedad y antes de los
+     * totales parciales, para que entren en los grupos remunerativos.
      */
-    private boolean esCargoConPuntos(Categoria categoria) {
+    private void calcularConceptosEtec(Long legajoId, Integer anho, Integer mes, LiquidacionState state) {
+        Map<Integer, BigDecimal> conceptos = etecLiquidacionCalculator.calcular(state.getEtecAcumulado(),
+                state.getControlEtec());
+        for (Map.Entry<Integer, BigDecimal> concepto : conceptos.entrySet()) {
+            if (state.getCodigos().containsKey(concepto.getKey())) {
+                addItem(legajoId, anho, mes, concepto.getKey(), concepto.getValue(), state);
+            }
+        }
+    }
+
+    private boolean esCargoEtec(Categoria categoria) {
         return categoria != null && categoria.getPuntos() != null
                 && categoria.getPuntos().compareTo(BigDecimal.ZERO) > 0;
     }
 
+    /**
+     * Genera los cargos del universo docente (incluye ETEC, que también es docente) delegando en
+     * el orquestador polimórfico de {@code cargo_liquidacion}.
+     */
     @Transactional
     public void generateCargosDocentes(Long legajoId, Integer anho, Integer mes) {
-        cargoLiquidacionService.deleteAllCargosDocentes(legajoId, anho, mes);
-        Map<String, Dependencia> dependencias = dependenciaService.findAll().stream().collect(Collectors.toMap(Dependencia::getSedeKey, Function.identity(), (dependencia, replacement) -> dependencia));
-        List<CargoLiquidacion> cargoLiquidacions = new ArrayList<>();
-        for (Cargo cargo : cargoService.findAllDocenteByPeriodo(legajoId, anho, mes)) {
-            Categoria categoria = cargo.getCategoria();
-            if (categoria.getCategoriaId() != CODIGO_NOVEDAD_AJUSTE_BASICO && !esCargoConPuntos(categoria)) {
-                cargoLiquidacions.add(new CargoLiquidacion(null,
-                        legajoId,
-                        anho,
-                        mes,
-                        cargo.getDependenciaId(),
-                        Periodo.firstDay(anho, mes),
-                        Periodo.lastDay(anho, mes),
-                        categoria.getCategoriaId(),
-                        categoria.getNombre(),
-                        categoria.getBasico(),
-                        categoria.getEstadoDocente(),
-                        cargo.getHorasJornada(),
-                        cargo.getJornada(),
-                        cargo.getPresentismo(),
-                        "A",
-                        null,
-                        null,
-                        categoria));
-            }
-        }
-        ControlEntity control = controlService.findByPeriodo(anho, mes);
-        if (control.getModoLiquidacionId() == constLiquidarConFusion) {
-            for (CursoFusion cursoFusion : cursoFusionService.findAllByLegajoId(legajoId, anho, mes)) {
-                Dependencia dependencia = dependencias.get(cursoFusion.getFacultadId() + "." + cursoFusion.getGeograficaId());
-                Categoria categoria = cursoFusion.getCategoria();
-                cargoLiquidacions.add(new CargoLiquidacion(null,
-                        legajoId,
-                        anho,
-                        mes,
-                        dependencia.getDependenciaId(),
-                        Periodo.firstDay(anho, mes),
-                        Periodo.lastDay(anho, mes),
-                        categoria.getCategoriaId(),
-                        categoria.getNombre(),
-                        categoria.getBasico(),
-                        categoria.getEstadoDocente(),
-                        BigDecimal.ZERO,
-                        1,
-                        0,
-                        "A",
-                        null,
-                        dependencia,
-                        categoria));
-            }
-        }
-        if (control.getModoLiquidacionId() == constLiquidarSinFusion) {
-            for (CursoCargo cursoCargo : cursoCargoService.findAllByLegajo(legajoId, anho, mes)) {
-                if (cursoCargo.getCategoriaId() != null) {
-                    Dependencia dependencia = dependencias.get(Objects.requireNonNull(cursoCargo.getCurso()).getFacultadId() + "." + cursoCargo.getCurso().getGeograficaId());
-                    Categoria categoria = cursoCargo.getCategoria();
-                    cargoLiquidacions.add(new CargoLiquidacion(null,
-                            legajoId,
-                            anho,
-                            mes,
-                            dependencia.getDependenciaId(),
-                            Periodo.firstDay(anho, mes),
-                            Periodo.lastDay(anho, mes),
-                            categoria.getCategoriaId(),
-                            categoria.getNombre(),
-                            categoria.getBasico(),
-                            categoria.getEstadoDocente(),
-                            BigDecimal.ZERO,
-                            1,
-                            0,
-                            "A",
-                            null,
-                            dependencia,
-                            categoria));
-                }
-            }
-        }
-        Categoria categoria = categoriaService.findByCategoriaId(CODIGO_NOVEDAD_AJUSTE_BASICO);
-        for (Novedad novedad : novedadService.findAllByLegajoAndCodigo(legajoId, anho, mes, CODIGO_NOVEDAD_AJUSTE_BASICO)) {
-            cargoLiquidacions.add(new CargoLiquidacion(null,
-                    legajoId,
-                    anho,
-                    mes,
-                    novedad.getDependenciaId(),
-                    Periodo.firstDay(anho, mes),
-                    Periodo.lastDay(anho, mes),
-                    categoria.getCategoriaId(),
-                    categoria.getNombre(),
-                    novedad.getImporte(),
-                    BigDecimal.ZERO,
-                    BigDecimal.ZERO,
-                    1,
-                    0,
-                    "A",
-                    null,
-                    novedad.getDependencia(),
-                    categoria));
-        }
-        cargoLiquidacions = cargoLiquidacionService.saveAll(cargoLiquidacions, null);
+        generarCargosLegajoUseCase.generar(Set.of(UniversoCargos.DOCENTE, UniversoCargos.ETEC),
+                legajoId, anho, mes);
     }
 
+    /**
+     * Genera los cargos del universo no docente delegando en el orquestador polimórfico de
+     * {@code cargo_liquidacion}.
+     */
     @Transactional
     public void generateCargosNoDocentes(Long legajoId, Integer anho, Integer mes) {
-        List<CargoLiquidacion> cargoLiquidacions = new ArrayList<>();
-        cargoLiquidacionService.deleteAllCargosNoDocentes(legajoId, anho, mes);
-        for (Cargo cargo : cargoService.findAllNoDocenteByPeriodo(legajoId, anho, mes)) {
-            log.debug("Cargo -> {}", cargo.jsonify());
-            Categoria categoria = cargo.getCategoria();
-            if (categoria.getCategoriaId() != CODIGO_NOVEDAD_AJUSTE_BASICO && !esCargoConPuntos(categoria)) {
-                cargoLiquidacions.add(new CargoLiquidacion(null,
-                        legajoId,
-                        anho,
-                        mes,
-                        cargo.getDependenciaId(),
-                        Periodo.firstDay(anho, mes),
-                        Periodo.lastDay(anho, mes),
-                        categoria.getCategoriaId(),
-                        categoria.getNombre(),
-                        categoria.getBasico(),
-                        categoria.getEstadoDocente(),
-                        cargo.getHorasJornada(),
-                        cargo.getJornada(),
-                        cargo.getPresentismo(),
-                        "A",
-                        null,
-                        null,
-                        categoria));
-            }
-        }
-        cargoLiquidacionService.saveAll(cargoLiquidacions, null);
+        generarCargosLegajoUseCase.generar(Set.of(UniversoCargos.NO_DOCENTE), legajoId, anho, mes);
     }
 
     @Transactional

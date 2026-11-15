@@ -78,9 +78,6 @@ public class PersonaDtoMapper {
         if (request.getSituacionAfip() != null) {
             builder.situacionAfip(request.getSituacionAfip());
         }
-        if (request.getDirectivoEtec() != null) {
-            builder.directivoEtec(request.getDirectivoEtec());
-        }
         return builder.build();
     }
 
@@ -113,7 +110,6 @@ public class PersonaDtoMapper {
                 .localidadAfip(request.getLocalidadAfip())
                 .situacionAfip(request.getSituacionAfip())
                 .modeloContratacionAfip(request.getModeloContratacionAfip())
-                .directivoEtec(request.getDirectivoEtec())
                 .build();
     }
 
@@ -148,7 +144,8 @@ public class PersonaDtoMapper {
                 .localidadAfip(domain.getLocalidadAfip())
                 .situacionAfip(domain.getSituacionAfip())
                 .modeloContratacionAfip(domain.getModeloContratacionAfip())
-                .directivoEtec(domain.getDirectivoEtec())
+                // Contrato legacy: la columna se eliminó, el JSON conserva el campo en 0.
+                .directivoEtec((byte) 0)
                 .build();
     }
 

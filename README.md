@@ -5,7 +5,7 @@
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1.2-6DB33F?logo=springboot&logoColor=white)
 ![Spring Cloud](https://img.shields.io/badge/Spring%20Cloud-2025.1.4-6DB33F?logo=spring&logoColor=white)
 ![Spring Data JPA](https://img.shields.io/badge/Spring%20Data%20JPA-6DB33F?logo=spring&logoColor=white)
-![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?logo=mysql&logoColor=white)
 ![Apache POI](https://img.shields.io/badge/Apache%20POI-6.0.0-D22128)
 ![OpenPDF](https://img.shields.io/badge/OpenPDF-3.0.5-blue)
 ![Springdoc OpenAPI](https://img.shields.io/badge/Springdoc%20OpenAPI-3.1.1-85EA2D?logo=swagger&logoColor=black)
@@ -13,12 +13,13 @@
 ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?logo=githubactions&logoColor=white)
 ![Maven](https://img.shields.io/badge/Maven-C71A36?logo=apachemaven&logoColor=white)
 ![JUnit](https://img.shields.io/badge/JUnit-25A162?logo=junit5&logoColor=white)
+![Caffeine](https://img.shields.io/badge/Caffeine-blue)
 
 Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permite la gestión integral de liquidaciones individuales y masivas, acreditaciones, reportes y administración de personal docente y no docente.
 
 ## Versión
 
-**1.27.0** (2026-11-12)
+**2.0.0** (2026-11-15)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
@@ -59,6 +60,7 @@ Liquidaciones:
 - `docs/diagrams/flujo-catalogos-liquidacion.mmd`
 - `docs/diagrams/flujo-etec-antiguedad.mmd`
 - `docs/diagrams/flujo-etec-cargo-puntos.mmd`
+- `docs/diagrams/flujo-etec-liquidacion-puntos.mmd`
 - `docs/diagrams/flujo-cargo-clase.mmd`
 - `docs/diagrams/flujo-liquidacion-adicional.mmd`
 - `docs/diagrams/flujo-bono-individual.mmd`
@@ -288,7 +290,7 @@ docker run -d \
 
 ### Liquidación individual (slice hexagonal)
 - `GET /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}` - Ficha agregada del legajo/período con las acciones habilitadas
-- `POST /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/cargos` - Regenerar cargos docentes y no docentes
+- `POST /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/cargos` - Regenerar cargos docentes, no docentes y ETEC por puntos del legajo/período
 - `POST /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/liquidar` - Liquidar el legajo/período (body opcional `{"forzar": true}`)
 - `DELETE /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/{forzar}` - Eliminar la liquidación del legajo/período
 - `POST /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/novedad` - Alta o actualización de una novedad
@@ -302,6 +304,11 @@ docker run -d \
 - `DELETE /api/haberes/core/cargo/{cargoId}` - Eliminar cargo
 - `POST /api/haberes/core/cargoliquidacion/reemplazar/periodo/{anho}/{mes}` - Reemplazar atómicamente los cargos del período para un conjunto de categorías
 - `POST /api/haberes/core/cargoliquidacion/reemplazar/legajo/{legajoId}/{anho}/{mes}` - Reemplazar atómicamente los cargos de un legajo para un conjunto de categorías
+- `POST /api/haberes/core/cargoliquidacion/generacion/legajo/{legajoId}/{anho}/{mes}` - Generar los cargos del legajo/período con todos los universos (docentes, no docentes y ETEC)
+- `POST /api/haberes/core/cargoliquidacion/generacion/etec/legajo/{legajoId}/{anho}/{mes}` - Regenerar sólo los cargos ETEC del legajo/período
+- `POST /api/haberes/core/cargoliquidacion/generacion/etec/periodo/{anho}/{mes}` - Regenerar sólo los cargos ETEC del período
+- `GET /api/haberes/core/cargoliquidacion/generacion/preview/etec/legajo/{legajoId}/{anho}/{mes}` - Previsualizar los cargos ETEC del legajo sin persistir
+- `GET /api/haberes/core/cargoliquidacion/generacion/preview/etec/periodo/{anho}/{mes}` - Previsualizar los cargos ETEC del período sin persistir
 
 ### Categorías
 - `GET /api/haberes/core/categoria/` - Listar categorías
@@ -319,6 +326,12 @@ docker run -d \
 - `POST /api/haberes/core/etec/asignacion-cargo/` - Alta (`legajoId`, `categoriaId` y `fechaAlta` obligatorios)
 - `PUT /api/haberes/core/etec/asignacion-cargo/{asignacionCargoId}` - Actualización
 - `DELETE /api/haberes/core/etec/asignacion-cargo/{asignacionCargoId}` - Baja
+- `GET /api/haberes/core/etec/control/{anho}/{mes}` - Parámetros ETEC del período (`404` si no está configurado)
+- `GET /api/haberes/core/etec/control/{anho}/{mes}/opcional` - Ídem, con `200` y cuerpo vacío si no existe
+- `POST /api/haberes/core/etec/control/{anho}/{mes}` - Alta o actualización (upsert) de los parámetros ETEC del período
+- `POST /api/haberes/core/etec/control/copiar/{anho}/{mes}` - Copia los parámetros del mes anterior (`409` si el destino existe, `404` si no hay origen)
+- `GET /api/haberes/core/etec/arraigo/escala` - Escala global de arraigo ETEC por antigüedad docente
+- `PUT /api/haberes/core/etec/arraigo/escala` - Reemplazo completo de la escala (valida años mínimos, duplicados y porcentajes entre 0 y 100)
 
 ### Control de período
 - `GET /api/haberes/core/control/periodo/{anho}/{mes}/opcional` - Control del período (`200` con cuerpo vacío si todavía no existe)

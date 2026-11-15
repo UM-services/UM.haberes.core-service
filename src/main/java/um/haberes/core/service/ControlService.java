@@ -102,8 +102,6 @@ public class ControlService {
                     newControl.getEstadoDocenteAdjunto(),
                     newControl.getEstadoDocenteAuxiliar(),
                     newControl.getAdicionalHoraCargoClase(),
-                    newControl.getHoraReferenciaEtec(),
-                    newControl.getValorPuntoEtec(),
                     newControl.getModoLiquidacionId(),
                     null);
             repository.save(control);
@@ -177,8 +175,6 @@ public class ControlService {
         copia.setEstadoDocenteAdjunto(origen.getEstadoDocenteAdjunto());
         copia.setEstadoDocenteAuxiliar(origen.getEstadoDocenteAuxiliar());
         copia.setAdicionalHoraCargoClase(origen.getAdicionalHoraCargoClase());
-        copia.setHoraReferenciaEtec(origen.getHoraReferenciaEtec());
-        copia.setValorPuntoEtec(origen.getValorPuntoEtec());
         copia.setModoLiquidacionId(origen.getModoLiquidacionId());
         return copia;
     }

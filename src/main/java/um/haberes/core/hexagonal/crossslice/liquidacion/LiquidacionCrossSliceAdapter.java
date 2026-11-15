@@ -35,6 +35,11 @@ public class LiquidacionCrossSliceAdapter implements LiquidacionCrossSlice {
         }
     }
 
+    @Override
+    public boolean hayAcreditadasEnPeriodo(Integer anho, Integer mes) {
+        return !liquidacionService.getLiquidacionesByAcreditado(anho, mes).isEmpty();
+    }
+
     private LiquidacionView toView(Liquidacion liquidacion) {
         if (liquidacion == null) {
             return null;

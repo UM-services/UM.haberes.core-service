@@ -85,9 +85,6 @@ public class Persona {
 
     private Integer modeloContratacionAfip;
 
-    @Builder.Default
-    private Byte directivoEtec = 0;
-
     public String getApellidoNombre() {
         return MessageFormat.format("{0}, {1}", this.apellido, this.nombre);
     }

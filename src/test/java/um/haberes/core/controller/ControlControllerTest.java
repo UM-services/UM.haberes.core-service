@@ -113,7 +113,6 @@ class ControlControllerTest {
                   "estadoDocenteAuxiliar": 0,
                   "adicionalHoraCargoClase": 0,
                   "horaReferenciaEtec": 0,
-                  "valorPuntoEtec": 0,
                   "modoLiquidacionId": 3,
                   "modoLiquidacion": null,
                   "created": null,

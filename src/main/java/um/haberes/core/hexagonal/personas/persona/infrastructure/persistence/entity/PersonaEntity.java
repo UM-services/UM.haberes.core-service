@@ -97,9 +97,6 @@ public class PersonaEntity extends AuditableEntity {
 
     private Integer modeloContratacionAfip;
 
-    @Builder.Default
-    private Byte directivoEtec = 0;
-
     @OneToOne(optional = true)
     @JoinColumn(name = "dependenciaId", insertable = false, updatable = false)
     private DependenciaEntity dependencia;

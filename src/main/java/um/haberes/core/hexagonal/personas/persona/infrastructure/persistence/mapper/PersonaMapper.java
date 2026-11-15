@@ -60,9 +60,6 @@ public class PersonaMapper {
         if (domain.getLiquida() != null) {
             builder.liquida(domain.getLiquida());
         }
-        if (domain.getDirectivoEtec() != null) {
-            builder.directivoEtec(domain.getDirectivoEtec());
-        }
         return builder.build();
     }
 
@@ -112,9 +109,6 @@ public class PersonaMapper {
         }
         if (entity.getLiquida() != null) {
             builder.liquida(entity.getLiquida());
-        }
-        if (entity.getDirectivoEtec() != null) {
-            builder.directivoEtec(entity.getDirectivoEtec());
         }
         return builder.build();
     }
