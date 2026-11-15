@@ -21,7 +21,7 @@ public record BonoLote(Integer anho, Integer mes, Integer dependenciaId, String 
 
     public record Control(OffsetDateTime fechaDesde, OffsetDateTime fechaHasta,
                           OffsetDateTime fechaPago, OffsetDateTime fechaDeposito,
-                          String aporteJubilatorio, BigDecimal horaReferenciaEtec) {
+                          String aporteJubilatorio) {
     }
 
     public record Catalogo(List<Dependencia> dependencias, Codigo codigo981,
@@ -50,8 +50,7 @@ public record BonoLote(Integer anho, Integer mes, Integer dependenciaId, String 
                          List<CursoCargo> cursos, List<CursoCargo> cursosEtec,
                          List<CargoLiquidado> docentes, List<CargoLiquidado> noDocentes,
                          List<Clase> clases, List<Adicional> adicionales,
-                         BigDecimal porcentajeAntiguedadEtec, String mailInstitucional,
-                         Long legajoControlId, boolean bonoEnviado) {
+                         String mailInstitucional, Long legajoControlId, boolean bonoEnviado) {
 
         public Legajo {
             indices = indices == null ? List.of() : List.copyOf(indices);
@@ -66,8 +65,7 @@ public record BonoLote(Integer anho, Integer mes, Integer dependenciaId, String 
     }
 
     public record Persona(Long legajoId, String apellido, String nombre, String documento,
-                          String cuil, Integer dependenciaId, OffsetDateTime altaAdministrativa,
-                          byte directivoEtec) {
+                          String cuil, Integer dependenciaId, OffsetDateTime altaAdministrativa) {
     }
 
     public record Antiguedad(int mesesDocentes, int mesesAdministrativos) {

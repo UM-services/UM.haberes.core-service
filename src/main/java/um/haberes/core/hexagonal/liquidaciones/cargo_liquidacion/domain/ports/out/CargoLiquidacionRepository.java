@@ -55,6 +55,9 @@ public interface CargoLiquidacionRepository {
 
     void deleteAllByLegajoIdNotInAndAnhoAndMes(List<Long> legajoIds, Integer anho, Integer mes);
 
+    void deleteAllByLegajoIdNotInAndAnhoAndMesAndCategoriaIdNotIn(List<Long> legajoIds, Integer anho,
+            Integer mes, List<Integer> categoriaIds);
+
     void deleteAllByAnhoAndMes(Integer anho, Integer mes);
 
     void deleteAllByAnhoAndMesAndCategoriaIdIn(Integer anho, Integer mes, List<Integer> categoriaIds);

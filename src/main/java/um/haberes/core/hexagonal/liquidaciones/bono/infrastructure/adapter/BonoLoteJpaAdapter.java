@@ -44,7 +44,6 @@ import um.haberes.core.repository.JpaLiquidacionAdicionalRepository;
 import um.haberes.core.service.CodigoGrupoService;
 import um.haberes.core.service.ControlService;
 import um.haberes.core.service.facade.DesignacionToolService;
-import um.haberes.core.service.facade.LiquidacionEtecService;
 
 /**
  * Lee de una sola vez todo el lote de bonos de una dependencia.
@@ -59,8 +58,6 @@ import um.haberes.core.service.facade.LiquidacionEtecService;
 public class BonoLoteJpaAdapter implements BonoLoteDataPort {
 
     private static final Integer CODIGO_981 = 981;
-    private static final Integer FACULTAD_ETEC = 15;
-    private static final Integer GEOGRAFICA_ETEC = 1;
     private static final Integer NIVEL_ETEC = 2;
     private static final Byte ACTIVO = 1;
 
@@ -86,7 +83,6 @@ public class BonoLoteJpaAdapter implements BonoLoteDataPort {
     private final CodigoService codigoService;
     private final CodigoGrupoService codigoGrupoService;
     private final DesignacionToolService designacionToolService;
-    private final LiquidacionEtecService liquidacionEtecService;
 
     @Override
     public BonoLote cargar(List<Long> legajoIds, Integer anho, Integer mes, Integer dependenciaId,
@@ -159,7 +155,6 @@ public class BonoLoteJpaAdapter implements BonoLoteDataPort {
                             .map(adicional -> new BonoLote.Adicional(adicional.getDependenciaId(),
                                     adicional.getAdicional()))
                             .toList(),
-                    porcentajeAntiguedadEtec(legajoId, anho, mes),
                     contacto == null ? null : contacto.getMailInstitucional(),
                     legajoControl == null ? null : legajoControl.getLegajoControlId(),
                     legajoControl != null && valor(legajoControl.getBonoEnviado()) == ACTIVO));
@@ -175,8 +170,7 @@ public class BonoLoteJpaAdapter implements BonoLoteDataPort {
             return null;
         }
         return new BonoLote.Control(control.getFechaDesde(), control.getFechaHasta(),
-                control.getFechaPago(), control.getFechaDeposito(), control.getAporteJubilatorio(),
-                control.getHoraReferenciaEtec());
+                control.getFechaPago(), control.getFechaDeposito(), control.getAporteJubilatorio());
     }
 
     private BonoLote.Catalogo catalogo() {
@@ -220,8 +214,7 @@ public class BonoLoteJpaAdapter implements BonoLoteDataPort {
         }
         return new BonoLote.Persona(persona.getLegajoId(), persona.getApellido(), persona.getNombre(),
                 persona.getDocumento() == null ? null : persona.getDocumento().toString(),
-                persona.getCuil(), persona.getDependenciaId(), persona.getAltaAdministrativa(),
-                valor(persona.getDirectivoEtec()));
+                persona.getCuil(), persona.getDependenciaId(), persona.getAltaAdministrativa());
     }
 
     private BonoLote.Antiguedad antiguedad(AntiguedadEntity antiguedad) {
@@ -238,15 +231,6 @@ public class BonoLoteJpaAdapter implements BonoLoteDataPort {
             return indices == null ? List.of() : indices;
         } catch (RuntimeException e) {
             return List.of();
-        }
-    }
-
-    private BigDecimal porcentajeAntiguedadEtec(Long legajoId, Integer anho, Integer mes) {
-        try {
-            return liquidacionEtecService.calcularPorcentajeAntiguedad(legajoId, anho, mes,
-                    FACULTAD_ETEC, GEOGRAFICA_ETEC);
-        } catch (RuntimeException e) {
-            return BigDecimal.ZERO;
         }
     }
 

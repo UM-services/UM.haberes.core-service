@@ -81,7 +81,6 @@ class PersonaControllerTest {
         persona.setLocalidadAfip(100);
         persona.setSituacionAfip(3);
         persona.setModeloContratacionAfip(1);
-        persona.setDirectivoEtec((byte) 1);
         return persona;
     }
 
@@ -117,7 +116,7 @@ class PersonaControllerTest {
               "localidadAfip": 100,
               "situacionAfip": 3,
               "modeloContratacionAfip": 1,
-              "directivoEtec": 1,
+              "directivoEtec": 0,
               "apellidoNombre": "Perez, Juan"
                                         }
             """;

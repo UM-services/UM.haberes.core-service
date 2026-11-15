@@ -124,10 +124,15 @@ public class ControlEntity extends AuditableEntity {
 
     private BigDecimal adicionalHoraCargoClase = BigDecimal.ZERO;
 
-    private BigDecimal horaReferenciaEtec = BigDecimal.ZERO;
-
-    /** Valor del punto de referencia ETEC (puente hasta que haberes-etec gestione etec_valor_punto). */
-    private BigDecimal valorPuntoEtec = BigDecimal.ZERO;
+    /**
+     * Propiedad legada que ya no se persiste ni se usa: se conserva en el JSON con valor cero para
+     * no romper a los consumidores que todavía la leen. El desglose del bono ETEC que la usaba se
+     * retiró y la columna se elimina con {@code sql/012_drop_control_hora_referencia_etec.sql}.
+     */
+    @Deprecated
+    public BigDecimal getHoraReferenciaEtec() {
+        return BigDecimal.ZERO;
+    }
 
     private Integer modoLiquidacionId = null;
 
