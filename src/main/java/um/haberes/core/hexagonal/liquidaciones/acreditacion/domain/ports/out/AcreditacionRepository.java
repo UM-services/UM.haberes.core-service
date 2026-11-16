@@ -1,5 +1,6 @@
 package um.haberes.core.hexagonal.liquidaciones.acreditacion.domain.ports.out;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +17,8 @@ public interface AcreditacionRepository {
     Acreditacion create(Acreditacion acreditacion);
 
     Optional<Acreditacion> update(Long acreditacionId, Acreditacion acreditacion);
+
+    Optional<Acreditacion> updateLimiteNovedades(Long acreditacionId, OffsetDateTime limiteNovedades);
 
     void deleteById(Long acreditacionId);
 }

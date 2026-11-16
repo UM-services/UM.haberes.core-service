@@ -1,5 +1,6 @@
 package um.haberes.core.hexagonal.crossslice.liquidacion;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
@@ -36,6 +37,13 @@ public class LiquidacionCrossSliceAdapter implements LiquidacionCrossSlice {
     }
 
     @Override
+    public List<LiquidacionView> porPeriodo(Integer anho, Integer mes) {
+        return liquidacionService.getLiquidacionesByPeriodo(anho, mes).stream()
+                .map(this::toView)
+                .toList();
+    }
+
+    @Override
     public boolean hayAcreditadasEnPeriodo(Integer anho, Integer mes) {
         return !liquidacionService.getLiquidacionesByAcreditado(anho, mes).isEmpty();
     }
@@ -44,7 +52,7 @@ public class LiquidacionCrossSliceAdapter implements LiquidacionCrossSlice {
         if (liquidacion == null) {
             return null;
         }
-        return new LiquidacionView(liquidacion.getLiquidacionId(), liquidacion.getAnho(), liquidacion.getMes(),
+        return new LiquidacionView(liquidacion.getLiquidacionId(), liquidacion.getLegajoId(), liquidacion.getAnho(), liquidacion.getMes(),
                 liquidacion.getBloqueado(), liquidacion.getEstado(), liquidacion.getLiquida(),
                 liquidacion.getTotalRemunerativo(), liquidacion.getTotalNoRemunerativo(),
                 liquidacion.getTotalDeduccion(), liquidacion.getTotalNeto(),

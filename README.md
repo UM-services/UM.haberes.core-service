@@ -19,7 +19,7 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**2.1.0** (2026-11-15)
+**2.2.0** (2026-11-16)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
@@ -49,6 +49,7 @@ Arquitectura y modelo:
 Liquidaciones:
 - `docs/diagrams/flujo-liquidacion-sueldos.mmd`
 - `docs/diagrams/flujo-liquidacion-general.mmd`
+- `docs/diagrams/flujo-liquidacion-general-proceso.mmd`
 - `docs/diagrams/flujo-liquidacion-ciclo.mmd`
 - `docs/diagrams/flujo-liquidacion-individual.mmd`
 - `docs/diagrams/flujo-cargo-liquidacion.mmd`
@@ -152,7 +153,14 @@ logging:
     um.haberes.core: DEBUG
   file:
     name: logs/haberes-core.log
+
+haberes:
+  liquidacion-general:
+    concurrencia: 2
 ```
+
+`haberes.liquidacion-general.concurrencia` (default `2`) limita los hilos con los que el
+proceso masivo de liquidación general procesa los legajos del período.
 
 
 ## Auditoría de operaciones
@@ -180,7 +188,7 @@ logging:
 | `HABERES_AUDIT_REQUEST_EVENTS` | `true` | Emitir un evento por operación |
 | `HABERES_AUDIT_CHANGE_EVENTS` | `true` | Emitir un evento por cambio de entidad |
 | `HABERES_AUDIT_MASK_FIELDS` | `password,cbu,cuenta,documento` | Campos que se enmascaran |
-| `HABERES_AUDIT_EXCLUDED_ENTITIES` | `BuildEntity,ConversionLogEntity` | Entidades no auditadas |
+| `HABERES_AUDIT_EXCLUDED_ENTITIES` | `BuildEntity,ConversionLogEntity,LiquidacionGeneralProcesoEntity,LiquidacionGeneralDetalleEntity` | Entidades no auditadas |
 | `HABERES_AUDIT_MAX_ATTEMPTS` | `10` | Intentos antes de marcar `FAILED` |
 | `HABERES_AUDIT_BATCH_SIZE` | `200` | Eventos por lote del sender |
 | `HABERES_AUDIT_SENDER_DELAY_MS` | `2000` | Espera entre corridas del sender |
@@ -295,6 +303,20 @@ docker run -d \
 - `DELETE /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/{forzar}` - Eliminar la liquidación del legajo/período
 - `POST /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/novedad` - Alta o actualización de una novedad
 - `DELETE /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/novedad/{novedadId}/{forzar}` - Eliminar una novedad del legajo/período
+
+### Liquidación general (slice hexagonal)
+- `GET /api/haberes/core/liquidacion-general/{anho}/{mes}` - Padrón agregado del período: acciones, resumen (docentes, no docentes, novedades, liquidados, bloqueados, neto negativo/cero y total neto) y filas por legajo
+- `POST /api/haberes/core/liquidacion-general/{anho}/{mes}/cargos` - Iniciar la generación masiva de cargos (`202` con `procesoId`; `409` si ya hay un proceso en curso)
+- `POST /api/haberes/core/liquidacion-general/{anho}/{mes}/liquidar` - Iniciar la liquidación masiva (body opcional `{"forzar": true}`)
+- `POST /api/haberes/core/liquidacion-general/{anho}/{mes}/eliminar` - Iniciar la eliminación masiva de liquidaciones (body opcional `{"forzar": true}`)
+- `GET /api/haberes/core/liquidacion-general/proceso/{procesoId}` - Estado y avance del proceso (`404` si no existe)
+- `GET /api/haberes/core/liquidacion-general/proceso/{procesoId}/detalle/{resultado}` - Resultados por legajo (`LIQUIDADO`, `ELIMINADO`, `GENERADO`, `OMITIDO`, `FALLIDO`)
+- `GET /api/haberes/core/liquidacion-general/procesos/{anho}/{mes}` - Procesos del período
+
+Los tres procesos masivos responden `202` con `procesoId`, `409 PROCESO_EN_CURSO` o `200` con
+`SIN_CONTROL` (salvo en eliminar) o `SIN_LIQUIDABLES` cuando no se inician. El avance se persiste en
+`liquidacion_general_proceso`/`liquidacion_general_detalle` (aplicar
+`sql/019_liquidacion_general_proceso.sql` antes de usarlos).
 
 ### Cargos
 - `GET /api/haberes/core/cargo/legajo/{legajoId}` - Obtener cargos por legajo

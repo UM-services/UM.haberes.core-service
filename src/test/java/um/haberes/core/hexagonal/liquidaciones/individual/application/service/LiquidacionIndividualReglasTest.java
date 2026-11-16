@@ -164,7 +164,7 @@ class LiquidacionIndividualReglasTest {
     }
 
     private LiquidacionView liquidacion(byte bloqueado, int estado, String liquida) {
-        return new LiquidacionView(1L, ANHO, MES, bloqueado, estado, liquida, BigDecimal.ZERO, BigDecimal.ZERO,
+        return new LiquidacionView(1L, 1001L, ANHO, MES, bloqueado, estado, liquida, BigDecimal.ZERO, BigDecimal.ZERO,
                 BigDecimal.ZERO, BigDecimal.ZERO, null, null, 7, "B");
     }
 

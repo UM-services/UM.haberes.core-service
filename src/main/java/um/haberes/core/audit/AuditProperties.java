@@ -63,7 +63,8 @@ public class AuditProperties {
 
     private List<String> maskFields = new ArrayList<>(List.of("password", "cbu", "cuenta", "documento"));
 
-    private Set<String> excludedEntities = new HashSet<>(Set.of("BuildEntity", "ConversionLogEntity"));
+    private Set<String> excludedEntities = new HashSet<>(Set.of("BuildEntity", "ConversionLogEntity",
+            "LiquidacionGeneralProcesoEntity", "LiquidacionGeneralDetalleEntity"));
 
     /**
      * Kill switch del resumen masivo: con {@code false} los scopes son inertes y todo se

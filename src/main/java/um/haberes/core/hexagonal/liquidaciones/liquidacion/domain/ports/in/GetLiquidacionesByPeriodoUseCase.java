@@ -7,4 +7,6 @@ import um.haberes.core.hexagonal.liquidaciones.liquidacion.domain.model.Liquidac
 public interface GetLiquidacionesByPeriodoUseCase {
 
     List<Liquidacion> getLiquidacionesByPeriodo(Integer anho, Integer mes, Integer limit);
+
+    List<Liquidacion> getLiquidacionesByPeriodo(Integer anho, Integer mes);
 }

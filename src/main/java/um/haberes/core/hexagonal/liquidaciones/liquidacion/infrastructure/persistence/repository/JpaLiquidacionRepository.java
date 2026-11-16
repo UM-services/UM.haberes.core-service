@@ -21,6 +21,8 @@ public interface JpaLiquidacionRepository extends JpaRepository<LiquidacionEntit
 
     List<LiquidacionEntity> findAllByAnhoAndMesOrderByLegajoId(Integer anho, Integer mes, Pageable pageable);
 
+    List<LiquidacionEntity> findAllByAnhoAndMesOrderByLegajoId(Integer anho, Integer mes);
+
     List<LiquidacionEntity> findAllByAnhoAndMesAndLegajoId(Integer anho, Integer mes, Long legajoId,
                                                      Pageable pageable);
 

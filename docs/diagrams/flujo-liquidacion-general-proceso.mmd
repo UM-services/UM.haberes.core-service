@@ -1,0 +1,77 @@
+---
+title: "Liquidación general: padrón y procesos masivos asíncronos"
+---
+flowchart TD
+    UI["Cliente / pantalla de liquidación general"]
+
+    subgraph API ["Adaptador web"]
+        CTRL["LiquidacionGeneralController<br/>/api/haberes/core/liquidacion-general"]
+        RESP["202 procesoId<br/>200 SIN_CONTROL o SIN_LIQUIDABLES<br/>409 PROCESO_EN_CURSO<br/>404 proceso inexistente"]
+    end
+
+    subgraph APP ["Servicio de aplicación"]
+        SVC["LiquidacionGeneralService"]
+        PADRON["Padrón del período<br/>acciones, resumen y filas por legajo"]
+        VALIDA["Valida proceso en curso, control y liquidables"]
+    end
+
+    subgraph CROSS ["Cross-slice (lecturas)"]
+        PER["PersonaCrossSlice.liquidables"]
+        CAR["CargoLiquidacionCrossSlice.porPeriodo"]
+        LIQ["LiquidacionCrossSlice.porPeriodo<br/>porClaveUnica"]
+        NOV["NovedadCrossSlice.legajosConNovedades"]
+        LCTL["LegajoControlCrossSlice.porPeriodo<br/>desmarcarPeriodo"]
+        REG["ReglasElegibilidadLiquidacion"]
+    end
+
+    subgraph RUN ["ProcesoGeneralRunner (@Async)"]
+        UNIV["Universo liquidable"]
+        DESM["Si el proceso es LIQUIDAR:<br/>desmarcar el período una sola vez"]
+        POOL["Pool acotado por<br/>haberes.liquidacion-general.concurrencia"]
+        TIPO{"Tipo de proceso"}
+        CARGOS["CARGOS<br/>bloqueo con forzar en false<br/>genera cargos y cuenta docentes y no docentes"]
+        LIQUIDAR["LIQUIDAR<br/>bloqueo, control, persona y período liquidable<br/>motor y relectura de la liquidación"]
+        ELIMINAR["ELIMINAR<br/>bloqueo, borrado y verificación<br/>de que la liquidación ya no exista"]
+        DETALLE["Resultado por legajo<br/>LIQUIDADO, ELIMINADO, GENERADO,<br/>OMITIDO o FALLIDO"]
+    end
+
+    subgraph DB ["Persistencia"]
+        PROC[("liquidacion_general_proceso")]
+        DET[("liquidacion_general_detalle")]
+        SQL["sql/019_liquidacion_general_proceso.sql<br/>esquema aplicado a mano"]
+    end
+
+    UI -->|"GET /{anho}/{mes}"| CTRL
+    UI -->|"POST /{anho}/{mes}/cargos, /liquidar, /eliminar"| CTRL
+    UI -->|"GET /proceso/{procesoId}, /detalle/{resultado}, /procesos/{anho}/{mes}"| CTRL
+    CTRL --> SVC
+    SVC --> PADRON
+    PADRON --> PER
+    PADRON --> CAR
+    PADRON --> LIQ
+    PADRON --> NOV
+    PADRON --> LCTL
+    SVC --> VALIDA
+    VALIDA --> REG
+    VALIDA --> RESP
+    VALIDA -->|"guarda EN_CURSO y dispara"| PROC
+    VALIDA --> RUN
+    RUN --> UNIV
+    UNIV --> DESM
+    DESM --> POOL
+    POOL --> TIPO
+    TIPO --> CARGOS
+    TIPO --> LIQUIDAR
+    TIPO --> ELIMINAR
+    CARGOS --> REG
+    LIQUIDAR --> REG
+    ELIMINAR --> REG
+    CARGOS --> DETALLE
+    LIQUIDAR --> DETALLE
+    ELIMINAR --> DETALLE
+    DETALLE --> DET
+    RUN -->|"actualiza contadores y estado"| PROC
+    CTRL -->|"consulta avance y detalle"| PROC
+    CTRL -->|"consulta resultados"| DET
+    PROC --- SQL
+    DET --- SQL

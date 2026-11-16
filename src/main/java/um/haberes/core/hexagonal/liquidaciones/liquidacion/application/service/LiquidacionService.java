@@ -66,6 +66,10 @@ public class LiquidacionService {
         return getLiquidacionesByPeriodoUseCase.getLiquidacionesByPeriodo(anho, mes, limit);
     }
 
+    public List<Liquidacion> getLiquidacionesByPeriodo(Integer anho, Integer mes) {
+        return getLiquidacionesByPeriodoUseCase.getLiquidacionesByPeriodo(anho, mes);
+    }
+
     public List<Liquidacion> getLiquidacionesByPeriodoAndLegajoIds(Integer anho, Integer mes, List<Long> legajoIds) {
         return getLiquidacionesByPeriodoAndLegajoIdsUseCase.getLiquidacionesByPeriodoAndLegajoIds(anho, mes, legajoIds);
     }

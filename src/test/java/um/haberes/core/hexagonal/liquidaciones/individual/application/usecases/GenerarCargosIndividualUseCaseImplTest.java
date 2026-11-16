@@ -93,13 +93,13 @@ class GenerarCargosIndividualUseCaseImplTest {
     }
 
     private CargoLiquidacionView cargo(boolean docente) {
-        return new CargoLiquidacionView(1L, 7, "FING", OffsetDateTime.now(), OffsetDateTime.now(), 1,
+        return new CargoLiquidacionView(1L, 1001L, 7, "FING", OffsetDateTime.now(), OffsetDateTime.now(), 1,
                 "PROFESOR", BigDecimal.TEN, BigDecimal.ZERO, BigDecimal.TEN, 1, 0, "A", docente);
     }
 
     @SuppressWarnings("unused")
     private LiquidacionView liquidacion() {
-        return new LiquidacionView(1L, ANHO, MES, (byte) 0, 1, "S", BigDecimal.ZERO, BigDecimal.ZERO,
+        return new LiquidacionView(1L, 1001L, ANHO, MES, (byte) 0, 1, "S", BigDecimal.ZERO, BigDecimal.ZERO,
                 BigDecimal.ZERO, BigDecimal.ZERO, null, null, 7, "B");
     }
 }

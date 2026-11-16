@@ -57,6 +57,11 @@ public class JpaLiquidacionRepositoryAdapter implements LiquidacionRepository {
     }
 
     @Override
+    public List<Liquidacion> findAllByAnhoAndMes(Integer anho, Integer mes) {
+        return toDomainList(jpaLiquidacionRepository.findAllByAnhoAndMesOrderByLegajoId(anho, mes));
+    }
+
+    @Override
     public List<Liquidacion> findAllByAnhoAndMesAndLegajoId(Integer anho, Integer mes, Long legajoId, Integer limit) {
         return toDomainList(jpaLiquidacionRepository.findAllByAnhoAndMesAndLegajoId(anho, mes, legajoId,
                 PageRequest.of(0, effectiveLimit(limit))));
