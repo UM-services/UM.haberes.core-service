@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -20,12 +21,17 @@ import um.haberes.core.hexagonal.etec.control_etec.application.exception.Control
 import um.haberes.core.hexagonal.etec.control_etec.application.exception.ControlEtecYaExisteException;
 import um.haberes.core.hexagonal.etec.control_etec.domain.model.ControlEtec;
 import um.haberes.core.hexagonal.etec.control_etec.domain.ports.out.ControlEtecRepository;
+import um.haberes.core.hexagonal.etec.hora_escala.domain.model.EscalaHoraEtec;
+import um.haberes.core.hexagonal.etec.hora_escala.domain.ports.out.EscalaHoraEtecRepository;
 
 @ExtendWith(MockitoExtension.class)
 class CopiarControlEtecUseCaseImplTest {
 
     @Mock
     private ControlEtecRepository repository;
+
+    @Mock
+    private EscalaHoraEtecRepository escalaHoraEtecRepository;
 
     @InjectMocks
     private CopiarControlEtecUseCaseImpl useCase;
@@ -72,6 +78,53 @@ class CopiarControlEtecUseCaseImplTest {
         assertThat(copia.getAnho()).isEqualTo(2026);
         assertThat(copia.getMes()).isEqualTo(1);
         assertThat(copia.getValorPuntoEtec()).isEqualByComparingTo("311.3633");
+    }
+
+    @Test
+    void copiaLaEscalaDeHorasApuntandoAlControlNuevo() {
+        when(repository.findByPeriodo(2026, 10)).thenReturn(Optional.of(origen(2026, 10)));
+        when(repository.save(any(ControlEtec.class))).thenAnswer(invocation -> {
+            ControlEtec control = invocation.getArgument(0);
+            control.setControlEtecId(51L);
+            return control;
+        });
+        when(escalaHoraEtecRepository.findAllByControlEtecId(5L)).thenReturn(List.of(
+                EscalaHoraEtec.builder()
+                        .escalaHoraEtecId(9L)
+                        .controlEtecId(5L)
+                        .horasDesde(new BigDecimal("0.00"))
+                        .horasHasta(new BigDecimal("12.00"))
+                        .montoFijo(new BigDecimal("50000.00"))
+                        .valorHora(new BigDecimal("5000.00"))
+                        .build()));
+
+        useCase.copiar(2026, 11);
+
+        @SuppressWarnings("unchecked")
+        org.mockito.ArgumentCaptor<List<EscalaHoraEtec>> captor =
+                org.mockito.ArgumentCaptor.forClass(List.class);
+        verify(escalaHoraEtecRepository).saveAll(captor.capture());
+        assertThat(captor.getValue()).singleElement().satisfies(tramo -> {
+            assertThat(tramo.getEscalaHoraEtecId()).isNull();
+            assertThat(tramo.getControlEtecId()).isEqualTo(51L);
+            assertThat(tramo.getHorasDesde()).isEqualByComparingTo("0.00");
+            assertThat(tramo.getValorHora()).isEqualByComparingTo("5000.00");
+        });
+    }
+
+    @Test
+    void sinTramosNoLlamaAlGuardadoDeLaEscala() {
+        when(repository.findByPeriodo(2026, 10)).thenReturn(Optional.of(origen(2026, 10)));
+        when(repository.save(any(ControlEtec.class))).thenAnswer(invocation -> {
+            ControlEtec control = invocation.getArgument(0);
+            control.setControlEtecId(51L);
+            return control;
+        });
+        when(escalaHoraEtecRepository.findAllByControlEtecId(5L)).thenReturn(List.of());
+
+        useCase.copiar(2026, 11);
+
+        verify(escalaHoraEtecRepository, never()).saveAll(any());
     }
 
     @Test

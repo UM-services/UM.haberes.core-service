@@ -19,7 +19,7 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**2.0.0** (2026-11-15)
+**2.1.0** (2026-11-15)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
@@ -290,7 +290,7 @@ docker run -d \
 
 ### Liquidación individual (slice hexagonal)
 - `GET /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}` - Ficha agregada del legajo/período con las acciones habilitadas
-- `POST /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/cargos` - Regenerar cargos docentes, no docentes y ETEC por puntos del legajo/período
+- `POST /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/cargos` - Regenerar cargos docentes, no docentes y ETEC (puntos y horas) del legajo/período
 - `POST /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/liquidar` - Liquidar el legajo/período (body opcional `{"forzar": true}`)
 - `DELETE /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/{forzar}` - Eliminar la liquidación del legajo/período
 - `POST /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/novedad` - Alta o actualización de una novedad
@@ -317,7 +317,7 @@ docker run -d \
 - `POST /api/haberes/core/categoria/upload/{anho}/{mes}` - Cargar categorías desde Excel
 - `GET /api/haberes/core/categoria/nogrado` - Listar categorías sin grado
 
-### ETEC (cargos por puntos)
+### ETEC (cargos por puntos y por horas)
 - `GET /api/haberes/core/etec/asignacion-cargo/legajo/{legajoId}` - Asignaciones del legajo
 - `GET /api/haberes/core/etec/asignacion-cargo/legajo/{legajoId}/periodo/{anho}/{mes}` - Asignaciones vigentes del legajo en el período
 - `GET /api/haberes/core/etec/asignacion-cargo/periodo/{anho}/{mes}` - Asignaciones vigentes del período
@@ -329,7 +329,9 @@ docker run -d \
 - `GET /api/haberes/core/etec/control/{anho}/{mes}` - Parámetros ETEC del período (`404` si no está configurado)
 - `GET /api/haberes/core/etec/control/{anho}/{mes}/opcional` - Ídem, con `200` y cuerpo vacío si no existe
 - `POST /api/haberes/core/etec/control/{anho}/{mes}` - Alta o actualización (upsert) de los parámetros ETEC del período
-- `POST /api/haberes/core/etec/control/copiar/{anho}/{mes}` - Copia los parámetros del mes anterior (`409` si el destino existe, `404` si no hay origen)
+- `POST /api/haberes/core/etec/control/copiar/{anho}/{mes}` - Copia los parámetros ETEC y la escala de horas del mes anterior (`409` si el destino existe, `404` si no hay origen)
+- `GET /api/haberes/core/etec/hora/escala/{anho}/{mes}` - Escala de horas de clase ETEC del período (lista vacía si el período no tiene control ETEC)
+- `PUT /api/haberes/core/etec/hora/escala/{anho}/{mes}` - Reemplazo completo de la escala de horas (valida rangos, solapamientos e importes; la lista vacía borra la escala; `404` si el período no tiene control ETEC)
 - `GET /api/haberes/core/etec/arraigo/escala` - Escala global de arraigo ETEC por antigüedad docente
 - `PUT /api/haberes/core/etec/arraigo/escala` - Reemplazo completo de la escala (valida años mínimos, duplicados y porcentajes entre 0 y 100)
 

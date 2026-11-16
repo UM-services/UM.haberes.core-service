@@ -48,6 +48,16 @@ final class CargoLiquidacionFactory {
                 BigDecimal.ZERO, BigDecimal.ZERO, 1, 0, null);
     }
 
+    /**
+     * Cargo de horas de clase ETEC: el importe del tramo ya viene calculado. No lleva horas de
+     * jornada (se multiplicaría de nuevo) ni presentismo no docente.
+     */
+    static CargoLiquidacion deEtecHoras(ContextoGeneracionCargos contexto, Long legajoId,
+                                        Dependencia dependencia, Categoria categoria, BigDecimal importe) {
+        return base(contexto, legajoId, dependencia.getDependenciaId(), categoria, importe,
+                BigDecimal.ZERO, BigDecimal.ZERO, 1, 0, dependencia);
+    }
+
     private static CargoLiquidacion base(ContextoGeneracionCargos contexto, Integer dependenciaId,
                                          Categoria categoria, BigDecimal categoriaBasico,
                                          BigDecimal estadoDocente, BigDecimal horasJornada, int jornada,

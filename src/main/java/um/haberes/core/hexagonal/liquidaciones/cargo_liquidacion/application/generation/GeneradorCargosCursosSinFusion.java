@@ -40,6 +40,8 @@ public class GeneradorCargosCursosSinFusion implements GeneradorCargosLiquidacio
     public List<CargoLiquidacion> cargos(ContextoGeneracionCargos contexto) {
         return datos.cursosCargo(contexto.legajoId(), contexto.anho(), contexto.mes()).stream()
                 .filter(cursoCargo -> cursoCargo.getCategoriaId() != null)
+                .filter(cursoCargo -> !GeneradorCargosEtecHoras.FACULTAD_ETEC
+                        .equals(Objects.requireNonNull(cursoCargo.getCurso()).getFacultadId()))
                 .map(cursoCargo -> CargoLiquidacionFactory.deCurso(contexto,
                         dependencia(contexto, Objects.requireNonNull(cursoCargo.getCurso())),
                         cursoCargo.getCategoria()))

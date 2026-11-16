@@ -39,6 +39,8 @@ public class GeneradorCargosCursosFusion implements GeneradorCargosLiquidacion {
     @Override
     public List<CargoLiquidacion> cargos(ContextoGeneracionCargos contexto) {
         return datos.cursosFusion(contexto.legajoId(), contexto.anho(), contexto.mes()).stream()
+                .filter(cursoFusion -> !GeneradorCargosEtecHoras.FACULTAD_ETEC
+                        .equals(cursoFusion.getFacultadId()))
                 .map(cursoFusion -> CargoLiquidacionFactory.deCurso(contexto,
                         dependencia(contexto, cursoFusion.getFacultadId(), cursoFusion.getGeograficaId()),
                         cursoFusion.getCategoria()))

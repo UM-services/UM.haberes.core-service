@@ -49,17 +49,26 @@ class CatalogoUniversosCargosTest {
     void elUniversoNoDocenteExcluyeLasCategoriasConPuntos() {
         when(categoriaRepository.findAllByNoDocente((byte) 1)).thenReturn(List.of(
                 categoria(5, "0.00", (byte) 0, (byte) 1),
-                categoria(2002, "100.00", (byte) 0, (byte) 1)));
+                categoria(2001, "100.00", (byte) 0, (byte) 1)));
 
         assertThat(catalogo.categoriaIds(UniversoCargos.NO_DOCENTE)).containsExactly(5);
     }
 
     @Test
-    void elUniversoEtecSonLasCategoriasConPuntos() {
+    void elUniversoDocenteExcluyeLaCategoriaDeHorasEtec() {
+        when(categoriaRepository.findAllByDocente((byte) 1)).thenReturn(List.of(
+                categoria(1, "0.00", (byte) 1, (byte) 0),
+                categoria(2002, "0.00", (byte) 1, (byte) 0)));
+
+        assertThat(catalogo.categoriaIds(UniversoCargos.DOCENTE)).containsExactly(1);
+    }
+
+    @Test
+    void elUniversoEtecSonLasCategoriasConPuntosMasLaDeHoras() {
         when(categoriaRepository.findAllByPuntosGreaterThan(BigDecimal.ZERO)).thenReturn(List.of(
                 categoria(2001, "3000.00", (byte) 1, (byte) 0)));
 
-        assertThat(catalogo.categoriaIds(UniversoCargos.ETEC)).containsExactly(2001);
+        assertThat(catalogo.categoriaIds(UniversoCargos.ETEC)).containsExactly(2001, 2002);
     }
 
     @Test
@@ -70,6 +79,6 @@ class CatalogoUniversosCargosTest {
                 categoria(2001, "3000.00", (byte) 1, (byte) 0)));
 
         assertThat(catalogo.categoriaIds(Set.of(UniversoCargos.DOCENTE, UniversoCargos.ETEC), List.of(2001)))
-                .containsExactlyInAnyOrder(1, 2001);
+                .containsExactlyInAnyOrder(1, 2001, 2002);
     }
 }
