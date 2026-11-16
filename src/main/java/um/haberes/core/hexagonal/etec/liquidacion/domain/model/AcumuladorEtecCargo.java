@@ -6,9 +6,9 @@ import java.math.RoundingMode;
 import lombok.Getter;
 
 /**
- * Acumula los conceptos ETEC de todos los cargos por puntos del legajo: valor del cargo,
- * antigüedad, presentismo, adicional carrera y arraigo. Cada importe se redondea por cargo, igual
- * que el resto del motor.
+ * Acumula los conceptos de los cargos ETEC de un mismo origen: valor del cargo, antigüedad,
+ * presentismo, adicional carrera, arraigo y horas de clase. Cada importe se redondea por cargo,
+ * igual que el resto del motor. El origen (puntos u horas) lo decide {@link AcumuladorEtec}.
  */
 @Getter
 public class AcumuladorEtecCargo {
@@ -23,13 +23,27 @@ public class AcumuladorEtecCargo {
 
     private BigDecimal arraigo = BigDecimal.ZERO;
 
+    /** Horas de clase semanales del origen: sólo el cargo por horas las aporta. */
+    private BigDecimal horas = BigDecimal.ZERO;
+
     /**
-     * Acumula un cargo. El porcentaje de arraigo sale de la escala global según la antigüedad
-     * docente del legajo (puede ser cero si no alcanza el primer tramo).
+     * Acumula un cargo sin horas de clase. El porcentaje de arraigo sale de la escala global según
+     * la antigüedad docente del legajo (puede ser cero si no alcanza el primer tramo).
      */
     public void acumular(BigDecimal cargoCargo, BigDecimal antiguedadCargo,
                          BigDecimal porcentajePresentismo, BigDecimal porcentajeAdicionalCarrera,
                          BigDecimal porcentajeArraigo) {
+        acumular(cargoCargo, antiguedadCargo, porcentajePresentismo, porcentajeAdicionalCarrera,
+                porcentajeArraigo, BigDecimal.ZERO);
+    }
+
+    /** Acumula un cargo con las horas de clase que le dieron origen. */
+    public void acumular(BigDecimal cargoCargo, BigDecimal antiguedadCargo,
+                         BigDecimal porcentajePresentismo, BigDecimal porcentajeAdicionalCarrera,
+                         BigDecimal porcentajeArraigo, BigDecimal horasCargo) {
+        if (horasCargo != null && horasCargo.compareTo(BigDecimal.ZERO) > 0) {
+            this.horas = this.horas.add(horasCargo);
+        }
         if (cargoCargo == null || cargoCargo.compareTo(BigDecimal.ZERO) == 0) {
             return;
         }

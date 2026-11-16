@@ -2,7 +2,7 @@ package um.haberes.core.service.facade.liquidaciones;
 
 import lombok.*;
 import um.haberes.core.hexagonal.etec.control_etec.domain.model.ControlEtec;
-import um.haberes.core.hexagonal.etec.liquidacion.domain.model.AcumuladorEtecCargo;
+import um.haberes.core.hexagonal.etec.liquidacion.domain.model.AcumuladorEtec;
 import um.haberes.core.hexagonal.liquidaciones.codigo.domain.model.Codigo;
 import um.haberes.core.hexagonal.liquidaciones.item.domain.model.Item;
 import um.haberes.core.hexagonal.liquidaciones.novedad.domain.model.Novedad;
@@ -31,7 +31,7 @@ public class LiquidacionState {
     private List<CargoClaseDetalleEntity> cargoClases;
     private ControlEtec controlEtec;
     @Builder.Default
-    private AcumuladorEtecCargo etecAcumulado = new AcumuladorEtecCargo();
+    private AcumuladorEtec etecAcumulado = new AcumuladorEtec();
     /**
      * Porcentaje de arraigo ETEC del legajo según su antigüedad docente. Lo resuelve
      * {@code inicializarLiquidacion} con la escala global; cero si no hay antigüedad o no alcanza

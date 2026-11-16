@@ -17,6 +17,8 @@ import um.haberes.core.hexagonal.cursos.curso_fusion.domain.model.CursoFusion;
 import um.haberes.core.hexagonal.etec.asignacion_cargo.domain.model.EtecAsignacionCargo;
 import um.haberes.core.hexagonal.etec.asignacion_cargo.domain.ports.out.EtecAsignacionCargoRepository;
 import um.haberes.core.hexagonal.etec.control_etec.application.service.ControlEtecService;
+import um.haberes.core.hexagonal.etec.hora_escala.application.service.EscalaHoraEtecService;
+import um.haberes.core.hexagonal.etec.hora_escala.domain.model.EscalaHoraEtec;
 import um.haberes.core.hexagonal.liquidaciones.cargo.application.service.CargoService;
 import um.haberes.core.hexagonal.liquidaciones.cargo.domain.model.Cargo;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.model.ControlGeneracionCargos;
@@ -55,6 +57,8 @@ public class LegacyGeneracionCargosAdapter implements GeneracionCargosDatosPort 
     private final ControlService controlService;
 
     private final ControlEtecService controlEtecService;
+
+    private final EscalaHoraEtecService escalaHoraEtecService;
 
     @Override
     public ControlGeneracionCargos control(Integer anho, Integer mes) {
@@ -96,6 +100,11 @@ public class LegacyGeneracionCargosAdapter implements GeneracionCargosDatosPort 
     }
 
     @Override
+    public List<CursoCargo> cursosCargoPeriodo(Integer anho, Integer mes) {
+        return cursoCargoService.findAllByAnhoAndMes(anho, mes);
+    }
+
+    @Override
     public List<Novedad> novedades(Long legajoId, Integer anho, Integer mes, Integer codigoId) {
         return novedadService.findAllByLegajoAndCodigo(legajoId, anho, mes, codigoId);
     }
@@ -120,5 +129,10 @@ public class LegacyGeneracionCargosAdapter implements GeneracionCargosDatosPort 
     @Override
     public List<Integer> categoriasEtecAsignadas() {
         return etecAsignacionCargoRepository.findDistinctCategoriaIds();
+    }
+
+    @Override
+    public List<EscalaHoraEtec> escalasHoraEtec(Integer anho, Integer mes) {
+        return escalaHoraEtecService.findByPeriodo(anho, mes);
     }
 }

@@ -19,24 +19,34 @@ import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.out.Catego
  * <ul>
  *   <li>DOCENTE: {@code docente = 1} y {@code puntos = 0}</li>
  *   <li>NO_DOCENTE: {@code noDocente = 1} y {@code puntos = 0}</li>
- *   <li>ETEC: {@code puntos > 0}</li>
+ *   <li>ETEC: {@code puntos > 0} más la categoría de horas de clase {@code 2002}</li>
  * </ul>
  *
  * <p>Los universos son disjuntos por construcción: una categoría ETEC nunca entra en el borrado
- * docente/no docente, y viceversa.</p>
+ * docente/no docente, y viceversa. La categoría {@code 2002 DOCENTE ETEC HORAS} no tiene puntos;
+ * se agrega explícitamente al universo ETEC porque sus cargos los genera la escala de horas.</p>
  */
 @Component
 @RequiredArgsConstructor
 public class CatalogoUniversosCargos {
 
+    /** Categoría del cargo que genera la escala de horas de clase ETEC. */
+    public static final Integer CATEGORIA_HORAS_ETEC = 2002;
+
     private static final byte ACTIVO = 1;
 
     private final CategoriaRepository categoriaRepository;
 
-    /** Una categoría es ETEC cuando tiene puntos configurados. */
+    /** Una categoría es ETEC cuando tiene puntos configurados o es la de horas de clase. */
     public static boolean esCategoriaEtec(Categoria categoria) {
-        return categoria != null && categoria.getPuntos() != null
-                && categoria.getPuntos().compareTo(BigDecimal.ZERO) > 0;
+        return esCategoriaHorasEtec(categoria)
+                || (categoria != null && categoria.getPuntos() != null
+                        && categoria.getPuntos().compareTo(BigDecimal.ZERO) > 0);
+    }
+
+    /** La categoría de horas de clase ETEC liquida por la escala de horas, no por puntos. */
+    public static boolean esCategoriaHorasEtec(Categoria categoria) {
+        return categoria != null && CATEGORIA_HORAS_ETEC.equals(categoria.getCategoriaId());
     }
 
     public List<Integer> categoriaIds(Set<UniversoCargos> universos, List<Integer> categoriasAdicionales) {
@@ -53,8 +63,14 @@ public class CatalogoUniversosCargos {
         return switch (universo) {
             case DOCENTE -> idsComunes(categoriaRepository.findAllByDocente(ACTIVO));
             case NO_DOCENTE -> idsComunes(categoriaRepository.findAllByNoDocente(ACTIVO));
-            case ETEC -> ids(categoriaRepository.findAllByPuntosGreaterThan(BigDecimal.ZERO));
+            case ETEC -> idsEtec(categoriaRepository.findAllByPuntosGreaterThan(BigDecimal.ZERO));
         };
+    }
+
+    private List<Integer> idsEtec(List<Categoria> categorias) {
+        List<Integer> ids = new ArrayList<>(ids(categorias));
+        ids.add(CATEGORIA_HORAS_ETEC);
+        return ids.stream().distinct().toList();
     }
 
     private List<Integer> idsComunes(List<Categoria> categorias) {

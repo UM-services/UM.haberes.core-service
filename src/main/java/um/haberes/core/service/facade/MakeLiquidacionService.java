@@ -14,10 +14,12 @@ import um.haberes.core.hexagonal.cursos.curso_fusion.application.service.CursoFu
 import um.haberes.core.hexagonal.cursos.curso_fusion.domain.model.CursoFusion;
 import um.haberes.core.hexagonal.etec.arraigo_escala.application.service.EscalaArraigoEtecService;
 import um.haberes.core.hexagonal.etec.control_etec.application.service.ControlEtecService;
+import um.haberes.core.hexagonal.etec.hora_escala.domain.model.AgrupadorHorasEtec;
 import um.haberes.core.hexagonal.etec.liquidacion.application.service.EtecLiquidacionCalculator;
 import um.haberes.core.hexagonal.liquidaciones.cargo.application.service.CargoService;
 import um.haberes.core.hexagonal.liquidaciones.cargo.domain.model.Cargo;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.model.UniversoCargos;
+import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.application.service.CatalogoUniversosCargos;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.ports.in.GenerarCargosLegajoUseCase;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.application.service.CargoLiquidacionService;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.model.CargoLiquidacion;
@@ -634,10 +636,18 @@ public class MakeLiquidacionService {
         }
 
         if (esCargoEtec(categoria) && state.getControlEtec() != null) {
-            state.getEtecAcumulado().acumular(basico, antiguedad,
-                    state.getControlEtec().getPorcentajePresentismo(),
-                    state.getControlEtec().getPorcentajeAdicionalCarrera(),
-                    state.getPorcentajeArraigoEtec());
+            if (CatalogoUniversosCargos.esCategoriaHorasEtec(categoria)) {
+                state.getEtecAcumulado().acumularHoras(basico, antiguedad,
+                        state.getControlEtec().getPorcentajePresentismo(),
+                        state.getControlEtec().getPorcentajeAdicionalCarrera(),
+                        state.getPorcentajeArraigoEtec(),
+                        horasClaseEtec(legajoId, anho, mes, cargoLiquidacion));
+            } else {
+                state.getEtecAcumulado().acumularPuntos(basico, antiguedad,
+                        state.getControlEtec().getPorcentajePresentismo(),
+                        state.getControlEtec().getPorcentajeAdicionalCarrera(),
+                        state.getPorcentajeArraigoEtec());
+            }
         }
 
         if (categoria.getNoDocente() == 1) {
@@ -675,8 +685,20 @@ public class MakeLiquidacionService {
     }
 
     private boolean esCargoEtec(Categoria categoria) {
-        return categoria != null && categoria.getPuntos() != null
-                && categoria.getPuntos().compareTo(BigDecimal.ZERO) > 0;
+        return CatalogoUniversosCargos.esCategoriaEtec(categoria);
+    }
+
+    /**
+     * Horas de clase que originaron el cargo por horas ETEC (categoría 2002), tomadas de los cursos
+     * de la facultad 15 del legajo en la sede del cargo. Se recalculan con el mismo agrupador que usa
+     * la generación, así que no hace falta persistirlas en el cargo.
+     */
+    private BigDecimal horasClaseEtec(Long legajoId, Integer anho, Integer mes,
+                                      CargoLiquidacion cargoLiquidacion) {
+        Integer geograficaId = cargoLiquidacion.getDependencia() == null ? null
+                : cargoLiquidacion.getDependencia().getGeograficaId();
+        return AgrupadorHorasEtec.horasEnSede(
+                cursoCargoService.findAllByLegajo(legajoId, anho, mes), legajoId, geograficaId);
     }
 
     /**

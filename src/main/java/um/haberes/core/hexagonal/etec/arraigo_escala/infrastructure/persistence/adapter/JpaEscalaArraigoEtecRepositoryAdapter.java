@@ -25,9 +25,16 @@ public class JpaEscalaArraigoEtecRepositoryAdapter implements EscalaArraigoEtecR
                 .toList();
     }
 
+    /**
+     * El derived delete deja los DELETE encolados y Hibernate ejecuta los INSERT antes que
+     * los DELETE en el flush: al reemplazar la escala, un tramo con el mismo `anios_minimos`
+     * se insertaría mientras el anterior sigue en la tabla y chocaría con la clave única.
+     * El flush fuerza el borrado antes de que el caso de uso inserte los tramos nuevos.
+     */
     @Override
     public void deleteAll() {
         repository.deleteAll();
+        repository.flush();
     }
 
     @Override
