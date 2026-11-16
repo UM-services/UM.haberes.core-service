@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import um.haberes.core.hexagonal.liquidaciones.acreditacion.application.exception.AcreditacionException;
 import um.haberes.core.hexagonal.liquidaciones.acreditacion.application.service.AcreditacionService;
 import um.haberes.core.hexagonal.liquidaciones.acreditacion.domain.model.Acreditacion;
+import um.haberes.core.hexagonal.liquidaciones.acreditacion.infrastructure.web.dto.AcreditacionLimiteNovedadesRequest;
 import um.haberes.core.hexagonal.liquidaciones.acreditacion.infrastructure.web.dto.AcreditacionRequest;
 import um.haberes.core.hexagonal.liquidaciones.acreditacion.infrastructure.web.dto.AcreditacionResponse;
 import um.haberes.core.hexagonal.liquidaciones.acreditacion.infrastructure.web.mapper.AcreditacionDtoMapper;
@@ -71,6 +73,19 @@ public class AcreditacionController {
     public ResponseEntity<AcreditacionResponse> add(@Valid @RequestBody AcreditacionRequest request) {
         Acreditacion created = acreditacionService.add(acreditacionDtoMapper.toDomain(request));
         return new ResponseEntity<>(acreditacionDtoMapper.toResponse(created), HttpStatus.CREATED);
+    }
+
+    @PatchMapping("/{acreditacionId}")
+    public ResponseEntity<AcreditacionResponse> updateLimiteNovedades(
+            @Valid @RequestBody AcreditacionLimiteNovedadesRequest request,
+            @PathVariable Long acreditacionId) {
+        try {
+            Acreditacion updated = acreditacionService.updateLimiteNovedades(
+                    acreditacionId, request.getLimiteNovedades());
+            return ResponseEntity.ok(acreditacionDtoMapper.toResponse(updated));
+        } catch (AcreditacionException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
     }
 
     @PutMapping("/{acreditacionId}")

@@ -1,5 +1,6 @@
 package um.haberes.core.hexagonal.liquidaciones.acreditacion.application.service;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import um.haberes.core.hexagonal.liquidaciones.acreditacion.domain.ports.in.Dele
 import um.haberes.core.hexagonal.liquidaciones.acreditacion.domain.ports.in.GetAllAcreditacionesUseCase;
 import um.haberes.core.hexagonal.liquidaciones.acreditacion.domain.ports.in.GetAcreditacionByIdUseCase;
 import um.haberes.core.hexagonal.liquidaciones.acreditacion.domain.ports.in.GetAcreditacionByPeriodoUseCase;
+import um.haberes.core.hexagonal.liquidaciones.acreditacion.domain.ports.in.UpdateAcreditacionLimiteNovedadesUseCase;
 import um.haberes.core.hexagonal.liquidaciones.acreditacion.domain.ports.in.UpdateAcreditacionUseCase;
 
 @Service
@@ -24,6 +26,7 @@ public class AcreditacionService {
     private final CreateAcreditacionUseCase createAcreditacionUseCase;
     private final UpdateAcreditacionUseCase updateAcreditacionUseCase;
     private final DeleteAcreditacionUseCase deleteAcreditacionUseCase;
+    private final UpdateAcreditacionLimiteNovedadesUseCase updateAcreditacionLimiteNovedadesUseCase;
 
     public List<Acreditacion> findAll() {
         return getAllAcreditacionesUseCase.getAllAcreditaciones();
@@ -45,6 +48,12 @@ public class AcreditacionService {
 
     public Acreditacion update(Acreditacion acreditacion, Long acreditacionId) {
         return updateAcreditacionUseCase.updateAcreditacion(acreditacionId, acreditacion)
+                .orElseThrow(() -> new AcreditacionException(acreditacionId));
+    }
+
+    public Acreditacion updateLimiteNovedades(Long acreditacionId, OffsetDateTime limiteNovedades) {
+        return updateAcreditacionLimiteNovedadesUseCase
+                .updateLimiteNovedades(acreditacionId, limiteNovedades)
                 .orElseThrow(() -> new AcreditacionException(acreditacionId));
     }
 
