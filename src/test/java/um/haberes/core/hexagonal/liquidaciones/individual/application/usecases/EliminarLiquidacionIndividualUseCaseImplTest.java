@@ -95,7 +95,7 @@ class EliminarLiquidacionIndividualUseCaseImplTest {
     }
 
     private LiquidacionView liquidacion(byte bloqueado) {
-        return new LiquidacionView(1L, ANHO, MES, bloqueado, 1, "S", BigDecimal.ZERO, BigDecimal.ZERO,
+        return new LiquidacionView(1L, 1001L, ANHO, MES, bloqueado, 1, "S", BigDecimal.ZERO, BigDecimal.ZERO,
                 BigDecimal.ZERO, BigDecimal.ZERO, null, null, 7, "B");
     }
 }

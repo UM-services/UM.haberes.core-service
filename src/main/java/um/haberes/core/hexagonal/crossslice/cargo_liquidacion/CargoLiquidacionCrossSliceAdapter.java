@@ -24,6 +24,13 @@ public class CargoLiquidacionCrossSliceAdapter implements CargoLiquidacionCrossS
     }
 
     @Override
+    public List<CargoLiquidacionView> porPeriodo(Integer anho, Integer mes) {
+        return cargoLiquidacionService.findAllByPeriodo(anho, mes).stream()
+                .map(this::toView)
+                .toList();
+    }
+
+    @Override
     public boolean tieneCargosActivos(Long legajoId, Integer anho, Integer mes) {
         return !cargoLiquidacionService.findAllActivosByLegajo(legajoId, anho, mes).isEmpty();
     }
@@ -32,7 +39,8 @@ public class CargoLiquidacionCrossSliceAdapter implements CargoLiquidacionCrossS
         String acronimo = cargo.getDependencia() == null ? null : cargo.getDependencia().getAcronimo();
         boolean docente = cargo.getCategoria() != null && cargo.getCategoria().getDocente() != null
                 && cargo.getCategoria().getDocente() == 1;
-        return new CargoLiquidacionView(cargo.getCargoLiquidacionId(), cargo.getDependenciaId(), acronimo,
+        return new CargoLiquidacionView(cargo.getCargoLiquidacionId(), cargo.getLegajoId(),
+                cargo.getDependenciaId(), acronimo,
                 cargo.getFechaDesde(), cargo.getFechaHasta(), cargo.getCategoriaId(),
                 cargo.getCategoriaNombre(), cargo.getCategoriaBasico(), cargo.getEstadoDocente(),
                 cargo.getHorasJornada(), cargo.getJornada(), cargo.getPresentismo(),

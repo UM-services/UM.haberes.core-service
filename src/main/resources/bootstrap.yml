@@ -100,7 +100,7 @@ haberes:
     cleanup-delay-ms: ${HABERES_AUDIT_CLEANUP_DELAY_MS:3600000}
     cleanup-initial-delay-ms: ${HABERES_AUDIT_CLEANUP_INITIAL_DELAY_MS:60000}
     mask-fields: ${HABERES_AUDIT_MASK_FIELDS:password,cbu,cuenta,documento}
-    excluded-entities: ${HABERES_AUDIT_EXCLUDED_ENTITIES:BuildEntity,ConversionLogEntity}
+    excluded-entities: ${HABERES_AUDIT_EXCLUDED_ENTITIES:BuildEntity,ConversionLogEntity,LiquidacionGeneralProcesoEntity,LiquidacionGeneralDetalleEntity}
     # RESUMEN de operaciones masivas (item/item_version). false = auditar fila por fila.
     bulk-enabled: ${HABERES_AUDIT_BULK_ENABLED:true}
     summary-entities: ${HABERES_AUDIT_SUMMARY_ENTITIES:ItemEntity,ItemVersionEntity,CargoLiquidacionEntity,CargoLiquidacionVersionEntity}
