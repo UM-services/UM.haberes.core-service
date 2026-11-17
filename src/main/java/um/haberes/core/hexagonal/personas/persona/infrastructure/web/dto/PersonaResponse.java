@@ -82,6 +82,7 @@ public class PersonaResponse {
      * @deprecated sin efecto; se retira cuando se jubile el cliente VB6.
      */
     @Deprecated
+    @Builder.Default
     private Byte directivoEtec = 0;
 
     public String getApellidoNombre() {
