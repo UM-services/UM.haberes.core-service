@@ -15,6 +15,7 @@ import um.haberes.core.model.SeguridadSocialEntity;
 import um.haberes.core.service.SeguridadSocialService;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -90,6 +91,25 @@ class SeguridadSocialControllerTest {
 
         mockMvc.perform(get("/api/haberes/core/seguridadSocial/unique/{anho}/{mes}", 2024, 1))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void findByUniqueOpcional_whenPeriodoExists_returnsOkWithSeguridadSocialBody() throws Exception {
+        when(service.findByUniqueOpcional(2024, 6)).thenReturn(Optional.of(sampleSeguridadSocial()));
+
+        mockMvc.perform(get("/api/haberes/core/seguridadSocial/unique/{anho}/{mes}/opcional", 2024, 6))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(SEGURIDAD_SOCIAL_JSON, JsonCompareMode.STRICT));
+    }
+
+    @Test
+    void findByUniqueOpcional_whenPeriodoIsNew_returnsOkWithEmptyBody() throws Exception {
+        when(service.findByUniqueOpcional(2024, 1)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/api/haberes/core/seguridadSocial/unique/{anho}/{mes}/opcional", 2024, 1))
+                .andExpect(status().isOk())
+                .andExpect(content().string(""));
     }
 
     @Test
