@@ -24,19 +24,19 @@ import java.time.OffsetDateTime;
 public class UsuarioEntity extends AuditableEntity {
 
     @Id
-    private Long legajoId = null;
+    private Long legajoId;
 
     @Builder.Default
     private String password = "";
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXX", timezone = "UTC")
-    private OffsetDateTime lastLog = null;
+    private OffsetDateTime lastLog;
 
-    private Long build = null;
+    private Long build;
 
-    private Long usuarioId = null;
+    private Long usuarioId;
 
-    private Integer facultadId = null;
+    private Integer facultadId;
 
     @Builder.Default
     private Byte administrador = 0;
