@@ -1,0 +1,52 @@
+---
+title: "Acreditación: Generación del Archivo Bancario"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant Ctrl as ArchivoAcreditacionController
+    participant Svc as ArchivoAcreditacionService
+    participant Gen as GenerarArchivoAcreditacionUseCase
+    participant Prep as PrepararAcreditacionesUseCase
+    participant BancoSvc as LegajoBancoService
+    participant ExcSvc as ExcluidoService
+    participant LiqSvc as LiquidacionService
+    participant AcrSvc as AcreditacionService
+    participant PagoSvc as OrdenPagoService (facade)
+    participant Layout as SantanderLayout
+
+    Usuario->>Ctrl: POST /acreditacion/archivo/santander (ArchivoAcreditacionRequest)
+    Ctrl->>Svc: generarSantander(filtro)
+    Svc->>Gen: generarSantander(filtro)
+
+    alt masivo (individual = false)
+        Gen->>Prep: prepararPeriodo o prepararPorCodigo
+        Prep->>BancoSvc: copiar los CBU del último período si el legajo no tiene filas
+        Prep->>Prep: repartir el neto del ítem 99 (fijo topado al resto, porcentaje y saldo a resto = 1)
+        Gen->>BancoSvc: findAllSantander o findAllSantanderConCodigo
+    else individual
+        Gen->>BancoSvc: findByUnique(legajoId, anho, mes, cbu) por legajo informado
+    end
+
+    BancoSvc-->>Gen: filas de legajo_banco con CBU, persona y neto a acreditar
+    Gen->>ExcSvc: findAllByPeriodo(anho, mes) sólo en el masivo
+
+    loop cada fila del banco
+        Gen->>Gen: evaluar motivos de rechazo (CBU, CUIL, importe, banco y excluido)
+        alt sin motivos
+            Gen->>Layout: detalle(...)
+            Gen->>LiqSvc: acreditar la liquidación del legajo
+        else con motivos
+            Gen->>Gen: acumular en la grilla de rechazos
+        end
+    end
+
+    Gen->>Layout: header, trailer y serializar (650 caracteres, CRLF, windows-1252)
+
+    opt masivo con al menos un legajo aceptado
+        Gen->>AcrSvc: marcar el período como acreditado
+        Gen->>PagoSvc: generateOrdenPago(total del banco)
+    end
+
+    Gen-->>Ctrl: ArchivoAcreditacion (Base64, cantidad, total, rechazos)
+    Ctrl-->>Usuario: 200 OK o 422 si ningún legajo pudo acreditarse

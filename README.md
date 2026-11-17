@@ -19,7 +19,7 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**2.2.0** (2026-11-16)
+**2.4.0** (2026-11-16)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
@@ -57,6 +57,7 @@ Liquidaciones:
 - `docs/diagrams/flujo-novedad-gestion.mmd`
 - `docs/diagrams/flujo-novedad-file.mmd`
 - `docs/diagrams/flujo-acreditacion.mmd`
+- `docs/diagrams/flujo-archivo-acreditacion.mmd`
 - `docs/diagrams/flujo-orden-pago.mmd`
 - `docs/diagrams/flujo-catalogos-liquidacion.mmd`
 - `docs/diagrams/flujo-etec-antiguedad.mmd`
@@ -318,6 +319,19 @@ Los tres procesos masivos responden `202` con `procesoId`, `409 PROCESO_EN_CURSO
 `liquidacion_general_proceso`/`liquidacion_general_detalle` (aplicar
 `sql/019_liquidacion_general_proceso.sql` antes de usarlos).
 
+### Acreditación bancaria (archivo Santander y Otros Bancos)
+- `POST /api/haberes/core/acreditacion/archivo/santander` - Generar el archivo de acreditación Santander (masivo o individual según el body)
+- `POST /api/haberes/core/acreditacion/archivo/otrosbancos` - Generar el archivo de acreditación del resto de los bancos (acuerdo `02`, o `03`/forma de pago `57` con `cci`)
+- `POST /api/haberes/core/legajobanco/preparar/{anho}/{mes}` - Preparar las acreditaciones del período completo
+- `POST /api/haberes/core/legajobanco/preparar/codigo/{anho}/{mes}/{codigoId}` - Preparar sólo los legajos con novedades del código
+- `POST /api/haberes/core/legajobanco/preparar/{legajoId}/{anho}/{mes}` - Preparar un legajo y devolver sus filas
+
+El body común es `{anho, mes, fechaPago, numEnvio, salida, dependenciaId, codigoId, cci, individual, legajos}`;
+en el modo individual, `legajos` lleva `{legajoId, cbu, acreditado}`. La respuesta devuelve el archivo en
+Base64 (líneas de 650 caracteres, CRLF y windows-1252), la cantidad, el total, los rechazos y si el período
+quedó acreditado; responde `422` si ningún legajo pudo acreditarse. El masivo marca la acreditación del
+período y genera la orden de pago.
+
 ### Cargos
 - `GET /api/haberes/core/cargo/legajo/{legajoId}` - Obtener cargos por legajo
 - `GET /api/haberes/core/cargo/{cargoId}` - Obtener cargo
@@ -360,6 +374,12 @@ Los tres procesos masivos responden `202` con `procesoId`, `409 PROCESO_EN_CURSO
 ### Control de período
 - `GET /api/haberes/core/control/periodo/{anho}/{mes}/opcional` - Control del período (`200` con cuerpo vacío si todavía no existe)
 - `POST /api/haberes/core/control/copiar/{anho}/{mes}` - Crear el período copiando el mes anterior (`409` si el destino existe, `404` si no hay origen)
+
+### Seguridad social (Formulario 931)
+- `GET /api/haberes/core/seguridadSocial/unique/{anho}/{mes}` - Totales del F.931 del período (`400` si no existe)
+- `GET /api/haberes/core/seguridadSocial/unique/{anho}/{mes}/opcional` - Ídem, con `200` y cuerpo vacío si todavía no existe
+- `POST /api/haberes/core/seguridadSocial/` - Alta de los totales del período
+- `PUT /api/haberes/core/seguridadSocial/{seguridadSocialId}` - Reemplazo total de los totales del período
 
 ### Personas
 - `GET /api/haberes/core/persona/` - Listar personas

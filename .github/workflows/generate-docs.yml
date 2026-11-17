@@ -136,6 +136,7 @@ jobs:
                   { file: 'diagrams/flujo-novedad-gestion.mmd', title: '🔄 Secuencia: Gestión de Novedades' },
                   { file: 'diagrams/flujo-novedad-file.mmd', title: '📤 Secuencia: Carga Masiva de Novedades (Excel)' },
                   { file: 'diagrams/flujo-acreditacion.mmd', title: '💳 Secuencia: Acreditación y Pago' },
+                  { file: 'diagrams/flujo-archivo-acreditacion.mmd', title: '🏦 Secuencia: Generación del Archivo de Acreditación Bancaria' },
                   { file: 'diagrams/flujo-orden-pago.mmd', title: '💵 Secuencia: Orden de Pago' },
                   { file: 'diagrams/flujo-contable-asiento.mmd', title: '📒 Secuencia: Cierre Contable por Legajo' },
                   { file: 'diagrams/flujo-contabilidad-imputaciones.mmd', title: '🧾 Secuencia: Imputaciones Contables' },
