@@ -1,5 +1,6 @@
 package um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.out;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,6 +9,8 @@ import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.Categoria;
 public interface CategoriaRepository {
 
     List<Categoria> findAll();
+
+    List<Categoria> findAllByPuntosGreaterThan(BigDecimal puntos);
 
     List<Categoria> findAllByCategoriaIdIn(List<Integer> categoriaIds);
 

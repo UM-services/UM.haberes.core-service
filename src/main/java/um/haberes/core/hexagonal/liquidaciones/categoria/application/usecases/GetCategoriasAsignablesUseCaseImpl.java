@@ -1,5 +1,6 @@
 package um.haberes.core.hexagonal.liquidaciones.categoria.application.usecases;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -20,9 +21,13 @@ public class GetCategoriasAsignablesUseCaseImpl implements GetCategoriasAsignabl
     @Override
     public List<Categoria> getCategoriasAsignables() {
         List<Integer> asignadas = designacionRepository.findCategoriaIdsAsignadas();
-        if (asignadas.isEmpty()) {
-            return categoriaRepository.findAll();
-        }
-        return categoriaRepository.findAllByCategoriaIdNotIn(asignadas);
+        List<Categoria> categorias = asignadas.isEmpty()
+                ? categoriaRepository.findAll()
+                : categoriaRepository.findAllByCategoriaIdNotIn(asignadas);
+        // Los cargos con puntos (ETEC) se asignan por su propio circuito, no por designaciones.
+        return categorias.stream()
+                .filter(categoria -> categoria.getPuntos() == null
+                        || categoria.getPuntos().compareTo(BigDecimal.ZERO) == 0)
+                .toList();
     }
 }

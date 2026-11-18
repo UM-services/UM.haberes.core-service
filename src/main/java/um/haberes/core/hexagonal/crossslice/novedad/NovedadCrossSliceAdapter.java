@@ -3,6 +3,8 @@ package um.haberes.core.hexagonal.crossslice.novedad;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
@@ -11,6 +13,7 @@ import um.haberes.core.hexagonal.crossslice.novedad.model.NovedadView;
 import um.haberes.core.hexagonal.liquidaciones.novedad.application.exception.NovedadException;
 import um.haberes.core.hexagonal.liquidaciones.novedad.application.service.NovedadService;
 import um.haberes.core.hexagonal.liquidaciones.novedad.domain.model.Novedad;
+import um.haberes.core.service.view.NovedadExisteService;
 
 /** Adaptador cross-slice de novedades. */
 @Component
@@ -19,11 +22,20 @@ public class NovedadCrossSliceAdapter implements NovedadCrossSlice {
 
     private final NovedadService novedadService;
 
+    private final NovedadExisteService novedadExisteService;
+
     @Override
     public List<NovedadView> porLegajo(Long legajoId, Integer anho, Integer mes) {
         return novedadService.findAllByLegajo(legajoId, anho, mes).stream()
                 .map(this::toView)
                 .toList();
+    }
+
+    @Override
+    public Set<Long> legajosConNovedades(Integer anho, Integer mes) {
+        return novedadExisteService.findAllByPeriodo(anho, mes).stream()
+                .map(novedadExiste -> novedadExiste.getLegajoId())
+                .collect(Collectors.toSet());
     }
 
     @Override

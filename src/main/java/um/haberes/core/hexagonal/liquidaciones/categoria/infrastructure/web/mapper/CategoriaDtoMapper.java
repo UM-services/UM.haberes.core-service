@@ -37,6 +37,9 @@ public class CategoriaDtoMapper {
         if (request.getEstadoDocente() != null) {
             builder.estadoDocente(request.getEstadoDocente());
         }
+        if (request.getPuntos() != null) {
+            builder.puntos(request.getPuntos());
+        }
         return builder.build();
     }
 
@@ -52,6 +55,7 @@ public class CategoriaDtoMapper {
                 .noDocente(domain.getNoDocente())
                 .liquidaPorHora(domain.getLiquidaPorHora())
                 .estadoDocente(domain.getEstadoDocente())
+                .puntos(domain.getPuntos())
                 .build();
     }
 

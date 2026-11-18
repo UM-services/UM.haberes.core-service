@@ -122,7 +122,7 @@ class ObtenerFichaLiquidacionIndividualUseCaseImplTest {
     }
 
     private CargoLiquidacionView cargo(boolean docente) {
-        return new CargoLiquidacionView(1L, 7, "FING", OffsetDateTime.now(), OffsetDateTime.now(), 1,
+        return new CargoLiquidacionView(1L, 1001L, 7, "FING", OffsetDateTime.now(), OffsetDateTime.now(), 1,
                 "PROFESOR", BigDecimal.TEN, BigDecimal.ZERO, BigDecimal.TEN, 1, 0, "A", docente);
     }
 }

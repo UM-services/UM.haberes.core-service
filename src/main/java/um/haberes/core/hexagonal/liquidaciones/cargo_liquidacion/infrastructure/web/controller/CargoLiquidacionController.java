@@ -25,6 +25,7 @@ import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.model.Ca
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.infrastructure.web.dto.CargoLiquidacionPeriodoResponse;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.infrastructure.web.dto.CargoLiquidacionRequest;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.infrastructure.web.dto.CargoLiquidacionResponse;
+import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.infrastructure.web.dto.ReemplazoCargosRequest;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.infrastructure.web.mapper.CargoLiquidacionDtoMapper;
 import um.haberes.core.service.view.CargoLiquidacionPeriodoService;
 
@@ -146,6 +147,35 @@ public class CargoLiquidacionController {
 				.map(cargoLiquidacionDtoMapper::toDomain)
 				.collect(Collectors.toList());
 		return new ResponseEntity<>(toResponseList(service.saveAll(cargos, version)), HttpStatus.OK);
+	}
+
+	@PostMapping("/reemplazar/periodo/{anho}/{mes}")
+	public ResponseEntity<List<CargoLiquidacionResponse>> replaceByPeriodo(@PathVariable Integer anho,
+			@PathVariable Integer mes, @Valid @RequestBody ReemplazoCargosRequest request) {
+		try {
+			List<CargoLiquidacion> cargos = request.getCargos().stream()
+					.map(cargoLiquidacionDtoMapper::toDomain)
+					.collect(Collectors.toList());
+			return new ResponseEntity<>(toResponseList(
+					service.replaceByPeriodo(anho, mes, request.getCategoriaIds(), cargos)), HttpStatus.OK);
+		} catch (CargoLiquidacionException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
+	}
+
+	@PostMapping("/reemplazar/legajo/{legajoId}/{anho}/{mes}")
+	public ResponseEntity<List<CargoLiquidacionResponse>> replaceByLegajo(@PathVariable Long legajoId,
+			@PathVariable Integer anho, @PathVariable Integer mes,
+			@Valid @RequestBody ReemplazoCargosRequest request) {
+		try {
+			List<CargoLiquidacion> cargos = request.getCargos().stream()
+					.map(cargoLiquidacionDtoMapper::toDomain)
+					.collect(Collectors.toList());
+			return new ResponseEntity<>(toResponseList(
+					service.replaceByLegajo(legajoId, anho, mes, request.getCategoriaIds(), cargos)), HttpStatus.OK);
+		} catch (CargoLiquidacionException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
 	}
 
 	@DeleteMapping("/periodo/{anho}/{mes}")

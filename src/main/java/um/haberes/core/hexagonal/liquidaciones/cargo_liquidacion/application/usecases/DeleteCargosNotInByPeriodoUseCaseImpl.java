@@ -1,5 +1,6 @@
 package um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.application.usecases;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -11,20 +12,33 @@ import um.haberes.core.audit.AuditBulkService;
 import um.haberes.core.audit.BulkContext;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.ports.in.DeleteCargosNotInByPeriodoUseCase;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.ports.out.CargoLiquidacionRepository;
+import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.Categoria;
+import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.out.CategoriaRepository;
 
 @Component
 @RequiredArgsConstructor
 public class DeleteCargosNotInByPeriodoUseCaseImpl implements DeleteCargosNotInByPeriodoUseCase {
 
     private final CargoLiquidacionRepository cargoLiquidacionRepository;
+
+    private final CategoriaRepository categoriaRepository;
+
     private final AuditBulkService auditBulk;
 
     @Transactional
     @Override
     public void deleteCargosNotInByPeriodo(List<Long> legajoIds, Integer anho, Integer mes) {
+        // Los cargos ETEC no se depuran con la planilla de cargos: dependen de la asignación
+        // vigente en etec_asignacion_cargo, no de que el legajo tenga liquidación en el período.
+        List<Integer> categoriasEtec = categoriaRepository.findAllByPuntosGreaterThan(BigDecimal.ZERO)
+                .stream()
+                .map(Categoria::getCategoriaId)
+                .filter(categoriaId -> categoriaId != null)
+                .toList();
         try (AuditBulkScope ignored = auditBulk.begin(
                 BulkContext.of("depuracion-cargos-periodo", anho, mes, null))) {
-            cargoLiquidacionRepository.deleteAllByLegajoIdNotInAndAnhoAndMes(legajoIds, anho, mes);
+            cargoLiquidacionRepository.deleteAllByLegajoIdNotInAndAnhoAndMesAndCategoriaIdNotIn(legajoIds,
+                    anho, mes, categoriasEtec);
         }
     }
 }

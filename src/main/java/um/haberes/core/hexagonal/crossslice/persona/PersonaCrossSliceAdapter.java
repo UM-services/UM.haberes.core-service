@@ -1,5 +1,6 @@
 package um.haberes.core.hexagonal.crossslice.persona;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
@@ -30,6 +31,13 @@ public class PersonaCrossSliceAdapter implements PersonaCrossSlice {
         } catch (PersonaException e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public List<PersonaView> liquidables() {
+        return personaService.findAllLiquidables().stream()
+                .map(this::toView)
+                .toList();
     }
 
     @Override

@@ -15,6 +15,8 @@ import um.haberes.core.model.UsuarioEntity;
 import um.haberes.core.model.dto.CambiarClaveRequest;
 import um.haberes.core.service.UsuarioService;
 
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -61,6 +63,7 @@ class UsuarioControllerTest {
               "build": 42,
               "usuarioId": 9,
               "facultadId": 1,
+              "administrador": 0,
               "created": null,
               "updated": null
             }
@@ -99,6 +102,53 @@ class UsuarioControllerTest {
         when(service.updateLastLog(99L, 42L)).thenThrow(new UsuarioException(99L));
 
         mockMvc.perform(get("/api/haberes/core/usuario/lastlog/{legajoId}/{build}", 99, 42))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void findAll_returnsResumenWithoutPassword() throws Exception {
+        when(service.findAll()).thenReturn(List.of(sampleUsuario()));
+
+        mockMvc.perform(get("/api/haberes/core/usuario/"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("""
+                        [
+                          {
+                            "legajoId": 100,
+                            "usuarioId": 9,
+                            "facultadId": 1,
+                            "administrador": 0
+                          }
+                        ]
+                        """, JsonCompareMode.STRICT));
+    }
+
+    @Test
+    void setAdministrador_returnsOkWithResumen() throws Exception {
+        UsuarioEntity admin = sampleUsuario();
+        admin.setAdministrador((byte) 1);
+        admin.setFacultadId(null);
+        when(service.setAdministrador(100L, 1)).thenReturn(admin);
+
+        mockMvc.perform(put("/api/haberes/core/usuario/{legajoId}/administrador/{administrador}", 100, 1))
+                .andExpect(status().isOk())
+                .andExpect(content().json("""
+                        {
+                          "legajoId": 100,
+                          "usuarioId": 9,
+                          "facultadId": null,
+                          "administrador": 1
+                        }
+                        """, JsonCompareMode.STRICT));
+    }
+
+    @Test
+    void setAdministrador_whenServiceThrowsIllegalArgument_returnsBadRequest() throws Exception {
+        when(service.setAdministrador(100L, 1))
+                .thenThrow(new IllegalArgumentException("ERROR: Usuario con facultad asignada NO puede ser administrador"));
+
+        mockMvc.perform(put("/api/haberes/core/usuario/{legajoId}/administrador/{administrador}", 100, 1))
                 .andExpect(status().isBadRequest());
     }
 

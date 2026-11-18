@@ -1,5 +1,6 @@
 package um.haberes.core.hexagonal.crossslice.persona;
 
+import java.util.List;
 import java.util.Optional;
 
 import um.haberes.core.hexagonal.crossslice.persona.model.PersonaView;
@@ -8,6 +9,9 @@ import um.haberes.core.hexagonal.crossslice.persona.model.PersonaView;
 public interface PersonaCrossSlice {
 
     Optional<PersonaView> porLegajo(Long legajoId);
+
+    /** Personas con {@code liquida = "S"}, ordenadas por apellido y nombre. */
+    List<PersonaView> liquidables();
 
     /**
      * Marca la persona como no liquidable ({@code liquida = "N"}).

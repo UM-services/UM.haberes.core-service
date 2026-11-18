@@ -18,13 +18,19 @@ import um.haberes.core.hexagonal.liquidaciones.acreditacion.infrastructure.web.c
 import um.haberes.core.hexagonal.liquidaciones.acreditacion.infrastructure.web.mapper.AcreditacionDtoMapper;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -164,5 +170,89 @@ class AcreditacionControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isNotFound());
+    }
+
+    private Acreditacion sampleAcreditacionConLimite() {
+        Acreditacion acreditacion = sampleAcreditacion();
+        acreditacion.setLimiteNovedades(OffsetDateTime.of(2026, 11, 30, 23, 59, 59, 0, ZoneOffset.ofHours(-3)));
+        return acreditacion;
+    }
+
+    private static final String ACREDITACION_CON_LIMITE_JSON = """
+            {
+              "acreditacionId": 1,
+              "anho": 2024,
+              "mes": 6,
+              "acreditado": 1,
+              "limiteNovedades": "2026-12-01T02:59:59Z",
+              "fechaContable": null,
+              "ordenContable": 5,
+              "sueldosOriginal": 1000.50,
+              "sueldosAjustados": 1200.75,
+              "contribucionesPatronales": 300.25
+                                        }
+            """;
+
+    @Test
+    void updateLimiteNovedades_returnsOkWithOnlyTheLimitChanged() throws Exception {
+        String requestJson = """
+                { "limiteNovedades": "2026-11-30T23:59:59-0300" }
+                """;
+        when(service.updateLimiteNovedades(eq(1L), any(OffsetDateTime.class)))
+                .thenReturn(sampleAcreditacionConLimite());
+
+        mockMvc.perform(patch("/api/haberes/core/acreditacion/{acreditacionId}", 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(ACREDITACION_CON_LIMITE_JSON, JsonCompareMode.STRICT));
+
+        verify(service).updateLimiteNovedades(
+                eq(1L),
+                eq(OffsetDateTime.of(2026, 12, 1, 2, 59, 59, 0, ZoneOffset.UTC)));
+    }
+
+    @Test
+    void updateLimiteNovedades_whenServiceThrowsAcreditacionException_returnsNotFound() throws Exception {
+        String requestJson = """
+                { "limiteNovedades": "2026-11-30T23:59:59-0300" }
+                """;
+        when(service.updateLimiteNovedades(eq(99L), any(OffsetDateTime.class)))
+                .thenThrow(new AcreditacionException(99L));
+
+        mockMvc.perform(patch("/api/haberes/core/acreditacion/{acreditacionId}", 99)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateLimiteNovedades_withoutLimite_returnsBadRequest() throws Exception {
+        mockMvc.perform(patch("/api/haberes/core/acreditacion/{acreditacionId}", 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest());
+
+        verify(service, never()).updateLimiteNovedades(any(), any());
+    }
+
+    @Test
+    void add_acceptsTheLimitPayloadSentByTheFrontend() throws Exception {
+        String requestJson = """
+                { "anho": 2026, "mes": 12, "limiteNovedades": "2026-12-15T23:59:59-0300" }
+                """;
+        when(service.add(any(Acreditacion.class))).thenReturn(sampleAcreditacionConLimite());
+
+        mockMvc.perform(post("/api/haberes/core/acreditacion/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isCreated());
+
+        verify(service).add(argThat(acreditacion ->
+                acreditacion.getAnho() == 2026
+                        && acreditacion.getMes() == 12
+                        && acreditacion.getLimiteNovedades().equals(
+                                OffsetDateTime.of(2026, 12, 16, 2, 59, 59, 0, ZoneOffset.UTC))));
     }
 }

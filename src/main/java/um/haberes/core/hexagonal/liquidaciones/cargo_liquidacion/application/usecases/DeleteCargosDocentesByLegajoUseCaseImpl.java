@@ -1,5 +1,6 @@
 package um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.application.usecases;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +30,8 @@ public class DeleteCargosDocentesByLegajoUseCaseImpl implements DeleteCargosDoce
     @Override
     public void deleteCargosDocentesByLegajo(Long legajoId, Integer anho, Integer mes) {
         List<Integer> categoriaIds = categoriaRepository.findAllByDocente((byte) 1).stream()
+                .filter(categoria -> categoria.getPuntos() == null
+                        || categoria.getPuntos().compareTo(BigDecimal.ZERO) == 0)
                 .map(Categoria::getCategoriaId)
                 .collect(Collectors.toList());
         try (AuditBulkScope ignored = auditBulk.begin(

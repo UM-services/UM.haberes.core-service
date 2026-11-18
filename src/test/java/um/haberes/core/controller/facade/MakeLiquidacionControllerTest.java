@@ -123,7 +123,6 @@ class MakeLiquidacionControllerTest {
                               "localidadAfip": null,
                               "situacionAfip": 0,
                               "modeloContratacionAfip": null,
-                              "directivoEtec": 0,
                               "apellidoNombre": "Perez, Juan"
                             }
                                                                                   }

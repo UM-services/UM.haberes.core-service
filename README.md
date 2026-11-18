@@ -5,7 +5,7 @@
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1.2-6DB33F?logo=springboot&logoColor=white)
 ![Spring Cloud](https://img.shields.io/badge/Spring%20Cloud-2025.1.4-6DB33F?logo=spring&logoColor=white)
 ![Spring Data JPA](https://img.shields.io/badge/Spring%20Data%20JPA-6DB33F?logo=spring&logoColor=white)
-![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?logo=mysql&logoColor=white)
 ![Apache POI](https://img.shields.io/badge/Apache%20POI-6.0.0-D22128)
 ![OpenPDF](https://img.shields.io/badge/OpenPDF-3.0.5-blue)
 ![Springdoc OpenAPI](https://img.shields.io/badge/Springdoc%20OpenAPI-3.1.1-85EA2D?logo=swagger&logoColor=black)
@@ -13,12 +13,13 @@
 ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?logo=githubactions&logoColor=white)
 ![Maven](https://img.shields.io/badge/Maven-C71A36?logo=apachemaven&logoColor=white)
 ![JUnit](https://img.shields.io/badge/JUnit-25A162?logo=junit5&logoColor=white)
+![Caffeine](https://img.shields.io/badge/Caffeine-blue)
 
 Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permite la gestión integral de liquidaciones individuales y masivas, acreditaciones, reportes y administración de personal docente y no docente.
 
 ## Versión
 
-**1.26.0** (2026-11-09)
+**2.4.0** (2026-11-16)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
@@ -48,6 +49,7 @@ Arquitectura y modelo:
 Liquidaciones:
 - `docs/diagrams/flujo-liquidacion-sueldos.mmd`
 - `docs/diagrams/flujo-liquidacion-general.mmd`
+- `docs/diagrams/flujo-liquidacion-general-proceso.mmd`
 - `docs/diagrams/flujo-liquidacion-ciclo.mmd`
 - `docs/diagrams/flujo-liquidacion-individual.mmd`
 - `docs/diagrams/flujo-cargo-liquidacion.mmd`
@@ -55,9 +57,12 @@ Liquidaciones:
 - `docs/diagrams/flujo-novedad-gestion.mmd`
 - `docs/diagrams/flujo-novedad-file.mmd`
 - `docs/diagrams/flujo-acreditacion.mmd`
+- `docs/diagrams/flujo-archivo-acreditacion.mmd`
 - `docs/diagrams/flujo-orden-pago.mmd`
 - `docs/diagrams/flujo-catalogos-liquidacion.mmd`
 - `docs/diagrams/flujo-etec-antiguedad.mmd`
+- `docs/diagrams/flujo-etec-cargo-puntos.mmd`
+- `docs/diagrams/flujo-etec-liquidacion-puntos.mmd`
 - `docs/diagrams/flujo-cargo-clase.mmd`
 - `docs/diagrams/flujo-liquidacion-adicional.mmd`
 - `docs/diagrams/flujo-bono-individual.mmd`
@@ -149,7 +154,14 @@ logging:
     um.haberes.core: DEBUG
   file:
     name: logs/haberes-core.log
+
+haberes:
+  liquidacion-general:
+    concurrencia: 2
 ```
+
+`haberes.liquidacion-general.concurrencia` (default `2`) limita los hilos con los que el
+proceso masivo de liquidación general procesa los legajos del período.
 
 
 ## Auditoría de operaciones
@@ -177,7 +189,7 @@ logging:
 | `HABERES_AUDIT_REQUEST_EVENTS` | `true` | Emitir un evento por operación |
 | `HABERES_AUDIT_CHANGE_EVENTS` | `true` | Emitir un evento por cambio de entidad |
 | `HABERES_AUDIT_MASK_FIELDS` | `password,cbu,cuenta,documento` | Campos que se enmascaran |
-| `HABERES_AUDIT_EXCLUDED_ENTITIES` | `BuildEntity,ConversionLogEntity` | Entidades no auditadas |
+| `HABERES_AUDIT_EXCLUDED_ENTITIES` | `BuildEntity,ConversionLogEntity,LiquidacionGeneralProcesoEntity,LiquidacionGeneralDetalleEntity` | Entidades no auditadas |
 | `HABERES_AUDIT_MAX_ATTEMPTS` | `10` | Intentos antes de marcar `FAILED` |
 | `HABERES_AUDIT_BATCH_SIZE` | `200` | Eventos por lote del sender |
 | `HABERES_AUDIT_SENDER_DELAY_MS` | `2000` | Espera entre corridas del sender |
@@ -287,11 +299,38 @@ docker run -d \
 
 ### Liquidación individual (slice hexagonal)
 - `GET /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}` - Ficha agregada del legajo/período con las acciones habilitadas
-- `POST /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/cargos` - Regenerar cargos docentes y no docentes
+- `POST /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/cargos` - Regenerar cargos docentes, no docentes y ETEC (puntos y horas) del legajo/período
 - `POST /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/liquidar` - Liquidar el legajo/período (body opcional `{"forzar": true}`)
 - `DELETE /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/{forzar}` - Eliminar la liquidación del legajo/período
 - `POST /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/novedad` - Alta o actualización de una novedad
 - `DELETE /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/novedad/{novedadId}/{forzar}` - Eliminar una novedad del legajo/período
+
+### Liquidación general (slice hexagonal)
+- `GET /api/haberes/core/liquidacion-general/{anho}/{mes}` - Padrón agregado del período: acciones, resumen (docentes, no docentes, novedades, liquidados, bloqueados, neto negativo/cero y total neto) y filas por legajo
+- `POST /api/haberes/core/liquidacion-general/{anho}/{mes}/cargos` - Iniciar la generación masiva de cargos (`202` con `procesoId`; `409` si ya hay un proceso en curso)
+- `POST /api/haberes/core/liquidacion-general/{anho}/{mes}/liquidar` - Iniciar la liquidación masiva (body opcional `{"forzar": true}`)
+- `POST /api/haberes/core/liquidacion-general/{anho}/{mes}/eliminar` - Iniciar la eliminación masiva de liquidaciones (body opcional `{"forzar": true}`)
+- `GET /api/haberes/core/liquidacion-general/proceso/{procesoId}` - Estado y avance del proceso (`404` si no existe)
+- `GET /api/haberes/core/liquidacion-general/proceso/{procesoId}/detalle/{resultado}` - Resultados por legajo (`LIQUIDADO`, `ELIMINADO`, `GENERADO`, `OMITIDO`, `FALLIDO`)
+- `GET /api/haberes/core/liquidacion-general/procesos/{anho}/{mes}` - Procesos del período
+
+Los tres procesos masivos responden `202` con `procesoId`, `409 PROCESO_EN_CURSO` o `200` con
+`SIN_CONTROL` (salvo en eliminar) o `SIN_LIQUIDABLES` cuando no se inician. El avance se persiste en
+`liquidacion_general_proceso`/`liquidacion_general_detalle` (aplicar
+`sql/019_liquidacion_general_proceso.sql` antes de usarlos).
+
+### Acreditación bancaria (archivo Santander y Otros Bancos)
+- `POST /api/haberes/core/acreditacion/archivo/santander` - Generar el archivo de acreditación Santander (masivo o individual según el body)
+- `POST /api/haberes/core/acreditacion/archivo/otrosbancos` - Generar el archivo de acreditación del resto de los bancos (acuerdo `02`, o `03`/forma de pago `57` con `cci`)
+- `POST /api/haberes/core/legajobanco/preparar/{anho}/{mes}` - Preparar las acreditaciones del período completo
+- `POST /api/haberes/core/legajobanco/preparar/codigo/{anho}/{mes}/{codigoId}` - Preparar sólo los legajos con novedades del código
+- `POST /api/haberes/core/legajobanco/preparar/{legajoId}/{anho}/{mes}` - Preparar un legajo y devolver sus filas
+
+El body común es `{anho, mes, fechaPago, numEnvio, salida, dependenciaId, codigoId, cci, individual, legajos}`;
+en el modo individual, `legajos` lleva `{legajoId, cbu, acreditado}`. La respuesta devuelve el archivo en
+Base64 (líneas de 650 caracteres, CRLF y windows-1252), la cantidad, el total, los rechazos y si el período
+quedó acreditado; responde `422` si ningún legajo pudo acreditarse. El masivo marca la acreditación del
+período y genera la orden de pago.
 
 ### Cargos
 - `GET /api/haberes/core/cargo/legajo/{legajoId}` - Obtener cargos por legajo
@@ -299,18 +338,58 @@ docker run -d \
 - `POST /api/haberes/core/cargo/` - Crear cargo
 - `PUT /api/haberes/core/cargo/{cargoId}` - Actualizar cargo
 - `DELETE /api/haberes/core/cargo/{cargoId}` - Eliminar cargo
+- `POST /api/haberes/core/cargoliquidacion/reemplazar/periodo/{anho}/{mes}` - Reemplazar atómicamente los cargos del período para un conjunto de categorías
+- `POST /api/haberes/core/cargoliquidacion/reemplazar/legajo/{legajoId}/{anho}/{mes}` - Reemplazar atómicamente los cargos de un legajo para un conjunto de categorías
+- `POST /api/haberes/core/cargoliquidacion/generacion/legajo/{legajoId}/{anho}/{mes}` - Generar los cargos del legajo/período con todos los universos (docentes, no docentes y ETEC)
+- `POST /api/haberes/core/cargoliquidacion/generacion/etec/legajo/{legajoId}/{anho}/{mes}` - Regenerar sólo los cargos ETEC del legajo/período
+- `POST /api/haberes/core/cargoliquidacion/generacion/etec/periodo/{anho}/{mes}` - Regenerar sólo los cargos ETEC del período
+- `GET /api/haberes/core/cargoliquidacion/generacion/preview/etec/legajo/{legajoId}/{anho}/{mes}` - Previsualizar los cargos ETEC del legajo sin persistir
+- `GET /api/haberes/core/cargoliquidacion/generacion/preview/etec/periodo/{anho}/{mes}` - Previsualizar los cargos ETEC del período sin persistir
 
 ### Categorías
 - `GET /api/haberes/core/categoria/` - Listar categorías
 - `GET /api/haberes/core/categoria/{categoriaId}` - Obtener categoría
+- `GET /api/haberes/core/categoria/puntos` - Listar categorías ETEC con puntos (`puntos > 0`)
 - `POST /api/haberes/core/categoria/upload/{anho}/{mes}` - Cargar categorías desde Excel
 - `GET /api/haberes/core/categoria/nogrado` - Listar categorías sin grado
+
+### ETEC (cargos por puntos y por horas)
+- `GET /api/haberes/core/etec/asignacion-cargo/legajo/{legajoId}` - Asignaciones del legajo
+- `GET /api/haberes/core/etec/asignacion-cargo/legajo/{legajoId}/periodo/{anho}/{mes}` - Asignaciones vigentes del legajo en el período
+- `GET /api/haberes/core/etec/asignacion-cargo/periodo/{anho}/{mes}` - Asignaciones vigentes del período
+- `GET /api/haberes/core/etec/asignacion-cargo/categorias` - Categorías con asignaciones
+- `GET /api/haberes/core/etec/asignacion-cargo/categoria/{categoriaId}/exists` - Indica si la categoría tiene asignaciones
+- `POST /api/haberes/core/etec/asignacion-cargo/` - Alta (`legajoId`, `categoriaId` y `fechaAlta` obligatorios)
+- `PUT /api/haberes/core/etec/asignacion-cargo/{asignacionCargoId}` - Actualización
+- `DELETE /api/haberes/core/etec/asignacion-cargo/{asignacionCargoId}` - Baja
+- `GET /api/haberes/core/etec/control/{anho}/{mes}` - Parámetros ETEC del período (`404` si no está configurado)
+- `GET /api/haberes/core/etec/control/{anho}/{mes}/opcional` - Ídem, con `200` y cuerpo vacío si no existe
+- `POST /api/haberes/core/etec/control/{anho}/{mes}` - Alta o actualización (upsert) de los parámetros ETEC del período
+- `POST /api/haberes/core/etec/control/copiar/{anho}/{mes}` - Copia los parámetros ETEC y la escala de horas del mes anterior (`409` si el destino existe, `404` si no hay origen)
+- `GET /api/haberes/core/etec/hora/escala/{anho}/{mes}` - Escala de horas de clase ETEC del período (lista vacía si el período no tiene control ETEC)
+- `PUT /api/haberes/core/etec/hora/escala/{anho}/{mes}` - Reemplazo completo de la escala de horas (valida rangos, solapamientos e importes; la lista vacía borra la escala; `404` si el período no tiene control ETEC)
+- `GET /api/haberes/core/etec/arraigo/escala` - Escala global de arraigo ETEC por antigüedad docente
+- `PUT /api/haberes/core/etec/arraigo/escala` - Reemplazo completo de la escala (valida años mínimos, duplicados y porcentajes entre 0 y 100)
+
+### Control de período
+- `GET /api/haberes/core/control/periodo/{anho}/{mes}/opcional` - Control del período (`200` con cuerpo vacío si todavía no existe)
+- `POST /api/haberes/core/control/copiar/{anho}/{mes}` - Crear el período copiando el mes anterior (`409` si el destino existe, `404` si no hay origen)
+
+### Seguridad social (Formulario 931)
+- `GET /api/haberes/core/seguridadSocial/unique/{anho}/{mes}` - Totales del F.931 del período (`400` si no existe)
+- `GET /api/haberes/core/seguridadSocial/unique/{anho}/{mes}/opcional` - Ídem, con `200` y cuerpo vacío si todavía no existe
+- `POST /api/haberes/core/seguridadSocial/` - Alta de los totales del período
+- `PUT /api/haberes/core/seguridadSocial/{seguridadSocialId}` - Reemplazo total de los totales del período
 
 ### Personas
 - `GET /api/haberes/core/persona/` - Listar personas
 - `GET /api/haberes/core/persona/liquidables` - Listar personas liquidables
 - `GET /api/haberes/core/persona/liquidado/{anho}/{mes}` - Personas con liquidación en el período (ordenadas por nombre)
 - `POST /api/haberes/core/persona/upload` - Cargar contactos de personas desde Excel
+
+### Usuarios
+- `GET /api/haberes/core/usuario/` - Listar usuarios sin hash de clave (`UsuarioResumenResponse`)
+- `PUT /api/haberes/core/usuario/{legajoId}/administrador/{administrador}` - Habilitar (`1`) o revocar (`0`) el flag administrador (sólo usuarios sin facultad y sin dejar el sistema sin administradores)
 
 ### Consultas por período
 - `GET /api/haberes/core/cargoliquidacion/periodo/{anho}/{mes}` - Cargos activos del período

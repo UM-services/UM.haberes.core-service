@@ -19,4 +19,9 @@ public class GetLiquidacionesByPeriodoUseCaseImpl implements GetLiquidacionesByP
     public List<Liquidacion> getLiquidacionesByPeriodo(Integer anho, Integer mes, Integer limit) {
         return liquidacionRepository.findAllByAnhoAndMes(anho, mes, limit);
     }
+
+    @Override
+    public List<Liquidacion> getLiquidacionesByPeriodo(Integer anho, Integer mes) {
+        return liquidacionRepository.findAllByAnhoAndMes(anho, mes);
+    }
 }

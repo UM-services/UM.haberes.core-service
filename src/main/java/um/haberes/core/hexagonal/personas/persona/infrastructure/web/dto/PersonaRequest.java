@@ -72,6 +72,4 @@ public class PersonaRequest {
     private Integer situacionAfip;
 
     private Integer modeloContratacionAfip;
-
-    private Byte directivoEtec;
 }

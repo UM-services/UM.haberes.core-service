@@ -11,16 +11,27 @@ sequenceDiagram
     participant ProvSvc as ProveedorMovimientoService (externo)
     participant ProvCli as ProveedorMovimientoClient (OpenFeign)
 
-    Usuario->>Ctrl: POST /ordenPago/generate (OrdenPagoRequest: anho, mes, fechaPago)
+    Usuario->>Ctrl: POST /ordenPago/generate (OrdenPagoRequest con anho, mes, fechaPago y totales)
     Ctrl->>Svc: generateOrdenPago(ordenPagoRequest)
-    Svc->>EjeSvc: ejercicioService.findByFecha(fechaPago)
-    EjeSvc-->>Svc: EjercicioDto (ejercicio contable vigente)
-    Svc->>AcrSvc: acreditacionPagoService.findByUnique(anho, mes, fechaPago)
-    AcrSvc-->>Svc: AcreditacionPago (punto venta y comprobante del pago)
-    Svc->>ProvSvc: buscar orden de pago previa del período
-    alt no existe orden previa
-        Svc->>ProvSvc: findLastOrdenPago(ejercicioId) (numeración siguiente)
-        Svc->>Svc: construir ProveedorMovimientoDto "Sueldos mes M/A"
+    alt el pedido es individual (corta el flujo sin generar la orden)
+        Svc-->>Ctrl: true sin generar la orden
     end
-    Svc->>ProvCli: registrar movimiento de proveedor (orden de pago)
-    ProvCli-->>Usuario: confirmación externa (orden de pago generada)
+    Svc->>EjeSvc: findByFecha(fechaPago)
+    EjeSvc-->>Svc: EjercicioDto del ejercicio vigente
+    Svc->>AcrSvc: findByUnique(anho, mes, fechaPago)
+    alt ya existe acreditacion_pago con comprobante
+        AcrSvc-->>Svc: AcreditacionPago con punto de venta y número
+        Svc->>ProvSvc: findByOrdenPago(puntoVentaPago, numeroComprobantePago)
+        ProvSvc-->>Svc: ProveedorMovimientoDto existente (se reutiliza)
+    else sin acreditación o sin comprobante
+        Svc->>ProvSvc: findLastOrdenPago(ejercicioId)
+        ProvSvc-->>Svc: último comprobante del ejercicio
+        Svc->>Svc: construir ProveedorMovimientoDto con el siguiente número, comprobante 6 y concepto "Sueldos mes MM/AAAA"
+        Svc->>ProvSvc: add(proveedorMovimiento)
+        ProvSvc->>ProvCli: alta del movimiento de proveedor
+        ProvCli-->>Svc: ProveedorMovimientoDto con comprobante y número
+    end
+    Svc->>Svc: tomar los totales del banco sólo si son mayores a cero
+    Svc->>AcrSvc: add o update de acreditacion_pago (totales por banco)
+    Svc-->>Ctrl: true
+    Ctrl-->>Usuario: 200 OK

@@ -131,7 +131,7 @@ class LiquidarIndividualUseCaseImplTest {
     }
 
     private LiquidacionView liquidacion() {
-        return new LiquidacionView(1L, ANHO, MES, (byte) 0, 1, "S", BigDecimal.ZERO, BigDecimal.ZERO,
+        return new LiquidacionView(1L, 1001L, ANHO, MES, (byte) 0, 1, "S", BigDecimal.ZERO, BigDecimal.ZERO,
                 BigDecimal.ZERO, BigDecimal.ZERO, null, null, 7, "B");
     }
 

@@ -51,7 +51,7 @@ class ObtenerBonoLoteUseCaseImplTest {
     @Test
     void limpiaLosItemsEnCeroDeCadaLegajoAntesDeLeerElLote() {
         BonoLote lote = new BonoLote(2026, 9, 7, "A",
-                new BonoLote.Control(null, null, null, null, "11%", null),
+                new BonoLote.Control(null, null, null, null, "11%"),
                 new BonoLote.Catalogo(List.of(), null, List.of(), List.of(), List.of()),
                 List.of());
         when(liquidacionQueryPort.findLegajoIdsByDependencia(7, 2026, 9, "A"))

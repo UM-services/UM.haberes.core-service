@@ -49,7 +49,6 @@ public class PersonaPatch {
     private Integer localidadAfip;
     private Integer situacionAfip;
     private Integer modeloContratacionAfip;
-    private Byte directivoEtec;
 
     public void applyTo(Persona persona) {
         if (documento != null) persona.setDocumento(documento);
@@ -78,6 +77,5 @@ public class PersonaPatch {
         if (modeloContratacionAfip != null) {
             persona.setModeloContratacionAfip(modeloContratacionAfip == 0 ? null : modeloContratacionAfip);
         }
-        if (directivoEtec != null) persona.setDirectivoEtec(directivoEtec);
     }
 }

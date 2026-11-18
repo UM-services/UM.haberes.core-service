@@ -32,6 +32,9 @@ public class CategoriaMapper {
         if (domain.getEstadoDocente() != null) {
             entity.setEstadoDocente(domain.getEstadoDocente());
         }
+        if (domain.getPuntos() != null) {
+            entity.setPuntos(domain.getPuntos());
+        }
         return entity;
     }
 
@@ -58,6 +61,9 @@ public class CategoriaMapper {
         }
         if (entity.getEstadoDocente() != null) {
             builder.estadoDocente(entity.getEstadoDocente());
+        }
+        if (entity.getPuntos() != null) {
+            builder.puntos(entity.getPuntos());
         }
         return builder.build();
     }

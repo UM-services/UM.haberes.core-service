@@ -143,9 +143,6 @@ public class LiquidacionMapper {
         if (persona.getLiquida() != null) {
             builder.liquida(persona.getLiquida());
         }
-        if (persona.getDirectivoEtec() != null) {
-            builder.directivoEtec(persona.getDirectivoEtec());
-        }
         return builder.build();
     }
 }
