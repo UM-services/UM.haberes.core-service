@@ -1,5 +1,6 @@
 package um.haberes.core.hexagonal.liquidaciones.acreditacion.infrastructure.persistence.adapter;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -59,6 +60,15 @@ public class JpaAcreditacionRepositoryAdapter implements AcreditacionRepository 
                     entity.setSueldosOriginal(mapped.getSueldosOriginal());
                     entity.setSueldosAjustados(mapped.getSueldosAjustados());
                     entity.setContribucionesPatronales(mapped.getContribucionesPatronales());
+                    return acreditacionMapper.toDomain(jpaAcreditacionRepository.save(entity));
+                });
+    }
+
+    @Override
+    public Optional<Acreditacion> updateLimiteNovedades(Long acreditacionId, OffsetDateTime limiteNovedades) {
+        return jpaAcreditacionRepository.findByAcreditacionId(acreditacionId)
+                .map(entity -> {
+                    entity.setLimiteNovedades(limiteNovedades);
                     return acreditacionMapper.toDomain(jpaAcreditacionRepository.save(entity));
                 });
     }

@@ -1,0 +1,84 @@
+---
+title: "Cargos ETEC por Puntos y por Horas de Clase"
+---
+sequenceDiagram
+    autonumber
+    actor Cliente as Cliente (haberes-etec / UI)
+    participant EtecCtrl as EtecAsignacionCargoController
+    participant EtecUC as Use Cases (ports/in)
+    participant EtecRepo as JpaEtecAsignacionCargoRepositoryAdapter
+    participant CatCtrl as CategoriaController
+    participant CtlCtrl as ControlEtecController
+    participant EscCtrl as EscalaHoraEtecController
+    participant GenCtrl as GeneracionCargosLiquidacionController
+    participant Guard as GeneracionCargosGuard
+    participant Orq as GeneracionCargosOrquestador
+    participant GenEtec as GeneradorCargosEtecPuntos
+    participant GenHoras as GeneradorCargosEtecHoras
+    participant CargCtrl as CargoLiquidacionController
+    participant DB as MySQL
+
+    Note over Cliente,DB: haberes-etec no abre conexión a la base: opera por API contra core
+    Note over GenCtrl,DB: core genera los cargos ETEC por puntos y por horas.<br/>Los endpoints de reemplazo se conservan
+
+    Cliente->>EtecCtrl: POST /etec/asignacion-cargo/ (legajoId, categoriaId, fechaAlta)
+    EtecCtrl->>EtecUC: CreateEtecAsignacionCargoUseCase
+    EtecUC->>EtecRepo: save(asignacion)
+    EtecRepo->>DB: INSERT etec_asignacion_cargo (alta/baja por fechas)
+    Cliente->>EtecCtrl: PUT /{asignacionCargoId} , DELETE /{asignacionCargoId}
+    EtecCtrl->>DB: UPDATE / DELETE (entidad auditada, sin @Modifying)
+
+    Cliente->>EtecCtrl: GET /legajo/{legajoId}/periodo/{anho}/{mes}
+    EtecCtrl->>DB: SELECT asignaciones vigentes en el período
+    EtecCtrl-->>Cliente: legajo, categoría, dependencia y persona
+
+    Cliente->>CatCtrl: GET /categoria/puntos
+    CatCtrl->>DB: SELECT categoria WHERE puntos > 0
+
+    Cliente->>CtlCtrl: GET o POST /etec/control/{anho}/{mes}
+    CtlCtrl->>DB: SELECT o upsert control_etec del período
+    CtlCtrl-->>Cliente: valor del punto, monto fijo, presentismo, adicional carrera, garantía y carga horaria
+
+    Cliente->>EscCtrl: GET o PUT /etec/hora/escala/{anho}/{mes}
+    EscCtrl->>DB: SELECT o reemplazo de etec_hora_escala del control_etec
+    EscCtrl-->>Cliente: tramos con horas desde/hasta, monto fijo y valor hora
+
+    Cliente->>CtlCtrl: POST /etec/control/copiar/{anho}/{mes}
+    CtlCtrl->>DB: copia control_etec y sus tramos de etec_hora_escala
+
+    Cliente->>GenCtrl: POST /cargoliquidacion/generacion/etec/legajo/{legajoId}/{anho}/{mes}
+    GenCtrl->>Guard: validarLegajo(legajoId, anho, mes)
+    Guard-->>GenCtrl: rechaza el legajo si el período ya está acreditado
+    GenCtrl->>Orq: generar(universo ETEC, legajoId o período)
+    Orq->>GenEtec: cargos(contexto)
+    GenEtec->>DB: SELECT control_etec, etec_asignacion_cargo vigentes y categorías con puntos
+    alt Sin asignaciones vigentes o sin categorías con puntos
+        GenEtec-->>Orq: lista vacía
+    else Con asignaciones y valor del punto
+        GenEtec-->>Orq: categoriaBasico = puntos × valor_punto_etec + monto_fijo_cargo
+    end
+    Orq->>GenHoras: cargos(contexto)
+    GenHoras->>DB: SELECT etec_hora_escala del período y cursos de la facultad 15
+    Note over GenHoras: AgrupadorHorasEtec suma las horas semanales<br/>por legajo y sede, y el tramo da monto fijo + horas × valor hora
+    alt Sin escala configurada o sin horas
+        GenHoras-->>Orq: lista vacía
+    else Con horas en un tramo
+        GenHoras-->>Orq: un cargo por sede con la categoría 2002 DOCENTE ETEC HORAS
+    end
+    Orq->>DB: DELETE cargos ETEC del alcance (AuditBulkScope)
+    Orq->>DB: INSERT lote + snapshot MAX(version)+1 por legajo/período
+    Orq-->>GenCtrl: ResultadoGeneracionCargos con el conteo por universo
+    GenCtrl-->>Cliente: cargos generados (400 ProblemDetail si falta el valor del punto o las horas no caen en la escala)
+
+    Cliente->>GenCtrl: GET /cargoliquidacion/generacion/preview/etec/legajo/{legajoId}/{anho}/{mes}
+    GenCtrl->>Orq: previsualizar(universo ETEC, legajoId, anho, mes)
+    Orq-->>GenCtrl: cargos calculados sin escrituras
+    GenCtrl-->>Cliente: lista de cargos previsualizados
+
+    Cliente->>CargCtrl: POST /cargoliquidacion/reemplazar/periodo o /reemplazar/legajo/{legajoId}/{anho}/{mes}
+    CargCtrl->>DB: DELETE cargos de las categorías ETEC del alcance
+    CargCtrl->>DB: INSERT lote + snapshot MAX(version)+1
+    CargCtrl-->>Cliente: cargos guardados
+
+    Note over Orq,DB: El reemplazo conserva el contrato de haberes-etec, valida período,<br/>legajo y alcance antes de borrar, abre AuditBulkScope (SUMMARY/BULK)<br/>y usa version null para que se escriba el snapshot.
+    Note over GenEtec,DB: Los parámetros del circuito viven en control_etec (sql/009),<br/>el puntaje del cargo en categoria.puntos (sql/005) y la escala de<br/>horas en etec_hora_escala (sql/018). El arraigo se resuelve con<br/>la escala global etec_arraigo_escala (sql/017).

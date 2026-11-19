@@ -3,6 +3,7 @@
  */
 package um.haberes.core.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -22,6 +23,8 @@ import um.haberes.core.util.Tool;
 @Service
 public class UsuarioService {
 
+	private static final Byte ADMINISTRADOR = (byte) 1;
+
 	private final JpaUsuarioRepository repository;
 
 	@Autowired
@@ -29,17 +32,19 @@ public class UsuarioService {
 		this.repository = repository;
 	}
 
+	public List<UsuarioEntity> findAll() {
+		return repository.findAllByOrderByLegajoIdAsc();
+	}
+
 	public UsuarioEntity findByLegajoId(Long legajoId) {
 		return repository.findByLegajoId(legajoId).orElseThrow(() -> new UsuarioException(legajoId));
 	}
 
 	public UsuarioEntity updateLastLog(Long legajoId, Long build) {
-		return repository.findByLegajoId(legajoId).map(usuario -> {
-			usuario = new UsuarioEntity(legajoId, usuario.getPassword(), Tool.hourAbsoluteArgentina(), build,
-					usuario.getUsuarioId(), usuario.getFacultadId());
-			repository.save(usuario);
-			return usuario;
-		}).orElseThrow(() -> new UsuarioException(legajoId));
+		return repository.findByLegajoId(legajoId).map(usuario -> repository.save(usuario.toBuilder()
+				.lastLog(Tool.hourAbsoluteArgentina())
+				.build(build)
+				.build())).orElseThrow(() -> new UsuarioException(legajoId));
 	}
 
 	public Boolean isUserValid(UsuarioEntity usuario) {
@@ -50,9 +55,10 @@ public class UsuarioService {
 
 	public void setPassword(UsuarioEntity newUsuario) {
 		UsuarioEntity usuario = repository.findByLegajoId(newUsuario.getLegajoId()).get();
-		usuario = new UsuarioEntity(usuario.getLegajoId(), DigestUtils.sha256Hex(newUsuario.getPassword()),
-				usuario.getLastLog(), newUsuario.getBuild(), usuario.getUsuarioId(), usuario.getFacultadId());
-		repository.save(usuario);
+		repository.save(usuario.toBuilder()
+				.password(DigestUtils.sha256Hex(newUsuario.getPassword()))
+				.build(newUsuario.getBuild())
+				.build());
 	}
 
 	/**
@@ -93,8 +99,40 @@ public class UsuarioService {
 		}
 
 		String newHashed = DigestUtils.sha256Hex(request.getNewPassword().trim());
-		repository.save(new UsuarioEntity(usuario.getLegajoId(), newHashed, usuario.getLastLog(),
-				usuario.getBuild(), usuario.getUsuarioId(), usuario.getFacultadId()));
+		repository.save(usuario.toBuilder().password(newHashed).build());
+	}
+
+	/**
+	 * Habilita o revoca el flag administrador de un usuario.
+	 *
+	 * Reglas (PLANIFICACION_CAMPO_ADMINISTRADOR_USUARIO_HABERES.md, D1/D5/D6):
+	 * solo usuarios sin facultad asignada pueden ser administradores y el sistema
+	 * nunca puede quedar sin al menos un administrador.
+	 *
+	 * @param legajoId      usuario destino
+	 * @param administrador 1 habilita, 0 revoca
+	 * @throws IllegalArgumentException con el mensaje de negocio
+	 * @throws UsuarioException         si el usuario no existe
+	 */
+	public UsuarioEntity setAdministrador(Long legajoId, Integer administrador) {
+		if (administrador == null || (administrador != 0 && administrador != 1)) {
+			throw new IllegalArgumentException("ERROR: Valor de administrador invalido");
+		}
+
+		UsuarioEntity usuario = repository.findByLegajoId(legajoId).orElseThrow(() -> new UsuarioException(legajoId));
+		Byte nuevoValor = administrador.byteValue();
+
+		if (ADMINISTRADOR.equals(nuevoValor) && usuario.getFacultadId() != null) {
+			throw new IllegalArgumentException("ERROR: Usuario con facultad asignada NO puede ser administrador");
+		}
+
+		boolean revoca = Byte.valueOf((byte) 0).equals(nuevoValor)
+				&& ADMINISTRADOR.equals(usuario.getAdministrador());
+		if (revoca && repository.countByAdministrador(ADMINISTRADOR) <= 1) {
+			throw new IllegalArgumentException("ERROR: Debe quedar al menos un administrador");
+		}
+
+		return repository.save(usuario.toBuilder().administrador(nuevoValor).build());
 	}
 
 }

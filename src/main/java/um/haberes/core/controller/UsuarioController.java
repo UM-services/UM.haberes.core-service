@@ -17,7 +17,10 @@ import org.springframework.web.server.ResponseStatusException;
 import um.haberes.core.exception.UsuarioException;
 import um.haberes.core.model.UsuarioEntity;
 import um.haberes.core.model.dto.CambiarClaveRequest;
+import um.haberes.core.model.dto.UsuarioResumenResponse;
 import um.haberes.core.service.UsuarioService;
+
+import java.util.List;
 
 /**
  * @author daniel
@@ -29,6 +32,23 @@ import um.haberes.core.service.UsuarioService;
 public class UsuarioController {
 
     private final UsuarioService service;
+
+    /**
+     * Listado para la pantalla de usuarios del modulo Administrador. No expone el
+     * hash de la clave (ver {@link UsuarioResumenResponse}).
+     */
+    @GetMapping("/")
+    public ResponseEntity<List<UsuarioResumenResponse>> findAll() {
+        List<UsuarioResumenResponse> usuarios = service.findAll().stream()
+                .map(usuario -> UsuarioResumenResponse.builder()
+                        .legajoId(usuario.getLegajoId())
+                        .usuarioId(usuario.getUsuarioId())
+                        .facultadId(usuario.getFacultadId())
+                        .administrador(usuario.getAdministrador())
+                        .build())
+                .toList();
+        return new ResponseEntity<>(usuarios, HttpStatus.OK);
+    }
 
     @GetMapping("/{legajoId}")
     public ResponseEntity<UsuarioEntity> findByLegajoId(@PathVariable Long legajoId) {
@@ -57,6 +77,22 @@ public class UsuarioController {
     public ResponseEntity<Void> setPassword(@RequestBody UsuarioEntity usuario) {
         service.setPassword(usuario);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/{legajoId}/administrador/{administrador}")
+    public ResponseEntity<UsuarioResumenResponse> setAdministrador(@PathVariable Long legajoId,
+            @PathVariable Integer administrador) {
+        try {
+            UsuarioEntity usuario = service.setAdministrador(legajoId, administrador);
+            return new ResponseEntity<>(UsuarioResumenResponse.builder()
+                    .legajoId(usuario.getLegajoId())
+                    .usuarioId(usuario.getUsuarioId())
+                    .facultadId(usuario.getFacultadId())
+                    .administrador(usuario.getAdministrador())
+                    .build(), HttpStatus.OK);
+        } catch (UsuarioException | IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 
     /**

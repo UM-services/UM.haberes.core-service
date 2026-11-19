@@ -10,6 +10,8 @@ import um.haberes.core.exception.SeguridadSocialException;
 import um.haberes.core.model.SeguridadSocialEntity;
 import um.haberes.core.repository.JpaSeguridadSocialRepository;
 
+import java.util.Optional;
+
 /**
  * @author daniel
  *
@@ -23,6 +25,10 @@ public class SeguridadSocialService {
 	public SeguridadSocialEntity findByUnique(Integer anho, Integer mes) {
 		return repository.findByAnhoAndMes(anho, mes)
 				.orElseThrow(() -> new SeguridadSocialException(anho, mes));
+	}
+
+	public Optional<SeguridadSocialEntity> findByUniqueOpcional(Integer anho, Integer mes) {
+		return repository.findByAnhoAndMes(anho, mes);
 	}
 
 	public SeguridadSocialEntity add(SeguridadSocialEntity seguridadSocial) {

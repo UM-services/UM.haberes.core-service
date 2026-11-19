@@ -1,0 +1,78 @@
+---
+title: "Liquidación individual: ficha, reglas y motor congelado"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant Ctrl as LiquidacionIndividualController
+    participant Svc as LiquidacionIndividualService
+    participant UC as Casos de uso (ports/in)
+    participant Reglas as LiquidacionIndividualReglas
+    participant Cross as Capa cross-slice
+    participant Motor as ProcesoLiquidacionCrossSlice
+    participant Legacy as MakeLiquidacionService
+
+    Note over Ctrl,Legacy: Superficie aditiva /api/haberes/core/liquidacion-individual<br/>El motor legacy no se modifica: se valida antes y se relee después
+
+    Usuario->>Ctrl: GET /{legajoId}/{anho}/{mes}
+    Ctrl->>Svc: obtenerFicha(...)
+    Svc->>UC: ObtenerFichaLiquidacionIndividualUseCase
+    UC->>Cross: persona, control, liquidación, antigüedad
+    UC->>Cross: cargos docentes/no docentes, cargos con clase, novedades, items
+    Cross-->>UC: vistas de dominio (*View)
+    UC->>Reglas: acciones(liquidacion, hayControl)
+    UC-->>Ctrl: FichaLiquidacionIndividual
+    Ctrl-->>Usuario: 200 ficha + acciones (404 si el legajo no existe)
+
+    Usuario->>Ctrl: POST /{legajoId}/{anho}/{mes}/cargos
+    Ctrl->>Svc: generarCargos(...)
+    Svc->>UC: GenerarCargosIndividualUseCase
+    UC->>Reglas: bloquearSiCorresponde(false) y hayControl
+    alt Liquidación bloqueada o período sin control
+        UC-->>Ctrl: BLOQUEADA / SIN_CONTROL
+    else Precondiciones cumplidas
+        UC->>Motor: generarCargos(...)
+        Motor->>Legacy: generateCargosNoDocentes + generateCargosDocentes
+        UC->>Cross: recuento de cargos docentes y no docentes
+        UC-->>Ctrl: GENERADOS (docentes, noDocentes)
+    end
+    Ctrl-->>Usuario: 200 ResumenGeneracionCargosResponse
+
+    Usuario->>Ctrl: POST /{legajoId}/{anho}/{mes}/liquidar (forzar)
+    Ctrl->>Svc: liquidar(..., forzar)
+    Svc->>UC: LiquidarIndividualUseCase
+    UC->>Reglas: bloqueo, hayControl, validarPersona y periodoLiquidable
+    alt Alguna regla no se cumple
+        UC-->>Ctrl: BLOQUEADA / SIN_CONTROL / PERSONA_* / PERIODO_NO_LIQUIDABLE
+    else Precondiciones cumplidas
+        UC->>Motor: liquidar(..., forzar)
+        Motor->>Legacy: liquidacionByLegajoId(...)
+        UC->>Cross: relectura de la liquidación del período
+        UC-->>Ctrl: LIQUIDADO o NO_LIQUIDABLE
+    end
+    Ctrl-->>Usuario: 200 ResultadoProcesoResponse
+
+    Usuario->>Ctrl: DELETE /{legajoId}/{anho}/{mes}/{forzar}
+    Ctrl->>Svc: eliminarLiquidacion(..., forzar)
+    Svc->>UC: EliminarLiquidacionIndividualUseCase
+    UC->>Motor: eliminarLiquidacion(..., forzar)
+    Motor->>Legacy: deleteLiquidacionByLegajoId(...)
+    UC->>Cross: verifica que la liquidación ya no existe
+    UC-->>Ctrl: ELIMINADA / NO_ELIMINADA / SIN_LIQUIDACION
+
+    Usuario->>Ctrl: POST /{legajoId}/{anho}/{mes}/novedad (codigoId, importe, valor)
+    Ctrl->>Svc: registrarNovedad(...)
+    Svc->>UC: RegistrarNovedadIndividualUseCase
+    UC->>Reglas: bloqueo del período + buscarNovedad por clave única
+    UC->>Cross: crear o actualizar (valor "S"/"N" guarda importe en cero)
+    Cross-->>UC: NovedadView con nombre de código
+    UC-->>Ctrl: GUARDADA / BLOQUEADA / DATOS_INVALIDOS
+
+    Usuario->>Ctrl: DELETE /{legajoId}/{anho}/{mes}/novedad/{novedadId}/{forzar}
+    Ctrl->>Svc: eliminarNovedad(...)
+    Svc->>UC: EliminarNovedadIndividualUseCase
+    UC->>Cross: verifica pertenencia al legajo/período y elimina
+    UC-->>Ctrl: ELIMINADA / SIN_NOVEDAD / BLOQUEADA
+    Ctrl-->>Usuario: 200 ResultadoProcesoResponse / NovedadRegistradaResponse
+
+    Note over Cross,Legacy: Adaptadores cross-slice: persona, control, liquidación, cargo_liquidacion,<br/>cargos_clase, novedad, item, antigüedad y liquidacion_proceso

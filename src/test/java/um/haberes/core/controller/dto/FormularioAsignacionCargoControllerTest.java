@@ -100,7 +100,8 @@ class FormularioAsignacionCargoControllerTest {
                               "docente": 1,
                               "noDocente": 0,
                               "liquidaPorHora": 0,
-                              "estadoDocente": 35.00
+                              "estadoDocente": 35.00,
+                              "puntos": 0
                             }
                           ],
                           "categoriasAsignables": [
@@ -111,7 +112,8 @@ class FormularioAsignacionCargoControllerTest {
                               "docente": 1,
                               "noDocente": 0,
                               "liquidaPorHora": 0,
-                              "estadoDocente": 35.00
+                              "estadoDocente": 35.00,
+                              "puntos": 0
                             }
                           ],
                           "dependencias": [

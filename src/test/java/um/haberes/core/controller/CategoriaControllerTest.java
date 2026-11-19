@@ -74,7 +74,8 @@ class CategoriaControllerTest {
                   "docente": 1,
                   "noDocente": 0,
                   "liquidaPorHora": 0,
-                  "estadoDocente": 1.20
+                  "estadoDocente": 1.20,
+                  "puntos": 0
                                                     }
                 """;
     }
@@ -88,7 +89,8 @@ class CategoriaControllerTest {
                   "docente": 1,
                   "noDocente": 0,
                   "liquidaPorHora": 0,
-                  "estadoDocente": 1.20
+                  "estadoDocente": 1.20,
+                  "puntos": 0
                                                     } ]
                 """;
     }
@@ -108,6 +110,15 @@ class CategoriaControllerTest {
         when(service.findAllNoDocentes()).thenReturn(List.of(sampleCategoria()));
 
         mockMvc.perform(get("/api/haberes/core/categoria/nogrado"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(categoriaArrayJson(), JsonCompareMode.STRICT));
+    }
+
+    @Test
+    void findAllAsignables_returnsOkWithListOfCategoria() throws Exception {
+        when(service.findAllAsignables()).thenReturn(List.of(sampleCategoria()));
+
+        mockMvc.perform(get("/api/haberes/core/categoria/asignables"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(categoriaArrayJson(), JsonCompareMode.STRICT));
     }

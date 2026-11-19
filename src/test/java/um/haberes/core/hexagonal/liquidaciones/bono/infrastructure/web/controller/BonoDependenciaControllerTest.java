@@ -71,7 +71,7 @@ class BonoDependenciaControllerTest {
         um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoLote lote =
                 new um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoLote(2026, 9, 7, "A",
                         new um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoLote.Control(
-                                null, null, null, null, "11%", cero),
+                                null, null, null, null, "11%"),
                         new um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoLote.Catalogo(
                                 List.of(new um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoLote.Dependencia(7, "ACRO")),
                                 new um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoLote.Codigo(981, "Adicional"),
@@ -80,12 +80,11 @@ class BonoDependenciaControllerTest {
                         List.of(new um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoLote.Legajo(
                                 1001L,
                                 new um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoLote.Persona(
-                                        1001L, "Gómez", "Ana", "30111222", "20-30111222-3", 7, null,
-                                        (byte) 0),
+                                        1001L, "Gómez", "Ana", "30111222", "20-30111222-3", 7, null),
                                 new um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoLote.Antiguedad(10, 0),
                                 List.of(cero), "CBU",
                                 List.of(new um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoLote.Item(99, cero)),
-                                List.of(), List.of(), List.of(), List.of(), List.of(), List.of(), cero,
+                                List.of(), List.of(), List.of(), List.of(), List.of(), List.of(),
                                 "ana@um.edu.ar", 1L, false)));
         when(bonoService.obtenerLote(7, 2026, 9, "A")).thenReturn(lote);
 

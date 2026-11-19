@@ -30,4 +30,7 @@ public class CategoriaRequest {
     private Byte liquidaPorHora;
 
     private BigDecimal estadoDocente;
+
+    /** Puntaje del cargo ETEC. 0 = categoría común. */
+    private BigDecimal puntos;
 }

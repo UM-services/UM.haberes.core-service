@@ -17,6 +17,9 @@ public interface LiquidacionRepository {
 
     List<Liquidacion> findAllByAnhoAndMes(Integer anho, Integer mes, Integer limit);
 
+    /** Todas las liquidaciones del período, sin límite (padrón de liquidación general). */
+    List<Liquidacion> findAllByAnhoAndMes(Integer anho, Integer mes);
+
     List<Liquidacion> findAllByAnhoAndMesAndLegajoId(Integer anho, Integer mes, Long legajoId, Integer limit);
 
     List<Liquidacion> findAllByAnhoAndMesAndLegajoIdIn(Integer anho, Integer mes, List<Long> legajoIds);

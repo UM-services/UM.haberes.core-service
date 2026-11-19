@@ -39,6 +39,12 @@ public class SeguridadSocialController {
 		}
 	}
 
+	@GetMapping("/unique/{anho}/{mes}/opcional")
+	public ResponseEntity<SeguridadSocialEntity> findByUniqueOpcional(@PathVariable Integer anho,
+			@PathVariable Integer mes) {
+		return new ResponseEntity<>(service.findByUniqueOpcional(anho, mes).orElse(null), HttpStatus.OK);
+	}
+
 	@PostMapping("/")
 	public ResponseEntity<SeguridadSocialEntity> add(@RequestBody SeguridadSocialEntity seguridadSocial) {
         return ResponseEntity.ok(service.add(seguridadSocial));
