@@ -19,7 +19,7 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**2.4.0** (2026-11-16)
+**2.5.0** (2026-11-19)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
@@ -84,6 +84,7 @@ Contabilidad y reportes:
 - `docs/diagrams/flujo-vistas-reporte.mmd`
 - `docs/diagrams/flujo-sheets-reportes.mmd`
 - `docs/diagrams/flujo-libro-sueldo.mmd`
+- `docs/diagrams/flujo-sijp.mmd`
 - `docs/diagrams/flujo-contratados-planilla.mmd`
 - `docs/diagrams/flujo-administracion-formularios.mmd`
 
@@ -318,6 +319,10 @@ Los tres procesos masivos responden `202` con `procesoId`, `409 PROCESO_EN_CURSO
 `SIN_CONTROL` (salvo en eliminar) o `SIN_LIQUIDABLES` cuando no se inician. El avance se persiste en
 `liquidacion_general_proceso`/`liquidacion_general_detalle` (aplicar
 `sql/019_liquidacion_general_proceso.sql` antes de usarlos).
+
+### Seguridad social (SIJP)
+- `GET /api/haberes/core/sijp/{anho}/{mes}/{variante}` - Genera el archivo SIJP del período (`variante`: `normal` o `etec`). Devuelve el `.txt` en Base64 (registros de 499 caracteres, CRLF y windows-1252), la cantidad de registros y las listas `omitidos`/`advertencias` (vacías: hoy la generación bloquea en lugar de omitir); responde `400` si la variante no es `normal`/`etec`, `404` si el período no tiene control y `422` si no hay legajos liquidados o alguno no tiene persona/CUIL de 11 dígitos
+- `GET /api/haberes/core/makeLiquidacion/generateSIJP/{anho}/{mes}` - Alias legado de la variante normal; escribe `sijp-<anho>-<mes>.txt` en `path.files`
 
 ### Acreditación bancaria (archivo Santander y Otros Bancos)
 - `POST /api/haberes/core/acreditacion/archivo/santander` - Generar el archivo de acreditación Santander (masivo o individual según el body)
