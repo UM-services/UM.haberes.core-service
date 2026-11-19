@@ -20,6 +20,8 @@ public interface ItemRepository {
 
     List<Item> findAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
 
+    List<Item> findAllByAnhoAndMes(Integer anho, Integer mes);
+
     List<Item> findAllByAnhoAndMes(Integer anho, Integer mes, Integer limit);
 
     List<Item> findAllByAnhoAndMesAndLegajoId(Integer anho, Integer mes, Long legajoId, Integer limit);

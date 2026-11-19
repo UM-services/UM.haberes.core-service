@@ -58,6 +58,11 @@ public class JpaItemRepositoryAdapter implements ItemRepository {
     }
 
     @Override
+    public List<Item> findAllByAnhoAndMes(Integer anho, Integer mes) {
+        return toDomainList(jpaItemRepository.findAllByAnhoAndMes(anho, mes));
+    }
+
+    @Override
     public List<Item> findAllByAnhoAndMes(Integer anho, Integer mes, Integer limit) {
         return toDomainList(jpaItemRepository.findAllByAnhoAndMes(anho, mes, PageRequest.of(0, limit)));
     }

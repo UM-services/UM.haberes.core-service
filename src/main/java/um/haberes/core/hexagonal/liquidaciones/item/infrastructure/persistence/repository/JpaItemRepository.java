@@ -24,6 +24,8 @@ public interface JpaItemRepository extends JpaRepository<ItemEntity, Long> {
 	List<ItemEntity> findAllByCodigoIdAndAnhoAndMesAndLegajoId(Integer codigoId, Integer anho, Integer mes,
 			Long legajoId);
 
+	List<ItemEntity> findAllByAnhoAndMes(Integer anho, Integer mes);
+
 	List<ItemEntity> findAllByAnhoAndMes(Integer anho, Integer mes, Pageable pageable);
 
 	List<ItemEntity> findAllByAnhoAndMesAndLegajoId(Integer anho, Integer mes, Long legajoId, Pageable pageable);

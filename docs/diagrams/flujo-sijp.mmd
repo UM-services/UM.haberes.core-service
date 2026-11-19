@@ -1,0 +1,52 @@
+---
+title: "Generación del archivo SIJP (variantes normal y ETEC)"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant Ctrl as SijpController
+    participant Svc as SijpService
+    participant UC as GenerarArchivoSijpUseCaseImpl
+    participant Ctl as ControlService
+    participant LCtrl as LegajoControlService
+    participant Items as ItemService
+    participant Nov as NovedadService
+    participant Cod as CodigoService / CodigoGrupoService
+    participant Layout as SijpLayout
+    participant Legacy as MakeLiquidacionService
+    participant FS as path.files
+
+    Usuario->>Ctrl: GET /api/haberes/core/sijp/{anho}/{mes}/{variante}
+    Ctrl->>Svc: generar(anho, mes, variante)
+    Svc->>UC: generar(anho, mes, variante)
+    UC->>UC: validar año y mes
+    UC->>Ctl: findByPeriodoOpcional(anho, mes)
+    alt el período no tiene control
+        Ctl-->>UC: vacío
+        UC-->>Ctrl: SijpSinControlException
+        Ctrl-->>Usuario: 404
+    end
+    UC->>LCtrl: findAllLiquidadoByPeriodo(anho, mes)
+    alt no hay legajos liquidados o falta persona/CUIL
+        LCtrl-->>UC: lista vacía o legajo inválido
+        UC-->>Ctrl: SijpException
+        Ctrl-->>Usuario: 422 con el detalle de los legajos
+    end
+    UC->>Items: getItemsByPeriodo(anho, mes)
+    Items-->>UC: ítems del período sin N+1
+    UC->>Nov: findAllByCodigo(18, anho, mes)
+    Nov-->>UC: días no trabajados
+    UC->>Cod: códigos remunerativos e incluidoEtec
+    Cod-->>UC: clasificación onlyETEC
+    UC->>UC: calcular los 60 campos (96/97/3/51, topes, piso, coeficiente 6/12 y detracción)
+    UC->>Layout: render(registro)
+    Layout-->>UC: línea de 499 caracteres
+    UC-->>Svc: ArchivoSijp en windows-1252 con CRLF
+    Svc-->>Ctrl: ArchivoSijp
+    Ctrl-->>Usuario: 200 SijpResponse con el contenido en Base64
+
+    Usuario->>Legacy: GET /makeLiquidacion/generateSIJP/{anho}/{mes}
+    Legacy->>Svc: generar(anho, mes, NORMAL)
+    Svc-->>Legacy: ArchivoSijp
+    Legacy->>FS: escribir sijp-{anho}-{mes}.txt
+    Legacy-->>Usuario: Resource sijp.txt para descarga

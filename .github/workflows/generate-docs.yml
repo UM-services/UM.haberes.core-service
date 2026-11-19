@@ -155,6 +155,7 @@ jobs:
                   { file: 'diagrams/flujo-vistas-reporte.mmd', title: '📊 Secuencia: Vistas de Reporte' },
                   { file: 'diagrams/flujo-sheets-reportes.mmd', title: '📑 Secuencia: Planillas Excel' },
                   { file: 'diagrams/flujo-libro-sueldo.mmd', title: '📕 Secuencia: Libro de Sueldo y SIJP' },
+                  { file: 'diagrams/flujo-sijp.mmd', title: '🧾 Secuencia: Generación del Archivo SIJP' },
                   { file: 'diagrams/flujo-contratados-planilla.mmd', title: '📋 Secuencia: Planilla de Contratados' },
                   { file: 'diagrams/flujo-administracion-formularios.mmd', title: '⚙️ Secuencia: Sesión, Auditoría y Formularios' },
                   { file: 'diagrams/flujo-maestros-catalogos.mmd', title: '🗂️ Secuencia: Maestros y Catálogos Legacy' },
