@@ -8,6 +8,8 @@ sequenceDiagram
     participant LSvc as LibroSueldoService (facade)
     participant MCtrl as MakeLiquidacionController
     participant MSvc as MakeLiquidacionService (facade)
+    participant CtrlSIJP as SijpController
+    participant SvcSIJP as SijpService
     participant Data as Liquidacion/Item/LegajoBanco/Control (servicios)
     participant Afip as AfipContextService
     participant PDF as OpenPDF / Archivo
@@ -23,6 +25,13 @@ sequenceDiagram
 
     Usuario->>MCtrl: GET /makeLiquidacion/generateSIJP/{anho}/{mes}
     MCtrl->>MSvc: generateSIJP(anho, mes)
-    MSvc->>Data: liquidaciones acreditadas del período (estado y totales)
-    MSvc->>PDF: generar archivo SIJP (jubilaciones y aportes)
-    PDF-->>Usuario: Resource con el archivo para descarga
+    MSvc->>SvcSIJP: generar(anho, mes, NORMAL)
+    SvcSIJP->>Data: control, legajos liquidados, ítems y novedad 18
+    SvcSIJP-->>MSvc: ArchivoSijp (499 caracteres, CRLF, windows-1252)
+    MSvc->>PDF: escribir sijp-{anho}-{mes}.txt en path.files
+    PDF-->>Usuario: Resource sijp.txt
+
+    Usuario->>CtrlSIJP: GET /api/haberes/core/sijp/{anho}/{mes}/{variante}
+    CtrlSIJP->>SvcSIJP: generar(anho, mes, variante)
+    SvcSIJP-->>CtrlSIJP: ArchivoSijp
+    CtrlSIJP-->>Usuario: 200 con el .txt en Base64
