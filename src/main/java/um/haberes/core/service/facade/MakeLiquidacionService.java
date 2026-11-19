@@ -3,6 +3,7 @@ package um.haberes.core.service.facade;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import um.haberes.core.exception.*;
 import um.haberes.core.hexagonal.cursos.curso.domain.model.Curso;
@@ -37,6 +38,10 @@ import um.haberes.core.hexagonal.liquidaciones.liquidacion.application.service.L
 import um.haberes.core.hexagonal.liquidaciones.liquidacion.domain.model.Liquidacion;
 import um.haberes.core.hexagonal.liquidaciones.novedad.application.service.NovedadService;
 import um.haberes.core.hexagonal.liquidaciones.novedad.domain.model.Novedad;
+import um.haberes.core.hexagonal.liquidaciones.sijp.application.exception.SijpException;
+import um.haberes.core.hexagonal.liquidaciones.sijp.application.service.SijpService;
+import um.haberes.core.hexagonal.liquidaciones.sijp.domain.model.ArchivoSijp;
+import um.haberes.core.hexagonal.liquidaciones.sijp.domain.model.VarianteSijp;
 import um.haberes.core.hexagonal.personas.dependencia.application.service.DependenciaService;
 import um.haberes.core.hexagonal.personas.dependencia.domain.model.Dependencia;
 import um.haberes.core.hexagonal.personas.persona.application.service.PersonaService;
@@ -48,8 +53,11 @@ import um.haberes.core.service.view.NovedadDuplicadaService;
 import um.haberes.core.util.Periodo;
 import um.haberes.core.util.Tool;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -121,6 +129,8 @@ public class MakeLiquidacionService {
     private final ControlEtecService controlEtecService;
     private final EscalaArraigoEtecService escalaArraigoEtecService;
     private final EtecLiquidacionCalculator etecLiquidacionCalculator;
+    private final SijpService sijpService;
+    private final Environment environment;
 
     @Transactional
     public LiquidacionState makeContext(Long legajoId, Integer anho, Integer mes) {
@@ -737,8 +747,22 @@ public class MakeLiquidacionService {
         legajoControlService.saveAll(legajos);
     }
 
+    /**
+     * Alias legado del generador SIJP: conserva la firma de {@code MakeLiquidacionController} y
+     * escribe el archivo de la variante normal en {@code path.files}. El frontend usa el endpoint
+     * {@code GET /api/haberes/core/sijp/{anho}/{mes}/{variante}}, que no toca disco.
+     */
     public String generateSIJP(Integer anho, Integer mes) {
-        return null;
+        ArchivoSijp archivo = sijpService.generar(anho, mes, VarianteSijp.NORMAL);
+        String base = environment.getProperty("path.files", "/tmp/");
+        Path destino = Path.of(base, archivo.getNombreArchivo());
+        try {
+            Files.createDirectories(destino.getParent());
+            Files.write(destino, archivo.getContenido());
+        } catch (IOException e) {
+            throw new SijpException("No se pudo escribir el archivo SIJP: " + e.getMessage());
+        }
+        return destino.toString();
     }
 
     private void addItem(Long legajoId, Integer anho, Integer mes, Integer codigoId, BigDecimal importe, LiquidacionState state) {

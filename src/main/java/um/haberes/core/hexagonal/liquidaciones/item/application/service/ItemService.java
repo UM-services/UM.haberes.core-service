@@ -49,6 +49,10 @@ public class ItemService {
         return getItemsByLegajoUseCase.getItemsByLegajo(legajoId, anho, mes);
     }
 
+    public List<Item> getItemsByPeriodo(Integer anho, Integer mes) {
+        return getItemsByPeriodoUseCase.getItemsByPeriodo(anho, mes);
+    }
+
     public List<Item> getItemsByPeriodo(Integer anho, Integer mes, Integer limit) {
         return getItemsByPeriodoUseCase.getItemsByPeriodo(anho, mes, limit);
     }

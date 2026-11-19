@@ -16,6 +16,11 @@ public class GetItemsByPeriodoUseCaseImpl implements GetItemsByPeriodoUseCase {
     private final ItemRepository itemRepository;
 
     @Override
+    public List<Item> getItemsByPeriodo(Integer anho, Integer mes) {
+        return itemRepository.findAllByAnhoAndMes(anho, mes);
+    }
+
+    @Override
     public List<Item> getItemsByPeriodo(Integer anho, Integer mes, Integer limit) {
         return itemRepository.findAllByAnhoAndMes(anho, mes, limit);
     }
