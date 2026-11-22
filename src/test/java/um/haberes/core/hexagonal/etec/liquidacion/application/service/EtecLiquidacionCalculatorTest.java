@@ -35,6 +35,44 @@ class EtecLiquidacionCalculatorTest {
     }
 
     @Test
+    void descuentaElPresentismoCuandoElCargoPierdePresentismo() {
+        AcumuladorEtec acumulador = new AcumuladorEtec();
+        acumulador.acumularPuntos(new BigDecimal("500000.00"), BigDecimal.ZERO,
+                new BigDecimal("20.00"), new BigDecimal("10.00"), BigDecimal.ZERO, true);
+
+        Map<Integer, BigDecimal> conceptos = calculator.calcular(acumulador,
+                control("0.00", "0.00", "0.00"));
+
+        assertThat(conceptos).containsEntry(985, new BigDecimal("100000.00"));
+        assertThat(conceptos).containsEntry(984, new BigDecimal("-100000.00"));
+        assertThat(conceptos).containsEntry(986, new BigDecimal("50000.00"));
+    }
+
+    @Test
+    void sinPerdidaDePresentismoNoEmiteElDescuento() {
+        Map<Integer, BigDecimal> conceptos = calculator.calcular(
+                acumulado("500000.00", BigDecimal.ZERO.toPlainString()),
+                control("0.00", "0.00", "0.00"));
+
+        assertThat(conceptos).containsEntry(985, new BigDecimal("100000.00"));
+        assertThat(conceptos).doesNotContainKey(984);
+    }
+
+    @Test
+    void elDescuentoDePresentismoTambienAplicaAlCargoPorHoras() {
+        AcumuladorEtec acumulador = new AcumuladorEtec();
+        acumulador.acumularHoras(new BigDecimal("400000.00"), BigDecimal.ZERO,
+                new BigDecimal("20.00"), new BigDecimal("10.00"), BigDecimal.ZERO,
+                new BigDecimal("18.00"), true);
+
+        Map<Integer, BigDecimal> conceptos = calculator.calcular(acumulador,
+                control("0.00", "0.00", "0.00"));
+
+        assertThat(conceptos).containsEntry(985, new BigDecimal("80000.00"));
+        assertThat(conceptos).containsEntry(984, new BigDecimal("-80000.00"));
+    }
+
+    @Test
     void calculaPresentismoAdicionalCargaHorariaYSinGarantiaCuandoLaBaseSuperaElPiso() {
         Map<Integer, BigDecimal> conceptos = calculator.calcular(
                 acumulado("500000.00", "400000.00"), control("844872.78", "15.00", "8012.19"));

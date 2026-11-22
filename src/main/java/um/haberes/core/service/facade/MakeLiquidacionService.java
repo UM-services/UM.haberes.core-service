@@ -17,6 +17,8 @@ import um.haberes.core.hexagonal.etec.arraigo_escala.application.service.EscalaA
 import um.haberes.core.hexagonal.etec.control_etec.application.service.ControlEtecService;
 import um.haberes.core.hexagonal.etec.hora_escala.domain.model.AgrupadorHorasEtec;
 import um.haberes.core.hexagonal.etec.liquidacion.application.service.EtecLiquidacionCalculator;
+import um.haberes.core.hexagonal.etec.presentismo.application.service.EtecPresentismoService;
+import um.haberes.core.hexagonal.etec.presentismo_horas.application.service.EtecPresentismoHorasService;
 import um.haberes.core.hexagonal.liquidaciones.cargo.application.service.CargoService;
 import um.haberes.core.hexagonal.liquidaciones.cargo.domain.model.Cargo;
 import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.model.UniversoCargos;
@@ -129,6 +131,8 @@ public class MakeLiquidacionService {
     private final ControlEtecService controlEtecService;
     private final EscalaArraigoEtecService escalaArraigoEtecService;
     private final EtecLiquidacionCalculator etecLiquidacionCalculator;
+    private final EtecPresentismoService etecPresentismoService;
+    private final EtecPresentismoHorasService etecPresentismoHorasService;
     private final SijpService sijpService;
     private final Environment environment;
 
@@ -146,6 +150,12 @@ public class MakeLiquidacionService {
         }
         state.setCodigos(codigoService.findAll().stream().collect(Collectors.toMap(Codigo::getCodigoId, codigo -> codigo)));
         state.setControlEtec(controlEtecService.findByPeriodo(anho, mes).orElse(null));
+        Set<Integer> etecCategoriasSinPresentismo = new HashSet<>(
+                etecPresentismoService.categoriasSinPresentismo(legajoId, anho, mes));
+        if (etecPresentismoHorasService.existe(legajoId, anho, mes)) {
+            etecCategoriasSinPresentismo.add(CatalogoUniversosCargos.CATEGORIA_HORAS_ETEC);
+        }
+        state.setEtecCategoriasSinPresentismo(etecCategoriasSinPresentismo);
         state.setNovedades(novedadService.findAllByLegajo(legajoId, anho, mes).stream().filter(novedad -> !Objects.equals(novedad.getCodigoId(), CODIGO_NOVEDAD_AJUSTE_BASICO)).collect(Collectors.toMap(Novedad::getCodigoId, novedad -> novedad)));
         return state;
     }
@@ -646,17 +656,21 @@ public class MakeLiquidacionService {
         }
 
         if (esCargoEtec(categoria) && state.getControlEtec() != null) {
+            boolean sinPresentismo = state.getEtecCategoriasSinPresentismo()
+                    .contains(categoria.getCategoriaId());
             if (CatalogoUniversosCargos.esCategoriaHorasEtec(categoria)) {
                 state.getEtecAcumulado().acumularHoras(basico, antiguedad,
                         state.getControlEtec().getPorcentajePresentismo(),
                         state.getControlEtec().getPorcentajeAdicionalCarrera(),
                         state.getPorcentajeArraigoEtec(),
-                        horasClaseEtec(legajoId, anho, mes, cargoLiquidacion));
+                        horasClaseEtec(legajoId, anho, mes, cargoLiquidacion),
+                        sinPresentismo);
             } else {
                 state.getEtecAcumulado().acumularPuntos(basico, antiguedad,
                         state.getControlEtec().getPorcentajePresentismo(),
                         state.getControlEtec().getPorcentajeAdicionalCarrera(),
-                        state.getPorcentajeArraigoEtec());
+                        state.getPorcentajeArraigoEtec(),
+                        sinPresentismo);
             }
         }
 
@@ -687,6 +701,13 @@ public class MakeLiquidacionService {
     private void calcularConceptosEtec(Long legajoId, Integer anho, Integer mes, LiquidacionState state) {
         Map<Integer, BigDecimal> conceptos = etecLiquidacionCalculator.calcular(state.getEtecAcumulado(),
                 state.getControlEtec());
+        BigDecimal descuentoPresentismo = conceptos.get(EtecLiquidacionCalculator.CODIGO_DESCUENTO_PRESENTISMO_ETEC);
+        if (descuentoPresentismo != null && descuentoPresentismo.compareTo(BigDecimal.ZERO) != 0
+                && !state.getCodigos().containsKey(EtecLiquidacionCalculator.CODIGO_DESCUENTO_PRESENTISMO_ETEC)) {
+            throw new IllegalStateException("Falta el código "
+                    + EtecLiquidacionCalculator.CODIGO_DESCUENTO_PRESENTISMO_ETEC
+                    + " DESCUENTO PRESENTISMO ETEC en el catálogo: aplicar sql/020_codigo_descuento_presentismo_etec.sql");
+        }
         for (Map.Entry<Integer, BigDecimal> concepto : conceptos.entrySet()) {
             if (state.getCodigos().containsKey(concepto.getKey())) {
                 addItem(legajoId, anho, mes, concepto.getKey(), concepto.getValue(), state);
