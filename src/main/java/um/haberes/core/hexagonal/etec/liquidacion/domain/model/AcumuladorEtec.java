@@ -28,14 +28,30 @@ public class AcumuladorEtec {
                                BigDecimal porcentajePresentismo,
                                BigDecimal porcentajeAdicionalCarrera, BigDecimal porcentajeArraigo) {
         puntos.acumular(cargoCargo, antiguedadCargo, porcentajePresentismo,
-                porcentajeAdicionalCarrera, porcentajeArraigo);
+                porcentajeAdicionalCarrera, porcentajeArraigo, false);
+    }
+
+    public void acumularPuntos(BigDecimal cargoCargo, BigDecimal antiguedadCargo,
+                               BigDecimal porcentajePresentismo,
+                               BigDecimal porcentajeAdicionalCarrera, BigDecimal porcentajeArraigo,
+                               boolean sinPresentismo) {
+        puntos.acumular(cargoCargo, antiguedadCargo, porcentajePresentismo,
+                porcentajeAdicionalCarrera, porcentajeArraigo, sinPresentismo);
     }
 
     public void acumularHoras(BigDecimal cargoCargo, BigDecimal antiguedadCargo,
                               BigDecimal porcentajePresentismo,
                               BigDecimal porcentajeAdicionalCarrera, BigDecimal porcentajeArraigo) {
         horas.acumular(cargoCargo, antiguedadCargo, porcentajePresentismo,
-                porcentajeAdicionalCarrera, porcentajeArraigo);
+                porcentajeAdicionalCarrera, porcentajeArraigo, false);
+    }
+
+    public void acumularHoras(BigDecimal cargoCargo, BigDecimal antiguedadCargo,
+                              BigDecimal porcentajePresentismo,
+                              BigDecimal porcentajeAdicionalCarrera, BigDecimal porcentajeArraigo,
+                              boolean sinPresentismo) {
+        horas.acumular(cargoCargo, antiguedadCargo, porcentajePresentismo,
+                porcentajeAdicionalCarrera, porcentajeArraigo, sinPresentismo);
     }
 
     /**
@@ -47,7 +63,15 @@ public class AcumuladorEtec {
                               BigDecimal porcentajeAdicionalCarrera, BigDecimal porcentajeArraigo,
                               BigDecimal horasCargo) {
         horas.acumular(cargoCargo, antiguedadCargo, porcentajePresentismo,
-                porcentajeAdicionalCarrera, porcentajeArraigo, horasCargo);
+                porcentajeAdicionalCarrera, porcentajeArraigo, horasCargo, false);
+    }
+
+    public void acumularHoras(BigDecimal cargoCargo, BigDecimal antiguedadCargo,
+                              BigDecimal porcentajePresentismo,
+                              BigDecimal porcentajeAdicionalCarrera, BigDecimal porcentajeArraigo,
+                              BigDecimal horasCargo, boolean sinPresentismo) {
+        horas.acumular(cargoCargo, antiguedadCargo, porcentajePresentismo,
+                porcentajeAdicionalCarrera, porcentajeArraigo, horasCargo, sinPresentismo);
     }
 
     public boolean hayCargos() {
@@ -64,6 +88,11 @@ public class AcumuladorEtec {
 
     public BigDecimal getPresentismo() {
         return puntos.getPresentismo().add(horas.getPresentismo());
+    }
+
+    /** Presentismo que se descuenta por pérdida de presentismo de los cargos ETEC. */
+    public BigDecimal getPresentismoDescuento() {
+        return puntos.getPresentismoDescuento().add(horas.getPresentismoDescuento());
     }
 
     public BigDecimal getAdicionalCarrera() {

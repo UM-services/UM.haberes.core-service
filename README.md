@@ -19,7 +19,7 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**2.5.0** (2026-11-19)
+**2.6.0** (2026-11-22)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
@@ -63,6 +63,7 @@ Liquidaciones:
 - `docs/diagrams/flujo-etec-antiguedad.mmd`
 - `docs/diagrams/flujo-etec-cargo-puntos.mmd`
 - `docs/diagrams/flujo-etec-liquidacion-puntos.mmd`
+- `docs/diagrams/flujo-etec-presentismo.mmd`
 - `docs/diagrams/flujo-cargo-clase.mmd`
 - `docs/diagrams/flujo-liquidacion-adicional.mmd`
 - `docs/diagrams/flujo-bono-individual.mmd`
@@ -375,6 +376,24 @@ período y genera la orden de pago.
 - `PUT /api/haberes/core/etec/hora/escala/{anho}/{mes}` - Reemplazo completo de la escala de horas (valida rangos, solapamientos e importes; la lista vacía borra la escala; `404` si el período no tiene control ETEC)
 - `GET /api/haberes/core/etec/arraigo/escala` - Escala global de arraigo ETEC por antigüedad docente
 - `PUT /api/haberes/core/etec/arraigo/escala` - Reemplazo completo de la escala (valida años mínimos, duplicados y porcentajes entre 0 y 100)
+- `GET /api/haberes/core/etec/presentismo/legajo/{legajoId}/periodo/{anho}/{mes}` - Pérdidas de presentismo de los cargos ETEC con puntos del legajo/período
+- `GET /api/haberes/core/etec/presentismo/periodo/{anho}/{mes}` - Pérdidas de presentismo del período
+- `GET /api/haberes/core/etec/presentismo/asignacion/{asignacionCargoId}/periodo/{anho}/{mes}` - Pérdida de una asignación en el período (`404` si no existe)
+- `GET /api/haberes/core/etec/presentismo/{presentismoId}` - Pérdida por id (`404` si no existe)
+- `POST /api/haberes/core/etec/presentismo/` - Alta (`asignacionCargoId`, `anho`, `mes` y `motivo` obligatorios; la asignación debe estar vigente y el período abierto; `409` si la pérdida ya existe o el período está acreditado)
+- `PUT /api/haberes/core/etec/presentismo/{presentismoId}` - Actualización del motivo (`409` si el período está acreditado)
+- `DELETE /api/haberes/core/etec/presentismo/{presentismoId}` - Baja (`409` si el período está acreditado)
+- `GET /api/haberes/core/etec/presentismo-horas/legajo/{legajoId}/periodo/{anho}/{mes}` - Estado de la pérdida de presentismo por horas del legajo/período (siempre `200`; `presentismoHorasId` nulo si no hay pérdida y `tieneCargosHoras` indica si el bloque aplica)
+- `GET /api/haberes/core/etec/presentismo-horas/periodo/{anho}/{mes}` - Pérdidas de presentismo por horas del período
+- `GET /api/haberes/core/etec/presentismo-horas/{presentismoHorasId}` - Pérdida por id
+- `POST /api/haberes/core/etec/presentismo-horas/` - Alta (`legajoId`, `anho`, `mes` y `motivo`; el legajo debe tener cursos ETEC de la facultad 15 con horas en el período; `409` si ya existe o el período está acreditado)
+- `PUT /api/haberes/core/etec/presentismo-horas/{presentismoHorasId}` - Actualización del motivo (`409` si el período está acreditado)
+- `DELETE /api/haberes/core/etec/presentismo-horas/{presentismoHorasId}` - Baja (`409` si el período está acreditado)
+
+La pérdida de presentismo hace que la liquidación ETEC emita el `985 PRESENTISMO ETEC` bruto y el
+`984 DESCUENTO PRESENTISMO ETEC` por el mismo importe en negativo. Aplicar
+`sql/020_codigo_descuento_presentismo_etec.sql`, `sql/021_etec_presentismo.sql` y
+`sql/022_etec_presentismo_horas.sql` antes de usar los endpoints.
 
 ### Control de período
 - `GET /api/haberes/core/control/periodo/{anho}/{mes}/opcional` - Control del período (`200` con cuerpo vacío si todavía no existe)

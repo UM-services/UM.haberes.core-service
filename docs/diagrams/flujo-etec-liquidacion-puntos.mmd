@@ -1,5 +1,5 @@
 ---
-title: "Liquidación ETEC: Conceptos 985 a 989 (Puntos y Horas)"
+title: "Liquidación ETEC: Conceptos 984 a 989 (Puntos y Horas)"
 ---
 sequenceDiagram
     autonumber
@@ -16,6 +16,8 @@ sequenceDiagram
 
     Usuario->>Make: liquidacionByLegajoId(legajoId, anho, mes)
     Make->>DB: makeContext: control, persona, índices, códigos y novedades
+    Make->>DB: pérdidas de presentismo del legajo/período (etec_presentismo y etec_presentismo_horas)
+    DB-->>Make: categorías sin presentismo + 2002 si hay pérdida por horas
     Make->>CtlSvc: findByPeriodo(anho, mes)
     CtlSvc-->>Make: control_etec (valor del punto, monto fijo, porcentajes, garantía y horas)
     Make->>State: copiarContexto(estado nuevo)
@@ -33,9 +35,9 @@ sequenceDiagram
         alt Categoría 2002 DOCENTE ETEC HORAS
             Make->>Agrup: horasEnSede(cursos ETEC, legajoId, geográfica del cargo)
             Agrup-->>Make: horas semanales de la facultad 15 en la sede
-            Make->>Acum: acumularHoras(cargo, antigüedad, %, %, %arraigo, horas)
+            Make->>Acum: acumularHoras(cargo, antigüedad, %, %, %arraigo, horas, sinPresentismo)
         else Categoría con puntos
-            Make->>Acum: acumularPuntos(cargo, antigüedad, %presentismo, %adicional, %arraigo)
+            Make->>Acum: acumularPuntos(cargo, antigüedad, %presentismo, %adicional, %arraigo, sinPresentismo)
         else Categoría sin puntos
             Note over Make: sigue el circuito general docente o no docente
         end
@@ -45,10 +47,10 @@ sequenceDiagram
     alt Sin cargos ETEC acumulados
         Calc-->>Make: mapa vacío (no genera ítems ETEC)
     else Con cargos acumulados
-        Calc-->>Make: 985, 986, 987, 988 y 989 con importe distinto de cero
+        Calc-->>Make: 984 (sólo con pérdida), 985, 986, 987, 988 y 989 con importe distinto de cero
     end
     Make->>DB: agrega los ítems cuyo código existe en el catálogo, antes de los totales
 
-    Note over Calc,DB: 985 presentismo = cargo x %presentismo.<br/>986 adicional carrera = (cargo + antigüedad) x %adicional.<br/>988 carga horaria = horas adicionales fijas + horas de clase, ambas x valor hora.<br/>989 arraigo = cargo x porcentaje de la escala.<br/>Todo con HALF_UP a 2 decimales.
+    Note over Calc,DB: 984 descuento = -presentismo bruto de los cargos que perdieron presentismo.<br/>985 presentismo = cargo x %presentismo (bruto, para el recibo).<br/>986 adicional carrera = (cargo + antigüedad) x %adicional.<br/>988 carga horaria = horas adicionales fijas + horas de clase, ambas x valor hora.<br/>989 arraigo = cargo x porcentaje de la escala.<br/>Todo con HALF_UP a 2 decimales.
     Note over Calc,DB: 987 garantía tiene dos pisos: puntos contra max(0, garantía - base de puntos)<br/>y horas contra max(0, garantía / 18 x horas - base de horas), con piso completo desde 18 horas.
     Note over Acum: Puntos y horas se acumulan por separado y se suman por código,<br/>y la garantía de cada origen sólo descuenta su propia base.

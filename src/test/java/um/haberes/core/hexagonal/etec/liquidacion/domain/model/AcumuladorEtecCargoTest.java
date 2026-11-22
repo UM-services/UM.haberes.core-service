@@ -40,6 +40,28 @@ class AcumuladorEtecCargoTest {
     }
 
     @Test
+    void acumulaPresentismoBrutoYDescuentoCuandoElCargoPierdePresentismo() {
+        AcumuladorEtecCargo acumulador = new AcumuladorEtecCargo();
+
+        acumulador.acumular(new BigDecimal("500000.00"), new BigDecimal("400000.00"),
+                new BigDecimal("20.00"), new BigDecimal("10.00"), new BigDecimal("20.00"), true);
+
+        assertThat(acumulador.getPresentismo()).isEqualByComparingTo("100000.00");
+        assertThat(acumulador.getPresentismoDescuento()).isEqualByComparingTo("100000.00");
+    }
+
+    @Test
+    void sinPerdidaDePresentismoElDescuentoQuedaEnCero() {
+        AcumuladorEtecCargo acumulador = new AcumuladorEtecCargo();
+
+        acumulador.acumular(new BigDecimal("500000.00"), new BigDecimal("400000.00"),
+                new BigDecimal("20.00"), new BigDecimal("10.00"), new BigDecimal("20.00"));
+
+        assertThat(acumulador.getPresentismo()).isEqualByComparingTo("100000.00");
+        assertThat(acumulador.getPresentismoDescuento()).isEqualByComparingTo("0.00");
+    }
+
+    @Test
     void ignoraCargosEnCeroYPorcentajesNulos() {
         AcumuladorEtecCargo acumulador = new AcumuladorEtecCargo();
 
