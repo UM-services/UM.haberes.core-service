@@ -19,6 +19,9 @@ public class AcumuladorEtecCargo {
 
     private BigDecimal presentismo = BigDecimal.ZERO;
 
+    /** Parte del presentismo que se descuenta porque el cargo pierde el presentismo. */
+    private BigDecimal presentismoDescuento = BigDecimal.ZERO;
+
     private BigDecimal adicionalCarrera = BigDecimal.ZERO;
 
     private BigDecimal arraigo = BigDecimal.ZERO;
@@ -34,13 +37,31 @@ public class AcumuladorEtecCargo {
                          BigDecimal porcentajePresentismo, BigDecimal porcentajeAdicionalCarrera,
                          BigDecimal porcentajeArraigo) {
         acumular(cargoCargo, antiguedadCargo, porcentajePresentismo, porcentajeAdicionalCarrera,
-                porcentajeArraigo, BigDecimal.ZERO);
+                porcentajeArraigo, BigDecimal.ZERO, false);
+    }
+
+    public void acumular(BigDecimal cargoCargo, BigDecimal antiguedadCargo,
+                         BigDecimal porcentajePresentismo, BigDecimal porcentajeAdicionalCarrera,
+                         BigDecimal porcentajeArraigo, boolean sinPresentismo) {
+        acumular(cargoCargo, antiguedadCargo, porcentajePresentismo, porcentajeAdicionalCarrera,
+                porcentajeArraigo, BigDecimal.ZERO, sinPresentismo);
     }
 
     /** Acumula un cargo con las horas de clase que le dieron origen. */
     public void acumular(BigDecimal cargoCargo, BigDecimal antiguedadCargo,
                          BigDecimal porcentajePresentismo, BigDecimal porcentajeAdicionalCarrera,
                          BigDecimal porcentajeArraigo, BigDecimal horasCargo) {
+        acumular(cargoCargo, antiguedadCargo, porcentajePresentismo, porcentajeAdicionalCarrera,
+                porcentajeArraigo, horasCargo, false);
+    }
+
+    /**
+     * Acumula un cargo con sus horas de clase. {@code sinPresentismo} deja el presentismo
+     * bruto para el 985 y acumula el mismo importe como descuento para el 984.
+     */
+    public void acumular(BigDecimal cargoCargo, BigDecimal antiguedadCargo,
+                         BigDecimal porcentajePresentismo, BigDecimal porcentajeAdicionalCarrera,
+                         BigDecimal porcentajeArraigo, BigDecimal horasCargo, boolean sinPresentismo) {
         if (horasCargo != null && horasCargo.compareTo(BigDecimal.ZERO) > 0) {
             this.horas = this.horas.add(horasCargo);
         }
@@ -48,9 +69,13 @@ public class AcumuladorEtecCargo {
             return;
         }
         BigDecimal antiguedad = antiguedadCargo == null ? BigDecimal.ZERO : antiguedadCargo;
+        BigDecimal presentismoCargo = porcentaje(cargoCargo, porcentajePresentismo);
         this.cargo = this.cargo.add(cargoCargo);
         this.antiguedad = this.antiguedad.add(antiguedad);
-        this.presentismo = this.presentismo.add(porcentaje(cargoCargo, porcentajePresentismo));
+        this.presentismo = this.presentismo.add(presentismoCargo);
+        if (sinPresentismo) {
+            this.presentismoDescuento = this.presentismoDescuento.add(presentismoCargo);
+        }
         this.adicionalCarrera = this.adicionalCarrera.add(
                 porcentaje(cargoCargo.add(antiguedad), porcentajeAdicionalCarrera));
         this.arraigo = this.arraigo.add(porcentaje(cargoCargo, porcentajeArraigo));
