@@ -1,0 +1,45 @@
+---
+title: "ETEC: Pérdida de Presentismo y Concepto 984"
+---
+sequenceDiagram
+    autonumber
+    actor Usuario
+    participant Ctrl as EtecPresentismoController
+    participant Val as EtecPresentismoValidator
+    participant Acr as AcreditacionService
+    participant DB as MySQL
+    participant Make as MakeLiquidacionService
+    participant State as LiquidacionState
+    participant Acum as AcumuladorEtec
+    participant Calc as EtecLiquidacionCalculator
+
+    Usuario->>Ctrl: POST /etec/presentismo (asignación, período, motivo)
+    Ctrl->>Val: validarAlta(asignación, período, motivo)
+    Val->>Acr: findByPeriodo(anho, mes)
+    alt Período acreditado
+        Val-->>Ctrl: EtecPresentismoConflictoException (409)
+    else Período abierto
+        Val->>DB: asignación vigente y pérdida no registrada
+        alt Asignación inválida, duplicada o motivo vacío
+            Val-->>Ctrl: 400 / 409
+        else Válida
+            Ctrl->>DB: insert etec_presentismo
+            Ctrl-->>Usuario: 201 con legajo, categoría, dependencia y persona
+        end
+    end
+
+    Note over Usuario,DB: Los cargos por horas (categoría 2002) no tienen asignación:<br/>la pérdida se registra por legajo/período en etec_presentismo_horas.
+
+    Usuario->>Make: liquidacionByLegajoId(legajoId, anho, mes)
+    Make->>DB: makeContext: pérdidas de presentismo del legajo/período
+    DB-->>Make: categorías sin presentismo + 2002 si hay pérdida por horas
+    Make->>State: copiarContexto
+    loop Cada cargo ETEC del legajo
+        Make->>Acum: acumularPuntos/acumularHoras(..., sinPresentismo)
+        Note over Acum: acumula el presentismo bruto y, si corresponde,<br/>el mismo importe como descuento
+    end
+    Make->>Calc: calcular(acumulado, control_etec)
+    Calc-->>Make: 985 bruto y 984 negativo (sólo si hubo pérdida)
+    Make->>DB: agrega los ítems cuyo código existe en el catálogo
+
+    Note over Calc,DB: 984 descuento = -presentismo bruto de los cargos sin presentismo.<br/>986 adicional carrera y garantía siguen usando el presentismo bruto.

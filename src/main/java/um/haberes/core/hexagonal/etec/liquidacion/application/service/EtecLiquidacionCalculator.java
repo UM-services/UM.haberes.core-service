@@ -21,6 +21,9 @@ import um.haberes.core.hexagonal.etec.liquidacion.domain.model.AcumuladorEtecCar
  * importes del mismo código en un único ítem.</p>
  *
  * <ul>
+ *   <li>984 DESCUENTO PRESENTISMO ETEC: importe negativo del presentismo de los cargos que
+ *       perdieron el presentismo del período. Acompaña al 985, que se sigue informando
+ *       bruto para que el recibo muestre ambos conceptos.</li>
  *   <li>985 PRESENTISMO ETEC: suma de {@code cargo × porcentaje} por cargo.</li>
  *   <li>986 ADICIONAL CARRERA DOCENTE ETEC: suma de {@code (cargo + antigüedad) × porcentaje}.</li>
  *   <li>987 GARANTIA ETEC: dos pisos independientes que se suman.
@@ -44,6 +47,8 @@ public class EtecLiquidacionCalculator {
 
     public static final int CODIGO_PRESENTISMO_ETEC = 985;
 
+    public static final int CODIGO_DESCUENTO_PRESENTISMO_ETEC = 984;
+
     public static final int CODIGO_ADICIONAL_CARRERA_ETEC = 986;
 
     public static final int CODIGO_GARANTIA_ETEC = 987;
@@ -62,6 +67,8 @@ public class EtecLiquidacionCalculator {
 
         Map<Integer, BigDecimal> conceptos = new LinkedHashMap<>();
         agregar(conceptos, CODIGO_PRESENTISMO_ETEC, acumulado.getPresentismo());
+        agregar(conceptos, CODIGO_DESCUENTO_PRESENTISMO_ETEC,
+                acumulado.getPresentismoDescuento().negate());
         agregar(conceptos, CODIGO_ADICIONAL_CARRERA_ETEC, acumulado.getAdicionalCarrera());
 
         BigDecimal garantia = garantiaPuntos(acumulado, control).add(garantiaHoras(acumulado, control));

@@ -11,8 +11,10 @@ import um.haberes.core.model.*;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -41,6 +43,13 @@ public class LiquidacionState {
     private BigDecimal porcentajeArraigoEtec = BigDecimal.ZERO;
 
     /**
+     * Categorías de cargo ETEC que pierden el presentismo en el período. Se resuelve en
+     * {@code makeContext} desde {@code etec_presentismo}; el motor lo usa para emitir el 984.
+     */
+    @Builder.Default
+    private Set<Integer> etecCategoriasSinPresentismo = new HashSet<>();
+
+    /**
      * Copia los datos de contexto del período (control, persona, índices, códigos, novedades y
      * control ETEC) desde el estado recién construido por {@code makeContext}.
      *
@@ -54,5 +63,6 @@ public class LiquidacionState {
         this.codigos = origen.codigos;
         this.novedades = origen.novedades;
         this.controlEtec = origen.controlEtec;
+        this.etecCategoriasSinPresentismo = origen.etecCategoriasSinPresentismo;
     }
 }

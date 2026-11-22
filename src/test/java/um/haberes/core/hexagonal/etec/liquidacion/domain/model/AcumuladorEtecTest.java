@@ -54,8 +54,20 @@ class AcumuladorEtecTest {
     }
 
     @Test
-    void lasHorasDeClaseSoloLasAportaElCargoPorHoras() {
+    void elDescuentoDePresentismoSumaLosDosOrigenesSinTocarElPresentismoBruto() {
         AcumuladorEtec acumulador = new AcumuladorEtec();
+
+        acumulador.acumularPuntos(new BigDecimal("1000.00"), BigDecimal.ZERO,
+                PRESENTISMO, CARRERA, ARRAIGO, true);
+        acumulador.acumularHoras(new BigDecimal("600.00"), BigDecimal.ZERO,
+                PRESENTISMO, CARRERA, ARRAIGO, true);
+
+        assertThat(acumulador.getPresentismo()).isEqualByComparingTo("320.00");
+        assertThat(acumulador.getPresentismoDescuento()).isEqualByComparingTo("320.00");
+    }
+
+    @Test
+    void lasHorasDeClaseSoloLasAportaElCargoPorHoras() {        AcumuladorEtec acumulador = new AcumuladorEtec();
 
         acumulador.acumularPuntos(new BigDecimal("1000.00"), BigDecimal.ZERO,
                 PRESENTISMO, CARRERA, ARRAIGO);
