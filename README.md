@@ -19,7 +19,7 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**2.6.0** (2026-11-22)
+**2.7.0** (2026-11-23)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
@@ -428,7 +428,7 @@ La pérdida de presentismo hace que la liquidación ETEC emita el `985 PRESENTIS
 - `POST /api/haberes/core/libroSueldo/generate/{anho}/{mes}` - Generar libro de sueldo
 - `GET /api/haberes/core/sheet/generateitems/{anho}/{mes}` - Generar planilla de items
 - `POST /api/haberes/core/bono/dependencia/{dependenciaId}/{anho}/{mes}/{salida}/print-prepare` - Preparar y auditar la impresión masiva de bonos de una dependencia
-- `POST /api/haberes/core/bono/dependencia/{dependenciaId}/{anho}/{mes}/{salida}/lote` - Obtener en una sola lectura el lote completo de bonos de la dependencia (legajos y catálogos compartidos)
+- `POST /api/haberes/core/bono/dependencia/{dependenciaId}/{anho}/{mes}/{salida}/lote` - Obtener en una sola lectura el lote completo de bonos de la dependencia (legajos y catálogos compartidos); cada curso del legajo incluye `facultadId` para separar los cursos por facultad en el reporte
 
 
 ## Arquitectura
