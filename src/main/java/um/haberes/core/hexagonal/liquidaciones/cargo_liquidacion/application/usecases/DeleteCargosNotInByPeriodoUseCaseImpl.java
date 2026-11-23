@@ -30,8 +30,9 @@ public class DeleteCargosNotInByPeriodoUseCaseImpl implements DeleteCargosNotInB
     public void deleteCargosNotInByPeriodo(List<Long> legajoIds, Integer anho, Integer mes) {
         // Los cargos ETEC no se depuran con la planilla de cargos: dependen de la asignación
         // vigente en etec_asignacion_cargo, no de que el legajo tenga liquidación en el período.
-        List<Integer> categoriasEtec = categoriaRepository.findAllByPuntosGreaterThan(BigDecimal.ZERO)
-                .stream()
+        List<Integer> categoriasEtec = categoriaRepository.findAllByPeriodo(anho, mes).stream()
+                .filter(categoria -> categoria.getPuntos() != null
+                        && categoria.getPuntos().compareTo(BigDecimal.ZERO) > 0)
                 .map(Categoria::getCategoriaId)
                 .filter(categoriaId -> categoriaId != null)
                 .toList();

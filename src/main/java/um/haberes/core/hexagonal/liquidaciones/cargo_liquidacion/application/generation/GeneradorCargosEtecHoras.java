@@ -77,7 +77,7 @@ public class GeneradorCargosEtecHoras implements GeneradorCargosLiquidacion {
     }
 
     private Categoria categoria(EscalaHoraEtec tramo, ContextoGeneracionCargos contexto) {
-        Categoria categoria = datos.categoria(tramo.getCategoriaId());
+        Categoria categoria = datos.categoria(tramo.getCategoriaId(), contexto.anho(), contexto.mes());
         if (categoria == null) {
             throw new CargoLiquidacionException("No existe la categoría "
                     + tramo.getCategoriaId() + " del tramo de horas ETEC del período "

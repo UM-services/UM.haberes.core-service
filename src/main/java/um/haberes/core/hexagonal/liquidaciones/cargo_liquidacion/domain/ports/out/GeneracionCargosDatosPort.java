@@ -36,9 +36,10 @@ public interface GeneracionCargosDatosPort {
 
     List<Novedad> novedades(Long legajoId, Integer anho, Integer mes, Integer codigoId);
 
-    Categoria categoria(Integer categoriaId);
+    Categoria categoria(Integer categoriaId, Integer anho, Integer mes);
 
-    List<Categoria> categoriasConPuntos();
+    /** Categorías con {@code puntos > 0} según el período (fallback a la plantilla). */
+    List<Categoria> categoriasConPuntos(Integer anho, Integer mes);
 
     /**
      * Asignaciones ETEC vigentes en el período. Con {@code legajoId} nulo devuelve las de todo

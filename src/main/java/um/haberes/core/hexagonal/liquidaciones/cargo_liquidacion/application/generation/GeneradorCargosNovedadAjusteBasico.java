@@ -38,7 +38,7 @@ public class GeneradorCargosNovedadAjusteBasico implements GeneradorCargosLiquid
 
     @Override
     public List<CargoLiquidacion> cargos(ContextoGeneracionCargos contexto) {
-        Categoria categoria = datos.categoria(CODIGO_NOVEDAD_AJUSTE_BASICO);
+        Categoria categoria = datos.categoria(CODIGO_NOVEDAD_AJUSTE_BASICO, contexto.anho(), contexto.mes());
         return datos.novedades(contexto.legajoId(), contexto.anho(), contexto.mes(),
                         CODIGO_NOVEDAD_AJUSTE_BASICO).stream()
                 .map(novedad -> CargoLiquidacionFactory.deNovedadAjusteBasico(contexto, novedad, categoria))

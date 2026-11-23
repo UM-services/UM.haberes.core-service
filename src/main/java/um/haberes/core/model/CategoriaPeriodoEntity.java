@@ -41,4 +41,10 @@ public class CategoriaPeriodoEntity extends AuditableEntity {
     private Byte liquidaPorHora = 0;
 
     private BigDecimal estadoDocente = BigDecimal.ZERO;
+
+    /** Puntaje del cargo ETEC vigente en el período. */
+    private BigDecimal puntos = BigDecimal.ZERO;
+
+    /** 1 = la categoría liquida las horas de clase ETEC en el período. */
+    private Byte etecHoras = 0;
 }

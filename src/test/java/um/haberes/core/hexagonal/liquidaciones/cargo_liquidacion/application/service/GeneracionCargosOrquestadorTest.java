@@ -3,6 +3,7 @@ package um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.application.se
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
@@ -91,7 +92,7 @@ class GeneracionCargosOrquestadorTest {
         when(generador.universo()).thenReturn(UniversoCargos.DOCENTE);
         when(generador.aplica(any(ContextoGeneracionCargos.class))).thenReturn(true);
         when(generador.cargos(any(ContextoGeneracionCargos.class))).thenReturn(List.of(cargo));
-        when(catalogo.categoriaIds(anySet(), anyList())).thenReturn(List.of(1, 2));
+        when(catalogo.categoriaIds(anySet(), anyList(), eq(2026), eq(11))).thenReturn(List.of(1, 2));
         when(saveAllCargoLiquidacionesUseCase.saveAllCargoLiquidaciones(List.of(cargo), null))
                 .thenReturn(List.of(cargo));
 
@@ -116,7 +117,7 @@ class GeneracionCargosOrquestadorTest {
         when(generador.aplica(any(ContextoGeneracionCargos.class))).thenReturn(true);
         when(generador.cargos(any(ContextoGeneracionCargos.class))).thenReturn(List.of(cargo));
         when(datos.categoriasEtecAsignadas()).thenReturn(List.of(2001));
-        when(catalogo.categoriaIds(anySet(), anyList())).thenReturn(List.of(2001));
+        when(catalogo.categoriaIds(anySet(), anyList(), eq(2026), eq(11))).thenReturn(List.of(2001));
         when(saveAllCargoLiquidacionesUseCase.saveAllCargoLiquidaciones(List.of(cargo), null))
                 .thenReturn(List.of(cargo));
 
@@ -130,7 +131,7 @@ class GeneracionCargosOrquestadorTest {
         contextoComun();
         when(generador.universo()).thenReturn(UniversoCargos.DOCENTE);
         when(generador.aplica(any(ContextoGeneracionCargos.class))).thenReturn(false);
-        when(catalogo.categoriaIds(anySet(), anyList())).thenReturn(List.of());
+        when(catalogo.categoriaIds(anySet(), anyList(), eq(2026), eq(11))).thenReturn(List.of());
         when(saveAllCargoLiquidacionesUseCase.saveAllCargoLiquidaciones(List.of(), null))
                 .thenReturn(List.of());
 

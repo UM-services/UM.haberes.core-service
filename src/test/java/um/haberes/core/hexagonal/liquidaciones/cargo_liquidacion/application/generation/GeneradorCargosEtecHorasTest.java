@@ -93,7 +93,7 @@ class GeneradorCargosEtecHorasTest {
         when(datos.cursosCargo(LEGAJO, 2026, 11)).thenReturn(List.of(
                 cursoCargo(LEGAJO, 15, 1, "6"),
                 cursoCargo(LEGAJO, 15, 1, "6")));
-        when(datos.categoria(2002)).thenReturn(categoriaHoras());
+        when(datos.categoria(2002, 2026, 11)).thenReturn(categoriaHoras());
 
         var cargos = generador.cargos(contexto(LEGAJO));
 
@@ -118,7 +118,7 @@ class GeneradorCargosEtecHorasTest {
         when(datos.cursosCargo(LEGAJO, 2026, 11)).thenReturn(List.of(
                 cursoCargo(LEGAJO, 15, 1, "6"),
                 cursoCargo(LEGAJO, 15, 2, "6")));
-        when(datos.categoria(2002)).thenReturn(categoriaHoras());
+        when(datos.categoria(2002, 2026, 11)).thenReturn(categoriaHoras());
 
         var cargos = generador.cargos(contexto(LEGAJO));
 
@@ -137,7 +137,7 @@ class GeneradorCargosEtecHorasTest {
 
         assertThat(generador.cargos(contexto(LEGAJO))).isEmpty();
 
-        verify(datos, never()).categoria(2002);
+        verify(datos, never()).categoria(2002, 2026, 11);
     }
 
     @Test
@@ -176,7 +176,7 @@ class GeneradorCargosEtecHorasTest {
         when(datos.cursosCargoPeriodo(2026, 11)).thenReturn(List.of(
                 cursoCargo(100L, 15, 1, "6"),
                 cursoCargo(200L, 15, 1, "6")));
-        when(datos.categoria(2002)).thenReturn(categoriaHoras());
+        when(datos.categoria(2002, 2026, 11)).thenReturn(categoriaHoras());
 
         var cargos = generador.cargos(contexto(null));
 

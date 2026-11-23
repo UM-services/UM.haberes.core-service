@@ -3,7 +3,9 @@ package um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.persist
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Sort;
@@ -15,17 +17,30 @@ import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.out.Catego
 import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.persistence.entity.CategoriaEntity;
 import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.persistence.mapper.CategoriaMapper;
 import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.persistence.repository.JpaCategoriaRepository;
+import um.haberes.core.model.CategoriaPeriodoEntity;
+import um.haberes.core.repository.JpaCategoriaPeriodoRepository;
 
 @Component
 @RequiredArgsConstructor
 public class JpaCategoriaRepositoryAdapter implements CategoriaRepository {
 
     private final JpaCategoriaRepository jpaCategoriaRepository;
+    private final JpaCategoriaPeriodoRepository jpaCategoriaPeriodoRepository;
     private final CategoriaMapper categoriaMapper;
 
     @Override
     public List<Categoria> findAll() {
         return toDomainList(jpaCategoriaRepository.findAll(Sort.by("categoriaId").ascending()));
+    }
+
+    @Override
+    public List<Categoria> findAllByPeriodo(Integer anho, Integer mes) {
+        Map<Integer, CategoriaPeriodoEntity> periodos = jpaCategoriaPeriodoRepository
+                .findAllByAnhoAndMes(anho, mes).stream()
+                .collect(Collectors.toMap(CategoriaPeriodoEntity::getCategoriaId, Function.identity()));
+        return jpaCategoriaRepository.findAll(Sort.by("categoriaId").ascending()).stream()
+                .map(entity -> toDomainConPeriodo(entity, periodos.get(entity.getCategoriaId())))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -69,6 +84,13 @@ public class JpaCategoriaRepositoryAdapter implements CategoriaRepository {
     }
 
     @Override
+    public Optional<Categoria> findByCategoriaIdAndPeriodo(Integer categoriaId, Integer anho, Integer mes) {
+        return jpaCategoriaRepository.findByCategoriaId(categoriaId)
+                .map(entity -> toDomainConPeriodo(entity, jpaCategoriaPeriodoRepository
+                        .findByCategoriaIdAndAnhoAndMes(categoriaId, anho, mes).orElse(null)));
+    }
+
+    @Override
     public Optional<Categoria> findLast() {
         return jpaCategoriaRepository.findTopByOrderByCategoriaIdDesc().map(categoriaMapper::toDomain);
     }
@@ -95,5 +117,14 @@ public class JpaCategoriaRepositoryAdapter implements CategoriaRepository {
         return entities.stream()
                 .map(categoriaMapper::toDomain)
                 .collect(Collectors.toList());
+    }
+
+    private Categoria toDomainConPeriodo(CategoriaEntity entity, CategoriaPeriodoEntity periodo) {
+        Categoria categoria = categoriaMapper.toDomain(entity);
+        if (categoria != null && periodo != null) {
+            categoria.setPuntos(periodo.getPuntos());
+            categoria.setEtecHoras(periodo.getEtecHoras());
+        }
+        return categoria;
     }
 }
