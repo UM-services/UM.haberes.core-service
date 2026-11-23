@@ -92,6 +92,7 @@ class CopiarControlEtecUseCaseImplTest {
                 EscalaHoraEtec.builder()
                         .escalaHoraEtecId(9L)
                         .controlEtecId(5L)
+                        .categoriaId(2002)
                         .horasDesde(new BigDecimal("0.00"))
                         .horasHasta(new BigDecimal("12.00"))
                         .montoFijo(new BigDecimal("50000.00"))
@@ -107,6 +108,7 @@ class CopiarControlEtecUseCaseImplTest {
         assertThat(captor.getValue()).singleElement().satisfies(tramo -> {
             assertThat(tramo.getEscalaHoraEtecId()).isNull();
             assertThat(tramo.getControlEtecId()).isEqualTo(51L);
+            assertThat(tramo.getCategoriaId()).isEqualTo(2002);
             assertThat(tramo.getHorasDesde()).isEqualByComparingTo("0.00");
             assertThat(tramo.getValorHora()).isEqualByComparingTo("5000.00");
         });

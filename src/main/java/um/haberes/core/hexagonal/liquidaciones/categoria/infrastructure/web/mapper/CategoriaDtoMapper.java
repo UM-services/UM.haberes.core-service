@@ -40,6 +40,9 @@ public class CategoriaDtoMapper {
         if (request.getPuntos() != null) {
             builder.puntos(request.getPuntos());
         }
+        if (request.getEtecHoras() != null) {
+            builder.etecHoras(request.getEtecHoras());
+        }
         return builder.build();
     }
 
@@ -56,6 +59,7 @@ public class CategoriaDtoMapper {
                 .liquidaPorHora(domain.getLiquidaPorHora())
                 .estadoDocente(domain.getEstadoDocente())
                 .puntos(domain.getPuntos())
+                .etecHoras(domain.getEtecHoras())
                 .build();
     }
 

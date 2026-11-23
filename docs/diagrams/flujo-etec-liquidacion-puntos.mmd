@@ -17,7 +17,7 @@ sequenceDiagram
     Usuario->>Make: liquidacionByLegajoId(legajoId, anho, mes)
     Make->>DB: makeContext: control, persona, índices, códigos y novedades
     Make->>DB: pérdidas de presentismo del legajo/período (etec_presentismo y etec_presentismo_horas)
-    DB-->>Make: categorías sin presentismo + 2002 si hay pérdida por horas
+    DB-->>Make: categorías sin presentismo + categorías de la escala si hay pérdida por horas
     Make->>CtlSvc: findByPeriodo(anho, mes)
     CtlSvc-->>Make: control_etec (valor del punto, monto fijo, porcentajes, garantía y horas)
     Make->>State: copiarContexto(estado nuevo)
@@ -32,7 +32,7 @@ sequenceDiagram
 
     loop Cada cargo del legajo
         Make->>DB: básico y antigüedad del cargo
-        alt Categoría 2002 DOCENTE ETEC HORAS
+        alt Categoría etec_horas (horas de clase)
             Make->>Agrup: horasEnSede(cursos ETEC, legajoId, geográfica del cargo)
             Agrup-->>Make: horas semanales de la facultad 15 en la sede
             Make->>Acum: acumularHoras(cargo, antigüedad, %, %, %arraigo, horas, sinPresentismo)

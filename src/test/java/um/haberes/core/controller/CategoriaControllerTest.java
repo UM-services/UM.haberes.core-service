@@ -75,7 +75,8 @@ class CategoriaControllerTest {
                   "noDocente": 0,
                   "liquidaPorHora": 0,
                   "estadoDocente": 1.20,
-                  "puntos": 0
+                  "puntos": 0,
+                  "etecHoras": 0
                                                     }
                 """;
     }
@@ -90,7 +91,8 @@ class CategoriaControllerTest {
                   "noDocente": 0,
                   "liquidaPorHora": 0,
                   "estadoDocente": 1.20,
-                  "puntos": 0
+                  "puntos": 0,
+                  "etecHoras": 0
                                                     } ]
                 """;
     }

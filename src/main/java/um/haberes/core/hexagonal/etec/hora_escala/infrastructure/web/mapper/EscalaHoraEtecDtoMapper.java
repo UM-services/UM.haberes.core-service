@@ -11,6 +11,7 @@ public class EscalaHoraEtecDtoMapper {
 
     public EscalaHoraEtec toDomain(EscalaHoraEtecRequest request) {
         return EscalaHoraEtec.builder()
+                .categoriaId(request.getCategoriaId())
                 .horasDesde(request.getHorasDesde())
                 .horasHasta(request.getHorasHasta())
                 .montoFijo(request.getMontoFijo())
@@ -20,7 +21,7 @@ public class EscalaHoraEtecDtoMapper {
 
     public EscalaHoraEtecResponse toResponse(EscalaHoraEtec domain) {
         return new EscalaHoraEtecResponse(domain.getEscalaHoraEtecId(), domain.getControlEtecId(),
-                domain.getHorasDesde(), domain.getHorasHasta(), domain.getMontoFijo(),
-                domain.getValorHora());
+                domain.getCategoriaId(), domain.getHorasDesde(), domain.getHorasHasta(),
+                domain.getMontoFijo(), domain.getValorHora());
     }
 }

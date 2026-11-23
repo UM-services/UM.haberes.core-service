@@ -24,6 +24,8 @@ public interface JpaCategoriaRepository extends JpaRepository<CategoriaEntity, I
 
 	List<CategoriaEntity> findAllByPuntosGreaterThan(BigDecimal puntos, Sort sort);
 
+	List<CategoriaEntity> findAllByEtecHoras(Byte etecHoras, Sort sort);
+
 	List<CategoriaEntity> findAllByNoDocente(Byte noDocente, Sort sort);
 
 	List<CategoriaEntity> findAllByCategoriaIdIn(List<Integer> categoriaIds);
