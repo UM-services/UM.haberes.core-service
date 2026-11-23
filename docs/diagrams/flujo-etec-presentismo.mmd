@@ -28,11 +28,11 @@ sequenceDiagram
         end
     end
 
-    Note over Usuario,DB: Los cargos por horas (categoría 2002) no tienen asignación:<br/>la pérdida se registra por legajo/período en etec_presentismo_horas.
+    Note over Usuario,DB: Los cargos por horas (categorías etec_horas) no tienen asignación:<br/>la pérdida se registra por legajo/período en etec_presentismo_horas.
 
     Usuario->>Make: liquidacionByLegajoId(legajoId, anho, mes)
     Make->>DB: makeContext: pérdidas de presentismo del legajo/período
-    DB-->>Make: categorías sin presentismo + 2002 si hay pérdida por horas
+    DB-->>Make: categorías sin presentismo + categorías de la escala si hay pérdida por horas
     Make->>State: copiarContexto
     loop Cada cargo ETEC del legajo
         Make->>Acum: acumularPuntos/acumularHoras(..., sinPresentismo)

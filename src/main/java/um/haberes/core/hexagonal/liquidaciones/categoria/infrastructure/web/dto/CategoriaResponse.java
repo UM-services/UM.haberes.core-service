@@ -31,4 +31,7 @@ public class CategoriaResponse {
 
     /** Puntaje del cargo ETEC. 0 = categoría común. */
     private BigDecimal puntos;
+
+    /** 1 = la categoría liquida las horas de clase ETEC (escala de horas). */
+    private Byte etecHoras;
 }

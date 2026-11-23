@@ -101,7 +101,8 @@ class FormularioAsignacionCargoControllerTest {
                               "noDocente": 0,
                               "liquidaPorHora": 0,
                               "estadoDocente": 35.00,
-                              "puntos": 0
+                              "puntos": 0,
+                              "etecHoras": 0
                             }
                           ],
                           "categoriasAsignables": [
@@ -113,7 +114,8 @@ class FormularioAsignacionCargoControllerTest {
                               "noDocente": 0,
                               "liquidaPorHora": 0,
                               "estadoDocente": 35.00,
-                              "puntos": 0
+                              "puntos": 0,
+                              "etecHoras": 0
                             }
                           ],
                           "dependencias": [

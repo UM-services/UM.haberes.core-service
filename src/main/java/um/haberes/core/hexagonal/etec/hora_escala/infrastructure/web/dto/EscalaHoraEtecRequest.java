@@ -14,6 +14,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class EscalaHoraEtecRequest {
 
+    /** Categoría con la que se liquida el tramo (marcada como {@code etec_horas}). */
+    private Integer categoriaId;
+
     private BigDecimal horasDesde;
 
     private BigDecimal horasHasta;

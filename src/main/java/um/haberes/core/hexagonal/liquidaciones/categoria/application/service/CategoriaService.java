@@ -9,10 +9,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import um.haberes.core.hexagonal.liquidaciones.categoria.application.exception.CategoriaException;
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.Categoria;
+import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.CategoriaFilter;
+import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.CategoriaPage;
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.CategoriaSearchResult;
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.UploadedFile;
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.in.CreateCategoriaUseCase;
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.in.DeleteCategoriaUseCase;
+import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.in.FindCategoriasByFilterUseCase;
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.in.FindCategoriasBySearchUseCase;
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.in.GetAllCategoriasUseCase;
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.in.GetCategoriaByCategoriaIdUseCase;
@@ -35,6 +38,7 @@ public class CategoriaService {
 
     private final GetAllCategoriasUseCase getAllCategoriasUseCase;
     private final GetCategoriasByCategoriaIdsUseCase getCategoriasByCategoriaIdsUseCase;
+    private final FindCategoriasByFilterUseCase findCategoriasByFilterUseCase;
     private final FindCategoriasBySearchUseCase findCategoriasBySearchUseCase;
     private final GetCategoriasDocentesUseCase getCategoriasDocentesUseCase;
     private final GetCategoriasNoDocentesUseCase getCategoriasNoDocentesUseCase;
@@ -64,6 +68,10 @@ public class CategoriaService {
 
     public List<CategoriaSearchResult> findAllSearch(String chain) {
         return findCategoriasBySearchUseCase.findCategoriasBySearch(chain);
+    }
+
+    public CategoriaPage findAllByFilter(CategoriaFilter filter) {
+        return findCategoriasByFilterUseCase.findCategoriasByFilter(filter);
     }
 
     public List<Categoria> findAllDocentes() {

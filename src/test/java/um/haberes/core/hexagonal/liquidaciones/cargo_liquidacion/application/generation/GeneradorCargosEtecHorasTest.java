@@ -54,6 +54,7 @@ class GeneradorCargosEtecHorasTest {
     private EscalaHoraEtec tramo(String desde, String hasta, String montoFijo, String valorHora) {
         return EscalaHoraEtec.builder()
                 .controlEtecId(50L)
+                .categoriaId(2002)
                 .horasDesde(new BigDecimal(desde))
                 .horasHasta(new BigDecimal(hasta))
                 .montoFijo(new BigDecimal(montoFijo))
@@ -68,6 +69,7 @@ class GeneradorCargosEtecHorasTest {
                 .basico(BigDecimal.ZERO)
                 .docente((byte) 1)
                 .puntos(BigDecimal.ZERO)
+                .etecHoras((byte) 1)
                 .build();
     }
 
@@ -152,7 +154,6 @@ class GeneradorCargosEtecHorasTest {
         when(datos.escalasHoraEtec(2026, 11)).thenReturn(List.of(tramo("0", "12", "50000", "5000")));
         when(datos.cursosCargo(LEGAJO, 2026, 11))
                 .thenReturn(List.of(cursoCargo(LEGAJO, 15, 1, "20")));
-        when(datos.categoria(2002)).thenReturn(categoriaHoras());
 
         assertThatThrownBy(() -> generador.cargos(contexto(LEGAJO)))
                 .isInstanceOf(CargoLiquidacionException.class)
@@ -165,7 +166,6 @@ class GeneradorCargosEtecHorasTest {
         when(datos.escalasHoraEtec(2026, 11)).thenReturn(List.of(tramo("0", "12", "50000", "5000")));
         when(datos.cursosCargo(LEGAJO, 2026, 11))
                 .thenReturn(List.of(cursoCargo(LEGAJO, 15, 1, "0")));
-        when(datos.categoria(2002)).thenReturn(categoriaHoras());
 
         assertThat(generador.cargos(contexto(LEGAJO))).isEmpty();
     }

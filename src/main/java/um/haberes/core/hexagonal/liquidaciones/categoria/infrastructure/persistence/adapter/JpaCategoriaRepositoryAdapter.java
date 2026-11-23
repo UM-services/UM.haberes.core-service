@@ -34,6 +34,11 @@ public class JpaCategoriaRepositoryAdapter implements CategoriaRepository {
     }
 
     @Override
+    public List<Categoria> findAllByEtecHoras(Byte etecHoras) {
+        return toDomainList(jpaCategoriaRepository.findAllByEtecHoras(etecHoras, Sort.by("categoriaId").ascending()));
+    }
+
+    @Override
     public List<Categoria> findAllByCategoriaIdIn(List<Integer> categoriaIds) {
         if (categoriaIds == null || categoriaIds.isEmpty()) {
             return List.of();

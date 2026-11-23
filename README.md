@@ -19,7 +19,7 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**2.7.0** (2026-11-23)
+**2.8.0** (2026-11-23)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
@@ -356,8 +356,13 @@ período y genera la orden de pago.
 - `GET /api/haberes/core/categoria/` - Listar categorías
 - `GET /api/haberes/core/categoria/{categoriaId}` - Obtener categoría
 - `GET /api/haberes/core/categoria/puntos` - Listar categorías ETEC con puntos (`puntos > 0`)
+- `POST /api/haberes/core/categoria/search` - Buscador paginado del catálogo con body `{texto, condiciones, pagina, tamano}`: `texto` busca por nombre (varias palabras con AND) y por ID completo; `condiciones` (`DOCENTE`, `NO_DOCENTE`, `LIQUIDA_POR_HORA`, `ETEC`) se combinan con OR y con el texto con AND; `tamano` va de 1 a 200 (default 50) y responde `{filas, total, pagina, tamano}`
 - `POST /api/haberes/core/categoria/upload/{anho}/{mes}` - Cargar categorías desde Excel
 - `GET /api/haberes/core/categoria/nogrado` - Listar categorías sin grado
+
+`CategoriaRequest`, `CategoriaResponse`, la planilla de categorías y el upload aceptan `etec_horas`
+(1 = la categoría liquida las horas de clase ETEC por la escala de horas). La escala de horas ETEC
+exige que cada tramo indique una categoría marcada con `etec_horas = 1`.
 
 ### ETEC (cargos por puntos y por horas)
 - `GET /api/haberes/core/etec/asignacion-cargo/legajo/{legajoId}` - Asignaciones del legajo
@@ -372,8 +377,8 @@ período y genera la orden de pago.
 - `GET /api/haberes/core/etec/control/{anho}/{mes}/opcional` - Ídem, con `200` y cuerpo vacío si no existe
 - `POST /api/haberes/core/etec/control/{anho}/{mes}` - Alta o actualización (upsert) de los parámetros ETEC del período
 - `POST /api/haberes/core/etec/control/copiar/{anho}/{mes}` - Copia los parámetros ETEC y la escala de horas del mes anterior (`409` si el destino existe, `404` si no hay origen)
-- `GET /api/haberes/core/etec/hora/escala/{anho}/{mes}` - Escala de horas de clase ETEC del período (lista vacía si el período no tiene control ETEC)
-- `PUT /api/haberes/core/etec/hora/escala/{anho}/{mes}` - Reemplazo completo de la escala de horas (valida rangos, solapamientos e importes; la lista vacía borra la escala; `404` si el período no tiene control ETEC)
+- `GET /api/haberes/core/etec/hora/escala/{anho}/{mes}` - Escala de horas de clase ETEC del período (lista vacía si el período no tiene control ETEC); cada tramo incluye `categoriaId`
+- `PUT /api/haberes/core/etec/hora/escala/{anho}/{mes}` - Reemplazo completo de la escala de horas (valida rangos, solapamientos, importes y que cada tramo indique una categoría marcada como `etec_horas`; la lista vacía borra la escala; `404` si el período no tiene control ETEC)
 - `GET /api/haberes/core/etec/arraigo/escala` - Escala global de arraigo ETEC por antigüedad docente
 - `PUT /api/haberes/core/etec/arraigo/escala` - Reemplazo completo de la escala (valida años mínimos, duplicados y porcentajes entre 0 y 100)
 - `GET /api/haberes/core/etec/presentismo/legajo/{legajoId}/periodo/{anho}/{mes}` - Pérdidas de presentismo de los cargos ETEC con puntos del legajo/período
@@ -392,8 +397,11 @@ período y genera la orden de pago.
 
 La pérdida de presentismo hace que la liquidación ETEC emita el `985 PRESENTISMO ETEC` bruto y el
 `984 DESCUENTO PRESENTISMO ETEC` por el mismo importe en negativo. Aplicar
-`sql/020_codigo_descuento_presentismo_etec.sql`, `sql/021_etec_presentismo.sql` y
-`sql/022_etec_presentismo_horas.sql` antes de usar los endpoints.
+`sql/020_codigo_descuento_presentismo_etec.sql`, `sql/021_etec_presentismo.sql`,
+`sql/022_etec_presentismo_horas.sql` y `sql/023_etec_hora_categoria.sql` antes de usar los endpoints.
+`sql/023_etec_hora_categoria.sql` agrega `categoria.etec_horas` y `etec_hora_escala.categoria_id`
+(con backfill a `2002`), de modo que cada tramo de horas ETEC liquida con la categoría configurada
+y ya no con un id fijo en el código.
 
 ### Control de período
 - `GET /api/haberes/core/control/periodo/{anho}/{mes}/opcional` - Control del período (`200` con cuerpo vacío si todavía no existe)

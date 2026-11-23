@@ -38,4 +38,11 @@ public class Categoria {
     /** Puntaje del cargo ETEC. 0 = categoría común. */
     @Builder.Default
     private BigDecimal puntos = BigDecimal.ZERO;
+
+    /**
+     * Categoría que liquida las horas de clase ETEC (escala de horas). 1 = origen «horas»
+     * del acumulador ETEC; el importe sale del tramo, no de {@code basico}.
+     */
+    @Builder.Default
+    private Byte etecHoras = 0;
 }
