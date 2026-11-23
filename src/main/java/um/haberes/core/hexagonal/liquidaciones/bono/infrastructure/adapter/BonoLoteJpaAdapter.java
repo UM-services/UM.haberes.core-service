@@ -246,6 +246,7 @@ public class BonoLoteJpaAdapter implements BonoLoteDataPort {
         return new BonoLote.CursoCargo(
                 curso.getCargoTipo() == null ? null : curso.getCargoTipo().getNombre(),
                 curso.getCurso() == null ? null : curso.getCurso().getNombre(),
+                curso.getCurso() == null ? null : curso.getCurso().getFacultadId(),
                 valor(curso.getDesarraigo()),
                 curso.getCurso() == null ? 0 : valor(curso.getCurso().getAnual()),
                 curso.getCurso() == null ? 0 : valor(curso.getCurso().getSemestre1()),
