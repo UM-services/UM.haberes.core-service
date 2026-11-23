@@ -19,7 +19,7 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**2.8.0** (2026-11-23)
+**2.9.0** (2026-11-23)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
@@ -356,13 +356,18 @@ período y genera la orden de pago.
 - `GET /api/haberes/core/categoria/` - Listar categorías
 - `GET /api/haberes/core/categoria/{categoriaId}` - Obtener categoría
 - `GET /api/haberes/core/categoria/puntos` - Listar categorías ETEC con puntos (`puntos > 0`)
+- `GET /api/haberes/core/categoria/puntos/{anho}/{mes}` - Listar categorías ETEC con los puntos y el flag de horas vigentes en el período (`categoria_periodo`, fallback a `categoria`)
 - `POST /api/haberes/core/categoria/search` - Buscador paginado del catálogo con body `{texto, condiciones, pagina, tamano}`: `texto` busca por nombre (varias palabras con AND) y por ID completo; `condiciones` (`DOCENTE`, `NO_DOCENTE`, `LIQUIDA_POR_HORA`, `ETEC`) se combinan con OR y con el texto con AND; `tamano` va de 1 a 200 (default 50) y responde `{filas, total, pagina, tamano}`
 - `POST /api/haberes/core/categoria/upload/{anho}/{mes}` - Cargar categorías desde Excel
 - `GET /api/haberes/core/categoria/nogrado` - Listar categorías sin grado
 
 `CategoriaRequest`, `CategoriaResponse`, la planilla de categorías y el upload aceptan `etec_horas`
-(1 = la categoría liquida las horas de clase ETEC por la escala de horas). La escala de horas ETEC
-exige que cada tramo indique una categoría marcada con `etec_horas = 1`.
+(1 = la categoría liquida las horas de clase ETEC por la escala de horas) y `puntos` (puntaje del
+cargo ETEC); si la planilla no trae la columna `puntos`, la importación conserva el valor existente.
+La escala de horas ETEC exige que cada tramo indique una categoría marcada con `etec_horas = 1`.
+
+La generación ETEC resuelve `puntos` y `etec_horas` por período desde `categoria_periodo` y cae en
+la plantilla de `categoria` cuando el período no tiene fila.
 
 ### ETEC (cargos por puntos y por horas)
 - `GET /api/haberes/core/etec/asignacion-cargo/legajo/{legajoId}` - Asignaciones del legajo
@@ -398,10 +403,13 @@ exige que cada tramo indique una categoría marcada con `etec_horas = 1`.
 La pérdida de presentismo hace que la liquidación ETEC emita el `985 PRESENTISMO ETEC` bruto y el
 `984 DESCUENTO PRESENTISMO ETEC` por el mismo importe en negativo. Aplicar
 `sql/020_codigo_descuento_presentismo_etec.sql`, `sql/021_etec_presentismo.sql`,
-`sql/022_etec_presentismo_horas.sql` y `sql/023_etec_hora_categoria.sql` antes de usar los endpoints.
+`sql/022_etec_presentismo_horas.sql`, `sql/023_etec_hora_categoria.sql` y
+`sql/024_categoria_periodo_etec.sql` antes de usar los endpoints.
 `sql/023_etec_hora_categoria.sql` agrega `categoria.etec_horas` y `etec_hora_escala.categoria_id`
 (con backfill a `2002`), de modo que cada tramo de horas ETEC liquida con la categoría configurada
-y ya no con un id fijo en el código.
+y ya no con un id fijo en el código. `sql/024_categoria_periodo_etec.sql` agrega
+`categoria_periodo.puntos` y `categoria_periodo.etec_horas` con un backfill único desde `categoria`
+y debe aplicarse antes de desplegar la generación ETEC por período.
 
 ### Control de período
 - `GET /api/haberes/core/control/periodo/{anho}/{mes}/opcional` - Control del período (`200` con cuerpo vacío si todavía no existe)

@@ -63,7 +63,7 @@ class GeneradorCargosEtecPuntosTest {
 
     @Test
     void calculaElBasicoComoPuntosPorValorDelPunto() {
-        when(datos.categoriasConPuntos()).thenReturn(List.of(categoria(2001, "3000.00")));
+        when(datos.categoriasConPuntos(2026, 11)).thenReturn(List.of(categoria(2001, "3000.00")));
         when(datos.asignacionesEtec(LEGAJO, 2026, 11)).thenReturn(List.of(asignacion(LEGAJO, 2001)));
 
         var cargos = generador.cargos(contexto(LEGAJO, "1000.00"));
@@ -85,7 +85,7 @@ class GeneradorCargosEtecPuntosTest {
 
     @Test
     void redondeaElBasicoConValorDePuntoDeCuatroDecimales() {
-        when(datos.categoriasConPuntos()).thenReturn(List.of(categoria(2001, "1738.00")));
+        when(datos.categoriasConPuntos(2026, 11)).thenReturn(List.of(categoria(2001, "1738.00")));
         when(datos.asignacionesEtec(LEGAJO, 2026, 11)).thenReturn(List.of(asignacion(LEGAJO, 2001)));
 
         var cargos = generador.cargos(contexto(LEGAJO, "311.3633"));
@@ -96,7 +96,7 @@ class GeneradorCargosEtecPuntosTest {
 
     @Test
     void sumaElMontoFijoDelCargoAlProducto() {
-        when(datos.categoriasConPuntos()).thenReturn(List.of(categoria(2001, "1738.00")));
+        when(datos.categoriasConPuntos(2026, 11)).thenReturn(List.of(categoria(2001, "1738.00")));
         when(datos.asignacionesEtec(LEGAJO, 2026, 11)).thenReturn(List.of(asignacion(LEGAJO, 2001)));
 
         var cargos = generador.cargos(contexto(LEGAJO, "311.3633", "50000.00"));
@@ -107,7 +107,7 @@ class GeneradorCargosEtecPuntosTest {
 
     @Test
     void sinAsignacionesNoFallaAunqueElValorDelPuntoSeaCero() {
-        when(datos.categoriasConPuntos()).thenReturn(List.of(categoria(2001, "3000.00")));
+        when(datos.categoriasConPuntos(2026, 11)).thenReturn(List.of(categoria(2001, "3000.00")));
         when(datos.asignacionesEtec(LEGAJO, 2026, 11)).thenReturn(List.of());
 
         assertThat(generador.cargos(contexto(LEGAJO, "0.00"))).isEmpty();
@@ -115,7 +115,7 @@ class GeneradorCargosEtecPuntosTest {
 
     @Test
     void fallaConAsignacionesVigentesYValorDePuntoCero() {
-        when(datos.categoriasConPuntos()).thenReturn(List.of(categoria(2001, "3000.00")));
+        when(datos.categoriasConPuntos(2026, 11)).thenReturn(List.of(categoria(2001, "3000.00")));
         when(datos.asignacionesEtec(LEGAJO, 2026, 11)).thenReturn(List.of(asignacion(LEGAJO, 2001)));
 
         assertThatThrownBy(() -> generador.cargos(contexto(LEGAJO, "0.00")))
@@ -125,7 +125,7 @@ class GeneradorCargosEtecPuntosTest {
 
     @Test
     void ignoraAsignacionesDeCategoriasSinPuntos() {
-        when(datos.categoriasConPuntos()).thenReturn(List.of(categoria(2001, "3000.00")));
+        when(datos.categoriasConPuntos(2026, 11)).thenReturn(List.of(categoria(2001, "3000.00")));
         when(datos.asignacionesEtec(LEGAJO, 2026, 11))
                 .thenReturn(List.of(asignacion(LEGAJO, 1306)));
 
@@ -134,7 +134,7 @@ class GeneradorCargosEtecPuntosTest {
 
     @Test
     void enModoPeriodoPideLasAsignacionesDeTodoElPeriodo() {
-        when(datos.categoriasConPuntos()).thenReturn(List.of(categoria(2001, "3000.00")));
+        when(datos.categoriasConPuntos(2026, 11)).thenReturn(List.of(categoria(2001, "3000.00")));
         when(datos.asignacionesEtec(null, 2026, 11)).thenReturn(List.of(asignacion(LEGAJO, 2001)));
 
         var cargos = generador.cargos(contexto(null, "1000.00"));

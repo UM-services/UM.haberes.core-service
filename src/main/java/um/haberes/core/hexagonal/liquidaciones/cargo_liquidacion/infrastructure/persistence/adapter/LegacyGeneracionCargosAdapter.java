@@ -110,13 +110,13 @@ public class LegacyGeneracionCargosAdapter implements GeneracionCargosDatosPort 
     }
 
     @Override
-    public Categoria categoria(Integer categoriaId) {
-        return categoriaService.findByCategoriaId(categoriaId);
+    public Categoria categoria(Integer categoriaId, Integer anho, Integer mes) {
+        return categoriaService.findByCategoriaIdAndPeriodo(categoriaId, anho, mes);
     }
 
     @Override
-    public List<Categoria> categoriasConPuntos() {
-        return categoriaService.findAllConPuntos();
+    public List<Categoria> categoriasConPuntos(Integer anho, Integer mes) {
+        return categoriaService.findAllConPuntos(anho, mes);
     }
 
     @Override

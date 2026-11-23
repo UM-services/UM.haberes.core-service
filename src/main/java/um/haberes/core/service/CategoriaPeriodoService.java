@@ -50,7 +50,9 @@ public class CategoriaPeriodoService {
 			categoriaPeriodo = new CategoriaPeriodoEntity(categoriaPeriodoId, newCategoriaPeriodo.getCategoriaId(),
 					newCategoriaPeriodo.getAnho(), newCategoriaPeriodo.getMes(), newCategoriaPeriodo.getNombre(),
 					newCategoriaPeriodo.getBasico(), newCategoriaPeriodo.getDocente(),
-					newCategoriaPeriodo.getNoDocente(), newCategoriaPeriodo.getLiquidaPorHora(), newCategoriaPeriodo.getEstadoDocente());
+					newCategoriaPeriodo.getNoDocente(), newCategoriaPeriodo.getLiquidaPorHora(),
+					newCategoriaPeriodo.getEstadoDocente(), newCategoriaPeriodo.getPuntos(),
+					newCategoriaPeriodo.getEtecHoras());
 			categoriaPeriodo = repository.save(categoriaPeriodo);
 			return categoriaPeriodo;
 		}).orElseThrow(() -> new CategoriaPeriodoException(categoriaPeriodoId));
