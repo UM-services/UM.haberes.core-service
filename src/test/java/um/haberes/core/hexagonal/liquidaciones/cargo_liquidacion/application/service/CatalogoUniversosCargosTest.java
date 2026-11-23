@@ -20,6 +20,10 @@ import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.out.Catego
 @ExtendWith(MockitoExtension.class)
 class CatalogoUniversosCargosTest {
 
+    private static final Integer ANHO = 2026;
+
+    private static final Integer MES = 11;
+
     @Mock
     private CategoriaRepository categoriaRepository;
 
@@ -46,52 +50,60 @@ class CatalogoUniversosCargosTest {
 
     @Test
     void elUniversoDocenteExcluyeLasCategoriasConPuntos() {
-        when(categoriaRepository.findAllByDocente((byte) 1)).thenReturn(List.of(
+        when(categoriaRepository.findAllByPeriodo(ANHO, MES)).thenReturn(List.of(
                 categoria(1, "0.00", (byte) 1, (byte) 0),
                 categoria(980, "0.00", (byte) 1, (byte) 0),
                 categoria(2001, "3000.00", (byte) 1, (byte) 0)));
 
-        assertThat(catalogo.categoriaIds(UniversoCargos.DOCENTE)).containsExactly(1, 980);
+        assertThat(catalogo.categoriaIds(UniversoCargos.DOCENTE, ANHO, MES)).containsExactly(1, 980);
     }
 
     @Test
     void elUniversoNoDocenteExcluyeLasCategoriasConPuntos() {
-        when(categoriaRepository.findAllByNoDocente((byte) 1)).thenReturn(List.of(
+        when(categoriaRepository.findAllByPeriodo(ANHO, MES)).thenReturn(List.of(
                 categoria(5, "0.00", (byte) 0, (byte) 1),
                 categoria(2001, "100.00", (byte) 0, (byte) 1)));
 
-        assertThat(catalogo.categoriaIds(UniversoCargos.NO_DOCENTE)).containsExactly(5);
+        assertThat(catalogo.categoriaIds(UniversoCargos.NO_DOCENTE, ANHO, MES)).containsExactly(5);
     }
 
     @Test
     void elUniversoDocenteExcluyeLaCategoriaDeHorasEtec() {
-        when(categoriaRepository.findAllByDocente((byte) 1)).thenReturn(List.of(
+        when(categoriaRepository.findAllByPeriodo(ANHO, MES)).thenReturn(List.of(
                 categoria(1, "0.00", (byte) 1, (byte) 0),
                 categoriaHoras(2002)));
 
-        assertThat(catalogo.categoriaIds(UniversoCargos.DOCENTE)).containsExactly(1);
+        assertThat(catalogo.categoriaIds(UniversoCargos.DOCENTE, ANHO, MES)).containsExactly(1);
     }
 
     @Test
     void elUniversoEtecSonLasCategoriasConPuntosMasLasDeHoras() {
-        when(categoriaRepository.findAllByPuntosGreaterThan(BigDecimal.ZERO)).thenReturn(List.of(
-                categoria(2001, "3000.00", (byte) 1, (byte) 0)));
-        when(categoriaRepository.findAllByEtecHoras((byte) 1)).thenReturn(List.of(
+        when(categoriaRepository.findAllByPeriodo(ANHO, MES)).thenReturn(List.of(
+                categoria(2001, "3000.00", (byte) 1, (byte) 0),
                 categoriaHoras(2002)));
 
-        assertThat(catalogo.categoriaIds(UniversoCargos.ETEC)).containsExactly(2001, 2002);
+        assertThat(catalogo.categoriaIds(UniversoCargos.ETEC, ANHO, MES)).containsExactly(2001, 2002);
     }
 
     @Test
     void uneLosAlcancesSinRepetirCategorias() {
-        when(categoriaRepository.findAllByDocente((byte) 1)).thenReturn(List.of(
-                categoria(1, "0.00", (byte) 1, (byte) 0)));
-        when(categoriaRepository.findAllByPuntosGreaterThan(BigDecimal.ZERO)).thenReturn(List.of(
-                categoria(2001, "3000.00", (byte) 1, (byte) 0)));
-        when(categoriaRepository.findAllByEtecHoras((byte) 1)).thenReturn(List.of(
+        when(categoriaRepository.findAllByPeriodo(ANHO, MES)).thenReturn(List.of(
+                categoria(1, "0.00", (byte) 1, (byte) 0),
+                categoria(2001, "3000.00", (byte) 1, (byte) 0),
                 categoriaHoras(2002)));
 
-        assertThat(catalogo.categoriaIds(Set.of(UniversoCargos.DOCENTE, UniversoCargos.ETEC), List.of(2001)))
+        assertThat(catalogo.categoriaIds(Set.of(UniversoCargos.DOCENTE, UniversoCargos.ETEC), List.of(2001),
+                ANHO, MES))
                 .containsExactlyInAnyOrder(1, 2001, 2002);
+    }
+
+    @Test
+    void clasificaConLosValoresDelPeriodo() {
+        when(categoriaRepository.findAllByPeriodo(ANHO, MES)).thenReturn(List.of(
+                categoria(2001, "1738.00", (byte) 1, (byte) 0),
+                categoria(2003, "0.00", (byte) 1, (byte) 0)));
+
+        assertThat(catalogo.categoriaIds(UniversoCargos.ETEC, ANHO, MES)).containsExactly(2001);
+        assertThat(catalogo.categoriaIds(UniversoCargos.DOCENTE, ANHO, MES)).containsExactly(2003);
     }
 }

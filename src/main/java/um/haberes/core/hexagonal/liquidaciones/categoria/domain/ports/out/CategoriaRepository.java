@@ -10,6 +10,9 @@ public interface CategoriaRepository {
 
     List<Categoria> findAll();
 
+    /** Categorías con los valores ETEC del período (fallback a la plantilla si no hay fila). */
+    List<Categoria> findAllByPeriodo(Integer anho, Integer mes);
+
     List<Categoria> findAllByPuntosGreaterThan(BigDecimal puntos);
 
     List<Categoria> findAllByEtecHoras(Byte etecHoras);
@@ -23,6 +26,9 @@ public interface CategoriaRepository {
     List<Categoria> findAllByNoDocente(Byte noDocente);
 
     Optional<Categoria> findByCategoriaId(Integer categoriaId);
+
+    /** Categoría con los valores ETEC del período (fallback a la plantilla si no hay fila). */
+    Optional<Categoria> findByCategoriaIdAndPeriodo(Integer categoriaId, Integer anho, Integer mes);
 
     Optional<Categoria> findLast();
 

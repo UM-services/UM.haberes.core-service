@@ -35,6 +35,7 @@ public class ExcelCategoriaUploadFileReader implements CategoriaUploadFileReader
     private static final String COL_LIQUIDA_POR_HORA = "liquida_por_hora";
     private static final String COL_ESTADO_DOCENTE = "estado_docente";
     private static final String COL_ETEC_HORAS = "etec_horas";
+    private static final String COL_PUNTOS = "puntos";
 
     @Override
     public List<Categoria> readCategorias(UploadedFile file) {
@@ -56,6 +57,7 @@ public class ExcelCategoriaUploadFileReader implements CategoriaUploadFileReader
                 Integer columnLiquidaPorHora = null;
                 Integer columnEstadoDocente = null;
                 Integer columnEtecHoras = null;
+                Integer columnPuntos = null;
                 for (int column = 0; column < cols; column++) {
                     String columnName;
                     try {
@@ -88,6 +90,9 @@ public class ExcelCategoriaUploadFileReader implements CategoriaUploadFileReader
                     }
                     if (columnName.equals(COL_ETEC_HORAS)) {
                         columnEtecHoras = column;
+                    }
+                    if (columnName.equals(COL_PUNTOS)) {
+                        columnPuntos = column;
                     }
                 }
                 for (int rowNumber = 1; rowNumber <= rows; rowNumber++) {
@@ -128,7 +133,17 @@ public class ExcelCategoriaUploadFileReader implements CategoriaUploadFileReader
                         categoria.etecHoras(
                                 Double.valueOf(row.getCell(columnEtecHoras).getNumericCellValue()).byteValue());
                     }
-                    categorias.add(categoria.build());
+                    if (columnPuntos != null && row.getCell(columnPuntos) != null) {
+                        categoria.puntos(
+                                BigDecimal.valueOf(row.getCell(columnPuntos).getNumericCellValue()));
+                    }
+                    Categoria categoriaLeida = categoria.build();
+                    if (columnPuntos == null) {
+                        // Planilla sin columna de puntos: se conserva el puntaje de la categoría
+                        // existente en lugar de pisarlo con 0.
+                        categoriaLeida.setPuntos(null);
+                    }
+                    categorias.add(categoriaLeida);
                 }
             } finally {
                 workbook.close();

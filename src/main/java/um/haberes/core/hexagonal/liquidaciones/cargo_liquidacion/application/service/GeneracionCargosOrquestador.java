@@ -91,7 +91,7 @@ public class GeneracionCargosOrquestador {
 
     private void eliminar(Set<UniversoCargos> universos, Long legajoId, Integer anho, Integer mes) {
         List<Integer> categorias = catalogo.categoriaIds(universos,
-                universos.contains(UniversoCargos.ETEC) ? datos.categoriasEtecAsignadas() : List.of());
+                universos.contains(UniversoCargos.ETEC) ? datos.categoriasEtecAsignadas() : List.of(), anho, mes);
         if (categorias.isEmpty()) {
             return;
         }

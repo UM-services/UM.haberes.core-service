@@ -17,15 +17,18 @@ import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.out.Catego
  * define el alcance de borrado de cada universo:
  *
  * <ul>
- *   <li>DOCENTE: {@code docente = 1} y {@code puntos = 0}</li>
- *   <li>NO_DOCENTE: {@code noDocente = 1} y {@code puntos = 0}</li>
+ *   <li>DOCENTE: {@code docente = 1} y no ETEC</li>
+ *   <li>NO_DOCENTE: {@code noDocente = 1} y no ETEC</li>
  *   <li>ETEC: {@code puntos > 0} más las categorías marcadas como {@code etec_horas}</li>
  * </ul>
  *
+ * <p>La clasificación usa los valores del período ({@code categoria_periodo}), con fallback a la
+ * plantilla de {@code categoria} cuando el período no tiene fila. Así una categoría que en el
+ * período liquidaba por puntos u horas no queda fuera del alcance de borrado porque la plantilla
+ * actual cambió.</p>
+ *
  * <p>Los universos son disjuntos por construcción: una categoría ETEC nunca entra en el borrado
- * docente/no docente, y viceversa. La categoría de horas de clase ETEC no tiene puntos; se marca
- * con {@code etec_horas = 1} y se agrega explícitamente al universo ETEC porque sus cargos los
- * genera la escala de horas.</p>
+ * docente/no docente, y viceversa.</p>
  */
 @Component
 @RequiredArgsConstructor
@@ -47,35 +50,36 @@ public class CatalogoUniversosCargos {
         return categoria != null && Byte.valueOf(ACTIVO).equals(categoria.getEtecHoras());
     }
 
-    public List<Integer> categoriaIds(Set<UniversoCargos> universos, List<Integer> categoriasAdicionales) {
-        List<Integer> categorias = new ArrayList<>(universos.stream()
-                .flatMap(universo -> categoriaIds(universo).stream())
+    public List<Integer> categoriaIds(Set<UniversoCargos> universos, List<Integer> categoriasAdicionales,
+                                      Integer anho, Integer mes) {
+        List<Categoria> categorias = categoriaRepository.findAllByPeriodo(anho, mes);
+        List<Integer> ids = new ArrayList<>(universos.stream()
+                .flatMap(universo -> categoriaIds(categorias, universo).stream())
                 .toList());
         if (categoriasAdicionales != null) {
-            categorias.addAll(categoriasAdicionales);
+            ids.addAll(categoriasAdicionales);
         }
-        return categorias.stream().distinct().toList();
-    }
-
-    public List<Integer> categoriaIds(UniversoCargos universo) {
-        return switch (universo) {
-            case DOCENTE -> idsComunes(categoriaRepository.findAllByDocente(ACTIVO));
-            case NO_DOCENTE -> idsComunes(categoriaRepository.findAllByNoDocente(ACTIVO));
-            case ETEC -> idsEtec(
-                    categoriaRepository.findAllByPuntosGreaterThan(BigDecimal.ZERO),
-                    categoriaRepository.findAllByEtecHoras(ACTIVO));
-        };
-    }
-
-    private List<Integer> idsEtec(List<Categoria> categoriasConPuntos,
-                                  List<Categoria> categoriasHoras) {
-        List<Integer> ids = new ArrayList<>(ids(categoriasConPuntos));
-        ids.addAll(ids(categoriasHoras));
         return ids.stream().distinct().toList();
     }
 
-    private List<Integer> idsComunes(List<Categoria> categorias) {
-        return ids(categorias.stream().filter(categoria -> !esCategoriaEtec(categoria)).toList());
+    public List<Integer> categoriaIds(UniversoCargos universo, Integer anho, Integer mes) {
+        return categoriaIds(categoriaRepository.findAllByPeriodo(anho, mes), universo);
+    }
+
+    private List<Integer> categoriaIds(List<Categoria> categorias, UniversoCargos universo) {
+        return switch (universo) {
+            case DOCENTE -> ids(categorias.stream()
+                    .filter(categoria -> Byte.valueOf(ACTIVO).equals(categoria.getDocente()))
+                    .filter(categoria -> !esCategoriaEtec(categoria))
+                    .toList());
+            case NO_DOCENTE -> ids(categorias.stream()
+                    .filter(categoria -> Byte.valueOf(ACTIVO).equals(categoria.getNoDocente()))
+                    .filter(categoria -> !esCategoriaEtec(categoria))
+                    .toList());
+            case ETEC -> ids(categorias.stream()
+                    .filter(CatalogoUniversosCargos::esCategoriaEtec)
+                    .toList());
+        };
     }
 
     private List<Integer> ids(List<Categoria> categorias) {

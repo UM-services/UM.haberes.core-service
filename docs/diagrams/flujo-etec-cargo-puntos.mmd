@@ -32,8 +32,8 @@ sequenceDiagram
     EtecCtrl->>DB: SELECT asignaciones vigentes en el período
     EtecCtrl-->>Cliente: legajo, categoría, dependencia y persona
 
-    Cliente->>CatCtrl: GET /categoria/puntos
-    CatCtrl->>DB: SELECT categoria WHERE puntos > 0
+    Cliente->>CatCtrl: GET /categoria/puntos o /categoria/puntos/{anho}/{mes}
+    CatCtrl->>DB: SELECT categoria con puntos y etec_horas del período (categoria_periodo, fallback a categoria)
 
     Cliente->>CtlCtrl: GET o POST /etec/control/{anho}/{mes}
     CtlCtrl->>DB: SELECT o upsert control_etec del período
@@ -51,7 +51,7 @@ sequenceDiagram
     Guard-->>GenCtrl: rechaza el legajo si el período ya está acreditado
     GenCtrl->>Orq: generar(universo ETEC, legajoId o período)
     Orq->>GenEtec: cargos(contexto)
-    GenEtec->>DB: SELECT control_etec, etec_asignacion_cargo vigentes y categorías con puntos
+    GenEtec->>DB: SELECT control_etec, asignaciones vigentes y categorías con puntos del período (categoria_periodo)
     alt Sin asignaciones vigentes o sin categorías con puntos
         GenEtec-->>Orq: lista vacía
     else Con asignaciones y valor del punto
@@ -81,4 +81,4 @@ sequenceDiagram
     CargCtrl-->>Cliente: cargos guardados
 
     Note over Orq,DB: El reemplazo conserva el contrato de haberes-etec, valida período,<br/>legajo y alcance antes de borrar, abre AuditBulkScope (SUMMARY/BULK)<br/>y usa version null para que se escriba el snapshot.
-    Note over GenEtec,DB: Los parámetros del circuito viven en control_etec (sql/009),<br/>el puntaje del cargo en categoria.puntos (sql/005) y la escala de<br/>horas en etec_hora_escala (sql/018). El arraigo se resuelve con<br/>la escala global etec_arraigo_escala (sql/017).
+    Note over GenEtec,DB: Los parámetros del circuito viven en control_etec (sql/009),<br/>el puntaje y el flag de horas del cargo en categoria_periodo (sql/024,<br/>fallback a categoria.puntos, sql/005) y la escala de horas en<br/>etec_hora_escala (sql/018). El arraigo se resuelve con<br/>la escala global etec_arraigo_escala (sql/017).
