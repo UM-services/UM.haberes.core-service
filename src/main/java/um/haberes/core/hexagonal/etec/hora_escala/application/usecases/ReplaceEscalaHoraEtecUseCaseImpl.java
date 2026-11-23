@@ -3,7 +3,9 @@ package um.haberes.core.hexagonal.etec.hora_escala.application.usecases;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
@@ -15,6 +17,8 @@ import um.haberes.core.hexagonal.etec.hora_escala.application.exception.EscalaHo
 import um.haberes.core.hexagonal.etec.hora_escala.domain.model.EscalaHoraEtec;
 import um.haberes.core.hexagonal.etec.hora_escala.domain.ports.in.ReplaceEscalaHoraEtecUseCase;
 import um.haberes.core.hexagonal.etec.hora_escala.domain.ports.out.EscalaHoraEtecRepository;
+import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.Categoria;
+import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.out.CategoriaRepository;
 
 /**
  * Reemplaza la escala de horas del período. Valida todos los tramos antes de borrar para no
@@ -30,6 +34,8 @@ public class ReplaceEscalaHoraEtecUseCaseImpl implements ReplaceEscalaHoraEtecUs
     private final ControlEtecRepository controlEtecRepository;
 
     private final EscalaHoraEtecRepository repository;
+
+    private final CategoriaRepository categoriaRepository;
 
     @Transactional
     @Override
@@ -58,6 +64,7 @@ public class ReplaceEscalaHoraEtecUseCaseImpl implements ReplaceEscalaHoraEtecUs
                 .map(tramo -> EscalaHoraEtec.builder()
                         .escalaHoraEtecId(null)
                         .controlEtecId(controlEtecId)
+                        .categoriaId(tramo.getCategoriaId())
                         .horasDesde(tramo.getHorasDesde().setScale(2, RoundingMode.HALF_UP))
                         .horasHasta(tramo.getHorasHasta().setScale(2, RoundingMode.HALF_UP))
                         .montoFijo(importe(tramo.getMontoFijo()))
@@ -68,9 +75,22 @@ public class ReplaceEscalaHoraEtecUseCaseImpl implements ReplaceEscalaHoraEtecUs
     }
 
     private String validarTramos(List<EscalaHoraEtec> tramos) {
+        Map<Integer, Categoria> categorias = new HashMap<>();
         for (EscalaHoraEtec tramo : tramos) {
             if (tramo == null || tramo.getHorasDesde() == null || tramo.getHorasHasta() == null) {
                 return "Cada tramo debe indicar las horas desde y hasta";
+            }
+            if (tramo.getCategoriaId() == null) {
+                return "Cada tramo debe indicar la categoría que liquida sus horas";
+            }
+            Categoria categoria = categorias.computeIfAbsent(tramo.getCategoriaId(),
+                    categoriaId -> categoriaRepository.findByCategoriaId(categoriaId).orElse(null));
+            if (categoria == null) {
+                return "La categoría " + tramo.getCategoriaId() + " no existe";
+            }
+            if (!Byte.valueOf((byte) 1).equals(categoria.getEtecHoras())) {
+                return "La categoría " + categoria.getCategoriaId() + " (" + categoria.getNombre()
+                        + ") no está marcada como horas ETEC";
             }
             if (tramo.getHorasDesde().compareTo(BigDecimal.ZERO) < 0
                     || tramo.getHorasHasta().compareTo(BigDecimal.ZERO) < 0) {

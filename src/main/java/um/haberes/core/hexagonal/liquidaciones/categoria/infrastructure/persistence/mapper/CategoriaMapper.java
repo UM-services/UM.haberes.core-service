@@ -35,6 +35,9 @@ public class CategoriaMapper {
         if (domain.getPuntos() != null) {
             entity.setPuntos(domain.getPuntos());
         }
+        if (domain.getEtecHoras() != null) {
+            entity.setEtecHoras(domain.getEtecHoras());
+        }
         return entity;
     }
 
@@ -64,6 +67,9 @@ public class CategoriaMapper {
         }
         if (entity.getPuntos() != null) {
             builder.puntos(entity.getPuntos());
+        }
+        if (entity.getEtecHoras() != null) {
+            builder.etecHoras(entity.getEtecHoras());
         }
         return builder.build();
     }

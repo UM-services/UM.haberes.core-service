@@ -41,7 +41,7 @@ sequenceDiagram
 
     Cliente->>EscCtrl: GET o PUT /etec/hora/escala/{anho}/{mes}
     EscCtrl->>DB: SELECT o reemplazo de etec_hora_escala del control_etec
-    EscCtrl-->>Cliente: tramos con horas desde/hasta, monto fijo y valor hora
+    EscCtrl-->>Cliente: tramos con categoría, horas desde/hasta, monto fijo y valor hora
 
     Cliente->>CtlCtrl: POST /etec/control/copiar/{anho}/{mes}
     CtlCtrl->>DB: copia control_etec y sus tramos de etec_hora_escala
@@ -63,7 +63,7 @@ sequenceDiagram
     alt Sin escala configurada o sin horas
         GenHoras-->>Orq: lista vacía
     else Con horas en un tramo
-        GenHoras-->>Orq: un cargo por sede con la categoría 2002 DOCENTE ETEC HORAS
+        GenHoras-->>Orq: un cargo por sede con la categoría del tramo (etec_horas)
     end
     Orq->>DB: DELETE cargos ETEC del alcance (AuditBulkScope)
     Orq->>DB: INSERT lote + snapshot MAX(version)+1 por legajo/período

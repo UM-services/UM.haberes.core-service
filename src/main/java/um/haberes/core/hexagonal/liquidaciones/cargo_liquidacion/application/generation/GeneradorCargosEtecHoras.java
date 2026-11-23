@@ -2,6 +2,7 @@ package um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.application.ge
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +25,8 @@ import um.haberes.core.hexagonal.personas.dependencia.domain.model.Dependencia;
 /**
  * Cargos por horas de clase ETEC. Suma las horas semanales de los cursos de la facultad 15 por
  * sede, busca el tramo de la escala del período que contiene ese total y genera un cargo con la
- * categoría {@code 2002 DOCENTE ETEC HORAS} por {@code monto fijo + horas × valor hora}.
+ * categoría configurada en el tramo ({@code etec_horas = 1}) por
+ * {@code monto fijo + horas × valor hora}.
  *
  * <p>Los generadores de cursos excluyen la facultad 15 para que estas horas no se liquiden dos
  * veces. El cargo entra al acumulador ETEC como cualquier cargo con puntos, así que también
@@ -59,17 +61,36 @@ public class GeneradorCargosEtecHoras implements GeneradorCargosLiquidacion {
             return List.of();
         }
 
-        Categoria categoria = datos.categoria(CatalogoUniversosCargos.CATEGORIA_HORAS_ETEC);
+        Map<Integer, Categoria> categorias = new HashMap<>();
         List<CargoLiquidacion> cargos = new ArrayList<>();
         horas.forEach((legajoId, sedes) -> sedes.forEach((geograficaId, cantidad) -> {
             if (cantidad.compareTo(BigDecimal.ZERO) <= 0) {
                 return;
             }
             EscalaHoraEtec tramo = tramo(escala, cantidad, legajoId, geograficaId, contexto);
+            Categoria categoria = categorias.computeIfAbsent(tramo.getCategoriaId(),
+                    categoriaId -> categoria(tramo, contexto));
             cargos.add(CargoLiquidacionFactory.deEtecHoras(contexto, legajoId,
                     dependencia(contexto, geograficaId), categoria, tramo.importe(cantidad)));
         }));
         return cargos;
+    }
+
+    private Categoria categoria(EscalaHoraEtec tramo, ContextoGeneracionCargos contexto) {
+        Categoria categoria = datos.categoria(tramo.getCategoriaId());
+        if (categoria == null) {
+            throw new CargoLiquidacionException("No existe la categoría "
+                    + tramo.getCategoriaId() + " del tramo de horas ETEC del período "
+                    + contexto.anho() + "/" + contexto.mes());
+        }
+        if (!CatalogoUniversosCargos.esCategoriaHorasEtec(categoria)) {
+            throw new CargoLiquidacionException("La categoría " + categoria.getCategoriaId()
+                    + " (" + categoria.getNombre()
+                    + ") del tramo que empieza en "
+                    + tramo.getHorasDesde().stripTrailingZeros().toPlainString()
+                    + " hora(s) no está marcada como horas ETEC");
+        }
+        return categoria;
     }
 
     private EscalaHoraEtec tramo(List<EscalaHoraEtec> escala, BigDecimal horas, Long legajoId,

@@ -9,7 +9,8 @@ import lombok.Setter;
 /**
  * Pérdida de presentismo de los cargos ETEC por horas de un legajo en un período.
  *
- * <p>Los cargos por horas (categoría 2002) no tienen {@code etec_asignacion_cargo}: se
+ * <p>Los cargos por horas (categorías marcadas como {@code etec_horas}) no tienen
+ * {@code etec_asignacion_cargo}: se
  * generan desde los cursos de la facultad 15. La fila es por legajo/período y descuenta el
  * presentismo de todos sus cargos por horas.</p>
  */

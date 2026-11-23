@@ -35,6 +35,15 @@ class CatalogoUniversosCargosTest {
                 .build();
     }
 
+    private Categoria categoriaHoras(Integer id) {
+        return Categoria.builder()
+                .categoriaId(id)
+                .docente((byte) 1)
+                .puntos(BigDecimal.ZERO)
+                .etecHoras((byte) 1)
+                .build();
+    }
+
     @Test
     void elUniversoDocenteExcluyeLasCategoriasConPuntos() {
         when(categoriaRepository.findAllByDocente((byte) 1)).thenReturn(List.of(
@@ -58,15 +67,17 @@ class CatalogoUniversosCargosTest {
     void elUniversoDocenteExcluyeLaCategoriaDeHorasEtec() {
         when(categoriaRepository.findAllByDocente((byte) 1)).thenReturn(List.of(
                 categoria(1, "0.00", (byte) 1, (byte) 0),
-                categoria(2002, "0.00", (byte) 1, (byte) 0)));
+                categoriaHoras(2002)));
 
         assertThat(catalogo.categoriaIds(UniversoCargos.DOCENTE)).containsExactly(1);
     }
 
     @Test
-    void elUniversoEtecSonLasCategoriasConPuntosMasLaDeHoras() {
+    void elUniversoEtecSonLasCategoriasConPuntosMasLasDeHoras() {
         when(categoriaRepository.findAllByPuntosGreaterThan(BigDecimal.ZERO)).thenReturn(List.of(
                 categoria(2001, "3000.00", (byte) 1, (byte) 0)));
+        when(categoriaRepository.findAllByEtecHoras((byte) 1)).thenReturn(List.of(
+                categoriaHoras(2002)));
 
         assertThat(catalogo.categoriaIds(UniversoCargos.ETEC)).containsExactly(2001, 2002);
     }
@@ -77,6 +88,8 @@ class CatalogoUniversosCargosTest {
                 categoria(1, "0.00", (byte) 1, (byte) 0)));
         when(categoriaRepository.findAllByPuntosGreaterThan(BigDecimal.ZERO)).thenReturn(List.of(
                 categoria(2001, "3000.00", (byte) 1, (byte) 0)));
+        when(categoriaRepository.findAllByEtecHoras((byte) 1)).thenReturn(List.of(
+                categoriaHoras(2002)));
 
         assertThat(catalogo.categoriaIds(Set.of(UniversoCargos.DOCENTE, UniversoCargos.ETEC), List.of(2001)))
                 .containsExactlyInAnyOrder(1, 2001, 2002);

@@ -34,6 +34,7 @@ public class ExcelCategoriaUploadFileReader implements CategoriaUploadFileReader
     private static final String COL_NO_DOCENTE = "no_docente";
     private static final String COL_LIQUIDA_POR_HORA = "liquida_por_hora";
     private static final String COL_ESTADO_DOCENTE = "estado_docente";
+    private static final String COL_ETEC_HORAS = "etec_horas";
 
     @Override
     public List<Categoria> readCategorias(UploadedFile file) {
@@ -54,6 +55,7 @@ public class ExcelCategoriaUploadFileReader implements CategoriaUploadFileReader
                 Integer columnNoDocente = null;
                 Integer columnLiquidaPorHora = null;
                 Integer columnEstadoDocente = null;
+                Integer columnEtecHoras = null;
                 for (int column = 0; column < cols; column++) {
                     String columnName;
                     try {
@@ -83,6 +85,9 @@ public class ExcelCategoriaUploadFileReader implements CategoriaUploadFileReader
                     }
                     if (columnName.equals(COL_ESTADO_DOCENTE)) {
                         columnEstadoDocente = column;
+                    }
+                    if (columnName.equals(COL_ETEC_HORAS)) {
+                        columnEtecHoras = column;
                     }
                 }
                 for (int rowNumber = 1; rowNumber <= rows; rowNumber++) {
@@ -118,6 +123,10 @@ public class ExcelCategoriaUploadFileReader implements CategoriaUploadFileReader
                     if (columnEstadoDocente != null && row.getCell(columnEstadoDocente) != null) {
                         categoria.estadoDocente(
                                 BigDecimal.valueOf(row.getCell(columnEstadoDocente).getNumericCellValue()));
+                    }
+                    if (columnEtecHoras != null && row.getCell(columnEtecHoras) != null) {
+                        categoria.etecHoras(
+                                Double.valueOf(row.getCell(columnEtecHoras).getNumericCellValue()).byteValue());
                     }
                     categorias.add(categoria.build());
                 }

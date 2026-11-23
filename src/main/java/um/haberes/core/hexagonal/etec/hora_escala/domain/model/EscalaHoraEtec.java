@@ -27,6 +27,9 @@ public class EscalaHoraEtec {
 
     private Long controlEtecId;
 
+    /** Categoría con la que se liquida el tramo (marcada como {@code etec_horas}). */
+    private Integer categoriaId;
+
     private BigDecimal horasDesde;
 
     private BigDecimal horasHasta;

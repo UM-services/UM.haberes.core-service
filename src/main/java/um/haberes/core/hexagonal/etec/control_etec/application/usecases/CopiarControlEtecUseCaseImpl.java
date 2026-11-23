@@ -65,6 +65,7 @@ public class CopiarControlEtecUseCaseImpl implements CopiarControlEtecUseCase {
                 .map(tramo -> EscalaHoraEtec.builder()
                         .escalaHoraEtecId(null)
                         .controlEtecId(controlDestinoId)
+                        .categoriaId(tramo.getCategoriaId())
                         .horasDesde(tramo.getHorasDesde())
                         .horasHasta(tramo.getHorasHasta())
                         .montoFijo(tramo.getMontoFijo())
