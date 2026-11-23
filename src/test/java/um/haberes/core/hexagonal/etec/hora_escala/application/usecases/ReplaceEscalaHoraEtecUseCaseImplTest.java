@@ -23,6 +23,8 @@ import um.haberes.core.hexagonal.etec.hora_escala.application.exception.EscalaHo
 import um.haberes.core.hexagonal.etec.hora_escala.application.exception.EscalaHoraEtecPeriodoException;
 import um.haberes.core.hexagonal.etec.hora_escala.domain.model.EscalaHoraEtec;
 import um.haberes.core.hexagonal.etec.hora_escala.domain.ports.out.EscalaHoraEtecRepository;
+import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.Categoria;
+import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.out.CategoriaRepository;
 
 @ExtendWith(MockitoExtension.class)
 class ReplaceEscalaHoraEtecUseCaseImplTest {
@@ -35,6 +37,9 @@ class ReplaceEscalaHoraEtecUseCaseImplTest {
     @Mock
     private EscalaHoraEtecRepository repository;
 
+    @Mock
+    private CategoriaRepository categoriaRepository;
+
     @InjectMocks
     private ReplaceEscalaHoraEtecUseCaseImpl useCase;
 
@@ -43,8 +48,19 @@ class ReplaceEscalaHoraEtecUseCaseImplTest {
                 ControlEtec.builder().controlEtecId(CONTROL_ID).anho(2026).mes(11).build()));
     }
 
+    private void conCategoriaHoras() {
+        when(categoriaRepository.findByCategoriaId(2002)).thenReturn(Optional.of(
+                Categoria.builder()
+                        .categoriaId(2002)
+                        .nombre("DOCENTE ETEC HORAS")
+                        .docente((byte) 1)
+                        .etecHoras((byte) 1)
+                        .build()));
+    }
+
     private EscalaHoraEtec tramo(String desde, String hasta, String montoFijo, String valorHora) {
         return EscalaHoraEtec.builder()
+                .categoriaId(2002)
                 .horasDesde(desde == null ? null : new BigDecimal(desde))
                 .horasHasta(hasta == null ? null : new BigDecimal(hasta))
                 .montoFijo(montoFijo == null ? null : new BigDecimal(montoFijo))
@@ -55,6 +71,7 @@ class ReplaceEscalaHoraEtecUseCaseImplTest {
     @Test
     void reemplazaLaEscalaOrdenadaConDosDecimales() {
         conPeriodo();
+        conCategoriaHoras();
         when(repository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
 
         List<EscalaHoraEtec> resultado = useCase.reemplazar(2026, 11, List.of(
@@ -69,6 +86,8 @@ class ReplaceEscalaHoraEtecUseCaseImplTest {
         assertThat(resultado.get(1).getValorHora()).isEqualByComparingTo("6500.50");
         assertThat(resultado).allSatisfy(tramo -> assertThat(tramo.getControlEtecId())
                 .isEqualTo(CONTROL_ID));
+        assertThat(resultado).allSatisfy(tramo -> assertThat(tramo.getCategoriaId())
+                .isEqualTo(2002));
     }
 
     @Test
@@ -85,6 +104,7 @@ class ReplaceEscalaHoraEtecUseCaseImplTest {
     @Test
     void completaConCeroLosImportesNulos() {
         conPeriodo();
+        conCategoriaHoras();
         when(repository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
 
         List<EscalaHoraEtec> resultado = useCase.reemplazar(2026, 11,
@@ -97,6 +117,7 @@ class ReplaceEscalaHoraEtecUseCaseImplTest {
     @Test
     void rechazaTramosSuperpuestosSinBorrarNada() {
         conPeriodo();
+        conCategoriaHoras();
 
         assertThatThrownBy(() -> useCase.reemplazar(2026, 11, List.of(
                 tramo("0", "12", "0", "0"), tramo("10", "20", "0", "0"))))
@@ -109,6 +130,7 @@ class ReplaceEscalaHoraEtecUseCaseImplTest {
     @Test
     void rechazaElRangoInvertido() {
         conPeriodo();
+        conCategoriaHoras();
 
         assertThatThrownBy(() -> useCase.reemplazar(2026, 11,
                 List.of(tramo("10", "5", "0", "0"))))
@@ -119,6 +141,7 @@ class ReplaceEscalaHoraEtecUseCaseImplTest {
     @Test
     void rechazaImportesNegativos() {
         conPeriodo();
+        conCategoriaHoras();
 
         assertThatThrownBy(() -> useCase.reemplazar(2026, 11,
                 List.of(tramo("0", "12", "-1", "0"))))
@@ -139,6 +162,43 @@ class ReplaceEscalaHoraEtecUseCaseImplTest {
                 List.of(tramo(null, "12", "0", "0"))))
                 .isInstanceOf(EscalaHoraEtecException.class)
                 .hasMessageContaining("horas desde y hasta");
+    }
+
+    @Test
+    void rechazaTramoSinCategoria() {
+        conPeriodo();
+
+        EscalaHoraEtec sinCategoria = EscalaHoraEtec.builder()
+                .categoriaId(null)
+                .horasDesde(BigDecimal.ZERO)
+                .horasHasta(new BigDecimal("12"))
+                .montoFijo(BigDecimal.ZERO)
+                .valorHora(BigDecimal.ZERO)
+                .build();
+
+        assertThatThrownBy(() -> useCase.reemplazar(2026, 11, List.of(sinCategoria)))
+                .isInstanceOf(EscalaHoraEtecException.class)
+                .hasMessageContaining("categoría");
+
+        verify(repository, never()).deleteAllByControlEtecId(CONTROL_ID);
+    }
+
+    @Test
+    void rechazaCategoriaNoMarcadaComoHorasEtec() {
+        conPeriodo();
+        when(categoriaRepository.findByCategoriaId(2002)).thenReturn(Optional.of(
+                Categoria.builder()
+                        .categoriaId(2002)
+                        .nombre("CATEGORIA COMUN")
+                        .etecHoras((byte) 0)
+                        .build()));
+
+        assertThatThrownBy(() -> useCase.reemplazar(2026, 11,
+                List.of(tramo("0", "12", "0", "0"))))
+                .isInstanceOf(EscalaHoraEtecException.class)
+                .hasMessageContaining("no está marcada como horas ETEC");
+
+        verify(repository, never()).deleteAllByControlEtecId(CONTROL_ID);
     }
 
     @Test

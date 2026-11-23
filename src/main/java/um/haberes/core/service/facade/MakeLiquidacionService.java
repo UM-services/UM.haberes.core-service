@@ -15,7 +15,9 @@ import um.haberes.core.hexagonal.cursos.curso_fusion.application.service.CursoFu
 import um.haberes.core.hexagonal.cursos.curso_fusion.domain.model.CursoFusion;
 import um.haberes.core.hexagonal.etec.arraigo_escala.application.service.EscalaArraigoEtecService;
 import um.haberes.core.hexagonal.etec.control_etec.application.service.ControlEtecService;
+import um.haberes.core.hexagonal.etec.hora_escala.application.service.EscalaHoraEtecService;
 import um.haberes.core.hexagonal.etec.hora_escala.domain.model.AgrupadorHorasEtec;
+import um.haberes.core.hexagonal.etec.hora_escala.domain.model.EscalaHoraEtec;
 import um.haberes.core.hexagonal.etec.liquidacion.application.service.EtecLiquidacionCalculator;
 import um.haberes.core.hexagonal.etec.presentismo.application.service.EtecPresentismoService;
 import um.haberes.core.hexagonal.etec.presentismo_horas.application.service.EtecPresentismoHorasService;
@@ -130,6 +132,7 @@ public class MakeLiquidacionService {
     private final GenerarCargosLegajoUseCase generarCargosLegajoUseCase;
     private final ControlEtecService controlEtecService;
     private final EscalaArraigoEtecService escalaArraigoEtecService;
+    private final EscalaHoraEtecService escalaHoraEtecService;
     private final EtecLiquidacionCalculator etecLiquidacionCalculator;
     private final EtecPresentismoService etecPresentismoService;
     private final EtecPresentismoHorasService etecPresentismoHorasService;
@@ -153,7 +156,10 @@ public class MakeLiquidacionService {
         Set<Integer> etecCategoriasSinPresentismo = new HashSet<>(
                 etecPresentismoService.categoriasSinPresentismo(legajoId, anho, mes));
         if (etecPresentismoHorasService.existe(legajoId, anho, mes)) {
-            etecCategoriasSinPresentismo.add(CatalogoUniversosCargos.CATEGORIA_HORAS_ETEC);
+            escalaHoraEtecService.findByPeriodo(anho, mes).stream()
+                    .map(EscalaHoraEtec::getCategoriaId)
+                    .filter(Objects::nonNull)
+                    .forEach(etecCategoriasSinPresentismo::add);
         }
         state.setEtecCategoriasSinPresentismo(etecCategoriasSinPresentismo);
         state.setNovedades(novedadService.findAllByLegajo(legajoId, anho, mes).stream().filter(novedad -> !Objects.equals(novedad.getCodigoId(), CODIGO_NOVEDAD_AJUSTE_BASICO)).collect(Collectors.toMap(Novedad::getCodigoId, novedad -> novedad)));
@@ -720,7 +726,8 @@ public class MakeLiquidacionService {
     }
 
     /**
-     * Horas de clase que originaron el cargo por horas ETEC (categoría 2002), tomadas de los cursos
+     * Horas de clase que originaron el cargo por horas ETEC (categoría marcada como
+     * {@code etec_horas}), tomadas de los cursos
      * de la facultad 15 del legajo en la sede del cargo. Se recalculan con el mismo agrupador que usa
      * la generación, así que no hace falta persistirlas en el cargo.
      */

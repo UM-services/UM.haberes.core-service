@@ -28,6 +28,7 @@ public class UpdateCategoriaUseCaseImpl implements UpdateCategoriaUseCase {
             categoria.setNoDocente(newCategoria.getNoDocente());
             categoria.setLiquidaPorHora(newCategoria.getLiquidaPorHora());
             categoria.setEstadoDocente(newCategoria.getEstadoDocente());
+            categoria.setEtecHoras(newCategoria.getEtecHoras());
             if (anho > 0 && mes > 0) {
                 categoriaPeriodoRepository.upsert(categoria, anho, mes);
             }

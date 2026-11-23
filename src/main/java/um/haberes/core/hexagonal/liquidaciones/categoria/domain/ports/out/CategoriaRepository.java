@@ -12,6 +12,8 @@ public interface CategoriaRepository {
 
     List<Categoria> findAllByPuntosGreaterThan(BigDecimal puntos);
 
+    List<Categoria> findAllByEtecHoras(Byte etecHoras);
+
     List<Categoria> findAllByCategoriaIdIn(List<Integer> categoriaIds);
 
     List<Categoria> findAllByCategoriaIdNotIn(List<Integer> categoriaIds);

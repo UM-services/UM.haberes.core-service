@@ -21,6 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 import um.haberes.core.hexagonal.liquidaciones.categoria.application.exception.CategoriaException;
 import um.haberes.core.hexagonal.liquidaciones.categoria.application.service.CategoriaService;
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.Categoria;
+import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.web.dto.CategoriaFilterRequest;
+import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.web.dto.CategoriaPageResponse;
 import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.web.dto.CategoriaRequest;
 import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.web.dto.CategoriaResponse;
 import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.web.dto.CategoriaSearchResponse;
@@ -61,6 +63,12 @@ public class CategoriaController {
         return ResponseEntity.ok(service.findAllSearch(chain).stream()
                 .map(categoriaDtoMapper::toSearchResponse)
                 .collect(Collectors.toList()));
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<CategoriaPageResponse> search(@Valid @RequestBody CategoriaFilterRequest request) {
+        return ResponseEntity.ok(categoriaDtoMapper
+                .toPageResponse(service.findAllByFilter(categoriaDtoMapper.toFilter(request))));
     }
 
     @GetMapping("/nodocente/{anho}/{mes}")

@@ -183,6 +183,7 @@ public class SheetService {
         this.setCellString(row, 4, "no_docente", style_bold);
         this.setCellString(row, 5, "liquida_por_hora", style_bold);
         this.setCellString(row, 6, "estado_docente", style_bold);
+        this.setCellString(row, 7, "etec_horas", style_bold);
 
         for (Categoria categoria : categoriaService.findAll()) {
             row = sheet.createRow(++fila);
@@ -193,6 +194,7 @@ public class SheetService {
             this.setCellByte(row, 4, categoria.getNoDocente(), style_normal);
             this.setCellByte(row, 5, categoria.getLiquidaPorHora(), style_normal);
             this.setCellBigDecimal(row, 6, categoria.getEstadoDocente(), style_normal);
+            this.setCellByte(row, 7, categoria.getEtecHoras(), style_normal);
         }
 
         for (int column = 0; column < sheet.getRow(0).getPhysicalNumberOfCells(); column++)

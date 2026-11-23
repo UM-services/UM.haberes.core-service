@@ -6,7 +6,7 @@ import lombok.Getter;
 
 /**
  * Acumula los conceptos ETEC del legajo separando los dos orígenes de cargo: los cargos por
- * puntos y los cargos por horas de clase (categoría 2002).
+ * puntos y los cargos por horas de clase (categorías marcadas como {@code etec_horas}).
  *
  * <p>Cada origen liquida sus propios porcentajes sobre su propia base: lo que se calcula sobre el
  * cargo por puntos pertenece al cargo por puntos y lo que se calcula sobre el cargo por horas

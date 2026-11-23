@@ -35,6 +35,9 @@ public class EscalaHoraEtecEntity extends AuditableEntity {
 
     private Long controlEtecId;
 
+    /** Categoría con la que se liquida el tramo (marcada como {@code etec_horas}). */
+    private Integer categoriaId;
+
     private BigDecimal horasDesde = BigDecimal.ZERO;
 
     private BigDecimal horasHasta = BigDecimal.ZERO;

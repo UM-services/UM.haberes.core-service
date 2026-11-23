@@ -15,6 +15,8 @@ import um.haberes.core.hexagonal.liquidaciones.categoria.application.exception.C
 import um.haberes.core.hexagonal.liquidaciones.categoria.application.exception.CategoriaException;
 import um.haberes.core.hexagonal.liquidaciones.categoria.application.service.CategoriaService;
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.Categoria;
+import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.CategoriaFilter;
+import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.CategoriaPage;
 import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.web.controller.CategoriaController;
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.CategoriaSearchResult;
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.UploadedFile;
@@ -75,7 +77,8 @@ class CategoriaControllerTest {
                   "noDocente": 0,
                   "liquidaPorHora": 0,
                   "estadoDocente": 1.20,
-                  "puntos": 0
+                  "puntos": 0,
+                  "etecHoras": 0
                                                     }
                 """;
     }
@@ -90,7 +93,8 @@ class CategoriaControllerTest {
                   "noDocente": 0,
                   "liquidaPorHora": 0,
                   "estadoDocente": 1.20,
-                  "puntos": 0
+                  "puntos": 0,
+                  "etecHoras": 0
                                                     } ]
                 """;
     }
@@ -142,6 +146,69 @@ class CategoriaControllerTest {
                           "search": "auxiliar 9.75"
                         } ]
                         """, JsonCompareMode.STRICT));
+    }
+
+    @Test
+    void search_returnsOkWithPaginatedCategorias() throws Exception {
+        CategoriaPage page = CategoriaPage.builder()
+                .filas(List.of(sampleCategoria()))
+                .total(1)
+                .pagina(0)
+                .tamano(50)
+                .build();
+        when(service.findAllByFilter(any(CategoriaFilter.class))).thenReturn(page);
+
+        mockMvc.perform(post("/api/haberes/core/categoria/search")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                { "texto": "titular", "pagina": 0, "tamano": 50 }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("""
+                        {
+                          "filas": [ {
+                            "categoriaId": 1,
+                            "nombre": "TITULAR",
+                            "basico": 10.50,
+                            "docente": 1,
+                            "noDocente": 0,
+                            "liquidaPorHora": 0,
+                            "estadoDocente": 1.20,
+                            "puntos": 0,
+                            "etecHoras": 0
+                          } ],
+                          "total": 1,
+                          "pagina": 0,
+                          "tamano": 50
+                        }
+                        """, JsonCompareMode.STRICT));
+    }
+
+    @Test
+    void search_whenTamanoIsOutOfRange_returnsBadRequest() throws Exception {
+        mockMvc.perform(post("/api/haberes/core/categoria/search")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"texto\": \"aux\", \"tamano\": 0 }"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void search_whenCondicionIsUnknown_returnsBadRequest() throws Exception {
+        mockMvc.perform(post("/api/haberes/core/categoria/search")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"condiciones\": [\"OTRA\"] }"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void search_whenTextoIsTooLong_returnsBadRequest() throws Exception {
+        String texto = "a".repeat(101);
+
+        mockMvc.perform(post("/api/haberes/core/categoria/search")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"texto\": \"" + texto + "\" }"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
