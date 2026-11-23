@@ -84,7 +84,10 @@ class BonoDependenciaControllerTest {
                                 new um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoLote.Antiguedad(10, 0),
                                 List.of(cero), "CBU",
                                 List.of(new um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoLote.Item(99, cero)),
-                                List.of(), List.of(), List.of(), List.of(), List.of(), List.of(),
+                                List.of(new um.haberes.core.hexagonal.liquidaciones.bono.domain.model.BonoLote.CursoCargo(
+                                        "Profesor Titular", "Análisis Matemático I", 15, (byte) 1,
+                                        (byte) 1, (byte) 0, (byte) 0, new java.math.BigDecimal("6"))),
+                                List.of(), List.of(), List.of(), List.of(), List.of(),
                                 "ana@um.edu.ar", 1L, false)));
         when(bonoService.obtenerLote(7, 2026, 9, "A")).thenReturn(lote);
 
@@ -95,7 +98,9 @@ class BonoDependenciaControllerTest {
                 .andExpect(jsonPath("$.control.aporteJubilatorio").value("11%"))
                 .andExpect(jsonPath("$.catalogo.codigo981.codigoId").value(981))
                 .andExpect(jsonPath("$.legajos[0].legajoId").value(1001))
-                .andExpect(jsonPath("$.legajos[0].persona.apellido").value("Gómez"));
+                .andExpect(jsonPath("$.legajos[0].persona.apellido").value("Gómez"))
+                .andExpect(jsonPath("$.legajos[0].cursos[0].facultadId").value(15))
+                .andExpect(jsonPath("$.legajos[0].cursos[0].horasSemanales").value(6));
     }
 
     @Test

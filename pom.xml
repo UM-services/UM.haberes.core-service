@@ -11,7 +11,7 @@
     </parent>
     <groupId>ar.edu</groupId>
     <artifactId>um.haberes.core-service</artifactId>
-    <version>2.6.0</version>
+    <version>2.7.0</version>
     <name>UM.haberes.core-service</name>
     <description>Spring Boot Haberes</description>
     <properties>
