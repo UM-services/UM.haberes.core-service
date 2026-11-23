@@ -38,7 +38,7 @@ public class JpaCategoriaPeriodoRepositoryAdapter implements CategoriaPeriodoRep
                     .orElseThrow(() -> new CategoriaPeriodoException(categoria.getCategoriaId(), anho, mes));
         } catch (CategoriaPeriodoException e) {
             categoriaPeriodo = new CategoriaPeriodoEntity(null, categoria.getCategoriaId(), anho, mes, "",
-                    BigDecimal.ZERO, (byte) 0, (byte) 0, (byte) 0, BigDecimal.ZERO);
+                    BigDecimal.ZERO, (byte) 0, (byte) 0, (byte) 0, BigDecimal.ZERO, BigDecimal.ZERO, (byte) 0);
         }
         categoriaPeriodo.setNombre(categoria.getNombre());
         categoriaPeriodo.setBasico(categoria.getBasico());
@@ -46,6 +46,8 @@ public class JpaCategoriaPeriodoRepositoryAdapter implements CategoriaPeriodoRep
         categoriaPeriodo.setNoDocente(categoria.getNoDocente());
         categoriaPeriodo.setLiquidaPorHora(categoria.getLiquidaPorHora());
         categoriaPeriodo.setEstadoDocente(categoria.getEstadoDocente());
+        categoriaPeriodo.setPuntos(categoria.getPuntos());
+        categoriaPeriodo.setEtecHoras(categoria.getEtecHoras());
         jpaCategoriaPeriodoRepository.save(categoriaPeriodo);
     }
 
@@ -66,7 +68,7 @@ public class JpaCategoriaPeriodoRepositoryAdapter implements CategoriaPeriodoRep
             CategoriaPeriodoEntity categoriaPeriodo = new CategoriaPeriodoEntity(categoriaPeriodoId,
                     categoria.getCategoriaId(), anho, mes, categoria.getNombre(), categoria.getBasico(),
                     categoria.getDocente(), categoria.getNoDocente(), categoria.getLiquidaPorHora(),
-                    categoria.getEstadoDocente());
+                    categoria.getEstadoDocente(), categoria.getPuntos(), categoria.getEtecHoras());
             categoriaPeriodos.add(categoriaPeriodo);
         }
         jpaCategoriaPeriodoRepository.saveAll(categoriaPeriodos);

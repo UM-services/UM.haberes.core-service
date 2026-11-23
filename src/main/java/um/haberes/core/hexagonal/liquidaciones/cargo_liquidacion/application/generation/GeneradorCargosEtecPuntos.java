@@ -40,7 +40,7 @@ public class GeneradorCargosEtecPuntos implements GeneradorCargosLiquidacion {
 
     @Override
     public List<CargoLiquidacion> cargos(ContextoGeneracionCargos contexto) {
-        Map<Integer, Categoria> categorias = categoriasConPuntos();
+        Map<Integer, Categoria> categorias = categoriasConPuntos(contexto);
         if (categorias.isEmpty()) {
             return List.of();
         }
@@ -61,9 +61,9 @@ public class GeneradorCargosEtecPuntos implements GeneradorCargosLiquidacion {
                 .toList();
     }
 
-    private Map<Integer, Categoria> categoriasConPuntos() {
+    private Map<Integer, Categoria> categoriasConPuntos(ContextoGeneracionCargos contexto) {
         Map<Integer, Categoria> categorias = new LinkedHashMap<>();
-        for (Categoria categoria : datos.categoriasConPuntos()) {
+        for (Categoria categoria : datos.categoriasConPuntos(contexto.anho(), contexto.mes())) {
             if (categoria.getCategoriaId() != null) {
                 categorias.putIfAbsent(categoria.getCategoriaId(), categoria);
             }

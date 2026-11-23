@@ -48,6 +48,12 @@ public class CategoriaController {
         return ResponseEntity.ok(toResponseList(service.findAllConPuntos()));
     }
 
+    @GetMapping("/puntos/{anho}/{mes}")
+    public ResponseEntity<List<CategoriaResponse>> findAllConPuntosByPeriodo(@PathVariable Integer anho,
+            @PathVariable Integer mes) {
+        return ResponseEntity.ok(toResponseList(service.findAllConPuntos(anho, mes)));
+    }
+
     @GetMapping("/nogrado")
     public ResponseEntity<List<CategoriaResponse>> findAllNoGrado() {
         return ResponseEntity.ok(toResponseList(service.findAllNoDocentes()));

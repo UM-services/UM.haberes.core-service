@@ -33,6 +33,12 @@ public class UploadCategoriasUseCaseImpl implements UploadCategoriasUseCase {
             categorias.put(categoria.getCategoriaId(), categoria);
         }
         for (Categoria fila : filas) {
+            Categoria existente = categorias.get(fila.getCategoriaId());
+            // El lector deja los puntos en null cuando la planilla no trae la columna; en ese
+            // caso se conserva el puntaje ya registrado en la categoría.
+            if (existente != null && fila.getPuntos() == null) {
+                fila.setPuntos(existente.getPuntos());
+            }
             categorias.put(fila.getCategoriaId(), fila);
         }
         List<Categoria> consolidadas = new ArrayList<>(categorias.values());

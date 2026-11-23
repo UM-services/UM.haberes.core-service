@@ -128,6 +128,15 @@ class CategoriaControllerTest {
     }
 
     @Test
+    void findAllConPuntosByPeriodo_returnsOkWithListOfCategoria() throws Exception {
+        when(service.findAllConPuntos(2026, 11)).thenReturn(List.of(sampleCategoria()));
+
+        mockMvc.perform(get("/api/haberes/core/categoria/puntos/{anho}/{mes}", 2026, 11))
+                .andExpect(status().isOk())
+                .andExpect(content().json(categoriaArrayJson(), JsonCompareMode.STRICT));
+    }
+
+    @Test
     void findAllSearch_returnsOkWithListOfCategoriaSearch() throws Exception {
         CategoriaSearchResult categoriaSearch = new CategoriaSearchResult();
         categoriaSearch.setCategoriaId(5);

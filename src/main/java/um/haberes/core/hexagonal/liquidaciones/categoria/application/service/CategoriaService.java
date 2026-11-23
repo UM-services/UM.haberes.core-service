@@ -22,6 +22,7 @@ import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.in.GetCate
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.in.GetCategoriasAsignablesUseCase;
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.in.GetCategoriasByCategoriaIdsUseCase;
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.in.GetCategoriasConPuntosUseCase;
+import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.in.GetCategoriasConPuntosByPeriodoUseCase;
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.in.GetCategoriasDocentesUseCase;
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.in.GetCategoriasNoDocentesByLegajoUseCase;
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.ports.in.GetCategoriasNoDocentesByPeriodoUseCase;
@@ -44,6 +45,7 @@ public class CategoriaService {
     private final GetCategoriasNoDocentesUseCase getCategoriasNoDocentesUseCase;
     private final GetCategoriasAsignablesUseCase getCategoriasAsignablesUseCase;
     private final GetCategoriasConPuntosUseCase getCategoriasConPuntosUseCase;
+    private final GetCategoriasConPuntosByPeriodoUseCase getCategoriasConPuntosByPeriodoUseCase;
     private final GetCategoriasNoDocentesByPeriodoUseCase getCategoriasNoDocentesByPeriodoUseCase;
     private final GetCategoriasNoDocentesByLegajoUseCase getCategoriasNoDocentesByLegajoUseCase;
     private final GetCategoriaByCategoriaIdUseCase getCategoriaByCategoriaIdUseCase;
@@ -60,6 +62,14 @@ public class CategoriaService {
 
     public List<Categoria> findAllConPuntos() {
         return getCategoriasConPuntosUseCase.getCategoriasConPuntos();
+    }
+
+    public List<Categoria> findAllByPeriodo(Integer anho, Integer mes) {
+        return getCategoriasConPuntosByPeriodoUseCase.findAllByPeriodo(anho, mes);
+    }
+
+    public List<Categoria> findAllConPuntos(Integer anho, Integer mes) {
+        return getCategoriasConPuntosByPeriodoUseCase.getCategoriasConPuntos(anho, mes);
     }
 
     public List<Categoria> findAllByIds(Set<Integer> categoriaIds) {
@@ -96,6 +106,11 @@ public class CategoriaService {
 
     public Categoria findByCategoriaId(Integer categoriaId) {
         return getCategoriaByCategoriaIdUseCase.getCategoriaByCategoriaId(categoriaId)
+                .orElseThrow(() -> new CategoriaException(categoriaId));
+    }
+
+    public Categoria findByCategoriaIdAndPeriodo(Integer categoriaId, Integer anho, Integer mes) {
+        return getCategoriasConPuntosByPeriodoUseCase.findByCategoriaIdAndPeriodo(categoriaId, anho, mes)
                 .orElseThrow(() -> new CategoriaException(categoriaId));
     }
 
