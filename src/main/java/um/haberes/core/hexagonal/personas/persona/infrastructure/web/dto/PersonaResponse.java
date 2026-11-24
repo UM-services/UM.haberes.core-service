@@ -75,16 +75,6 @@ public class PersonaResponse {
 
     private Integer modeloContratacionAfip;
 
-    /**
-     * Campo conservado sólo por compatibilidad con el contrato legacy (`clsMODPersona` de
-     * bonos.vb6). La columna `persona.directivo_etec` se eliminó: siempre vale 0.
-     *
-     * @deprecated sin efecto; se retira cuando se jubile el cliente VB6.
-     */
-    @Deprecated
-    @Builder.Default
-    private Byte directivoEtec = 0;
-
     public String getApellidoNombre() {
         return MessageFormat.format("{0}, {1}", this.apellido, this.nombre);
     }
