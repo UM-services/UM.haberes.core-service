@@ -144,8 +144,6 @@ public class PersonaDtoMapper {
                 .localidadAfip(domain.getLocalidadAfip())
                 .situacionAfip(domain.getSituacionAfip())
                 .modeloContratacionAfip(domain.getModeloContratacionAfip())
-                // Contrato legacy: la columna se eliminó, el JSON conserva el campo en 0.
-                .directivoEtec((byte) 0)
                 .build();
     }
 
