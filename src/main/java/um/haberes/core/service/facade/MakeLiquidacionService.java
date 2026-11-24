@@ -416,7 +416,7 @@ public class MakeLiquidacionService {
         }
 
         // Jubilación Secundario (ETEC)
-        if (evaluateOnlyETEC(state)) {
+        if (evaluarJubilacionSecundaria(legajoId, anho, mes, state)) {
             BigDecimal jubilacionEtec = conAportes.multiply(new BigDecimal("0.02")).setScale(2, RoundingMode.HALF_UP);
             if (jubilacionEtec.compareTo(BigDecimal.ZERO) != 0) {
                 addItem(legajoId, anho, mes, CODIGO_JUBILACION_SECUNDARIO, jubilacionEtec, state);
@@ -863,6 +863,38 @@ public class MakeLiquidacionService {
         }
         totalDependencia.replaceAll((k, v) -> v.setScale(2, RoundingMode.HALF_UP));
         return totalDependencia;
+    }
+
+    /**
+     * Jubilación secundaria ETEC: corresponde el 2% adicional cuando el legajo dicta más horas
+     * semanales en la ETEC (facultad 15) que en el resto de las facultades. Se comparan las horas
+     * de {@code curso_cargo} del período; no se suman cargos con clase ni las horas fijas del
+     * cargo por puntos. Exige que el legajo tenga al menos un cargo ETEC liquidado.
+     */
+    private boolean evaluarJubilacionSecundaria(Long legajoId, Integer anho, Integer mes,
+                                                LiquidacionState state) {
+        return state.getEtecAcumulado().hayCargos()
+                && tieneMasHorasEtecQueOtras(cursoCargoService.findAllByLegajo(legajoId, anho, mes));
+    }
+
+    static boolean tieneMasHorasEtecQueOtras(List<CursoCargo> cursos) {
+        BigDecimal horasEtec = BigDecimal.ZERO;
+        BigDecimal horasOtras = BigDecimal.ZERO;
+        for (CursoCargo cursoCargo : cursos) {
+            Curso curso = cursoCargo.getCurso();
+            if (curso == null || curso.getFacultadId() == null) {
+                continue;
+            }
+            BigDecimal horas = cursoCargo.getHorasSemanales() == null
+                    ? BigDecimal.ZERO : cursoCargo.getHorasSemanales();
+            if (AgrupadorHorasEtec.FACULTAD_ETEC.equals(curso.getFacultadId())) {
+                horasEtec = horasEtec.add(horas);
+            } else {
+                horasOtras = horasOtras.add(horas);
+            }
+        }
+        return horasEtec.compareTo(BigDecimal.ZERO) > 0
+                && horasEtec.compareTo(horasOtras) > 0;
     }
 
     public boolean evaluateOnlyETEC(LiquidacionState state) {

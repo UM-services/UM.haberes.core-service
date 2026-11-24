@@ -1,6 +1,8 @@
 package um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.persistence.adapter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -17,6 +19,7 @@ import jakarta.persistence.EntityManager;
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.Categoria;
 import um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.persistence.entity.CategoriaEntity;
 import um.haberes.core.model.CategoriaPeriodoEntity;
+import um.haberes.core.repository.JpaCategoriaPeriodoRepository;
 
 @SpringBootTest
 @Transactional
@@ -31,6 +34,9 @@ class JpaCategoriaRepositoryAdapterTest {
 
     @Autowired
     private EntityManager entityManager;
+
+    @Autowired
+    private JpaCategoriaPeriodoRepository jpaCategoriaPeriodoRepository;
 
     @BeforeEach
     void cargarCatalogo() {
@@ -61,12 +67,40 @@ class JpaCategoriaRepositoryAdapterTest {
     }
 
     @Test
-    void laFilaDelPeriodoMandaAunqueElPuntajeSeaCero() {
+    void heredaLaPlantillaYRegistraElPuntajeCuandoLaFilaDelPeriodoEstaEnCero() {
         guardarPeriodo(992, BigDecimal.ZERO, (byte) 0);
 
         Categoria director = buscar(adapter.findAllByPeriodo(ANHO, MES), 992);
 
-        assertEquals(0, BigDecimal.ZERO.compareTo(director.getPuntos()));
+        assertEquals(0, new BigDecimal("1738.00").compareTo(director.getPuntos()));
+        assertEquals(0, new BigDecimal("1738.00").compareTo(periodo(992).getPuntos()));
+    }
+
+    @Test
+    void materializaLaFilaDelPeriodoCuandoNoExiste() {
+        adapter.findAllByPeriodo(ANHO, MES);
+
+        CategoriaPeriodoEntity vice = periodo(993);
+        assertNotNull(vice);
+        assertEquals(0, new BigDecimal("1469.00").compareTo(vice.getPuntos()));
+        assertEquals((byte) 1, vice.getDocente());
+    }
+
+    @Test
+    void noMaterializaCategoriasSinDatosEtec() {
+        guardarCategoria(994, "CATEGORIA COMUN", BigDecimal.ZERO, (byte) 0);
+
+        adapter.findAllByPeriodo(ANHO, MES);
+
+        assertNull(periodo(994));
+    }
+
+    @Test
+    void buscarPorIdYPeriodoMaterializaLaFilaCuandoNoExiste() {
+        Categoria vice = adapter.findByCategoriaIdAndPeriodo(993, ANHO, MES).orElseThrow();
+
+        assertEquals(0, new BigDecimal("1469.00").compareTo(vice.getPuntos()));
+        assertEquals(0, new BigDecimal("1469.00").compareTo(periodo(993).getPuntos()));
     }
 
     @Test
@@ -118,5 +152,9 @@ class JpaCategoriaRepositoryAdapterTest {
                 .filter(categoria -> categoria.getCategoriaId() == categoriaId)
                 .findFirst()
                 .orElseThrow();
+    }
+
+    private CategoriaPeriodoEntity periodo(int categoriaId) {
+        return jpaCategoriaPeriodoRepository.findByCategoriaIdAndAnhoAndMes(categoriaId, ANHO, MES).orElse(null);
     }
 }

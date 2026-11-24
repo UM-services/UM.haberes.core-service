@@ -1271,8 +1271,9 @@ public class SheetService {
             builder.append(anho);
             this.setCellString(row, column, builder.toString(), style_bold);
             Map<BigDecimal, CuentaMovimientoDto> cuentaMovimientoMap = null;
-            if (acreditacion.getOrdenContable() > 0) {
-                cuentaMovimientoMap = cuentaMovimientoClient.findAllByAsiento(acreditacion.getFechaContable(), acreditacion.getOrdenContable()).stream().collect(Collectors.toMap(CuentaMovimientoDto::getNumeroCuenta, cuentaMovimiento -> cuentaMovimiento));
+            Integer ordenContable = acreditacion.getOrdenContable();
+            if (ordenContable != null && ordenContable > 0 && acreditacion.getFechaContable() != null) {
+                cuentaMovimientoMap = cuentaMovimientoClient.findAllByAsiento(acreditacion.getFechaContable(), ordenContable).stream().collect(Collectors.toMap(CuentaMovimientoDto::getNumeroCuenta, cuentaMovimiento -> cuentaMovimiento));
                 for (CuentaMovimientoDto cuentaMovimientoDto : cuentaMovimientoMap.values()) {
                     if (!cuentaMap.containsKey(cuentaMovimientoDto.getNumeroCuenta())) {
                         cuentaMap.put(cuentaMovimientoDto.getNumeroCuenta(), cuentaMovimientoDto.getCuentaDto());
