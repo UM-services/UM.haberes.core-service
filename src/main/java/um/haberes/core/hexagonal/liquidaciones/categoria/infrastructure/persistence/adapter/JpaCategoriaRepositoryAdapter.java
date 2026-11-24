@@ -1,6 +1,7 @@
 package um.haberes.core.hexagonal.liquidaciones.categoria.infrastructure.persistence.adapter;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ public class JpaCategoriaRepositoryAdapter implements CategoriaRepository {
     private final JpaCategoriaRepository jpaCategoriaRepository;
     private final JpaCategoriaPeriodoRepository jpaCategoriaPeriodoRepository;
     private final CategoriaMapper categoriaMapper;
+    private final CategoriaPeriodoMaterializer categoriaPeriodoMaterializer;
 
     @Override
     public List<Categoria> findAll() {
@@ -38,9 +40,16 @@ public class JpaCategoriaRepositoryAdapter implements CategoriaRepository {
         Map<Integer, CategoriaPeriodoEntity> periodos = jpaCategoriaPeriodoRepository
                 .findAllByAnhoAndMes(anho, mes).stream()
                 .collect(Collectors.toMap(CategoriaPeriodoEntity::getCategoriaId, Function.identity()));
-        return jpaCategoriaRepository.findAll(Sort.by("categoriaId").ascending()).stream()
-                .map(entity -> toDomainConPeriodo(entity, periodos.get(entity.getCategoriaId())))
+        List<CategoriaPeriodoEntity> pendientes = new ArrayList<>();
+        List<Categoria> categorias = jpaCategoriaRepository.findAll(Sort.by("categoriaId").ascending()).stream()
+                .map(entity -> {
+                    Categoria categoria = categoriaMapper.toDomain(entity);
+                    resolverPeriodo(categoria, periodos.get(entity.getCategoriaId()), anho, mes, pendientes);
+                    return categoria;
+                })
                 .collect(Collectors.toList());
+        categoriaPeriodoMaterializer.guardar(pendientes);
+        return categorias;
     }
 
     @Override
@@ -85,9 +94,15 @@ public class JpaCategoriaRepositoryAdapter implements CategoriaRepository {
 
     @Override
     public Optional<Categoria> findByCategoriaIdAndPeriodo(Integer categoriaId, Integer anho, Integer mes) {
-        return jpaCategoriaRepository.findByCategoriaId(categoriaId)
-                .map(entity -> toDomainConPeriodo(entity, jpaCategoriaPeriodoRepository
-                        .findByCategoriaIdAndAnhoAndMes(categoriaId, anho, mes).orElse(null)));
+        return jpaCategoriaRepository.findByCategoriaId(categoriaId).map(entity -> {
+            CategoriaPeriodoEntity periodo = jpaCategoriaPeriodoRepository
+                    .findByCategoriaIdAndAnhoAndMes(categoriaId, anho, mes).orElse(null);
+            Categoria categoria = categoriaMapper.toDomain(entity);
+            List<CategoriaPeriodoEntity> pendientes = new ArrayList<>();
+            resolverPeriodo(categoria, periodo, anho, mes, pendientes);
+            categoriaPeriodoMaterializer.guardar(pendientes);
+            return categoria;
+        });
     }
 
     @Override
@@ -119,12 +134,68 @@ public class JpaCategoriaRepositoryAdapter implements CategoriaRepository {
                 .collect(Collectors.toList());
     }
 
-    private Categoria toDomainConPeriodo(CategoriaEntity entity, CategoriaPeriodoEntity periodo) {
-        Categoria categoria = categoriaMapper.toDomain(entity);
-        if (categoria != null && periodo != null) {
-            categoria.setPuntos(periodo.getPuntos());
-            categoria.setEtecHoras(periodo.getEtecHoras());
+    /**
+     * Aplica los valores ETEC del período sobre la plantilla de la categoría.
+     *
+     * <p>La fila de {@code categoria_periodo} manda cuando tiene puntaje propio (o marca
+     * horas ETEC). Si no existe, o existe todavía en cero, el valor sale de
+     * {@code categoria} y la fila queda pendiente de registrar para que el dato quede
+     * versionado en el período.</p>
+     */
+    private void resolverPeriodo(Categoria categoria, CategoriaPeriodoEntity periodo, Integer anho, Integer mes,
+            List<CategoriaPeriodoEntity> pendientes) {
+        if (categoria == null || anho == null || mes == null || anho <= 0 || mes <= 0) {
+            return;
         }
-        return categoria;
+        if (periodo == null) {
+            if (tieneDatosEtec(categoria)) {
+                pendientes.add(filaDesdePlantilla(categoria, anho, mes));
+            }
+            return;
+        }
+        boolean registrar = false;
+        if (tienePuntos(periodo.getPuntos())) {
+            categoria.setPuntos(periodo.getPuntos());
+        } else if (tienePuntos(categoria.getPuntos())) {
+            periodo.setPuntos(categoria.getPuntos());
+            registrar = true;
+        }
+        if (liquidaHoras(periodo.getEtecHoras())) {
+            categoria.setEtecHoras(periodo.getEtecHoras());
+        } else if (liquidaHoras(categoria.getEtecHoras())) {
+            periodo.setEtecHoras(categoria.getEtecHoras());
+            registrar = true;
+        }
+        if (registrar) {
+            pendientes.add(periodo);
+        }
+    }
+
+    private boolean tieneDatosEtec(Categoria categoria) {
+        return tienePuntos(categoria.getPuntos()) || liquidaHoras(categoria.getEtecHoras());
+    }
+
+    private boolean tienePuntos(BigDecimal puntos) {
+        return puntos != null && puntos.compareTo(BigDecimal.ZERO) > 0;
+    }
+
+    private boolean liquidaHoras(Byte etecHoras) {
+        return etecHoras != null && etecHoras.intValue() == 1;
+    }
+
+    private CategoriaPeriodoEntity filaDesdePlantilla(Categoria categoria, Integer anho, Integer mes) {
+        CategoriaPeriodoEntity fila = new CategoriaPeriodoEntity();
+        fila.setCategoriaId(categoria.getCategoriaId());
+        fila.setAnho(anho);
+        fila.setMes(mes);
+        fila.setNombre(categoria.getNombre() == null ? "" : categoria.getNombre());
+        fila.setBasico(categoria.getBasico() == null ? BigDecimal.ZERO : categoria.getBasico());
+        fila.setDocente(categoria.getDocente() == null ? (byte) 0 : categoria.getDocente());
+        fila.setNoDocente(categoria.getNoDocente() == null ? (byte) 0 : categoria.getNoDocente());
+        fila.setLiquidaPorHora(categoria.getLiquidaPorHora() == null ? (byte) 0 : categoria.getLiquidaPorHora());
+        fila.setEstadoDocente(categoria.getEstadoDocente() == null ? BigDecimal.ZERO : categoria.getEstadoDocente());
+        fila.setPuntos(categoria.getPuntos() == null ? BigDecimal.ZERO : categoria.getPuntos());
+        fila.setEtecHoras(categoria.getEtecHoras() == null ? (byte) 0 : categoria.getEtecHoras());
+        return fila;
     }
 }

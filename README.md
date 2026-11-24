@@ -19,7 +19,7 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**2.9.0** (2026-11-23)
+**2.9.1** (2026-11-24)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
@@ -299,6 +299,15 @@ docker run -d \
 - `GET /api/haberes/core/makeLiquidacion/legajo/{legajoId}/{anho}/{mes}/{force}` - Liquidar un legajo (legacy)
 - `GET /api/haberes/core/makeLiquidacionGeneral/general/{anho}/{mes}/{force}` - Liquidación general masiva
 
+En la liquidación individual, la jubilación secundaria ETEC (código `70`, 2% sobre los haberes con
+aportes) sólo se emite cuando el legajo tiene al menos un cargo ETEC acumulado y sus horas semanales
+de `curso_cargo` en la facultad ETEC (15) superan a las del resto de las facultades; el empate no
+aplica y se ignoran los cursos sin curso o sin facultad.
+
+Cada liquidación elimina antes las novedades duplicadas del período. Aplicar
+`sql/026_novedad_periodo_duplicado_index.sql` antes de desplegar: la consulta filtra por `anho`/`mes`
+con el índice en lugar de recorrer toda la tabla `novedad`.
+
 ### Liquidación individual (slice hexagonal)
 - `GET /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}` - Ficha agregada del legajo/período con las acciones habilitadas
 - `POST /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/cargos` - Regenerar cargos docentes, no docentes y ETEC (puntos y horas) del legajo/período
@@ -338,6 +347,11 @@ Base64 (líneas de 650 caracteres, CRLF y windows-1252), la cantidad, el total, 
 quedó acreditado; responde `422` si ningún legajo pudo acreditarse. El masivo marca la acreditación del
 período y genera la orden de pago.
 
+En la planilla contable, `acreditacion.orden_contable` puede quedar en `NULL` mientras el asiento no se
+generó: `NULL` significa "todavía sin asiento" y `0` es el valor heredado. Aplicar
+`sql/025_acreditacion_orden_contable_null.sql` antes de desplegar, porque es la columna la que hoy
+impide dar de alta el período sólo con el límite de novedades (`ddl-auto: none`).
+
 ### Cargos
 - `GET /api/haberes/core/cargo/legajo/{legajoId}` - Obtener cargos por legajo
 - `GET /api/haberes/core/cargo/{cargoId}` - Obtener cargo
@@ -367,7 +381,10 @@ cargo ETEC); si la planilla no trae la columna `puntos`, la importación conserv
 La escala de horas ETEC exige que cada tramo indique una categoría marcada con `etec_horas = 1`.
 
 La generación ETEC resuelve `puntos` y `etec_horas` por período desde `categoria_periodo` y cae en
-la plantilla de `categoria` cuando el período no tiene fila.
+la plantilla de `categoria` cuando el período no tiene fila o la tiene en cero. En esa lectura, la
+fila del período se registra de forma best-effort con los valores heredados (también en
+`GET /api/haberes/core/categoria/puntos/{anho}/{mes}`), de modo que el puntaje y el flag queden
+versionados en el período.
 
 ### ETEC (cargos por puntos y por horas)
 - `GET /api/haberes/core/etec/asignacion-cargo/legajo/{legajoId}` - Asignaciones del legajo
