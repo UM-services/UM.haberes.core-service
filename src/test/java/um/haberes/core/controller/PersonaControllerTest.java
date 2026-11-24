@@ -116,7 +116,6 @@ class PersonaControllerTest {
               "localidadAfip": 100,
               "situacionAfip": 3,
               "modeloContratacionAfip": 1,
-              "directivoEtec": 0,
               "apellidoNombre": "Perez, Juan"
                                         }
             """;
