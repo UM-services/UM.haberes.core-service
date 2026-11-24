@@ -22,7 +22,7 @@ public class NovedadDuplicadaService {
 	private JpaNovedadDuplicadaRepository repository;
 
 	public List<NovedadDuplicada> findAllByPeriodo(Integer anho, Integer mes) {
-		return repository.findAllByAnhoAndMes(anho, mes);
+		return repository.findAllByPeriodo(anho, mes);
 	}
 
 }
