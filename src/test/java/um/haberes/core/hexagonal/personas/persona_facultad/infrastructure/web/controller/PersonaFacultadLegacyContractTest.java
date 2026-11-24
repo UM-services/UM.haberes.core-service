@@ -47,7 +47,8 @@ import um.haberes.core.hexagonal.personas.persona_facultad.infrastructure.web.ma
  * por campo (`clsMODPersonaFacultad.fillObject`, `clsMODPersona.fillObject`,
  * `clsMODFacultad.fillObject`, `clsMODDependencia.fillObject`). Este test fija, como
  * contrato, los nombres que el VB6 lee: si alguno desaparece del response, falla acá en vez
- * de fallar en producción.
+ * de fallar en producción. El flag `directivoEtec` ya se retiró del modelo de persona y por
+ * eso no forma parte del contrato.
  */
 @ExtendWith(MockitoExtension.class)
 class PersonaFacultadLegacyContractTest {
@@ -66,7 +67,7 @@ class PersonaFacultadLegacyContractTest {
             "altaAdministrativa", "ajusteAdministrativo", "reemplazoDesarraigo", "mitadDesarraigo", "cuil",
             "estadoCivil", "situacionId", "posgrado", "estado", "liquida", "estadoAfip", "dependenciaId",
             "salida", "obraSocial", "actividadAfip", "localidadAfip", "situacionAfip",
-            "modeloContratacionAfip", "directivoEtec", "dependencia");
+            "modeloContratacionAfip", "dependencia");
 
     /** `clsMODFacultad.fillObject`. */
     private static final Set<String> FACULTAD_FIELDS = Set.of(
@@ -111,6 +112,8 @@ class PersonaFacultadLegacyContractTest {
         assertThat(fieldNames(root.get("persona"))).containsAll(PERSONA_FIELDS);
         assertThat(fieldNames(root.get("facultad"))).containsAll(FACULTAD_FIELDS);
         assertThat(fieldNames(root.get("persona").get("dependencia"))).containsAll(DEPENDENCIA_FIELDS);
+        // `directivoEtec` se retiró del modelo de persona: no debe volver al contrato.
+        assertThat(fieldNames(root.get("persona"))).doesNotContain("directivoEtec");
 
         // Tipos que el VB6 vuelca directo a TextBox / ComboBox.
         assertThat(root.get("legajoId").isNumber()).isTrue();

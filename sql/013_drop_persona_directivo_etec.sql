@@ -1,7 +1,6 @@
 -- Retiro de persona.directivo_etec.
 -- El flag sólo excluía a los directivos del desglose ETEC del bono, que ya no existe.
--- El contrato JSON de persona conserva el campo en 0 por compatibilidad con
--- `clsMODPersona` de bonos.vb6 (ver PersonaResponse, @Deprecated).
+-- Se retiró también del contrato JSON de persona: `PersonaResponse` ya no expone el campo.
 -- Idempotente: sólo actúa si la columna existe.
 
 SET @existe := (

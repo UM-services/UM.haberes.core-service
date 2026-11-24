@@ -19,7 +19,7 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**2.9.1** (2026-11-24)
+**3.0.0** (2026-11-24)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
@@ -443,6 +443,11 @@ y debe aplicarse antes de desplegar la generación ETEC por período.
 - `GET /api/haberes/core/persona/liquidables` - Listar personas liquidables
 - `GET /api/haberes/core/persona/liquidado/{anho}/{mes}` - Personas con liquidación en el período (ordenadas por nombre)
 - `POST /api/haberes/core/persona/upload` - Cargar contactos de personas desde Excel
+
+`PersonaResponse` ya no incluye `directivoEtec`: el campo se retiró del contrato JSON junto con la
+columna `persona.directivo_etec` (`sql/013_drop_persona_directivo_etec.sql`, idempotente), de modo que
+los clientes que todavía lo leían deben dejar de hacerlo. El resto del contrato legacy de persona que
+fija `PersonaFacultadLegacyContractTest` se mantiene.
 
 ### Usuarios
 - `GET /api/haberes/core/usuario/` - Listar usuarios sin hash de clave (`UsuarioResumenResponse`)
