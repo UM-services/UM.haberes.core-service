@@ -22,8 +22,6 @@ spring:
       - codigos
       - dependencias
       - codigos_grupos
-    caffeine:
-      spec: initialCapacity=50,maximumSize=500,expireAfterAccess=600s
   application:
     name: haberes-core-service
   cloud:
