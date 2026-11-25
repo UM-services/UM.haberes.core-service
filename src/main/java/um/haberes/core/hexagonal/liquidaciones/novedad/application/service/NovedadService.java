@@ -1,5 +1,6 @@
 package um.haberes.core.hexagonal.liquidaciones.novedad.application.service;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -14,9 +15,11 @@ import um.haberes.core.hexagonal.liquidaciones.novedad.domain.ports.in.GetNoveda
 import um.haberes.core.hexagonal.liquidaciones.novedad.domain.ports.in.GetNovedadByUniqueKeyUseCase;
 import um.haberes.core.hexagonal.liquidaciones.novedad.domain.ports.in.GetNovedadByUniqueKeyWithoutDependenciaUseCase;
 import um.haberes.core.hexagonal.liquidaciones.novedad.domain.ports.in.GetNovedadesByCodigoUseCase;
+import um.haberes.core.hexagonal.liquidaciones.novedad.domain.ports.in.GetNovedadesByCodigosUseCase;
 import um.haberes.core.hexagonal.liquidaciones.novedad.domain.ports.in.GetNovedadesByImportadoUseCase;
 import um.haberes.core.hexagonal.liquidaciones.novedad.domain.ports.in.GetNovedadesByLegajoAndCodigoUseCase;
 import um.haberes.core.hexagonal.liquidaciones.novedad.domain.ports.in.GetNovedadesByLegajoUseCase;
+import um.haberes.core.hexagonal.liquidaciones.novedad.domain.ports.in.GetNovedadesByPeriodoUseCase;
 import um.haberes.core.hexagonal.liquidaciones.novedad.domain.ports.in.SaveAllNovedadesUseCase;
 import um.haberes.core.hexagonal.liquidaciones.novedad.domain.ports.in.UpdateNovedadUseCase;
 
@@ -26,6 +29,8 @@ public class NovedadService {
 
     private final GetNovedadesByLegajoUseCase getNovedadesByLegajoUseCase;
     private final GetNovedadesByCodigoUseCase getNovedadesByCodigoUseCase;
+    private final GetNovedadesByCodigosUseCase getNovedadesByCodigosUseCase;
+    private final GetNovedadesByPeriodoUseCase getNovedadesByPeriodoUseCase;
     private final GetNovedadesByImportadoUseCase getNovedadesByImportadoUseCase;
     private final GetNovedadesByLegajoAndCodigoUseCase getNovedadesByLegajoAndCodigoUseCase;
     private final GetNovedadByIdUseCase getNovedadByIdUseCase;
@@ -43,6 +48,14 @@ public class NovedadService {
 
     public List<Novedad> findAllByCodigo(Integer codigoId, Integer anho, Integer mes) {
         return getNovedadesByCodigoUseCase.getNovedadesByCodigo(codigoId, anho, mes);
+    }
+
+    public List<Novedad> findAllByCodigos(Collection<Integer> codigoIds, Integer anho, Integer mes) {
+        return getNovedadesByCodigosUseCase.getNovedadesByCodigos(codigoIds, anho, mes);
+    }
+
+    public List<Novedad> findAllByPeriodo(Integer anho, Integer mes) {
+        return getNovedadesByPeriodoUseCase.getNovedadesByPeriodo(anho, mes);
     }
 
     public List<Novedad> findAllByImportado(Byte importado, Integer anho, Integer mes) {

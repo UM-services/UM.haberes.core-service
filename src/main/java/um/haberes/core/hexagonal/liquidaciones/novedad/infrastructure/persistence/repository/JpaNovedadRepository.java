@@ -3,6 +3,7 @@
  */
 package um.haberes.core.hexagonal.liquidaciones.novedad.infrastructure.persistence.repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +20,11 @@ import um.haberes.core.hexagonal.liquidaciones.novedad.infrastructure.persistenc
 public interface JpaNovedadRepository extends JpaRepository<NovedadEntity, Long> {
 
     List<NovedadEntity> findAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
+
+    List<NovedadEntity> findAllByAnhoAndMes(Integer anho, Integer mes);
+
+    List<NovedadEntity> findAllByCodigoIdInAndAnhoAndMes(Collection<Integer> codigoIds, Integer anho, Integer mes,
+                                                         Sort sort);
 
     List<NovedadEntity> findAllByCodigoIdAndAnhoAndMes(Integer codigoId, Integer anho, Integer mes, Sort sort);
 
