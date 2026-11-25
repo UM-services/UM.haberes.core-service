@@ -14,6 +14,7 @@ sequenceDiagram
 
     Usuario->>AntiCtrl: GET /antiguedad/calculate/{legajoId}/{anho}/{mes}
     AntiCtrl->>AntiSvc: calculate(legajoId, anho, mes)
+    AntiSvc->>DB: meses docentes, administrativos y ETEC (alta_docente, alta_administrativa y alta_etec)
     AntiSvc->>DB: recalcular escalafón según antigüedad y categoría (antiguedad_limite)
     Usuario->>AntiCtrl: GET /antiguedad/unique/{legajoId}/{anho}/{mes} o /periodo/{anho}/{mes}/{limit}
     AntiCtrl->>AntiSvc: findByUnique(...) / findAllByPeriodo(...)
@@ -27,4 +28,4 @@ sequenceDiagram
     Usuario->>BonoCtrl: POST /bonoimpresion/ (registro de impresión de bono)
     BonoCtrl->>DB: INSERT bono_impresion
 
-    Note over Usuario,DB: En la liquidación (MakeLiquidacionService) evaluateOnlyETEC usa estos datos<br/>para aplicar descuentos por asistencia al neto ETEC
+    Note over Usuario,DB: En la liquidación (MakeLiquidacionService) evaluateOnlyETEC usa estos datos<br/>para aplicar descuentos por asistencia al neto ETEC. La antigüedad ETEC<br/>(meses_etec, sql/029) alimenta el arraigo y el concepto 989.

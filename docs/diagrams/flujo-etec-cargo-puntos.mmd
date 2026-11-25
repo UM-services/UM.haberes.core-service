@@ -21,7 +21,7 @@ sequenceDiagram
     Note over Cliente,DB: haberes-etec no abre conexión a la base: opera por API contra core
     Note over GenCtrl,DB: core genera los cargos ETEC por puntos y por horas.<br/>Los endpoints de reemplazo se conservan
 
-    Cliente->>EtecCtrl: POST /etec/asignacion-cargo/ (legajoId, categoriaId, fechaAlta)
+    Cliente->>EtecCtrl: POST /etec/asignacion-cargo/ (legajoId, categoriaId, fechaAlta, horasCargo, vecesBasicoMaestroGrado)
     EtecCtrl->>EtecUC: CreateEtecAsignacionCargoUseCase
     EtecUC->>EtecRepo: save(asignacion)
     EtecRepo->>DB: INSERT etec_asignacion_cargo (alta/baja por fechas)
@@ -30,14 +30,14 @@ sequenceDiagram
 
     Cliente->>EtecCtrl: GET /legajo/{legajoId}/periodo/{anho}/{mes}
     EtecCtrl->>DB: SELECT asignaciones vigentes en el período
-    EtecCtrl-->>Cliente: legajo, categoría, dependencia y persona
+    EtecCtrl-->>Cliente: legajo, categoría, dependencia, horas del cargo y veces del básico
 
     Cliente->>CatCtrl: GET /categoria/puntos o /categoria/puntos/{anho}/{mes}
     CatCtrl->>DB: SELECT categoria con puntos y etec_horas del período (categoria_periodo, fallback a categoria)
 
     Cliente->>CtlCtrl: GET o POST /etec/control/{anho}/{mes}
     CtlCtrl->>DB: SELECT o upsert control_etec del período
-    CtlCtrl-->>Cliente: valor del punto, monto fijo, presentismo, adicional carrera, garantía y carga horaria
+    CtlCtrl-->>Cliente: valor del punto, monto fijo, horas de referencia, básico del maestro de grado, presentismo, adicional carrera, garantía y carga horaria
 
     Cliente->>EscCtrl: GET o PUT /etec/hora/escala/{anho}/{mes}
     EscCtrl->>DB: SELECT o reemplazo de etec_hora_escala del control_etec
@@ -55,7 +55,7 @@ sequenceDiagram
     alt Sin asignaciones vigentes o sin categorías con puntos
         GenEtec-->>Orq: lista vacía
     else Con asignaciones y valor del punto
-        GenEtec-->>Orq: categoriaBasico = puntos × valor_punto_etec + monto_fijo_cargo
+        GenEtec-->>Orq: categoriaBasico = (puntos x valor_punto_etec) x horas_cargo / horas_referencia_cargo + monto_fijo_cargo
     end
     Orq->>GenHoras: cargos(contexto)
     GenHoras->>DB: SELECT etec_hora_escala del período y cursos de la facultad 15
@@ -81,4 +81,4 @@ sequenceDiagram
     CargCtrl-->>Cliente: cargos guardados
 
     Note over Orq,DB: El reemplazo conserva el contrato de haberes-etec, valida período,<br/>legajo y alcance antes de borrar, abre AuditBulkScope (SUMMARY/BULK)<br/>y usa version null para que se escriba el snapshot.
-    Note over GenEtec,DB: Los parámetros del circuito viven en control_etec (sql/009),<br/>el puntaje y el flag de horas del cargo en categoria_periodo (sql/024,<br/>fallback a categoria.puntos, sql/005) y la escala de horas en<br/>etec_hora_escala (sql/018). El arraigo se resuelve con<br/>la escala global etec_arraigo_escala (sql/017).
+    Note over GenEtec,DB: Los parámetros del circuito viven en control_etec (sql/009 y<br/>sql/028: valor del punto, monto fijo, horas de referencia y básico),<br/>el puntaje y el flag de horas del cargo en categoria_periodo (sql/024,<br/>fallback a categoria.puntos, sql/005) y la escala de horas en<br/>etec_hora_escala (sql/018). El arraigo se resuelve con<br/>la escala global etec_arraigo_escala (sql/017) sobre la antigüedad ETEC<br/>(antiguedad.meses_etec, sql/029).
