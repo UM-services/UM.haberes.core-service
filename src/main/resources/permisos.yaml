@@ -1,0 +1,450 @@
+# Inventario de permisos de Haberes — FUENTE DE VERDAD.
+#
+# Se sincroniza contra la tabla `permiso` de `haberes` al arrancar haberes-core
+# (app.seguridad.manifest-sync.enabled) y también a demanda desde
+# POST /api/haberes/core/permiso/sync.
+#
+# Reglas:
+#  - La identidad de una clave es (aplicacion, clave).
+#  - Si una clave está acá y no en la base, se crea.
+#  - Si está en ambos, se actualizan descripcion, modulo y activo.
+#  - Si existe en la base y NO está acá, se retira con activo = false (nunca se borra).
+#  - Para agregar una funcionalidad: agregá la clave acá en el mismo cambio en que
+#    se cablea en el código (guard, menú, directiva o @RequierePermiso).
+version: 1
+
+permisos:
+  # --- Comunes: datos de referencia compartidos por varias pantallas ---
+  - aplicacion: HABERES
+    clave: comun.personas.consultar
+    modulo: comun
+    descripcion: "Buscar y consultar personas por legajo, documento o texto"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: comun.catalogos.consultar
+    modulo: comun
+    descripcion: "Consultar catálogos maestros (facultades, dependencias, categorías, códigos, clases)"
+    activo: true
+
+  # --- Novedades ---
+  - aplicacion: HABERES
+    clave: novedades.asig_cursos.gestionar
+    modulo: novedades
+    descripcion: "Asignación de cursos por facultad y sede"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: novedades.docentes_sede.ver
+    modulo: novedades
+    descripcion: "Consultar docentes por sede"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: novedades.cargos.ver
+    modulo: novedades
+    descripcion: "Consultar cargos por legajo"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: novedades.anotador.gestionar
+    modulo: novedades
+    descripcion: "Gestionar el anotador de novedades"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: novedades.designaciones.ver
+    modulo: novedades
+    descripcion: "Consultar designaciones"
+    activo: true
+
+  # --- Liquidación ---
+  - aplicacion: HABERES
+    clave: liquidacion.asig_cargos.gestionar
+    modulo: liquidacion
+    descripcion: "Asignación de cargos no docentes"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: liquidacion.etec.asignaciones.gestionar
+    modulo: liquidacion
+    descripcion: "Asignación de cargos ETEC y presentismo"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: liquidacion.novedades.gestionar
+    modulo: liquidacion
+    descripcion: "Gestión de novedades mensuales"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: liquidacion.individual.procesar
+    modulo: liquidacion
+    descripcion: "Liquidación y recálculo individual"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: liquidacion.general.procesar
+    modulo: liquidacion
+    descripcion: "Liquidación y recálculo general del período"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: liquidacion.sijp.generar
+    modulo: liquidacion
+    descripcion: "Generar archivo SIJP"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: liquidacion.transferir_novedades.procesar
+    modulo: liquidacion
+    descripcion: "Transferir novedades entre períodos y facultades"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: liquidacion.planilla_no_docentes.ver
+    modulo: liquidacion
+    descripcion: "Consultar la planilla de no docentes"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: liquidacion.afip_sicore.generar
+    modulo: liquidacion
+    descripcion: "Generar archivo AFIP SICORE"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: liquidacion.sac.generar
+    modulo: liquidacion
+    descripcion: "Generar y liquidar SAC"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: liquidacion.libro_sueldos_digital.generar
+    modulo: liquidacion
+    descripcion: "Generar archivo Libro de Sueldos Digital"
+    activo: true
+
+  # --- Designaciones ---
+  - aplicacion: HABERES
+    clave: designaciones.general.gestionar
+    modulo: designaciones
+    descripcion: "Gestión general de designaciones"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: designaciones.asig_cursos.gestionar
+    modulo: designaciones
+    descripcion: "Asignación de cursos de designaciones"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: designaciones.autorizar_novedades.gestionar
+    modulo: designaciones
+    descripcion: "Autorizar novedades de facultades"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: designaciones.cargos_clase.gestionar
+    modulo: designaciones
+    descripcion: "Asignación de cargos con clase"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: designaciones.anotador.gestionar
+    modulo: designaciones
+    descripcion: "Revisar el anotador de designaciones"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: designaciones.duplicar_cargos_clase.procesar
+    modulo: designaciones
+    descripcion: "Duplicar cargos con clase"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: designaciones.actualizar_cargos_clase.procesar
+    modulo: designaciones
+    descripcion: "Actualizar cargos con clase"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: designaciones.cursos.ver
+    modulo: designaciones
+    descripcion: "Consultar cursos por facultad y sede"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: designaciones.fusionar_todos.procesar
+    modulo: designaciones
+    descripcion: "Fusionar todos los cursos"
+    activo: true
+
+  # --- Movimientos y bancos ---
+  - aplicacion: HABERES
+    clave: movimientos.santander.generar
+    modulo: movimientos
+    descripcion: "Generar archivo Santander"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: movimientos.otros_bancos.generar
+    modulo: movimientos
+    descripcion: "Generar archivo de otros bancos"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: movimientos.santander_individual.generar
+    modulo: movimientos
+    descripcion: "Generar archivo Santander individual"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: movimientos.otros_bancos_individual.generar
+    modulo: movimientos
+    descripcion: "Generar archivo de otros bancos individual"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: movimientos.excluidos.gestionar
+    modulo: movimientos
+    descripcion: "Gestionar legajos excluidos de acreditación"
+    activo: true
+
+  # --- Consultas y reportes ---
+  - aplicacion: HABERES
+    clave: consultas.bonos_dependencia.ver
+    modulo: consultas
+    descripcion: "Imprimir bonos por dependencia"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: consultas.bono_individual.ver
+    modulo: consultas
+    descripcion: "Imprimir bono individual"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: consultas.comparacion_meses.ver
+    modulo: consultas
+    descripcion: "Comparación entre meses consecutivos"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: consultas.totales_generales.ver
+    modulo: consultas
+    descripcion: "Consultar totales generales"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: consultas.totales_codigo.ver
+    modulo: consultas
+    descripcion: "Consultar totales generales por código"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: consultas.detalle_codigo.ver
+    modulo: consultas
+    descripcion: "Consultar detalle por código"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: consultas.libro_sueldos.ver
+    modulo: consultas
+    descripcion: "Imprimir libro de sueldos"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: consultas.docentes_sede.ver
+    modulo: consultas
+    descripcion: "Consultar docentes por sede"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: consultas.designacion_docentes.ver
+    modulo: consultas
+    descripcion: "Consultar designación de docentes"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: consultas.cursos_docente.ver
+    modulo: consultas
+    descripcion: "Consultar cursos por docente"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: consultas.cursos_contratado.ver
+    modulo: consultas
+    descripcion: "Consultar cursos por contratado"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: consultas.fusion_docente.ver
+    modulo: consultas
+    descripcion: "Consultar fusión por docente"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: consultas.planilla_liquidables.ver
+    modulo: consultas
+    descripcion: "Consultar planilla de liquidables"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: consultas.cargos_periodo.ver
+    modulo: consultas
+    descripcion: "Consultar planilla de cargos por período"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: consultas.cursos_periodo.ver
+    modulo: consultas
+    descripcion: "Consultar planilla de cursos por período"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: consultas.basicos_periodo.ver
+    modulo: consultas
+    descripcion: "Consultar planilla de básicos por período"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: consultas.cantidad_cargos.ver
+    modulo: consultas
+    descripcion: "Consultar planilla de cantidad de cargos"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: consultas.historico_cargos.ver
+    modulo: consultas
+    descripcion: "Consultar histórico de asignación de cargos"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: consultas.cargos_clase_facultad.ver
+    modulo: consultas
+    descripcion: "Consultar cargos con clase por facultad"
+    activo: true
+
+  # --- Contabilidad ---
+  - aplicacion: HABERES
+    clave: contabilidad.imputacion_individual.generar
+    modulo: contabilidad
+    descripcion: "Generar imputación contable individual"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: contabilidad.imputacion_masiva.generar
+    modulo: contabilidad
+    descripcion: "Generar imputación contable masiva"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: contabilidad.formulario_931.ver
+    modulo: contabilidad
+    descripcion: "Consultar totales del Formulario 931"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: contabilidad.imputaciones_cargos.ver
+    modulo: contabilidad
+    descripcion: "Consultar imputaciones contables de cargos"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: contabilidad.imputaciones_cargos_clase.ver
+    modulo: contabilidad
+    descripcion: "Consultar imputaciones contables de cargos con clase"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: contabilidad.imputaciones_codigos.ver
+    modulo: contabilidad
+    descripcion: "Consultar imputaciones contables de códigos"
+    activo: true
+
+  # --- Administrador ---
+  - aplicacion: HABERES
+    clave: administrador.personas.editar
+    modulo: administrador
+    descripcion: "Editar datos personales y contacto"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: administrador.categorias.editar
+    modulo: administrador
+    descripcion: "Administrar categorías y básicos por período"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: administrador.codigos.editar
+    modulo: administrador
+    descripcion: "Administrar códigos de concepto"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: administrador.clases.editar
+    modulo: administrador
+    descripcion: "Administrar clases"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: administrador.cargos_clase.editar
+    modulo: administrador
+    descripcion: "Administrar cargos con clase"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: administrador.adicionales.editar
+    modulo: administrador
+    descripcion: "Administrar adicionales de carga horaria"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: administrador.control_periodo.editar
+    modulo: administrador
+    descripcion: "Administrar el control del período"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: administrador.limite_novedades.editar
+    modulo: administrador
+    descripcion: "Administrar el límite de novedades"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: administrador.sedes.editar
+    modulo: administrador
+    descripcion: "Administrar sedes"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: administrador.usuarios.administrar
+    modulo: administrador
+    descripcion: "Administrar usuarios y el flag de administrador"
+    activo: true
+
+  # --- Seguridad ---
+  - aplicacion: HABERES
+    clave: seguridad.permisos.administrar
+    modulo: seguridad
+    descripcion: "Asignar roles y permisos directos a un usuario"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: seguridad.roles.administrar
+    modulo: seguridad
+    descripcion: "Administrar roles y la matriz rol × permiso"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: seguridad.catalogo.administrar
+    modulo: seguridad
+    descripcion: "Administrar el catálogo de permisos"
+    activo: true
+
+  - aplicacion: HABERES
+    clave: seguridad.simulador.consultar
+    modulo: seguridad
+    descripcion: "Consultar los permisos efectivos de un usuario y su origen"
+    activo: true
