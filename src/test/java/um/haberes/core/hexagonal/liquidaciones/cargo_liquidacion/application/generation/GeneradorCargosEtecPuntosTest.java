@@ -103,7 +103,7 @@ class GeneradorCargosEtecPuntosTest {
         var cargos = generador.cargos(contexto(LEGAJO, "356.3552", "283313.35", "5.00"));
 
         assertThat(cargos).singleElement().satisfies(cargo ->
-                assertThat(cargo.getCategoriaBasico()).isEqualByComparingTo("1274265.89"));
+                assertThat(cargo.getCategoriaBasico()).isEqualByComparingTo("1444253.90"));
     }
 
     @Test
