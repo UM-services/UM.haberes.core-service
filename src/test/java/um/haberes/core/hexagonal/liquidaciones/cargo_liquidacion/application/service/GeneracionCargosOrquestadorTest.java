@@ -80,7 +80,7 @@ class GeneracionCargosOrquestadorTest {
     }
 
     private void contextoComun() {
-        when(datos.control(2026, 11)).thenReturn(new ControlGeneracionCargos(2, new BigDecimal("1000.00"), BigDecimal.ZERO));
+        when(datos.control(2026, 11)).thenReturn(new ControlGeneracionCargos(2, new BigDecimal("1000.00"), BigDecimal.ZERO, BigDecimal.ZERO));
         when(datos.dependenciasPorSede()).thenReturn(Map.of());
     }
 
@@ -144,7 +144,7 @@ class GeneracionCargosOrquestadorTest {
 
     @Test
     void previsualizarNoEscribeEnLaBase() {
-        when(datos.control(2026, 11)).thenReturn(new ControlGeneracionCargos(2, new BigDecimal("1000.00"), BigDecimal.ZERO));
+        when(datos.control(2026, 11)).thenReturn(new ControlGeneracionCargos(2, new BigDecimal("1000.00"), BigDecimal.ZERO, BigDecimal.ZERO));
         when(datos.dependenciasPorSede()).thenReturn(Map.of());
         CargoLiquidacion cargo = cargo();
         when(generador.universo()).thenReturn(UniversoCargos.ETEC);

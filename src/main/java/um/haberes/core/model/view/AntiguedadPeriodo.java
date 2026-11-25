@@ -36,5 +36,7 @@ public class AntiguedadPeriodo extends AuditableEntity {
 
     private Integer mesesAdministrativos = null;
 
+    private Integer mesesEtec = null;
+
     private Long periodo = null;
 }

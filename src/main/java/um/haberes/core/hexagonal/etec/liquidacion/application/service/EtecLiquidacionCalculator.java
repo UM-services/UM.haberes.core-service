@@ -29,8 +29,9 @@ import um.haberes.core.hexagonal.etec.liquidacion.domain.model.AcumuladorEtecCar
  *   <li>986 ADICIONAL CARRERA DOCENTE ETEC: suma de {@code (cargo + antigüedad) × porcentaje}.</li>
  *   <li>987 GARANTIA ETEC: dos pisos independientes que se suman.
  *       <ul>
- *         <li>Cargo por puntos: {@code max(0, garantía − (cargo + antigüedad + presentismo))} de
- *             los cargos por puntos.</li>
+ *         <li>Cargo por puntos: {@code max(0, garantía prorrateada − (cargo + antigüedad +
+ *             presentismo))} de los cargos por puntos. El piso se prorratea por
+ *             {@code horasCargo / horasReferenciaCargo}.</li>
  *         <li>Cargo por horas: el piso se prorratea por las horas de clase cuando no llegan a la
  *             dedicación completa ({@code garantía / 18 × horas}) y se compara contra la base de
  *             los cargos por horas.</li>
@@ -40,7 +41,8 @@ import um.haberes.core.hexagonal.etec.liquidacion.domain.model.AcumuladorEtecCar
  *       las horas adicionales fijas del período y el cargo por horas aporta sus horas de clase; los
  *       dos se calculan con el mismo valor hora y se suman en un único ítem.</li>
  *   <li>989 ARRAIGO ETEC: suma de {@code cargo × porcentaje} por cargo, con el porcentaje que
- *       corresponde a la antigüedad docente según la escala global ({@code etec_arraigo_escala}).</li>
+ *       corresponde a la antigüedad ETEC según la escala global ({@code etec_arraigo_escala}).</li>
+ *   <li>990 ADICIONAL DIRECTIVO ETEC: {@code básico del maestro de grado × veces} del cargo.</li>
  * </ul>
  */
 @Component
@@ -58,6 +60,8 @@ public class EtecLiquidacionCalculator {
 
     public static final int CODIGO_ARRAIGO_ETEC = 989;
 
+    public static final int CODIGO_ADICIONAL_DIRECTIVO_ETEC = 990;
+
     /** Horas de clase que corresponden a la garantía completa del período. */
     public static final BigDecimal HORAS_GARANTIA_COMPLETA_ETEC = new BigDecimal("18");
 
@@ -68,7 +72,8 @@ public class EtecLiquidacionCalculator {
             CODIGO_ADICIONAL_CARRERA_ETEC,
             CODIGO_GARANTIA_ETEC,
             CODIGO_ADICIONAL_CARGA_HORARIA_ETEC,
-            CODIGO_ARRAIGO_ETEC);
+            CODIGO_ARRAIGO_ETEC,
+            CODIGO_ADICIONAL_DIRECTIVO_ETEC);
 
     public Map<Integer, BigDecimal> calcular(AcumuladorEtec acumulado, ControlEtec control) {
         if (control == null || acumulado == null || !acumulado.hayCargos()) {
@@ -99,6 +104,8 @@ public class EtecLiquidacionCalculator {
 
         agregar(conceptos, CODIGO_ARRAIGO_ETEC, acumulado.getArraigo());
 
+        agregar(conceptos, CODIGO_ADICIONAL_DIRECTIVO_ETEC, acumulado.getAdicionalDirectivo());
+
         return conceptos;
     }
 
@@ -110,7 +117,23 @@ public class EtecLiquidacionCalculator {
         if (!acumulado.getPuntos().hayCargos()) {
             return BigDecimal.ZERO;
         }
-        return piso(valor(control.getGarantia()), base(acumulado.getPuntos()));
+        BigDecimal piso = prorratearPiso(valor(control.getGarantia()),
+                acumulado.getHorasCargoPuntos(), valor(control.getHorasReferenciaCargo()));
+        return piso(piso, base(acumulado.getPuntos()));
+    }
+
+    /**
+     * La garantía del cargo por puntos se expresa para las horas de referencia del período y se
+     * prorratea por las horas de los cargos: {@code garantía × horasCargo / horasReferencia}.
+     * Sin horas informadas o sin referencia se conserva la garantía completa.
+     */
+    private BigDecimal prorratearPiso(BigDecimal piso, BigDecimal horasCargo, BigDecimal horasReferencia) {
+        if (horasCargo == null || horasCargo.signum() <= 0
+                || horasReferencia == null || horasReferencia.signum() <= 0) {
+            return piso;
+        }
+        return piso.multiply(horasCargo)
+                .divide(horasReferencia, 2, RoundingMode.HALF_UP);
     }
 
     /**

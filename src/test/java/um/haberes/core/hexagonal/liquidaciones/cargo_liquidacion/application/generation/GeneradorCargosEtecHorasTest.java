@@ -44,7 +44,7 @@ class GeneradorCargosEtecHorasTest {
 
     private ContextoGeneracionCargos contexto(Long legajoId) {
         return new ContextoGeneracionCargos(legajoId, 2026, 11, 2, new BigDecimal("311.3633"),
-                new BigDecimal("0.00"), Map.of(
+                new BigDecimal("0.00"), BigDecimal.ZERO, Map.of(
                         "15.1", Dependencia.builder().dependenciaId(DEPENDENCIA_SEDE_1)
                                 .facultadId(15).geograficaId(1).build(),
                         "15.2", Dependencia.builder().dependenciaId(DEPENDENCIA_SEDE_2)

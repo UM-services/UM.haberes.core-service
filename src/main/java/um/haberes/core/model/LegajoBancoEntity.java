@@ -40,7 +40,7 @@ public class LegajoBancoEntity extends AuditableEntity {
 
     private Byte resto = 0;
 
-    private BigDecimal acreditado = BigDecimal.ZERO;
+    private BigDecimal acreditado = null;
 
     @OneToOne
     @JoinColumn(name = "legajoId", insertable = false, updatable = false)

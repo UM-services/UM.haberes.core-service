@@ -1,5 +1,6 @@
 package um.haberes.core.hexagonal.etec.asignacion_cargo.domain.model;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 import lombok.AllArgsConstructor;
@@ -24,6 +25,14 @@ public class EtecAsignacionCargo {
     private Long legajoId;
 
     private Integer categoriaId;
+
+    /** Cantidad de horas del cargo asignado. */
+    @Builder.Default
+    private BigDecimal horasCargo = BigDecimal.ZERO;
+
+    /** Multiplicador del básico del maestro de grado del período. */
+    @Builder.Default
+    private BigDecimal vecesBasicoMaestroGrado = BigDecimal.ZERO;
 
     private Integer dependenciaId;
 

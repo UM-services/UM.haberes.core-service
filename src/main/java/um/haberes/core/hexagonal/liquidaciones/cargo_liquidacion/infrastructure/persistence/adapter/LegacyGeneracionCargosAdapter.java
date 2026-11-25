@@ -66,10 +66,11 @@ public class LegacyGeneracionCargosAdapter implements GeneracionCargosDatosPort 
         return controlEtecService.findByPeriodo(anho, mes)
                 .map(controlEtec -> new ControlGeneracionCargos(
                         control.getModoLiquidacionId() == null ? 0 : control.getModoLiquidacionId(),
-                        controlEtec.getValorPuntoEtec(), controlEtec.getMontoFijoCargo()))
+                        controlEtec.getValorPuntoEtec(), controlEtec.getMontoFijoCargo(),
+                        controlEtec.getHorasReferenciaCargo()))
                 .orElseGet(() -> new ControlGeneracionCargos(
                         control.getModoLiquidacionId() == null ? 0 : control.getModoLiquidacionId(),
-                        BigDecimal.ZERO, BigDecimal.ZERO));
+                        BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO));
     }
 
     @Override

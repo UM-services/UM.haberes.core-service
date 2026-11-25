@@ -23,6 +23,10 @@ public class ControlEtecResponse {
 
     private BigDecimal montoFijoCargo;
 
+    private BigDecimal horasReferenciaCargo;
+
+    private BigDecimal basicoMaestroGrado;
+
     private BigDecimal porcentajePresentismo;
 
     private BigDecimal porcentajeAdicionalCarrera;

@@ -7,5 +7,5 @@ import java.math.BigDecimal;
  * fusión) y los parámetros ETEC por puntos del período ({@code control_etec}).
  */
 public record ControlGeneracionCargos(int modoLiquidacionId, BigDecimal valorPuntoEtec,
-                                      BigDecimal montoFijoCargo) {
+                                      BigDecimal montoFijoCargo, BigDecimal horasReferenciaCargo) {
 }

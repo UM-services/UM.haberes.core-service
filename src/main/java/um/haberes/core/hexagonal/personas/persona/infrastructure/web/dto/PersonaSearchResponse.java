@@ -40,6 +40,9 @@ public class PersonaSearchResponse {
 
     private Integer ajusteAdministrativo;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXX", timezone = "UTC")
+    private OffsetDateTime altaEtec;
+
     private String estadoCivil;
 
     private Integer situacionId;

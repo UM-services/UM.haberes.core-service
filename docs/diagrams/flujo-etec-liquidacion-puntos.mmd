@@ -1,5 +1,5 @@
 ---
-title: "Liquidación ETEC: Conceptos 984 a 989 (Puntos y Horas)"
+title: "Liquidación ETEC: Conceptos 984 a 990 (Puntos y Horas)"
 ---
 sequenceDiagram
     autonumber
@@ -19,16 +19,16 @@ sequenceDiagram
     Make->>DB: pérdidas de presentismo del legajo/período (etec_presentismo y etec_presentismo_horas)
     DB-->>Make: categorías sin presentismo + categorías de la escala si hay pérdida por horas
     Make->>CtlSvc: findByPeriodo(anho, mes)
-    CtlSvc-->>Make: control_etec (valor del punto, monto fijo, porcentajes, garantía y horas)
+    CtlSvc-->>Make: control_etec (valor del punto, monto fijo, horas de referencia, básico, porcentajes, garantía y horas)
     Make->>State: copiarContexto(estado nuevo)
     Note over State: Sin esta copia el estado de trabajo queda sin control_etec
 
     Make->>AntiSvc: calculate(legajoId, anho, mes) y findByUnique(...)
-    AntiSvc-->>Make: mesesDocentes
-    Make->>Escala: porcentajeParaAnios(mesesDocentes / 12)
+    AntiSvc-->>Make: mesesEtec
+    Make->>Escala: porcentajeParaAnios(mesesEtec / 12)
     Escala-->>Make: porcentaje de arraigo (0 si no alcanza el tramo de 2 años)
     Make->>State: setPorcentajeArraigoEtec(porcentaje)
-    Make->>Make: valida catálogo ETEC (984 a 989) si el legajo tiene cargos ETEC
+    Make->>Make: valida catálogo ETEC (984 a 990) si el legajo tiene cargos ETEC
     alt Falta un código ETEC
         Make-->>Usuario: IllegalStateException (conserva la liquidación previa)
     end
@@ -41,7 +41,9 @@ sequenceDiagram
             Agrup-->>Make: horas semanales de la facultad 15 en la sede
             Make->>Acum: acumularHoras(cargo, antigüedad, %, %, %arraigo, horas, sinPresentismo)
         else Categoría con puntos
-            Make->>Acum: acumularPuntos(cargo, antigüedad, %presentismo, %adicional, %arraigo, sinPresentismo)
+            Make->>DB: asignación ETEC vigente del legajo/período (horas y veces del básico)
+            Make->>Acum: acumularPuntos(cargo, antigüedad, %presentismo, %adicional, %arraigo, horasCargo, sinPresentismo)
+            Make->>Acum: acumularAdicionalDirectivo(básico del maestro de grado × veces del cargo)
         else Categoría sin puntos
             Note over Make: sigue el circuito general docente o no docente
         end
@@ -51,11 +53,11 @@ sequenceDiagram
     alt Sin cargos ETEC acumulados
         Calc-->>Make: mapa vacío (no genera ítems ETEC)
     else Con cargos acumulados
-        Calc-->>Make: 984 (sólo con pérdida), 985, 986, 987, 988 y 989 con importe distinto de cero
+        Calc-->>Make: 984 (sólo con pérdida), 985, 986, 987, 988, 989 y 990 con importe distinto de cero
     end
     Make->>Make: ConceptosEtecValidator.validar (todo importe distinto de cero exige código)
     Make->>DB: agrega los ítems con importe distinto de cero, antes de los totales
 
-    Note over Calc,DB: 984 descuento = -presentismo bruto de los cargos que perdieron presentismo.<br/>985 presentismo = cargo x %presentismo (bruto, para el recibo).<br/>986 adicional carrera = (cargo + antigüedad) x %adicional.<br/>988 carga horaria = horas adicionales fijas + horas de clase, ambas x valor hora.<br/>989 arraigo = cargo x porcentaje de la escala.<br/>Todo con HALF_UP a 2 decimales.
-    Note over Calc,DB: 987 garantía tiene dos pisos: puntos contra max(0, garantía - base de puntos)<br/>y horas contra max(0, garantía / 18 x horas - base de horas), con piso completo desde 18 horas.
+    Note over Calc,DB: 984 descuento = -presentismo bruto de los cargos que perdieron presentismo.<br/>985 presentismo = cargo x %presentismo (bruto, para el recibo).<br/>986 adicional carrera = (cargo + antigüedad) x %adicional.<br/>988 carga horaria = horas adicionales fijas + horas de clase, ambas x valor hora.<br/>989 arraigo = cargo x porcentaje de la escala ETEC.<br/>990 adicional directivo = básico del maestro de grado x veces del cargo.<br/>Todo con HALF_UP a 2 decimales.
+    Note over Calc,DB: 987 garantía tiene dos pisos: puntos contra max(0, garantía x horasCargo / horasReferencia - base de puntos)<br/>y horas contra max(0, garantía / 18 x horas - base de horas), con piso completo desde 18 horas.
     Note over Acum: Puntos y horas se acumulan por separado y se suman por código,<br/>y la garantía de cada origen sólo descuenta su propia base.

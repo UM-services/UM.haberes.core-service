@@ -14,7 +14,10 @@ import um.haberes.core.hexagonal.cursos.curso_desarraigo.domain.model.CursoDesar
 import um.haberes.core.hexagonal.cursos.curso_fusion.application.service.CursoFusionService;
 import um.haberes.core.hexagonal.cursos.curso_fusion.domain.model.CursoFusion;
 import um.haberes.core.hexagonal.etec.arraigo_escala.application.service.EscalaArraigoEtecService;
+import um.haberes.core.hexagonal.etec.asignacion_cargo.application.service.EtecAsignacionCargoService;
+import um.haberes.core.hexagonal.etec.asignacion_cargo.domain.model.EtecAsignacionCargo;
 import um.haberes.core.hexagonal.etec.control_etec.application.service.ControlEtecService;
+import um.haberes.core.hexagonal.etec.control_etec.domain.model.ControlEtec;
 import um.haberes.core.hexagonal.etec.hora_escala.application.service.EscalaHoraEtecService;
 import um.haberes.core.hexagonal.etec.hora_escala.domain.model.AgrupadorHorasEtec;
 import um.haberes.core.hexagonal.etec.hora_escala.domain.model.EscalaHoraEtec;
@@ -132,6 +135,7 @@ public class MakeLiquidacionService {
     private final LiquidacionAdicionalService liquidacionAdicionalService;
     private final GenerarCargosLegajoUseCase generarCargosLegajoUseCase;
     private final ControlEtecService controlEtecService;
+    private final EtecAsignacionCargoService etecAsignacionCargoService;
     private final EscalaArraigoEtecService escalaArraigoEtecService;
     private final EscalaHoraEtecService escalaHoraEtecService;
     private final EtecLiquidacionCalculator etecLiquidacionCalculator;
@@ -262,14 +266,14 @@ public class MakeLiquidacionService {
     }
 
     /**
-     * Resuelve el porcentaje de arraigo ETEC según la antigüedad docente del legajo. Se ejecuta
+     * Resuelve el porcentaje de arraigo ETEC según la antigüedad ETEC del legajo. Se ejecuta
      * después de {@code antiguedadService.calculate}, así que el registro del período está al día.
-     * Sin antigüedad docente, o con menos de dos años, el porcentaje queda en cero.
+     * Sin antigüedad ETEC, o con menos de dos años, el porcentaje queda en cero.
      */
     private void cargarPorcentajeArraigo(Long legajoId, Integer anho, Integer mes, LiquidacionState state) {
         int anios = 0;
         try {
-            anios = Math.max(0, antiguedadService.findByUnique(legajoId, anho, mes).getMesesDocentes() / 12);
+            anios = Math.max(0, antiguedadService.findByUnique(legajoId, anho, mes).getMesesEtec() / 12);
         } catch (AntiguedadException e) {
             log.debug("Sin antigüedad para el legajo {} en {}/{}: {}", legajoId, anho, mes, e.getMessage());
         }
@@ -674,11 +678,18 @@ public class MakeLiquidacionService {
                         horasClaseEtec(legajoId, anho, mes, cargoLiquidacion),
                         sinPresentismo);
             } else {
+                EtecAsignacionCargo asignacion = asignacionEtec(legajoId, anho, mes,
+                        categoria.getCategoriaId());
+                BigDecimal horasCargo = asignacion == null || asignacion.getHorasCargo() == null
+                        ? BigDecimal.ZERO : asignacion.getHorasCargo();
                 state.getEtecAcumulado().acumularPuntos(basico, antiguedad,
                         state.getControlEtec().getPorcentajePresentismo(),
                         state.getControlEtec().getPorcentajeAdicionalCarrera(),
                         state.getPorcentajeArraigoEtec(),
+                        horasCargo,
                         sinPresentismo);
+                state.getEtecAcumulado().acumularAdicionalDirectivo(
+                        adicionalDirectivo(asignacion, state.getControlEtec()));
             }
         }
 
@@ -702,7 +713,31 @@ public class MakeLiquidacionService {
     }
 
     /**
-     * Agrega los conceptos propios de la ETEC por puntos (985 a 988) calculados sobre los cargos
+     * Asignación vigente del cargo ETEC por puntos. La necesitan el prorrateo de la garantía y el
+     * adicional directivo, que no viven en {@code cargo_liquidacion}.
+     */
+    private EtecAsignacionCargo asignacionEtec(Long legajoId, Integer anho, Integer mes,
+                                               Integer categoriaId) {
+        return etecAsignacionCargoService.findAllVigentesByLegajoAndPeriodo(legajoId, anho, mes).stream()
+                .filter(asignacion -> Objects.equals(asignacion.getCategoriaId(), categoriaId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    /** {@code básico del maestro de grado × veces del cargo}; cero si no corresponde. */
+    private BigDecimal adicionalDirectivo(EtecAsignacionCargo asignacion, ControlEtec control) {
+        if (asignacion == null || asignacion.getVecesBasicoMaestroGrado() == null
+                || asignacion.getVecesBasicoMaestroGrado().signum() <= 0
+                || control == null || control.getBasicoMaestroGrado() == null) {
+            return BigDecimal.ZERO;
+        }
+        return control.getBasicoMaestroGrado()
+                .multiply(asignacion.getVecesBasicoMaestroGrado())
+                .setScale(2, RoundingMode.HALF_UP);
+    }
+
+    /**
+     * Agrega los conceptos propios de la ETEC por puntos (984 a 990) calculados sobre los cargos
      * con {@code categoria.puntos > 0}. Corre después del básico y la antigüedad y antes de los
      * totales parciales, para que entren en los grupos remunerativos.
      */
