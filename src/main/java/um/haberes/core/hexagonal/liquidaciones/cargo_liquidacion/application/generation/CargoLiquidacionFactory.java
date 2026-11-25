@@ -43,23 +43,22 @@ final class CargoLiquidacionFactory {
 
     static CargoLiquidacion deEtec(ContextoGeneracionCargos contexto, EtecAsignacionCargo asignacion,
                                    Categoria categoria, BigDecimal valorPunto, BigDecimal montoFijo) {
-        BigDecimal variable = categoria.getPuntos().multiply(valorPunto);
-        BigDecimal basico = prorratearVariablePorHoras(variable, asignacion.getHorasCargo(),
+        BigDecimal bruto = categoria.getPuntos().multiply(valorPunto)
+                .add(montoFijo == null ? BigDecimal.ZERO : montoFijo);
+        BigDecimal basico = prorratearPorHoras(bruto, asignacion.getHorasCargo(),
                 contexto.horasReferenciaCargo());
-        BigDecimal fijo = montoFijo == null ? BigDecimal.ZERO : montoFijo;
-        return base(contexto, asignacion.getLegajoId(), asignacion.getDependenciaId(), categoria,
-                basico.add(fijo).setScale(2, RoundingMode.HALF_UP),
+        return base(contexto, asignacion.getLegajoId(), asignacion.getDependenciaId(), categoria, basico,
                 BigDecimal.ZERO, BigDecimal.ZERO, 1, 0, null);
     }
 
     /**
-     * La parte variable del básico del cargo por puntos ({@code puntos × valor del punto}) se
-     * expresa para las horas de referencia del período. Si el cargo tiene horas informadas, se
-     * prorratea: {@code variable × horasCargo / horasReferencia}. Sin horas (datos previos o
-     * control sin referencia) se conserva el importe completo. El monto fijo no se prorratea.
+     * El básico del cargo por puntos ({@code puntos × valor del punto + monto fijo}) se expresa
+     * para las horas de referencia del período. Si el cargo tiene horas informadas, se prorratea:
+     * {@code importe × horasCargo / horasReferencia}. Sin horas (datos previos o control sin
+     * referencia) se conserva el importe completo.
      */
-    private static BigDecimal prorratearVariablePorHoras(BigDecimal importe, BigDecimal horasCargo,
-                                                        BigDecimal horasReferencia) {
+    private static BigDecimal prorratearPorHoras(BigDecimal importe, BigDecimal horasCargo,
+                                                 BigDecimal horasReferencia) {
         BigDecimal resultado = importe;
         if (horasCargo != null && horasCargo.signum() > 0
                 && horasReferencia != null && horasReferencia.signum() > 0) {

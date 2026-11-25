@@ -19,7 +19,7 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**3.3.0** (2026-11-25)
+**3.3.1** (2026-11-25)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
@@ -467,9 +467,10 @@ valida además al arrancar (`EtecCatalogoValidator`, ver `haberes.etec.catalogo-
 `etec_asignacion_cargo.horas_cargo` y `etec_asignacion_cargo.veces_basico_maestro_grado`, y recrea
 `vw_persona_search` para que el buscador devuelva el alta ETEC. Con esos datos:
 
-- el básico del cargo por puntos es `(puntos × valor del punto) × horasCargo / horasReferenciaCargo
-  + montoFijoCargo`; sin horas informadas o sin referencia se conserva el importe completo y el
-  monto fijo nunca se prorratea;
+- el básico del cargo por puntos es `(puntos × valor del punto + montoFijoCargo) × horasCargo /
+  horasReferenciaCargo`, con HALF_UP a 2 decimales; sin horas informadas o sin referencia se
+  conserva el importe completo, por lo que el monto fijo también se prorratea cuando el cargo
+  tiene menos horas que las de referencia;
 - la garantía `987 GARANTIA ETEC` de los cargos por puntos se prorratea por
   `horasCargo / horasReferenciaCargo`, y sin esos valores se conserva la garantía completa;
 - el `990 ADICIONAL DIRECTIVO ETEC` es `basicoMaestroGrado × vecesBasicoMaestroGrado` del cargo y
