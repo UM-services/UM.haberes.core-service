@@ -17,6 +17,7 @@ sequenceDiagram
     Usuario->>CodCtrl: GET /codigo/search/{chain} o /periodo/{anho}/{mes}
     CodCtrl->>CodSvc: findAllSearch(chain) / findAllByPeriodo(...)
     CodSvc->>DB: SELECT codigo (+CodigoSearchRepository)
+    Note over CodSvc,DB: Las cachés "codigos" y "codigos_grupos" usan como clave la versión del catálogo<br/>(cantidad + último updated + último id): un cambio por SQL directo se detecta sin reiniciar
     Note over CodCtrl,CodSvc: CodigoResponse incluye afipConceptoSueldoPrimerSemestre y<br/>afipConceptoSueldoSegundoSemestre anidados (CodigoDtoMapper)
     Usuario->>CodCtrl: PUT /codigo/ (saveall) y POST /codigo/
     CodCtrl->>CodSvc: saveAll(codigos) / add(codigo)

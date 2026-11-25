@@ -25,4 +25,8 @@ public interface JpaCodigoGrupoRepository extends JpaRepository<CodigoGrupoEntit
 
 	public Optional<CodigoGrupoEntity> findByCodigoId(Integer codigoId);
 
+	public Optional<CodigoGrupoEntity> findTopByOrderByUpdatedDesc();
+
+	public Optional<CodigoGrupoEntity> findTopByOrderByCodigoIdDesc();
+
 }
