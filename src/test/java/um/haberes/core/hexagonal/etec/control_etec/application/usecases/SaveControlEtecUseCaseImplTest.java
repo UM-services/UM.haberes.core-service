@@ -37,6 +37,8 @@ class SaveControlEtecUseCaseImplTest {
         ControlEtec control = useCase.save(2026, 11, ControlEtec.builder()
                 .valorPuntoEtec(new BigDecimal("311.3633"))
                 .montoFijoCargo(new BigDecimal("50000.00"))
+                .horasReferenciaCargo(new BigDecimal("18.00"))
+                .basicoMaestroGrado(new BigDecimal("750000.00"))
                 .build());
 
         assertThat(control.getControlEtecId()).isNull();
@@ -44,6 +46,8 @@ class SaveControlEtecUseCaseImplTest {
         assertThat(control.getMes()).isEqualTo(11);
         assertThat(control.getValorPuntoEtec()).isEqualByComparingTo("311.3633");
         assertThat(control.getMontoFijoCargo()).isEqualByComparingTo("50000.00");
+        assertThat(control.getHorasReferenciaCargo()).isEqualByComparingTo("18.00");
+        assertThat(control.getBasicoMaestroGrado()).isEqualByComparingTo("750000.00");
         assertThat(control.getPorcentajePresentismo()).isEqualByComparingTo("20.00");
         assertThat(control.getPorcentajeAdicionalCarrera()).isEqualByComparingTo("10.00");
         assertThat(control.getGarantia()).isEqualByComparingTo("0.00");
@@ -57,6 +61,8 @@ class SaveControlEtecUseCaseImplTest {
                 .mes(11)
                 .valorPuntoEtec(new BigDecimal("300.0000"))
                 .montoFijoCargo(new BigDecimal("10000.00"))
+                .horasReferenciaCargo(new BigDecimal("18.00"))
+                .basicoMaestroGrado(new BigDecimal("700000.00"))
                 .porcentajePresentismo(new BigDecimal("25.00"))
                 .porcentajeAdicionalCarrera(new BigDecimal("12.00"))
                 .garantia(new BigDecimal("844872.78"))
@@ -73,6 +79,8 @@ class SaveControlEtecUseCaseImplTest {
         assertThat(control.getControlEtecId()).isEqualTo(7L);
         assertThat(control.getValorPuntoEtec()).isEqualByComparingTo("311.3633");
         assertThat(control.getMontoFijoCargo()).isEqualByComparingTo("10000.00");
+        assertThat(control.getHorasReferenciaCargo()).isEqualByComparingTo("18.00");
+        assertThat(control.getBasicoMaestroGrado()).isEqualByComparingTo("700000.00");
         assertThat(control.getPorcentajePresentismo()).isEqualByComparingTo("25.00");
         assertThat(control.getGarantia()).isEqualByComparingTo("844872.78");
         assertThat(control.getHorasAdicionalCargaHoraria()).isEqualByComparingTo("15.00");

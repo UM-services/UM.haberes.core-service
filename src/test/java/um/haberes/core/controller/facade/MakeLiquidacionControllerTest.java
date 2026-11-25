@@ -106,6 +106,7 @@ class MakeLiquidacionControllerTest {
                               "ajusteDocente": 0,
                               "altaAdministrativa": null,
                               "ajusteAdministrativo": 0,
+                              "altaEtec": null,
                               "estadoCivil": "",
                               "situacionId": null,
                               "reemplazoDesarraigo": 0,

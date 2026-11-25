@@ -34,6 +34,12 @@ public class ControlEtec {
     /** Importe fijo que se suma al resultado de {@code puntos × valor del punto}. */
     private BigDecimal montoFijoCargo;
 
+    /** Horas de referencia de los cargos por puntos del período. */
+    private BigDecimal horasReferenciaCargo;
+
+    /** Básico del maestro de grado del período, base de {@code vecesBasicoMaestroGrado}. */
+    private BigDecimal basicoMaestroGrado;
+
     /** Porcentaje de presentismo ETEC sobre el valor del cargo. */
     private BigDecimal porcentajePresentismo;
 

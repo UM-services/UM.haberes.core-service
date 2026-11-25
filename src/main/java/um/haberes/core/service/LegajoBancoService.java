@@ -3,6 +3,7 @@
  */
 package um.haberes.core.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -187,16 +188,22 @@ public class LegajoBancoService {
 	}
 
 	public LegajoBancoEntity add(LegajoBancoEntity legajoBanco) {
+		if (legajoBanco.getAcreditado() == null) {
+			legajoBanco.setAcreditado(BigDecimal.ZERO);
+		}
 		repository.save(legajoBanco);
 		return legajoBanco;
 	}
 
 	public LegajoBancoEntity update(LegajoBancoEntity newLegajoBanco, Long legajoBancoId) {
 		return repository.findByLegajoBancoId(legajoBancoId).map(legajoBanco -> {
-			legajoBanco = new LegajoBancoEntity(newLegajoBanco.getLegajoBancoId(), newLegajoBanco.getLegajoId(),
+			BigDecimal acreditado = newLegajoBanco.getAcreditado() == null
+					? legajoBanco.getAcreditado()
+					: newLegajoBanco.getAcreditado();
+			legajoBanco = new LegajoBancoEntity(legajoBancoId, newLegajoBanco.getLegajoId(),
 					newLegajoBanco.getAnho(), newLegajoBanco.getMes(), newLegajoBanco.getCbu(),
 					newLegajoBanco.getFijo(), newLegajoBanco.getPorcentaje(), newLegajoBanco.getResto(),
-					newLegajoBanco.getAcreditado(), newLegajoBanco.getPersona(), newLegajoBanco.getLiquidacion());
+					acreditado, newLegajoBanco.getPersona(), newLegajoBanco.getLiquidacion());
 			repository.save(legajoBanco);
 			return legajoBanco;
 		}).orElseThrow(() -> new LegajoBancoException(legajoBancoId));

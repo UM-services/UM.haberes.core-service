@@ -42,6 +42,8 @@ public class Persona {
     @Builder.Default
     private int ajusteAdministrativo = 0;
 
+    private OffsetDateTime altaEtec;
+
     @Builder.Default
     private String estadoCivil = "";
 

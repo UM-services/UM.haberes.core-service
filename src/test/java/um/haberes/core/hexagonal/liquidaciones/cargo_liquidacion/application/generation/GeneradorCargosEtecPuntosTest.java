@@ -38,8 +38,13 @@ class GeneradorCargosEtecPuntosTest {
     }
 
     private ContextoGeneracionCargos contexto(Long legajoId, String valorPunto, String montoFijo) {
+        return contexto(legajoId, valorPunto, montoFijo, "0.00");
+    }
+
+    private ContextoGeneracionCargos contexto(Long legajoId, String valorPunto, String montoFijo,
+                                              String horasReferencia) {
         return new ContextoGeneracionCargos(legajoId, 2026, 11, 2, new BigDecimal(valorPunto),
-                new BigDecimal(montoFijo), Map.of());
+                new BigDecimal(montoFijo), new BigDecimal(horasReferencia), Map.of());
     }
 
     private Categoria categoria(Integer id, String puntos) {
@@ -81,6 +86,24 @@ class GeneradorCargosEtecPuntosTest {
                 .isEqualTo(OffsetDateTime.of(2026, 11, 1, 0, 0, 0, 0, ZoneOffset.UTC));
         assertThat(cargo.getFechaHasta())
                 .isEqualTo(OffsetDateTime.of(2026, 11, 30, 0, 0, 0, 0, ZoneOffset.UTC));
+    }
+
+    @Test
+    void prorrateaElBasicoPorLasHorasDelCargoSobreLasHorasDeReferencia() {
+        when(datos.categoriasConPuntos(2026, 11)).thenReturn(List.of(categoria(992, "1738.00")));
+        when(datos.asignacionesEtec(LEGAJO, 2026, 11)).thenReturn(List.of(EtecAsignacionCargo.builder()
+                .asignacionCargoId(1L)
+                .legajoId(LEGAJO)
+                .categoriaId(992)
+                .horasCargo(new BigDecimal("8.00"))
+                .dependenciaId(46)
+                .fechaAlta(OffsetDateTime.of(2026, 11, 1, 0, 0, 0, 0, ZoneOffset.UTC))
+                .build()));
+
+        var cargos = generador.cargos(contexto(LEGAJO, "356.3552", "283313.35", "5.00"));
+
+        assertThat(cargos).singleElement().satisfies(cargo ->
+                assertThat(cargo.getCategoriaBasico()).isEqualByComparingTo("1274265.89"));
     }
 
     @Test

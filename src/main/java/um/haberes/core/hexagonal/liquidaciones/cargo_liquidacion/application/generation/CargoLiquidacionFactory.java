@@ -1,6 +1,7 @@
 package um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.application.generation;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import um.haberes.core.hexagonal.etec.asignacion_cargo.domain.model.EtecAsignacionCargo;
 import um.haberes.core.hexagonal.liquidaciones.cargo.domain.model.Cargo;
@@ -42,10 +43,29 @@ final class CargoLiquidacionFactory {
 
     static CargoLiquidacion deEtec(ContextoGeneracionCargos contexto, EtecAsignacionCargo asignacion,
                                    Categoria categoria, BigDecimal valorPunto, BigDecimal montoFijo) {
-        BigDecimal basico = categoria.getPuntos().multiply(valorPunto).add(montoFijo)
-                .setScale(2, java.math.RoundingMode.HALF_UP);
-        return base(contexto, asignacion.getLegajoId(), asignacion.getDependenciaId(), categoria, basico,
+        BigDecimal variable = categoria.getPuntos().multiply(valorPunto);
+        BigDecimal basico = prorratearVariablePorHoras(variable, asignacion.getHorasCargo(),
+                contexto.horasReferenciaCargo());
+        BigDecimal fijo = montoFijo == null ? BigDecimal.ZERO : montoFijo;
+        return base(contexto, asignacion.getLegajoId(), asignacion.getDependenciaId(), categoria,
+                basico.add(fijo).setScale(2, RoundingMode.HALF_UP),
                 BigDecimal.ZERO, BigDecimal.ZERO, 1, 0, null);
+    }
+
+    /**
+     * La parte variable del básico del cargo por puntos ({@code puntos × valor del punto}) se
+     * expresa para las horas de referencia del período. Si el cargo tiene horas informadas, se
+     * prorratea: {@code variable × horasCargo / horasReferencia}. Sin horas (datos previos o
+     * control sin referencia) se conserva el importe completo. El monto fijo no se prorratea.
+     */
+    private static BigDecimal prorratearVariablePorHoras(BigDecimal importe, BigDecimal horasCargo,
+                                                        BigDecimal horasReferencia) {
+        BigDecimal resultado = importe;
+        if (horasCargo != null && horasCargo.signum() > 0
+                && horasReferencia != null && horasReferencia.signum() > 0) {
+            resultado = importe.multiply(horasCargo).divide(horasReferencia, 2, RoundingMode.HALF_UP);
+        }
+        return resultado.setScale(2, RoundingMode.HALF_UP);
     }
 
     /**

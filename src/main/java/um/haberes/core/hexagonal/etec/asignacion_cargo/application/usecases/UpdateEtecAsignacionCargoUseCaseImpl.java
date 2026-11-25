@@ -25,6 +25,8 @@ public class UpdateEtecAsignacionCargoUseCaseImpl implements UpdateEtecAsignacio
                         .asignacionCargoId(asignacionCargoId)
                         .legajoId(asignacion.getLegajoId())
                         .categoriaId(asignacion.getCategoriaId())
+                        .horasCargo(asignacion.getHorasCargo())
+                        .vecesBasicoMaestroGrado(asignacion.getVecesBasicoMaestroGrado())
                         .dependenciaId(asignacion.getDependenciaId())
                         .fechaAlta(asignacion.getFechaAlta())
                         .fechaBaja(asignacion.getFechaBaja())

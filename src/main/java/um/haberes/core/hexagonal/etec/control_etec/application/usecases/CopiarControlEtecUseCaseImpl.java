@@ -39,6 +39,8 @@ public class CopiarControlEtecUseCaseImpl implements CopiarControlEtecUseCase {
                 .mes(mes)
                 .valorPuntoEtec(origen.getValorPuntoEtec())
                 .montoFijoCargo(origen.getMontoFijoCargo())
+                .horasReferenciaCargo(origen.getHorasReferenciaCargo())
+                .basicoMaestroGrado(origen.getBasicoMaestroGrado())
                 .porcentajePresentismo(origen.getPorcentajePresentismo())
                 .porcentajeAdicionalCarrera(origen.getPorcentajeAdicionalCarrera())
                 .garantia(origen.getGarantia())

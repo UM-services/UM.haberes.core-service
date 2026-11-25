@@ -52,6 +52,7 @@ class AntiguedadControllerTest {
         antiguedad.setMes(6);
         antiguedad.setMesesDocentes(12);
         antiguedad.setMesesAdministrativos(3);
+        antiguedad.setMesesEtec(6);
         return antiguedad;
     }
 
@@ -67,6 +68,7 @@ class AntiguedadControllerTest {
               "mes": 6,
               "mesesDocentes": 12,
               "mesesAdministrativos": 3,
+              "mesesEtec": 6,
               "persona": null,
               "created": null,
               "updated": null
@@ -100,6 +102,7 @@ class AntiguedadControllerTest {
         periodo.setMes(6);
         periodo.setMesesDocentes(12);
         periodo.setMesesAdministrativos(3);
+        periodo.setMesesEtec(6);
         periodo.setPeriodo(202406L);
         when(service.findLastByUnique(100L, 2024, 6)).thenReturn(periodo);
 
@@ -114,6 +117,7 @@ class AntiguedadControllerTest {
                           "mes": 6,
                           "mesesDocentes": 12,
                           "mesesAdministrativos": 3,
+                          "mesesEtec": 6,
                           "periodo": 202406,
                           "created": null,
                           "updated": null

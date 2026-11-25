@@ -1,5 +1,7 @@
 package um.haberes.core.hexagonal.etec.asignacion_cargo.infrastructure.web.mapper;
 
+import java.math.BigDecimal;
+
 import org.springframework.stereotype.Component;
 
 import um.haberes.core.hexagonal.etec.asignacion_cargo.domain.model.EtecAsignacionCargo;
@@ -16,6 +18,9 @@ public class EtecAsignacionCargoDtoMapper {
         return EtecAsignacionCargo.builder()
                 .legajoId(request.getLegajoId())
                 .categoriaId(request.getCategoriaId())
+                .horasCargo(request.getHorasCargo() == null ? BigDecimal.ZERO : request.getHorasCargo())
+                .vecesBasicoMaestroGrado(request.getVecesBasicoMaestroGrado() == null
+                        ? BigDecimal.ZERO : request.getVecesBasicoMaestroGrado())
                 .dependenciaId(request.getDependenciaId())
                 .fechaAlta(request.getFechaAlta())
                 .fechaBaja(request.getFechaBaja())
@@ -31,6 +36,8 @@ public class EtecAsignacionCargoDtoMapper {
                 .asignacionCargoId(domain.getAsignacionCargoId())
                 .legajoId(domain.getLegajoId())
                 .categoriaId(domain.getCategoriaId())
+                .horasCargo(domain.getHorasCargo())
+                .vecesBasicoMaestroGrado(domain.getVecesBasicoMaestroGrado())
                 .dependenciaId(domain.getDependenciaId())
                 .fechaAlta(domain.getFechaAlta())
                 .fechaBaja(domain.getFechaBaja())
