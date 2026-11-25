@@ -23,6 +23,7 @@ import um.haberes.core.hexagonal.liquidaciones.codigo.domain.ports.in.GetCodigos
 import um.haberes.core.hexagonal.liquidaciones.codigo.domain.ports.in.GetLastCodigoUseCase;
 import um.haberes.core.hexagonal.liquidaciones.codigo.domain.ports.in.SaveAllCodigosUseCase;
 import um.haberes.core.hexagonal.liquidaciones.codigo.domain.ports.in.UpdateCodigoUseCase;
+import um.haberes.core.hexagonal.liquidaciones.codigo.domain.ports.out.CodigoRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -40,10 +41,20 @@ public class CodigoService {
     private final UpdateCodigoUseCase updateCodigoUseCase;
     private final DeleteCodigoUseCase deleteCodigoUseCase;
     private final SaveAllCodigosUseCase saveAllCodigosUseCase;
+    private final CodigoRepository codigoRepository;
 
-    @Cacheable("codigos")
+    /**
+     * La clave incluye la versión del catálogo (cantidad + último updated + último id), así que
+     * cualquier alta, baja o modificación detectada en la base invalida la entrada sin depender
+     * de que el cambio haya pasado por la API. El TTL corto sólo limpia claves viejas.
+     */
+    @Cacheable(value = "codigos", key = "#root.target.version()")
     public List<Codigo> findAll() {
         return getAllCodigosUseCase.getAllCodigos();
+    }
+
+    public String version() {
+        return codigoRepository.version();
     }
 
     public List<Codigo> findAllByCodigoIds(List<Integer> codigoIds) {

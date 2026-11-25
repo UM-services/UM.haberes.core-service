@@ -18,6 +18,7 @@ import um.haberes.core.hexagonal.etec.control_etec.application.service.ControlEt
 import um.haberes.core.hexagonal.etec.hora_escala.application.service.EscalaHoraEtecService;
 import um.haberes.core.hexagonal.etec.hora_escala.domain.model.AgrupadorHorasEtec;
 import um.haberes.core.hexagonal.etec.hora_escala.domain.model.EscalaHoraEtec;
+import um.haberes.core.hexagonal.etec.liquidacion.application.service.ConceptosEtecValidator;
 import um.haberes.core.hexagonal.etec.liquidacion.application.service.EtecLiquidacionCalculator;
 import um.haberes.core.hexagonal.etec.presentismo.application.service.EtecPresentismoService;
 import um.haberes.core.hexagonal.etec.presentismo_horas.application.service.EtecPresentismoHorasService;
@@ -254,6 +255,7 @@ public class MakeLiquidacionService {
 
         antiguedadService.calculate(legajoId, anho, mes);
         cargarPorcentajeArraigo(legajoId, anho, mes, state);
+        validarCatalogoEtec(legajoId, anho, mes, state);
         liquidacionAdicionalService.deleteAllByLegajo(legajoId, anho, mes);
         itemService.deleteAllByLegajo(legajoId, anho, mes);
         liquidacionService.deleteByLegajo(legajoId, anho, mes);
@@ -707,15 +709,9 @@ public class MakeLiquidacionService {
     private void calcularConceptosEtec(Long legajoId, Integer anho, Integer mes, LiquidacionState state) {
         Map<Integer, BigDecimal> conceptos = etecLiquidacionCalculator.calcular(state.getEtecAcumulado(),
                 state.getControlEtec());
-        BigDecimal descuentoPresentismo = conceptos.get(EtecLiquidacionCalculator.CODIGO_DESCUENTO_PRESENTISMO_ETEC);
-        if (descuentoPresentismo != null && descuentoPresentismo.compareTo(BigDecimal.ZERO) != 0
-                && !state.getCodigos().containsKey(EtecLiquidacionCalculator.CODIGO_DESCUENTO_PRESENTISMO_ETEC)) {
-            throw new IllegalStateException("Falta el código "
-                    + EtecLiquidacionCalculator.CODIGO_DESCUENTO_PRESENTISMO_ETEC
-                    + " DESCUENTO PRESENTISMO ETEC en el catálogo: aplicar sql/020_codigo_descuento_presentismo_etec.sql");
-        }
+        ConceptosEtecValidator.validar(conceptos, state.getCodigos().keySet());
         for (Map.Entry<Integer, BigDecimal> concepto : conceptos.entrySet()) {
-            if (state.getCodigos().containsKey(concepto.getKey())) {
+            if (concepto.getValue() != null && concepto.getValue().compareTo(BigDecimal.ZERO) != 0) {
                 addItem(legajoId, anho, mes, concepto.getKey(), concepto.getValue(), state);
             }
         }
@@ -723,6 +719,28 @@ public class MakeLiquidacionService {
 
     private boolean esCargoEtec(Categoria categoria) {
         return CatalogoUniversosCargos.esCategoriaEtec(categoria);
+    }
+
+    /**
+     * Antes de borrar la liquidación anterior, verifica que el catálogo cacheado tenga todos los
+     * códigos ETEC si el legajo tiene cargos ETEC. Así, un catálogo incompleto falla sin destruir
+     * la liquidación previa.
+     */
+    private void validarCatalogoEtec(Long legajoId, Integer anho, Integer mes, LiquidacionState state) {
+        boolean tieneCargoEtec = cargoLiquidacionService.findAllByLegajo(legajoId, anho, mes).stream()
+                .map(CargoLiquidacion::getCategoria)
+                .anyMatch(this::esCargoEtec);
+        if (!tieneCargoEtec) {
+            return;
+        }
+        List<Integer> faltantes = EtecLiquidacionCalculator.CODIGOS_ETEC.stream()
+                .filter(codigoId -> !state.getCodigos().containsKey(codigoId))
+                .toList();
+        if (!faltantes.isEmpty()) {
+            throw new IllegalStateException("Faltan códigos ETEC en el catálogo: " + faltantes
+                    + ". Aplicar sql/010_codigos_etec.sql, sql/016_codigo_arraigo_etec.sql y "
+                    + "sql/020_codigo_descuento_presentismo_etec.sql, y refrescar la caché de códigos.");
+        }
     }
 
     /**
