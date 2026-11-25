@@ -3,6 +3,7 @@
  */
 package um.haberes.core.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -26,9 +27,27 @@ public class CodigoGrupoService {
 		this.repository = repository;
 	}
 
-	@Cacheable("codigos_grupos")
+	/**
+	 * La clave incluye la versión del catálogo (cantidad + último updated + último id), así que
+	 * cualquier alta, baja o modificación detectada en la base invalida la entrada sin depender
+	 * de que el cambio haya pasado por la API. El TTL corto sólo limpia claves viejas.
+	 */
+	@Cacheable(value = "codigos_grupos", key = "#root.target.version()")
 	public List<CodigoGrupoEntity> findAll() {
 		return repository.findAll();
+	}
+
+	public String version() {
+		long count = repository.count();
+		String maxUpdated = repository.findTopByOrderByUpdatedDesc()
+				.map(CodigoGrupoEntity::getUpdated)
+				.map(LocalDateTime::toString)
+				.orElse("");
+		String maxId = repository.findTopByOrderByCodigoIdDesc()
+				.map(CodigoGrupoEntity::getCodigoId)
+				.map(String::valueOf)
+				.orElse("");
+		return count + "|" + maxUpdated + "|" + maxId;
 	}
 
 	public List<CodigoGrupoEntity> findAllByNoRemunerativo(Byte noRemunerativo) {

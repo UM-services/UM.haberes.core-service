@@ -28,6 +28,10 @@ sequenceDiagram
     Make->>Escala: porcentajeParaAnios(mesesDocentes / 12)
     Escala-->>Make: porcentaje de arraigo (0 si no alcanza el tramo de 2 años)
     Make->>State: setPorcentajeArraigoEtec(porcentaje)
+    Make->>Make: valida catálogo ETEC (984 a 989) si el legajo tiene cargos ETEC
+    alt Falta un código ETEC
+        Make-->>Usuario: IllegalStateException (conserva la liquidación previa)
+    end
     Make->>DB: borra ítems, adicionales y liquidación del legajo/período
 
     loop Cada cargo del legajo
@@ -49,7 +53,8 @@ sequenceDiagram
     else Con cargos acumulados
         Calc-->>Make: 984 (sólo con pérdida), 985, 986, 987, 988 y 989 con importe distinto de cero
     end
-    Make->>DB: agrega los ítems cuyo código existe en el catálogo, antes de los totales
+    Make->>Make: ConceptosEtecValidator.validar (todo importe distinto de cero exige código)
+    Make->>DB: agrega los ítems con importe distinto de cero, antes de los totales
 
     Note over Calc,DB: 984 descuento = -presentismo bruto de los cargos que perdieron presentismo.<br/>985 presentismo = cargo x %presentismo (bruto, para el recibo).<br/>986 adicional carrera = (cargo + antigüedad) x %adicional.<br/>988 carga horaria = horas adicionales fijas + horas de clase, ambas x valor hora.<br/>989 arraigo = cargo x porcentaje de la escala.<br/>Todo con HALF_UP a 2 decimales.
     Note over Calc,DB: 987 garantía tiene dos pisos: puntos contra max(0, garantía - base de puntos)<br/>y horas contra max(0, garantía / 18 x horas - base de horas), con piso completo desde 18 horas.

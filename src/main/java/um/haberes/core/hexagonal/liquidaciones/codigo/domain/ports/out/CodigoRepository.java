@@ -9,6 +9,12 @@ public interface CodigoRepository {
 
     List<Codigo> findAll();
 
+    /**
+     * Versión del catálogo para usar como clave de caché. Cambia ante altas, bajas o
+     * modificaciones, incluso si el cambio se hizo por SQL directo.
+     */
+    String version();
+
     List<Codigo> findAllByCodigoIdIn(List<Integer> codigoIds);
 
     List<Codigo> findAllByTransferible(Byte transferible);

@@ -3,6 +3,7 @@ package um.haberes.core.hexagonal.etec.liquidacion.application.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Component;
@@ -59,6 +60,15 @@ public class EtecLiquidacionCalculator {
 
     /** Horas de clase que corresponden a la garantía completa del período. */
     public static final BigDecimal HORAS_GARANTIA_COMPLETA_ETEC = new BigDecimal("18");
+
+    /** Códigos que el catálogo global debe tener para liquidar cualquier legajo ETEC. */
+    public static final List<Integer> CODIGOS_ETEC = List.of(
+            CODIGO_DESCUENTO_PRESENTISMO_ETEC,
+            CODIGO_PRESENTISMO_ETEC,
+            CODIGO_ADICIONAL_CARRERA_ETEC,
+            CODIGO_GARANTIA_ETEC,
+            CODIGO_ADICIONAL_CARGA_HORARIA_ETEC,
+            CODIGO_ARRAIGO_ETEC);
 
     public Map<Integer, BigDecimal> calcular(AcumuladorEtec acumulado, ControlEtec control) {
         if (control == null || acumulado == null || !acumulado.hayCargos()) {

@@ -24,4 +24,6 @@ public interface JpaCodigoRepository extends JpaRepository<CodigoEntity, Integer
 
 	public Optional<CodigoEntity> findTopByOrderByCodigoId();
 
+	public Optional<CodigoEntity> findTopByOrderByUpdatedDesc();
+
 }

@@ -19,7 +19,7 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**3.0.0** (2026-11-24)
+**3.1.0** (2026-11-25)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
@@ -164,6 +164,10 @@ haberes:
 
 `haberes.liquidacion-general.concurrencia` (default `2`) limita los hilos con los que el
 proceso masivo de liquidación general procesa los legajos del período.
+
+`haberes.etec.catalogo-estricto` (default `false`) hace que `EtecCatalogoValidator` impida el
+arranque si el catálogo no tiene los códigos ETEC (`984` a `989`); con `false` el faltante se
+registra como error en el log con los scripts `sql/` que hay que aplicar.
 
 
 ## Auditoría de operaciones
@@ -427,6 +431,17 @@ La pérdida de presentismo hace que la liquidación ETEC emita el `985 PRESENTIS
 y ya no con un id fijo en el código. `sql/024_categoria_periodo_etec.sql` agrega
 `categoria_periodo.puntos` y `categoria_periodo.etec_horas` con un backfill único desde `categoria`
 y debe aplicarse antes de desplegar la generación ETEC por período.
+
+Antes de borrar la liquidación anterior, un legajo con cargos ETEC verifica que el catálogo tenga
+los seis códigos ETEC (`984` a `989`); si falta alguno, la liquidación falla y conserva la previa.
+En el cálculo, `ConceptosEtecValidator` corta la liquidación cuando un concepto con importe
+distinto de cero no tiene código en el catálogo, en lugar de omitirlo en silencio. El catálogo se
+valida además al arrancar (`EtecCatalogoValidator`, ver `haberes.etec.catalogo-estricto`).
+
+Las cachés `codigos` y `codigos_grupos` usan como clave la versión del catálogo (cantidad de filas,
+último `updated` y último id), de modo que una carga por SQL directo invalida la entrada sin
+reiniciar el servicio ni depender de los `@CacheEvict`; el TTL de 60 segundos sólo limpia las
+claves viejas.
 
 ### Control de período
 - `GET /api/haberes/core/control/periodo/{anho}/{mes}/opcional` - Control del período (`200` con cuerpo vacío si todavía no existe)

@@ -1,5 +1,6 @@
 package um.haberes.core.hexagonal.liquidaciones.codigo.infrastructure.persistence.adapter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,6 +25,20 @@ public class JpaCodigoRepositoryAdapter implements CodigoRepository {
     @Override
     public List<Codigo> findAll() {
         return toDomainList(jpaCodigoRepository.findAll(Sort.by("codigoId").ascending()));
+    }
+
+    @Override
+    public String version() {
+        long count = jpaCodigoRepository.count();
+        String maxUpdated = jpaCodigoRepository.findTopByOrderByUpdatedDesc()
+                .map(CodigoEntity::getUpdated)
+                .map(LocalDateTime::toString)
+                .orElse("");
+        String maxId = jpaCodigoRepository.findTopByOrderByCodigoId()
+                .map(CodigoEntity::getCodigoId)
+                .map(String::valueOf)
+                .orElse("");
+        return count + "|" + maxUpdated + "|" + maxId;
     }
 
     @Override
