@@ -33,6 +33,8 @@ public class AntiguedadEntity extends AuditableEntity {
 
     private int mesesAdministrativos = 0;
 
+    private int mesesEtec = 0;
+
     @OneToOne(optional = true)
     @JoinColumn(name = "legajoId", insertable = false, updatable = false)
     private PersonaEntity persona = null;

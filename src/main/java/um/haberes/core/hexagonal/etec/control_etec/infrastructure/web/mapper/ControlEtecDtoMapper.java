@@ -13,6 +13,8 @@ public class ControlEtecDtoMapper {
         return ControlEtec.builder()
                 .valorPuntoEtec(request.getValorPuntoEtec())
                 .montoFijoCargo(request.getMontoFijoCargo())
+                .horasReferenciaCargo(request.getHorasReferenciaCargo())
+                .basicoMaestroGrado(request.getBasicoMaestroGrado())
                 .porcentajePresentismo(request.getPorcentajePresentismo())
                 .porcentajeAdicionalCarrera(request.getPorcentajeAdicionalCarrera())
                 .garantia(request.getGarantia())
@@ -23,7 +25,8 @@ public class ControlEtecDtoMapper {
 
     public ControlEtecResponse toResponse(ControlEtec domain) {
         return new ControlEtecResponse(domain.getControlEtecId(), domain.getAnho(), domain.getMes(),
-                domain.getValorPuntoEtec(), domain.getMontoFijoCargo(), domain.getPorcentajePresentismo(),
+                domain.getValorPuntoEtec(), domain.getMontoFijoCargo(), domain.getHorasReferenciaCargo(),
+                domain.getBasicoMaestroGrado(), domain.getPorcentajePresentismo(),
                 domain.getPorcentajeAdicionalCarrera(), domain.getGarantia(),
                 domain.getHorasAdicionalCargaHoraria(), domain.getValorHoraAdicionalCargaHoraria());
     }

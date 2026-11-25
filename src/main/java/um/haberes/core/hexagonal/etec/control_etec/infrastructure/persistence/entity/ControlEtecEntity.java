@@ -38,6 +38,10 @@ public class ControlEtecEntity extends AuditableEntity {
 
     private BigDecimal montoFijoCargo = BigDecimal.ZERO;
 
+    private BigDecimal horasReferenciaCargo = BigDecimal.ZERO;
+
+    private BigDecimal basicoMaestroGrado = BigDecimal.ZERO;
+
     private BigDecimal porcentajePresentismo = BigDecimal.ZERO;
 
     private BigDecimal porcentajeAdicionalCarrera = BigDecimal.ZERO;

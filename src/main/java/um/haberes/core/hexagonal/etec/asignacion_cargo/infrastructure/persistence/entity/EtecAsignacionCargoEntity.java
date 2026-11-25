@@ -1,5 +1,6 @@
 package um.haberes.core.hexagonal.etec.asignacion_cargo.infrastructure.persistence.entity;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -39,6 +40,10 @@ public class EtecAsignacionCargoEntity extends AuditableEntity {
     private Long legajoId = null;
 
     private Integer categoriaId = null;
+
+    private BigDecimal horasCargo = BigDecimal.ZERO;
+
+    private BigDecimal vecesBasicoMaestroGrado = BigDecimal.ZERO;
 
     private Integer dependenciaId = null;
 

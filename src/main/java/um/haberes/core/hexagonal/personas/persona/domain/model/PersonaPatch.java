@@ -33,6 +33,7 @@ public class PersonaPatch {
     private Integer ajusteDocente;
     private OffsetDateTime altaAdministrativa;
     private Integer ajusteAdministrativo;
+    private OffsetDateTime altaEtec;
     private String estadoCivil;
     private Integer situacionId;
     private Byte reemplazoDesarraigo;
@@ -59,6 +60,7 @@ public class PersonaPatch {
         if (ajusteDocente != null) persona.setAjusteDocente(ajusteDocente);
         if (altaAdministrativa != null) persona.setAltaAdministrativa(altaAdministrativa);
         if (ajusteAdministrativo != null) persona.setAjusteAdministrativo(ajusteAdministrativo);
+        if (altaEtec != null) persona.setAltaEtec(altaEtec);
         if (estadoCivil != null) persona.setEstadoCivil(estadoCivil);
         if (situacionId != null) persona.setSituacionId(situacionId == 0 ? null : situacionId);
         if (reemplazoDesarraigo != null) persona.setReemplazoDesarraigo(reemplazoDesarraigo);

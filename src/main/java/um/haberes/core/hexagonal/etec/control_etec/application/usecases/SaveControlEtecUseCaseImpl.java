@@ -31,6 +31,10 @@ public class SaveControlEtecUseCaseImpl implements SaveControlEtecUseCase {
                         BigDecimal.ZERO))
                 .montoFijoCargo(valor(datos.getMontoFijoCargo(), existente, ControlEtec::getMontoFijoCargo,
                         BigDecimal.ZERO))
+                .horasReferenciaCargo(valor(datos.getHorasReferenciaCargo(), existente,
+                        ControlEtec::getHorasReferenciaCargo, BigDecimal.ZERO))
+                .basicoMaestroGrado(valor(datos.getBasicoMaestroGrado(), existente,
+                        ControlEtec::getBasicoMaestroGrado, BigDecimal.ZERO))
                 .porcentajePresentismo(valor(datos.getPorcentajePresentismo(), existente,
                         ControlEtec::getPorcentajePresentismo, ControlEtec.PORCENTAJE_PRESENTISMO_DEFAULT))
                 .porcentajeAdicionalCarrera(valor(datos.getPorcentajeAdicionalCarrera(), existente,
@@ -76,6 +80,12 @@ public class SaveControlEtecUseCaseImpl implements SaveControlEtecUseCase {
         }
         if (negativo(control.getMontoFijoCargo())) {
             throw new ControlEtecException("El monto fijo del cargo no puede ser negativo");
+        }
+        if (negativo(control.getHorasReferenciaCargo())) {
+            throw new ControlEtecException("Las horas de referencia del cargo no pueden ser negativas");
+        }
+        if (negativo(control.getBasicoMaestroGrado())) {
+            throw new ControlEtecException("El básico del maestro de grado no puede ser negativo");
         }
         if (negativo(control.getPorcentajePresentismo())) {
             throw new ControlEtecException("El porcentaje de presentismo no puede ser negativo");

@@ -143,6 +143,56 @@ class EtecLiquidacionCalculatorTest {
     }
 
     @Test
+    void laGarantiaDelCargoPorPuntosSeProrrateaPorLasHorasDelCargo() {
+        AcumuladorEtec acumulador = new AcumuladorEtec();
+        acumulador.acumularPuntos(new BigDecimal("500000.00"), BigDecimal.ZERO,
+                new BigDecimal("20.00"), new BigDecimal("10.00"), BigDecimal.ZERO,
+                new BigDecimal("8.00"));
+
+        ControlEtec control = ControlEtec.builder()
+                .garantia(new BigDecimal("1000000.00"))
+                .horasReferenciaCargo(new BigDecimal("5.00"))
+                .horasAdicionalCargaHoraria(BigDecimal.ZERO)
+                .valorHoraAdicionalCargaHoraria(BigDecimal.ZERO)
+                .build();
+
+        // Piso 1.000.000 × 8 / 5 = 1.600.000; base 600.000 (cargo + presentismo).
+        Map<Integer, BigDecimal> conceptos = calculator.calcular(acumulador, control);
+
+        assertThat(conceptos).containsEntry(987, new BigDecimal("1000000.00"));
+    }
+
+    @Test
+    void prorrateaGarantiaYPresentismoConLosValoresDelLegajo2559() {
+        AcumuladorEtec acumulador = new AcumuladorEtec();
+        acumulador.acumularPuntos(new BigDecimal("1274265.89"), new BigDecimal("1019412.71"),
+                new BigDecimal("20.00"), new BigDecimal("10.00"), new BigDecimal("60.00"),
+                new BigDecimal("8.00"));
+        acumulador.acumularAdicionalDirectivo(new BigDecimal("712710.00"));
+
+        ControlEtec control = ControlEtec.builder()
+                .valorPuntoEtec(new BigDecimal("356.3552"))
+                .montoFijoCargo(new BigDecimal("283313.35"))
+                .horasReferenciaCargo(new BigDecimal("5.00"))
+                .basicoMaestroGrado(new BigDecimal("356355.00"))
+                .porcentajePresentismo(new BigDecimal("20.00"))
+                .porcentajeAdicionalCarrera(new BigDecimal("10.00"))
+                .garantia(new BigDecimal("887116.98"))
+                .horasAdicionalCargaHoraria(new BigDecimal("15.00"))
+                .valorHoraAdicionalCargaHoraria(new BigDecimal("8412.81"))
+                .build();
+
+        Map<Integer, BigDecimal> conceptos = calculator.calcular(acumulador, control);
+
+        assertThat(conceptos).containsEntry(985, new BigDecimal("254853.18"));
+        assertThat(conceptos).containsEntry(986, new BigDecimal("229367.86"));
+        assertThat(conceptos).doesNotContainKey(987);
+        assertThat(conceptos).containsEntry(988, new BigDecimal("126192.15"));
+        assertThat(conceptos).containsEntry(989, new BigDecimal("764559.53"));
+        assertThat(conceptos).containsEntry(990, new BigDecimal("712710.00"));
+    }
+
+    @Test
     void laGarantiaDelCargoPorPuntosNoIncluyeLasHoras() {
         AcumuladorEtec acumulador = new AcumuladorEtec();
         acumulador.acumularPuntos(new BigDecimal("500000.00"), BigDecimal.ZERO,

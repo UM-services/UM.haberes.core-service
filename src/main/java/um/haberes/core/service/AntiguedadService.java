@@ -62,7 +62,7 @@ public class AntiguedadService {
 		return repository.findByAntiguedadId(antiguedadId).map(antiguedad -> {
 			antiguedad = new AntiguedadEntity(antiguedadId, newAntiguedad.getLegajoId(), newAntiguedad.getAnho(),
 					newAntiguedad.getMes(), newAntiguedad.getMesesDocentes(), newAntiguedad.getMesesAdministrativos(),
-					newAntiguedad.getPersona());
+					newAntiguedad.getMesesEtec(), newAntiguedad.getPersona());
 			antiguedad = repository.save(antiguedad);
 			return antiguedad;
 		}).orElseThrow(() -> new AntiguedadException(antiguedadId));
@@ -79,18 +79,25 @@ public class AntiguedadService {
 		Persona persona = personaService.findByLegajoId(legajoId);
 		Periodo ingresoDocente = null;
 		Periodo ingresoAdministrativo = null;
+		Periodo ingresoEtec = null;
 		int mesesDocentes = 0;
 		int mesesAdministrativos = 0;
+		int mesesEtec = 0;
 		if (persona.getAltaDocente() != null) {
 			OffsetDateTime alta = persona.getAltaDocente().plusHours(3);
 			ingresoDocente = Periodo.builder().anho(alta.getYear()).mes(alta.getMonthValue()).build();
 			mesesDocentes = persona.getAjusteDocente() + Periodo.diffMonth(ingresoDocente, Periodo.builder().anho(anho).mes(mes).build());
 		}
 		if (persona.getAltaAdministrativa() != null) {
-			OffsetDateTime alta = persona.getAltaDocente().plusHours(3);
+			OffsetDateTime alta = persona.getAltaAdministrativa().plusHours(3);
 			ingresoAdministrativo = Periodo.builder().anho(alta.getYear()).mes(alta.getMonthValue()).build();
 			mesesAdministrativos = persona.getAjusteAdministrativo()
 					+ Periodo.diffMonth(ingresoAdministrativo, Periodo.builder().anho(anho).mes(mes).build());
+		}
+		if (persona.getAltaEtec() != null) {
+			OffsetDateTime alta = persona.getAltaEtec().plusHours(3);
+			ingresoEtec = Periodo.builder().anho(alta.getYear()).mes(alta.getMonthValue()).build();
+			mesesEtec = Periodo.diffMonth(ingresoEtec, Periodo.builder().anho(anho).mes(mes).build());
 		}
 		Long antiguedadId = null;
 		AntiguedadEntity antiguedad = null;
@@ -99,7 +106,8 @@ public class AntiguedadService {
 			antiguedadId = antiguedad.getAntiguedadId();
 		} catch (AntiguedadException e) {
 		}
-		antiguedad = new AntiguedadEntity(antiguedadId, legajoId, anho, mes, mesesDocentes, mesesAdministrativos, null);
+		antiguedad = new AntiguedadEntity(antiguedadId, legajoId, anho, mes, mesesDocentes, mesesAdministrativos,
+				mesesEtec, null);
 		if (antiguedadId == null) {
 			antiguedad = this.add(antiguedad);
 		} else {

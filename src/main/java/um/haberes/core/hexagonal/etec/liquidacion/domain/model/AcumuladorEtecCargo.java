@@ -31,7 +31,7 @@ public class AcumuladorEtecCargo {
 
     /**
      * Acumula un cargo sin horas de clase. El porcentaje de arraigo sale de la escala global según
-     * la antigüedad docente del legajo (puede ser cero si no alcanza el primer tramo).
+     * la antigüedad ETEC del legajo (puede ser cero si no alcanza el primer tramo).
      */
     public void acumular(BigDecimal cargoCargo, BigDecimal antiguedadCargo,
                          BigDecimal porcentajePresentismo, BigDecimal porcentajeAdicionalCarrera,

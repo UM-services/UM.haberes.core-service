@@ -30,7 +30,7 @@ class GeneradorCargosDocentesTest {
     private GeneradorCargosDocentes generador;
 
     private ContextoGeneracionCargos contexto(Long legajoId) {
-        return new ContextoGeneracionCargos(legajoId, 2026, 11, 2, new BigDecimal("1000.00"), BigDecimal.ZERO, Map.of());
+        return new ContextoGeneracionCargos(legajoId, 2026, 11, 2, new BigDecimal("1000.00"), BigDecimal.ZERO, BigDecimal.ZERO, Map.of());
     }
 
     private Cargo cargo(Integer categoriaId, String puntos) {

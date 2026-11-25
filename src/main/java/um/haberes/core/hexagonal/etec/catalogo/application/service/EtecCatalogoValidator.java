@@ -48,8 +48,9 @@ public class EtecCatalogoValidator implements ApplicationRunner {
                 return;
             }
             String mensaje = "Catálogo ETEC incompleto: faltan los códigos " + faltantes
-                    + ". Aplicar sql/010_codigos_etec.sql, sql/016_codigo_arraigo_etec.sql y "
-                    + "sql/020_codigo_descuento_presentismo_etec.sql.";
+                    + ". Aplicar sql/010_codigos_etec.sql, sql/016_codigo_arraigo_etec.sql, "
+                    + "sql/020_codigo_descuento_presentismo_etec.sql y "
+                    + "sql/030_adicional_directivo_etec.sql.";
             if (estricto) {
                 throw new IllegalStateException(mensaje);
             }
