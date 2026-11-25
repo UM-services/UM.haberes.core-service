@@ -38,7 +38,16 @@ public class HaberesConfiguration {
         // así que el TTL sólo necesita limpiar las claves viejas.
         cacheManager.registerCustomCache("codigos", catalogoCache());
         cacheManager.registerCustomCache("codigos_grupos", catalogoCache());
+        // Permisos efectivos: TTL corto para que un cambio de rol impacte sin redeploy.
+        cacheManager.registerCustomCache("permisosEfectivos", permisosCache());
         return cacheManager;
+    }
+
+    private Cache<Object, Object> permisosCache() {
+        return Caffeine.newBuilder()
+                .expireAfterWrite(60, TimeUnit.SECONDS)
+                .maximumSize(10_000)
+                .build();
     }
 
     private Cache<Object, Object> catalogoCache() {

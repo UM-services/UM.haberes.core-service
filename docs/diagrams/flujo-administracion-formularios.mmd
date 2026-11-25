@@ -6,6 +6,8 @@ sequenceDiagram
     actor Usuario
     participant UCtrl as UsuarioController
     participant USvc as UsuarioService
+    participant ACtrl as AuthController
+    participant TSvc as TokenService
     participant BCtrl as BuildController
     participant FCtrl as FormularioAsignacionCargoController
     participant FICtrl as FormularioImprimirController
@@ -13,7 +15,16 @@ sequenceDiagram
     participant FISvc as FormularioImprimirService
     participant DB as MySQL
 
-    Usuario->>UCtrl: PUT /usuario/isuservalid (credenciales)
+    Usuario->>ACtrl: GET /auth/legajo/{legajoId} (público)
+    ACtrl->>DB: persona + usuario (sin documento, CUIL ni hash)
+    ACtrl-->>Usuario: PreLoginResponse (apellidoNombre, habilitado, primerIngreso)
+    Usuario->>ACtrl: POST /auth/login (legajoId + password + build)
+    ACtrl->>USvc: isUserValid + updateLastLog
+    ACtrl->>TSvc: emitir(legajoId) → token HMAC-SHA256
+    ACtrl-->>Usuario: AuthResponse (token, expiresAt, administrador)
+    Note over Usuario,DB: TokenAuthenticationFilter publica la Identidad y<br/>RequierePermisoInterceptor aplica el RBAC con permissions-enforce=true
+
+    Usuario->>UCtrl: PUT /usuario/isuservalid (credenciales, cliente legacy)
     UCtrl->>USvc: isUserValid(usuario) → valida legajo y contraseña
     Usuario->>UCtrl: PUT /usuario/lastlog/{legajoId}/{build}
     UCtrl->>USvc: updateLastLog(legajoId, build) (auditoría de ingreso)

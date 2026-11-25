@@ -1,5 +1,6 @@
 package um.haberes.core.hexagonal.liquidaciones.novedad.domain.ports.out;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +15,10 @@ public interface NovedadRepository {
     Optional<Novedad> findByNovedadId(Long novedadId);
 
     List<Novedad> findAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes);
+
+    List<Novedad> findAllByAnhoAndMes(Integer anho, Integer mes);
+
+    List<Novedad> findAllByCodigoIdsAndAnhoAndMes(Collection<Integer> codigoIds, Integer anho, Integer mes);
 
     List<Novedad> findAllByCodigoIdAndAnhoAndMes(Integer codigoId, Integer anho, Integer mes);
 

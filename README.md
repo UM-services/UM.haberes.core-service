@@ -19,7 +19,7 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**3.1.0** (2026-11-25)
+**3.2.0** (2026-11-25)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
@@ -113,6 +113,7 @@ La documentación y los diagramas se generan automáticamente en cada push a la 
 - API REST documentada con OpenAPI
 - Respuestas REST con relaciones anidadas (persona, dependencia, facultad, geográfica, categoría, código y conceptos AFIP) para los clientes que antes resolvían esos datos con consultas adicionales
 - Auditoría y logs de operaciones
+- Seguridad con RBAC: permisos por módulo, roles, overrides por usuario, tokens de sesión y de servicio
 - Integración con Consul y OpenFeign para servicios distribuidos
 
 
@@ -184,8 +185,9 @@ registra como error en el log con los scripts `sql/` que hay que aplicar.
 - **Retención**: una limpieza programada (cada hora) purga `SENT` y `FAILED` según su
   retención; `PENDING` nunca se borra y, si envejece, se avisa por log.
 - **Esquema**: `sql/001_audit_outbox.sql` se aplica a mano (la app no migra: `ddl-auto: none`).
-- **Identidad**: headers `X-Usuario-Legajo` (o `X-Legajo-Solicitante`) y `X-Usuario-Login`.
-  Sin JWT todavía, el evento se marca con `actor_trust=CLIENT`.
+- **Identidad**: con token se usa el `legajoId` de la `Identidad` autenticada; sin token,
+  headers `X-Usuario-Legajo` (o `X-Legajo-Solicitante`) y `X-Usuario-Login`, y el evento se
+  marca con `actor_trust=CLIENT`.
 
 | Variable | Default | Descripción |
 |---|---|---|
@@ -356,6 +358,23 @@ generó: `NULL` significa "todavía sin asiento" y `0` es el valor heredado. Apl
 `sql/025_acreditacion_orden_contable_null.sql` antes de desplegar, porque es la columna la que hoy
 impide dar de alta el período sólo con el límite de novedades (`ddl-auto: none`).
 
+### Novedades (carga masiva y transferencia)
+- `POST /api/haberes/core/novedadfile/upload/{anho}/{mes}/{stepByStep}` - Carga la planilla Excel a la tabla de pendientes
+- `GET /api/haberes/core/novedadfile/import/{anho}/{mes}` - Importa los pendientes al período (`409` si hay duplicados)
+- `POST /api/haberes/core/novedadfile/transfer/{anho}/{mes}` - Transfiere las novedades transferibles del mes anterior y devuelve `{nuevas, actualizadas, sinCambios, total}`. Lee el destino una sola vez, copia una fila por clave (legajo + código + dependencia), reutiliza el `novedadId` existente y no reescribe las filas idénticas, por lo que repetir la operación no genera UPDATE ni eventos de auditoría
+- `GET /api/haberes/core/novedadfile/transfer/{anho}/{mes}` - Alias legacy del cliente VB6 (`204`, deprecado); el cliente web usa el `POST`
+
+### Seguridad (RBAC y sesión)
+- `GET /api/haberes/core/auth/legajo/{legajoId}` - Datos mínimos de la pantalla de login (`legajoId`, `apellidoNombre`, `habilitado`, `primerIngreso`); no expone documento, CUIL, facultad, permisos ni hash
+- `POST /api/haberes/core/auth/login` - Login con body `{legajoId, password, build}`; valida la clave, actualiza `last_log` y devuelve `{token, expiresAt, legajoId, administrador}`
+- `GET /api/haberes/core/permisoEfectivo/usuario/{legajoId}` - Permisos efectivos del usuario (`permisos` ordenados y `administrador`); sólo el propio legajo o un administrador
+- `GET /api/haberes/core/permiso` (`/activos`, `/aplicacion/{aplicacion}`, `/{permisoId}`), `POST`/`PUT /permiso`, `DELETE /permiso/{permisoId}` - Catálogo de permisos; la baja es lógica (`activo = 0`) para conservar las asignaciones
+- `POST /api/haberes/core/permiso/sync` - Reconciliación de `permisos.yaml`/`roles.yaml`; body opcional `{dryRun}` para previsualizar
+- `GET`/`POST`/`PUT`/`DELETE /api/haberes/core/rol` - Roles; `ADMIN_HABERES` es protegido y no se edita ni elimina
+- `GET /api/haberes/core/rolPermiso/rol/{rolId}`, `POST /api/haberes/core/rolPermiso`, `DELETE /api/haberes/core/rolPermiso/rol/{rolId}/permiso/{permisoId}` - Matriz rol/permiso (`ADMIN_HABERES` se reconcilia desde `roles.yaml`)
+- `GET /api/haberes/core/usuarioRol/usuario/{legajoId}`, `POST /api/haberes/core/usuarioRol`, `DELETE /api/haberes/core/usuarioRol/usuario/{legajoId}/rol/{rolId}` - Roles por usuario; `ADMIN_HABERES` se asigna con el flag administrador
+- `GET /api/haberes/core/usuarioPermiso/usuario/{legajoId}`, `PUT /api/haberes/core/usuarioPermiso/usuario/{legajoId}/permiso/{permisoId}` con body `{otorgado}` (`1` otorga, `0` revoca, nulo elimina) y `DELETE` del mismo path - Overrides individuales
+
 ### Cargos
 - `GET /api/haberes/core/cargo/legajo/{legajoId}` - Obtener cargos por legajo
 - `GET /api/haberes/core/cargo/{cargoId}` - Obtener cargo
@@ -503,6 +522,56 @@ El servicio sigue una arquitectura hexagonal (puertos y adaptadores):
 
 
 ## Seguridad
+
+El servicio tiene RBAC propio en el slice `hexagonal/seguridad`: permisos por módulo, roles,
+asignación de roles por usuario, overrides individuales y autenticación con tokens.
+
+- **Fuente de verdad**: `src/main/resources/permisos.yaml` (71 claves en los módulos
+  `administrador`, `comun`, `consultas`, `contabilidad`, `designaciones`, `liquidacion`,
+  `movimientos`, `novedades` y `seguridad`) y `roles.yaml` (semillas `ADMIN_HABERES`,
+  `OPERADOR_NOVEDADES`, `OPERADOR_LIQUIDACION` y `CONSULTA_HABERES`). El sync corre al arrancar
+  (`SeguridadManifestSyncRunner`) y también con `POST /permiso/sync`; los permisos declarados se
+  crean/actualizan, los que ya no están se retiran con `activo = 0` y la matriz de cada rol se
+  reconcilia completa. Una clave exacta inexistente o dejar `ADMIN_HABERES` sin permisos corta
+  el sync (y el arranque, si es el sync automático).
+- **Permisos efectivos**: roles activos → overrides `usuario_permiso` (`1` otorga, `0` revoca) →
+  acceso total del administrador al final (ningún override puede revocárselo). Se cachean en
+  `permisosEfectivos` (TTL 60 s, 10.000 entradas) y toda escritura de seguridad invalida la caché,
+  de modo que un cambio de rol impacta sin redeploy.
+- **Administrador**: el flag `usuario.administrador` es el interruptor y mantiene la membresía de
+  `ADMIN_HABERES` en `usuario_rol` (`UsuarioService.setAdministrador`). El rol es protegido: no se
+  edita, elimina ni asigna a mano, y no se puede quitar a un usuario administrador mientras tenga
+  el flag.
+- **PEP**: `RequierePermisoInterceptor` + `RutasPermisos` resuelven el permiso por anotación
+  `@RequierePermiso` o por el mapa ruta → claves (prefijo más largo primero, OR entre claves y
+  comodín `modulo.*`). Responde `401` sin identidad y `403` con el permiso requerido. Las rutas de
+  propio usuario (`usuario/{legajoId}`, `usuario/lastlog/{legajoId}` y
+  `permisoEfectivo/usuario/{legajoId}`) sólo admiten el mismo legajo o un administrador. El PEP se
+  registra con `app.seguridad.permissions-enforce=true`.
+- **Sesión**: `POST /auth/login` emite un token compacto firmado con HMAC-SHA256 (claims `sub`,
+  `iat`, `exp` y `jti`; TTL configurable). Con `app.seguridad.token-required=true` todas las rutas
+  salvo `actuator`, swagger, `/auth` y `/usuario/isuservalid` exigen `Authorization: Bearer ...`.
+  Los permisos y el flag de administrador se resuelven desde la base en cada request (la caché de
+  60 s acota el costo), no se congelan en el token. Los tokens service-to-service de
+  `HABERES_SERVICE_TOKENS` se reconocen y tienen acceso total.
+
+| Variable | Default | Descripción |
+|---|---|---|
+| `HABERES_SECURITY_MANIFEST_SYNC` | `true` | Sincronizar `permisos.yaml`/`roles.yaml` al arrancar |
+| `HABERES_SECURITY_MANIFEST_DRY_RUN` | `false` | Previsualizar el sync sin escribir |
+| `HABERES_SECURITY_TOKEN_REQUIRED` | `false` | Exigir token Bearer en los endpoints no públicos |
+| `HABERES_SECURITY_ENFORCE` | `false` | Evaluar permisos por endpoint (PEP) |
+| `HABERES_AUTH_SECRET` | *(vacío)* | Secreto HMAC; obligatorio (mínimo 32 bytes) si `token-required=true` |
+| `HABERES_AUTH_TTL_HOURS` | `8` | Duración del token de sesión |
+| `HABERES_SERVICE_TOKENS` | *(vacío)* | Tokens service-to-service, formato `etec:xxx,report:yyy,tesoreria-core:zzz` |
+
+Despliegue: aplicar `sql/027_rbac_permisos.sql` (idempotente) antes de arrancar con el sync
+habilitado; crea las tablas, los roles semilla y reproduce el acceso vigente (usuarios de facultad
+→ `OPERADOR_NOVEDADES`, globales no administradores → `OPERADOR_LIQUIDACION`, administradores →
+`ADMIN_HABERES`). El despliegue escalonado puede dejar `token-required` y `permissions-enforce` en
+`false` (el core nuevo responde al frontend viejo) y activarlos después de configurar
+`HABERES_AUTH_SECRET` y los service tokens; el arranque registra un warning por cada control
+desactivado.
 
 - Validación y sanitización de datos
 - Logs de auditoría
