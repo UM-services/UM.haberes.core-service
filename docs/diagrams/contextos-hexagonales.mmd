@@ -46,6 +46,16 @@ flowchart TD
         SL_CONTABLE["contable (planificación)"]:::plan
     end
 
+    subgraph SEGURIDAD ["seguridad"]
+        SL_PERMISO["permiso"]
+        SL_ROL["rol"]
+        SL_ROLPERMISO["rol_permiso"]
+        SL_USUARIOROL["usuario_rol"]
+        SL_USUARIOPERMISO["usuario_permiso"]
+        SL_AUTH["auth / identidad"]
+        SL_MANIFEST["permisos.yaml / roles.yaml"]
+    end
+
     subgraph OTROS ["contextos simples"]
         SL_FACULTAD["facultad"]
         SL_GEOGRAFICA["geografica"]
@@ -55,11 +65,14 @@ flowchart TD
     ROOT --> CURSOS
     ROOT --> LIQUIDACIONES
     ROOT --> CONTABILIDAD
+    ROOT --> SEGURIDAD
     ROOT --> OTROS
 
     PERSONAS --- CURSOS
     PERSONAS --- LIQUIDACIONES
     LIQUIDACIONES --- CONTABILIDAD
     CURSOS --- LIQUIDACIONES
+    SEGURIDAD --- PERSONAS
+    SEGURIDAD --- LIQUIDACIONES
 
     classDef plan stroke-dasharray: 5 5
