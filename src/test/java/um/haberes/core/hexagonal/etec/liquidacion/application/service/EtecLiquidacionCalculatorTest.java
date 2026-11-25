@@ -165,7 +165,7 @@ class EtecLiquidacionCalculatorTest {
     @Test
     void prorrateaGarantiaYPresentismoConLosValoresDelLegajo2559() {
         AcumuladorEtec acumulador = new AcumuladorEtec();
-        acumulador.acumularPuntos(new BigDecimal("1274265.89"), new BigDecimal("1019412.71"),
+        acumulador.acumularPuntos(new BigDecimal("1444253.90"), new BigDecimal("1155403.12"),
                 new BigDecimal("20.00"), new BigDecimal("10.00"), new BigDecimal("60.00"),
                 new BigDecimal("8.00"));
         acumulador.acumularAdicionalDirectivo(new BigDecimal("712710.00"));
@@ -184,11 +184,11 @@ class EtecLiquidacionCalculatorTest {
 
         Map<Integer, BigDecimal> conceptos = calculator.calcular(acumulador, control);
 
-        assertThat(conceptos).containsEntry(985, new BigDecimal("254853.18"));
-        assertThat(conceptos).containsEntry(986, new BigDecimal("229367.86"));
+        assertThat(conceptos).containsEntry(985, new BigDecimal("288850.78"));
+        assertThat(conceptos).containsEntry(986, new BigDecimal("259965.70"));
         assertThat(conceptos).doesNotContainKey(987);
         assertThat(conceptos).containsEntry(988, new BigDecimal("126192.15"));
-        assertThat(conceptos).containsEntry(989, new BigDecimal("764559.53"));
+        assertThat(conceptos).containsEntry(989, new BigDecimal("866552.34"));
         assertThat(conceptos).containsEntry(990, new BigDecimal("712710.00"));
     }
 
