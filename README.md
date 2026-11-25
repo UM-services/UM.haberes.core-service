@@ -19,7 +19,7 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**3.2.0** (2026-11-25)
+**3.3.0** (2026-11-25)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
@@ -167,7 +167,7 @@ haberes:
 proceso masivo de liquidación general procesa los legajos del período.
 
 `haberes.etec.catalogo-estricto` (default `false`) hace que `EtecCatalogoValidator` impida el
-arranque si el catálogo no tiene los códigos ETEC (`984` a `989`); con `false` el faltante se
+arranque si el catálogo no tiene los códigos ETEC (`984` a `990`); con `false` el faltante se
 registra como error en el log con los scripts `sql/` que hay que aplicar.
 
 
@@ -358,6 +358,10 @@ generó: `NULL` significa "todavía sin asiento" y `0` es el valor heredado. Apl
 `sql/025_acreditacion_orden_contable_null.sql` antes de desplegar, porque es la columna la que hoy
 impide dar de alta el período sólo con el límite de novedades (`ddl-auto: none`).
 
+`legajobanco.acreditado` admite `NULL`: el alta lo normaliza a `0`, una actualización que no informa
+el campo conserva el valor existente y el `PUT` respeta el `legajoBancoId` del path. El body común
+sigue aceptando `acreditado` en el modo individual.
+
 ### Novedades (carga masiva y transferencia)
 - `POST /api/haberes/core/novedadfile/upload/{anho}/{mes}/{stepByStep}` - Carga la planilla Excel a la tabla de pendientes
 - `GET /api/haberes/core/novedadfile/import/{anho}/{mes}` - Importa los pendientes al período (`409` si hay duplicados)
@@ -415,16 +419,16 @@ versionados en el período.
 - `GET /api/haberes/core/etec/asignacion-cargo/periodo/{anho}/{mes}` - Asignaciones vigentes del período
 - `GET /api/haberes/core/etec/asignacion-cargo/categorias` - Categorías con asignaciones
 - `GET /api/haberes/core/etec/asignacion-cargo/categoria/{categoriaId}/exists` - Indica si la categoría tiene asignaciones
-- `POST /api/haberes/core/etec/asignacion-cargo/` - Alta (`legajoId`, `categoriaId` y `fechaAlta` obligatorios)
-- `PUT /api/haberes/core/etec/asignacion-cargo/{asignacionCargoId}` - Actualización
+- `POST /api/haberes/core/etec/asignacion-cargo/` - Alta (`legajoId`, `categoriaId` y `fechaAlta` obligatorios); `horasCargo` y `vecesBasicoMaestroGrado` son opcionales y quedan en `0` si se omiten
+- `PUT /api/haberes/core/etec/asignacion-cargo/{asignacionCargoId}` - Actualización (`horasCargo` y `vecesBasicoMaestroGrado` se conservan si el body los omite)
 - `DELETE /api/haberes/core/etec/asignacion-cargo/{asignacionCargoId}` - Baja
 - `GET /api/haberes/core/etec/control/{anho}/{mes}` - Parámetros ETEC del período (`404` si no está configurado)
 - `GET /api/haberes/core/etec/control/{anho}/{mes}/opcional` - Ídem, con `200` y cuerpo vacío si no existe
-- `POST /api/haberes/core/etec/control/{anho}/{mes}` - Alta o actualización (upsert) de los parámetros ETEC del período
+- `POST /api/haberes/core/etec/control/{anho}/{mes}` - Alta o actualización (upsert) de los parámetros ETEC del período: valor del punto, monto fijo, `horasReferenciaCargo`, `basicoMaestroGrado`, porcentajes de presentismo y adicional carrera, garantía y horas adicionales de carga horaria
 - `POST /api/haberes/core/etec/control/copiar/{anho}/{mes}` - Copia los parámetros ETEC y la escala de horas del mes anterior (`409` si el destino existe, `404` si no hay origen)
 - `GET /api/haberes/core/etec/hora/escala/{anho}/{mes}` - Escala de horas de clase ETEC del período (lista vacía si el período no tiene control ETEC); cada tramo incluye `categoriaId`
 - `PUT /api/haberes/core/etec/hora/escala/{anho}/{mes}` - Reemplazo completo de la escala de horas (valida rangos, solapamientos, importes y que cada tramo indique una categoría marcada como `etec_horas`; la lista vacía borra la escala; `404` si el período no tiene control ETEC)
-- `GET /api/haberes/core/etec/arraigo/escala` - Escala global de arraigo ETEC por antigüedad docente
+- `GET /api/haberes/core/etec/arraigo/escala` - Escala global de arraigo ETEC por antigüedad ETEC
 - `PUT /api/haberes/core/etec/arraigo/escala` - Reemplazo completo de la escala (valida años mínimos, duplicados y porcentajes entre 0 y 100)
 - `GET /api/haberes/core/etec/presentismo/legajo/{legajoId}/periodo/{anho}/{mes}` - Pérdidas de presentismo de los cargos ETEC con puntos del legajo/período
 - `GET /api/haberes/core/etec/presentismo/periodo/{anho}/{mes}` - Pérdidas de presentismo del período
@@ -443,8 +447,9 @@ versionados en el período.
 La pérdida de presentismo hace que la liquidación ETEC emita el `985 PRESENTISMO ETEC` bruto y el
 `984 DESCUENTO PRESENTISMO ETEC` por el mismo importe en negativo. Aplicar
 `sql/020_codigo_descuento_presentismo_etec.sql`, `sql/021_etec_presentismo.sql`,
-`sql/022_etec_presentismo_horas.sql`, `sql/023_etec_hora_categoria.sql` y
-`sql/024_categoria_periodo_etec.sql` antes de usar los endpoints.
+`sql/022_etec_presentismo_horas.sql`, `sql/023_etec_hora_categoria.sql`,
+`sql/024_categoria_periodo_etec.sql`, `sql/028_etec_config_horas_basico.sql`,
+`sql/029_antiguedad_etec.sql` y `sql/030_adicional_directivo_etec.sql` antes de usar los endpoints.
 `sql/023_etec_hora_categoria.sql` agrega `categoria.etec_horas` y `etec_hora_escala.categoria_id`
 (con backfill a `2002`), de modo que cada tramo de horas ETEC liquida con la categoría configurada
 y ya no con un id fijo en el código. `sql/024_categoria_periodo_etec.sql` agrega
@@ -452,10 +457,31 @@ y ya no con un id fijo en el código. `sql/024_categoria_periodo_etec.sql` agreg
 y debe aplicarse antes de desplegar la generación ETEC por período.
 
 Antes de borrar la liquidación anterior, un legajo con cargos ETEC verifica que el catálogo tenga
-los seis códigos ETEC (`984` a `989`); si falta alguno, la liquidación falla y conserva la previa.
+los siete códigos ETEC (`984` a `990`); si falta alguno, la liquidación falla y conserva la previa.
 En el cálculo, `ConceptosEtecValidator` corta la liquidación cuando un concepto con importe
 distinto de cero no tiene código en el catálogo, en lugar de omitirlo en silencio. El catálogo se
 valida además al arrancar (`EtecCatalogoValidator`, ver `haberes.etec.catalogo-estricto`).
+
+`sql/028_etec_config_horas_basico.sql` agrega `persona.alta_etec`,
+`control_etec.horas_referencia_cargo`, `control_etec.basico_maestro_grado`,
+`etec_asignacion_cargo.horas_cargo` y `etec_asignacion_cargo.veces_basico_maestro_grado`, y recrea
+`vw_persona_search` para que el buscador devuelva el alta ETEC. Con esos datos:
+
+- el básico del cargo por puntos es `(puntos × valor del punto) × horasCargo / horasReferenciaCargo
+  + montoFijoCargo`; sin horas informadas o sin referencia se conserva el importe completo y el
+  monto fijo nunca se prorratea;
+- la garantía `987 GARANTIA ETEC` de los cargos por puntos se prorratea por
+  `horasCargo / horasReferenciaCargo`, y sin esos valores se conserva la garantía completa;
+- el `990 ADICIONAL DIRECTIVO ETEC` es `basicoMaestroGrado × vecesBasicoMaestroGrado` del cargo y
+  sólo se emite cuando `vecesBasicoMaestroGrado` es mayor a cero.
+
+`sql/029_antiguedad_etec.sql` agrega `antiguedad.meses_etec` con backfill desde `persona.alta_etec`
+y recrea `vw_antiguedad_periodo`. El arraigo ETEC y el `989 ARRAIGO ETEC` usan esa antigüedad ETEC en
+lugar de la docente; un legajo sin `alta_etec` queda con cero meses ETEC y sin arraigo. El cálculo
+también corrige la antigüedad administrativa, que tomaba `alta_docente` como fecha de ingreso.
+
+`sql/030_adicional_directivo_etec.sql` inserta el código `990 ADICIONAL DIRECTIVO ETEC`
+(remunerativo, docente, incluido en ETEC y con concepto AFIP `110000` en ambos semestres).
 
 Las cachés `codigos` y `codigos_grupos` usan como clave la versión del catálogo (cantidad de filas,
 último `updated` y último id), de modo que una carga por SQL directo invalida la entrada sin
@@ -482,6 +508,10 @@ claves viejas.
 columna `persona.directivo_etec` (`sql/013_drop_persona_directivo_etec.sql`, idempotente), de modo que
 los clientes que todavía lo leían deben dejar de hacerlo. El resto del contrato legacy de persona que
 fija `PersonaFacultadLegacyContractTest` se mantiene.
+
+`PersonaRequest`, `PersonaPatchRequest`, `PersonaResponse` y `PersonaSearchResponse` incorporan
+`altaEtec` (fecha de alta del legajo en el circuito ETEC, nullable). Se persiste en
+`persona.alta_etec` (`sql/028_etec_config_horas_basico.sql`) y alimenta `antiguedad.meses_etec`.
 
 ### Usuarios
 - `GET /api/haberes/core/usuario/` - Listar usuarios sin hash de clave (`UsuarioResumenResponse`)

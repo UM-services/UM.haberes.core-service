@@ -15,6 +15,8 @@ public class ControlEtecMapper {
                 .mes(entity.getMes())
                 .valorPuntoEtec(entity.getValorPuntoEtec())
                 .montoFijoCargo(entity.getMontoFijoCargo())
+                .horasReferenciaCargo(entity.getHorasReferenciaCargo())
+                .basicoMaestroGrado(entity.getBasicoMaestroGrado())
                 .porcentajePresentismo(entity.getPorcentajePresentismo())
                 .porcentajeAdicionalCarrera(entity.getPorcentajeAdicionalCarrera())
                 .garantia(entity.getGarantia())
@@ -25,7 +27,8 @@ public class ControlEtecMapper {
 
     public ControlEtecEntity toEntity(ControlEtec domain) {
         return new ControlEtecEntity(domain.getControlEtecId(), domain.getAnho(), domain.getMes(),
-                domain.getValorPuntoEtec(), domain.getMontoFijoCargo(), domain.getPorcentajePresentismo(),
+                domain.getValorPuntoEtec(), domain.getMontoFijoCargo(), domain.getHorasReferenciaCargo(),
+                domain.getBasicoMaestroGrado(), domain.getPorcentajePresentismo(),
                 domain.getPorcentajeAdicionalCarrera(), domain.getGarantia(),
                 domain.getHorasAdicionalCargaHoraria(), domain.getValorHoraAdicionalCargaHoraria());
     }

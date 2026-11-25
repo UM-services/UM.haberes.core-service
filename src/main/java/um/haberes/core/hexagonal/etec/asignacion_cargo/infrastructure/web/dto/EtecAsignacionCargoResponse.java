@@ -1,5 +1,6 @@
 package um.haberes.core.hexagonal.etec.asignacion_cargo.infrastructure.web.dto;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -22,6 +23,10 @@ public class EtecAsignacionCargoResponse {
     private Long legajoId;
 
     private Integer categoriaId;
+
+    private BigDecimal horasCargo;
+
+    private BigDecimal vecesBasicoMaestroGrado;
 
     private Integer dependenciaId;
 

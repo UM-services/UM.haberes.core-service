@@ -18,6 +18,8 @@ public class EtecAsignacionCargoMapper {
         entity.setAsignacionCargoId(domain.getAsignacionCargoId());
         entity.setLegajoId(domain.getLegajoId());
         entity.setCategoriaId(domain.getCategoriaId());
+        entity.setHorasCargo(domain.getHorasCargo());
+        entity.setVecesBasicoMaestroGrado(domain.getVecesBasicoMaestroGrado());
         entity.setDependenciaId(domain.getDependenciaId());
         entity.setFechaAlta(domain.getFechaAlta());
         entity.setFechaBaja(domain.getFechaBaja());
@@ -33,6 +35,8 @@ public class EtecAsignacionCargoMapper {
                 .asignacionCargoId(entity.getAsignacionCargoId())
                 .legajoId(entity.getLegajoId())
                 .categoriaId(entity.getCategoriaId())
+                .horasCargo(entity.getHorasCargo())
+                .vecesBasicoMaestroGrado(entity.getVecesBasicoMaestroGrado())
                 .dependenciaId(entity.getDependenciaId())
                 .fechaAlta(entity.getFechaAlta())
                 .fechaBaja(entity.getFechaBaja())

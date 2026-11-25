@@ -32,6 +32,7 @@ public class PersonaSearchServiceAdapter implements PersonaSearchRepository {
                 .altaDocente(view.getAltaDocente())
                 .ajusteDocente(view.getAjusteDocente())
                 .altaAdministrativa(view.getAltaAdministrativa())
+                .altaEtec(view.getAltaEtec())
                 .ajusteAdministrativo(view.getAjusteAdministrativo())
                 .situacionId(view.getSituacionId())
                 .posgrado(view.getPosgrado())

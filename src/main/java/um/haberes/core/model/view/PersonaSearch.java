@@ -48,6 +48,9 @@ public class PersonaSearch extends AuditableEntity {
 
     private int ajusteAdministrativo = 0;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXX", timezone = "UTC")
+    private OffsetDateTime altaEtec = null;
+
     private String estadoCivil = "";
 
     private Integer situacionId = null;

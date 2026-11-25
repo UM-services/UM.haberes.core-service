@@ -108,6 +108,7 @@ public class GeneracionCargosOrquestador {
     private ContextoGeneracionCargos contexto(Long legajoId, Integer anho, Integer mes) {
         ControlGeneracionCargos control = datos.control(anho, mes);
         return new ContextoGeneracionCargos(legajoId, anho, mes, control.modoLiquidacionId(),
-                control.valorPuntoEtec(), control.montoFijoCargo(), datos.dependenciasPorSede());
+                control.valorPuntoEtec(), control.montoFijoCargo(), control.horasReferenciaCargo(),
+                datos.dependenciasPorSede());
     }
 }

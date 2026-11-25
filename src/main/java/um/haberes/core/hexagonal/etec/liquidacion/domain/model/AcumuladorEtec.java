@@ -24,6 +24,12 @@ public class AcumuladorEtec {
 
     private final AcumuladorEtecCargo horas = new AcumuladorEtecCargo();
 
+    /** Horas informadas en los cargos por puntos del legajo (para prorratear la garantía). */
+    private BigDecimal horasCargoPuntos = BigDecimal.ZERO;
+
+    /** Importe del adicional directivo: básico del maestro de grado × veces del cargo. */
+    private BigDecimal adicionalDirectivo = BigDecimal.ZERO;
+
     public void acumularPuntos(BigDecimal cargoCargo, BigDecimal antiguedadCargo,
                                BigDecimal porcentajePresentismo,
                                BigDecimal porcentajeAdicionalCarrera, BigDecimal porcentajeArraigo) {
@@ -37,6 +43,32 @@ public class AcumuladorEtec {
                                boolean sinPresentismo) {
         puntos.acumular(cargoCargo, antiguedadCargo, porcentajePresentismo,
                 porcentajeAdicionalCarrera, porcentajeArraigo, sinPresentismo);
+    }
+
+    public void acumularPuntos(BigDecimal cargoCargo, BigDecimal antiguedadCargo,
+                               BigDecimal porcentajePresentismo,
+                               BigDecimal porcentajeAdicionalCarrera, BigDecimal porcentajeArraigo,
+                               BigDecimal horasCargo) {
+        acumularPuntos(cargoCargo, antiguedadCargo, porcentajePresentismo,
+                porcentajeAdicionalCarrera, porcentajeArraigo, horasCargo, false);
+    }
+
+    public void acumularPuntos(BigDecimal cargoCargo, BigDecimal antiguedadCargo,
+                               BigDecimal porcentajePresentismo,
+                               BigDecimal porcentajeAdicionalCarrera, BigDecimal porcentajeArraigo,
+                               BigDecimal horasCargo, boolean sinPresentismo) {
+        puntos.acumular(cargoCargo, antiguedadCargo, porcentajePresentismo,
+                porcentajeAdicionalCarrera, porcentajeArraigo, sinPresentismo);
+        if (horasCargo != null && horasCargo.signum() > 0) {
+            this.horasCargoPuntos = this.horasCargoPuntos.add(horasCargo);
+        }
+    }
+
+    /** Suma el adicional directivo de un cargo por puntos. */
+    public void acumularAdicionalDirectivo(BigDecimal importe) {
+        if (importe != null && importe.signum() > 0) {
+            this.adicionalDirectivo = this.adicionalDirectivo.add(importe);
+        }
     }
 
     public void acumularHoras(BigDecimal cargoCargo, BigDecimal antiguedadCargo,

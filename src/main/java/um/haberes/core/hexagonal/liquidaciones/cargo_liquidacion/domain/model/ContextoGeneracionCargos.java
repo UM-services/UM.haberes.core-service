@@ -14,6 +14,7 @@ import um.haberes.core.util.Periodo;
  */
 public record ContextoGeneracionCargos(Long legajoId, Integer anho, Integer mes, int modoLiquidacionId,
                                        BigDecimal valorPuntoEtec, BigDecimal montoFijoCargo,
+                                       BigDecimal horasReferenciaCargo,
                                        Map<String, Dependencia> dependenciasPorSede) {
 
     private static final int MODO_CON_FUSION = 1;

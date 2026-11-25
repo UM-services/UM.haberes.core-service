@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -58,6 +59,20 @@ class PartialUpdatePersonaUseCaseImplTest {
         assertThat(resultado.getCuil()).isEqualTo("27301112224");
         assertThat(resultado.getDocumento()).isEqualByComparingTo("30111222");
         assertThat(resultado.getObraSocial()).isEqualTo(5L);
+    }
+
+    @Test
+    void aplicaAltaEtecCuandoSeInforma() {
+        when(personaRepository.findByLegajoId(LEGAJO_ID)).thenReturn(Optional.of(persona()));
+        when(personaRepository.update(eq(LEGAJO_ID), any(Persona.class)))
+                .thenAnswer(invocation -> Optional.of(invocation.getArgument(1)));
+
+        OffsetDateTime altaEtec = OffsetDateTime.parse("2026-03-01T00:00:00Z");
+
+        Persona resultado = useCase.partialUpdatePersona(
+                LEGAJO_ID, PersonaPatch.builder().altaEtec(altaEtec).build());
+
+        assertThat(resultado.getAltaEtec()).isEqualTo(altaEtec);
     }
 
     @Test
