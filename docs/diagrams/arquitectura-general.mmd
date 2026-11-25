@@ -6,6 +6,7 @@ graph TD
     subgraph "API Layer (Infrastructure - Web)"
         B["Controladores REST hexagonales<br/>/api/haberes/core/*"]
         C["DTOs / Mappers"]
+        TF["TokenAuthenticationFilter /<br/>RequierePermisoInterceptor (RBAC)"]
     end
 
     subgraph "Contextos Hexagonales (Ports & Adapters)"
@@ -43,7 +44,8 @@ graph TD
         AA["haberes-auditoria<br/>(API de ingesta)"]
     end
 
-    A --> B
+    A --> TF
+    TF --> B
     B --> C
     C --> D
     D --> F

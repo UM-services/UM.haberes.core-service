@@ -9,8 +9,10 @@ import java.util.Optional;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import um.haberes.core.exception.UsuarioException;
+import um.haberes.core.hexagonal.seguridad.application.service.AdministradorRolService;
 import um.haberes.core.model.UsuarioEntity;
 import um.haberes.core.model.dto.CambiarClaveRequest;
 import um.haberes.core.repository.JpaUsuarioRepository;
@@ -26,10 +28,12 @@ public class UsuarioService {
 	private static final Byte ADMINISTRADOR = (byte) 1;
 
 	private final JpaUsuarioRepository repository;
+	private final AdministradorRolService administradorRolService;
 
 	@Autowired
-	public UsuarioService(JpaUsuarioRepository repository) {
+	public UsuarioService(JpaUsuarioRepository repository, AdministradorRolService administradorRolService) {
 		this.repository = repository;
+		this.administradorRolService = administradorRolService;
 	}
 
 	public List<UsuarioEntity> findAll() {
@@ -114,6 +118,7 @@ public class UsuarioService {
 	 * @throws IllegalArgumentException con el mensaje de negocio
 	 * @throws UsuarioException         si el usuario no existe
 	 */
+	@Transactional
 	public UsuarioEntity setAdministrador(Long legajoId, Integer administrador) {
 		if (administrador == null || (administrador != 0 && administrador != 1)) {
 			throw new IllegalArgumentException("ERROR: Valor de administrador invalido");
@@ -132,7 +137,9 @@ public class UsuarioService {
 			throw new IllegalArgumentException("ERROR: Debe quedar al menos un administrador");
 		}
 
-		return repository.save(usuario.toBuilder().administrador(nuevoValor).build());
+		UsuarioEntity actualizado = repository.save(usuario.toBuilder().administrador(nuevoValor).build());
+		administradorRolService.sincronizar(legajoId, administrador);
+		return actualizado;
 	}
 
 }

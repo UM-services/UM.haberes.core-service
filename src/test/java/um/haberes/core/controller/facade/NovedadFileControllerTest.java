@@ -15,6 +15,7 @@ import um.haberes.core.exception.common.ImportNewsException;
 import um.haberes.core.exception.common.TituloNotFoundException;
 import um.haberes.core.service.facade.NovedadFileService;
 import um.haberes.core.util.transfer.FileInfo;
+import um.haberes.core.util.transfer.NovedadesTransferencia;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,6 +27,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -87,7 +89,21 @@ class NovedadFileControllerTest {
     }
 
     @Test
-    void transfer_returnsNoContent() throws Exception {
+    void transfer_returnsCounts() throws Exception {
+        when(service.transfer(2024, 6)).thenReturn(new NovedadesTransferencia(3, 4, 2, 9));
+
+        mockMvc.perform(post("/api/haberes/core/novedadfile/transfer/{anho}/{mes}", 2024, 6))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nuevas").value(3))
+                .andExpect(jsonPath("$.actualizadas").value(4))
+                .andExpect(jsonPath("$.sinCambios").value(2))
+                .andExpect(jsonPath("$.total").value(9));
+    }
+
+    @Test
+    void transferLegacy_returnsNoContent() throws Exception {
+        when(service.transfer(2024, 6)).thenReturn(new NovedadesTransferencia(1, 0, 0, 1));
+
         mockMvc.perform(get("/api/haberes/core/novedadfile/transfer/{anho}/{mes}", 2024, 6))
                 .andExpect(status().isNoContent());
     }

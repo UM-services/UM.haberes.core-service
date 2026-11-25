@@ -11,6 +11,20 @@ app:
   mail:
     username: uid
     password: pwd
+  seguridad:
+    # Sincroniza permisos.yaml / roles.yaml contra la base al arrancar.
+    manifest-sync-enabled: ${HABERES_SECURITY_MANIFEST_SYNC:true}
+    manifest-dry-run: ${HABERES_SECURITY_MANIFEST_DRY_RUN:false}
+    permisos-manifest: classpath:permisos.yaml
+    roles-manifest: classpath:roles.yaml
+    # Enforcement. Desactivados por defecto para el despliegue escalonado.
+    permissions-enforce: ${HABERES_SECURITY_ENFORCE:false}
+    token-required: ${HABERES_SECURITY_TOKEN_REQUIRED:false}
+    # Obligatorio si token-required=true: mínimo 32 bytes.
+    token-secret: ${HABERES_AUTH_SECRET:}
+    token-ttl-hours: ${HABERES_AUTH_TTL_HOURS:8}
+    # Tokens service-to-service: "etec:xxx,report:yyy,tesoreria-core:zzz".
+    service-tokens: ${HABERES_SERVICE_TOKENS:}
 
 server:
   port: ${app.port}
@@ -22,6 +36,7 @@ spring:
       - codigos
       - dependencias
       - codigos_grupos
+      - permisosEfectivos
   application:
     name: haberes-core-service
   cloud:

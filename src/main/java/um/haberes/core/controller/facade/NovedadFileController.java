@@ -12,6 +12,7 @@ import um.haberes.core.exception.common.ImportNewsException;
 import um.haberes.core.exception.common.TituloNotFoundException;
 import um.haberes.core.service.facade.NovedadFileService;
 import um.haberes.core.util.transfer.FileInfo;
+import um.haberes.core.util.transfer.NovedadesTransferencia;
 
 /**
  * @author daniel
@@ -47,8 +48,19 @@ public class NovedadFileController {
         }
     }
 
+    @PostMapping("/transfer/{anho}/{mes}")
+    public ResponseEntity<NovedadesTransferencia> transfer(@PathVariable Integer anho, @PathVariable Integer mes) {
+        return new ResponseEntity<>(service.transfer(anho, mes), HttpStatus.OK);
+    }
+
+    /**
+     * Compatibilidad con el cliente legacy (`clsCtlLiquidacion.transfer` del proyecto VB6, que
+     * todavía invoca por GET y no revisa el status). El cliente web usa el POST. Retirar cuando
+     * se deje de usar el cliente VB6.
+     */
+    @Deprecated
     @GetMapping("/transfer/{anho}/{mes}")
-    public ResponseEntity<Void> transfer(@PathVariable Integer anho, @PathVariable Integer mes) {
+    public ResponseEntity<Void> transferLegacy(@PathVariable Integer anho, @PathVariable Integer mes) {
         service.transfer(anho, mes);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
