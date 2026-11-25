@@ -19,9 +19,9 @@ import um.haberes.core.hexagonal.liquidaciones.cargo_liquidacion.domain.ports.ou
 import um.haberes.core.hexagonal.liquidaciones.categoria.domain.model.Categoria;
 
 /**
- * Cargos ETEC por puntos: {@code categoriaBasico = (puntos del cargo × valor del punto) × horas
- * del cargo / horas de referencia + monto fijo}, tomando las asignaciones vigentes de
- * {@code etec_asignacion_cargo}. El monto fijo no se prorratea.
+ * Cargos ETEC por puntos: {@code categoriaBasico = (puntos del cargo × valor del punto + monto
+ * fijo) × horas del cargo / horas de referencia}, tomando las asignaciones vigentes de
+ * {@code etec_asignacion_cargo}.
  *
  * <p>Con {@code legajoId} nulo genera el período completo (lo que antes hacía
  * {@code haberes-etec} vía Feign). Si hay asignaciones vigentes y el período no tiene un valor
