@@ -31,6 +31,9 @@ class UsuarioServiceTest {
     @Mock
     private JpaUsuarioRepository repository;
 
+    @Mock
+    private um.haberes.core.hexagonal.seguridad.application.service.AdministradorRolService administradorRolService;
+
     @InjectMocks
     private UsuarioService usuarioService;
 

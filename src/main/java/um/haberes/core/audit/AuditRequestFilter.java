@@ -10,6 +10,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import um.haberes.core.hexagonal.seguridad.infrastructure.security.Identidad;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -134,6 +135,10 @@ public class AuditRequestFilter extends OncePerRequestFilter {
     }
 
     private Long actorId(HttpServletRequest request) {
+        Object identidad = request.getAttribute(Identidad.ATRIBUTO);
+        if (identidad instanceof Identidad id && id.legajoId() != null) {
+            return id.legajoId();
+        }
         String header = header(request, HEADER_LEGAJO);
         if (header == null || header.isBlank()) {
             header = header(request, HEADER_LEGAJO_LEGACY);

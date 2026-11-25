@@ -1,5 +1,6 @@
 package um.haberes.core.hexagonal.liquidaciones.novedad.infrastructure.persistence.adapter;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,6 +43,17 @@ public class JpaNovedadRepositoryAdapter implements NovedadRepository {
     @Override
     public List<Novedad> findAllByLegajoIdAndAnhoAndMes(Long legajoId, Integer anho, Integer mes) {
         return toDomainList(jpaNovedadRepository.findAllByLegajoIdAndAnhoAndMes(legajoId, anho, mes));
+    }
+
+    @Override
+    public List<Novedad> findAllByAnhoAndMes(Integer anho, Integer mes) {
+        return toDomainList(jpaNovedadRepository.findAllByAnhoAndMes(anho, mes));
+    }
+
+    @Override
+    public List<Novedad> findAllByCodigoIdsAndAnhoAndMes(Collection<Integer> codigoIds, Integer anho, Integer mes) {
+        return toDomainList(jpaNovedadRepository.findAllByCodigoIdInAndAnhoAndMes(codigoIds, anho, mes,
+                Sort.by("legajoId").ascending()));
     }
 
     @Override

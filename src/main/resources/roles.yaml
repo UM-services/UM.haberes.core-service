@@ -1,0 +1,57 @@
+# Semilla de roles RBAC de Haberes — FUENTE DE VERDAD de los roles declarados acá.
+#
+# Se sincroniza contra `rol` y `rol_permiso` de `haberes` al arrancar haberes-core
+# (app.seguridad.manifest-sync.enabled), DESPUÉS del manifiesto de permisos.
+#
+# Reglas:
+#  - La identidad de un rol es (aplicacion, nombre). `nombre` en MAYÚSCULAS (A-Z, 0-9, _).
+#  - Si el rol no existe, se crea con su matriz `rol_permiso`.
+#  - Si existe, se actualizan descripcion/activo y se RECONCILIA la matriz:
+#    se agregan las claves declaradas que falten y se quitan las que sobren.
+#    Las excepciones individuales van en `usuario_permiso`, no editando estos roles.
+#  - Los roles NO declarados acá no se tocan (los creados desde la UI sobreviven).
+#  - `permisos` acepta claves exactas y comodines:
+#      `*`          → todas las claves de la aplicación del rol
+#      `modulo.*`   → todas las claves con ese prefijo
+#    Un comodín sin coincidencias sólo emite un warning; una clave exacta
+#    inexistente corta el arranque.
+#
+# ADMIN_HABERES es el rol protegido de acceso total: el flag usuario.administrador
+# garantiza la membresía (ver AdministradorRolService) y la UI no lo permite editar.
+version: 1
+
+roles:
+  - nombre: ADMIN_HABERES
+    descripcion: "Administración completa de Haberes: todos los permisos, incluidos roles y permisos"
+    aplicacion: HABERES
+    activo: true
+    permisos:
+      - "*"
+
+  - nombre: OPERADOR_NOVEDADES
+    descripcion: "Operación completa del módulo Novedades"
+    aplicacion: HABERES
+    activo: true
+    permisos:
+      - "novedades.*"
+      - "comun.*"
+
+  - nombre: OPERADOR_LIQUIDACION
+    descripcion: "Operación de liquidación, designaciones, consultas, movimientos y contabilidad"
+    aplicacion: HABERES
+    activo: true
+    permisos:
+      - "liquidacion.*"
+      - "designaciones.*"
+      - "consultas.*"
+      - "movimientos.*"
+      - "contabilidad.*"
+      - "comun.*"
+
+  - nombre: CONSULTA_HABERES
+    descripcion: "Consulta de liquidaciones y reportes, sin operación"
+    aplicacion: HABERES
+    activo: true
+    permisos:
+      - "consultas.*"
+      - "comun.*"

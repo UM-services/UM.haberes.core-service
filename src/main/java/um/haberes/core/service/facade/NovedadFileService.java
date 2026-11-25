@@ -10,8 +10,11 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -40,6 +43,7 @@ import um.haberes.core.hexagonal.personas.persona.application.service.PersonaSer
 import um.haberes.core.util.Periodo;
 import um.haberes.core.util.Tool;
 import um.haberes.core.util.transfer.FileInfo;
+import um.haberes.core.util.transfer.NovedadesTransferencia;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -239,28 +243,104 @@ public class NovedadFileService {
         novedadService.saveAll(novedades);
     }
 
+    /**
+     * Copia al período destino las novedades transferibles del mes anterior.
+     *
+     * <p>El período destino se lee <b>una sola vez</b> y sus claves se resuelven en memoria:
+     * antes se hacía un {@code findByUnique} por fila (N + 1 consultas sobre ~2.400 filas) y
+     * la transferencia tardaba más de un minuto. Además, al quedar las entidades del destino
+     * gestionadas en la misma sesión, el {@code saveAll} sólo emite los UPDATE (batcheados por
+     * Hibernate) sin volver a consultar cada fila.</p>
+     */
     @Transactional
-    public void transfer(Integer anho, Integer mes) {
-        List<Novedad> novedades = new ArrayList<>();
+    public NovedadesTransferencia transfer(Integer anho, Integer mes) {
         Periodo anterior = Periodo.prevMonth(anho, mes);
-        Integer anhoAnterior = anterior.getAnho();
-        Integer mesAnterior = anterior.getMes();
-        for (Codigo codigo : codigoService.findAllByTransferible((byte) 1)) {
-            for (Novedad old : novedadService.findAllByCodigo(codigo.getCodigoId(), anhoAnterior, mesAnterior)) {
-                Long novedadId = null;
-                try {
-                    Novedad novedad = novedadService.findByUnique(old.getLegajoId(), anho, mes, old.getCodigoId(),
-                            old.getDependenciaId());
-                    novedadId = novedad.getNovedadId();
-                } catch (NovedadException e) {
-                    novedadId = null;
-                }
-                novedades.add(
-                        new Novedad(novedadId, old.getLegajoId(), anho, mes, old.getCodigoId(), old.getDependenciaId(),
-                                old.getImporte(), old.getValue(), "Transferido", (byte) 1, null, null, null, null));
-            }
+        List<Integer> codigoIds = codigoService.findAllByTransferible((byte) 1).stream()
+                .map(Codigo::getCodigoId)
+                .toList();
+        if (codigoIds.isEmpty()) {
+            return new NovedadesTransferencia(0, 0, 0, 0);
         }
-        novedadService.saveAll(novedades);
+
+        List<Novedad> destino = novedadService.findAllByPeriodo(anho, mes);
+        Map<ClaveNovedad, Novedad> existentes = new HashMap<>(destino.size() * 2);
+        for (Novedad novedad : destino) {
+            existentes.putIfAbsent(ClaveNovedad.of(novedad), novedad);
+        }
+        if (existentes.size() != destino.size()) {
+            log.warn("Transferencia {}/{}: el período destino tiene {} claves duplicadas",
+                    mes, anho, destino.size() - existentes.size());
+        }
+
+        List<Novedad> origen = novedadService.findAllByCodigos(codigoIds, anterior.getAnho(), anterior.getMes());
+        List<Novedad> novedades = new ArrayList<>(origen.size());
+        Set<ClaveNovedad> procesadas = new HashSet<>(origen.size() * 2);
+        int nuevas = 0;
+        int actualizadas = 0;
+        int sinCambios = 0;
+        int repetidas = 0;
+        for (Novedad old : origen) {
+            ClaveNovedad clave = ClaveNovedad.of(old);
+            // El único de `novedad` permite varias filas con dependencia NULL: se copia una sola
+            // para no duplicar en el destino (el legacy hubiera insertado todas).
+            if (!procesadas.add(clave)) {
+                repetidas++;
+                continue;
+            }
+            Novedad existente = existentes.get(clave);
+            if (existente == null) {
+                nuevas++;
+            } else if (sinCambios(existente, old)) {
+                // Reejecutar la transferencia no debe reescribir filas idénticas: sin UPDATE ni
+                // evento de auditoría por fila. En MySQL un UPDATE cuesta un viaje por fila.
+                sinCambios++;
+                continue;
+            } else {
+                actualizadas++;
+            }
+            novedades.add(
+                    new Novedad(existente == null ? null : existente.getNovedadId(), old.getLegajoId(), anho, mes,
+                            old.getCodigoId(), old.getDependenciaId(), old.getImporte(), old.getValue(),
+                            "Transferido", (byte) 1, null, null, null, null));
+        }
+        if (repetidas > 0) {
+            log.warn("Transferencia {}/{}: {} claves repetidas en el período de origen omitidas", mes, anho, repetidas);
+        }
+
+        if (!novedades.isEmpty()) {
+            novedadService.saveAll(novedades);
+        }
+        log.info("Transferencia {}/{}: {} novedades ({} nuevas, {} actualizadas, {} sin cambios)", mes, anho,
+                origen.size() - repetidas, nuevas, actualizadas, sinCambios);
+        return new NovedadesTransferencia(nuevas, actualizadas, sinCambios, origen.size() - repetidas);
+    }
+
+    /** ¿El destino ya tiene exactamente lo que la transferencia escribiría? */
+    private static boolean sinCambios(Novedad destino, Novedad origen) {
+        return "Transferido".equals(destino.getObservaciones())
+                && Byte.valueOf((byte) 1).equals(destino.getImportado())
+                && destino.getNovedadUploadId() == null
+                && mismoImporte(destino.getImporte(), origen.getImporte())
+                && texto(destino.getValue()).equals(texto(origen.getValue()));
+    }
+
+    private static boolean mismoImporte(BigDecimal destino, BigDecimal origen) {
+        if (destino == null || origen == null) {
+            return destino == origen;
+        }
+        return destino.compareTo(origen) == 0;
+    }
+
+    private static String texto(String value) {
+        return value == null ? "" : value;
+    }
+
+    /** Clave única lógica de una novedad: legajo + código + dependencia (período aparte). */
+    private record ClaveNovedad(Long legajoId, Integer codigoId, Integer dependenciaId) {
+
+        static ClaveNovedad of(Novedad novedad) {
+            return new ClaveNovedad(novedad.getLegajoId(), novedad.getCodigoId(), novedad.getDependenciaId());
+        }
     }
 
 }

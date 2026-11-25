@@ -30,10 +30,14 @@ sequenceDiagram
     end
     Svc->>NovSvc: saveAll(novedades creadas/actualizadas)
 
-    Usuario->>Ctrl: GET /novedadfile/transfer/{anho}/{mes}
+    Usuario->>Ctrl: POST /novedadfile/transfer/{anho}/{mes}
     Ctrl->>Svc: transfer(anho, mes)
-    Svc->>CodSvc: findAllByTransferible(1) (códigos transferibles)
-    loop por cada código transferible
-        Svc->>NovSvc: findAllByCodigo(codigoId, período anterior)
-    end
-    Svc->>NovSvc: saveAll(novedades traídas al período nuevo)
+    Svc->>CodSvc: findAllByTransferible(1) (ids de códigos)
+    Svc->>NovSvc: findAllByPeriodo(anho, mes) (destino, una sola lectura)
+    Svc->>NovSvc: findAllByCodigos(codigoIds, período anterior)
+    Svc->>Svc: resuelve claves en memoria y deduplica el origen
+    Note over Svc: nuevas / actualizadas por novedadId / sin cambios<br/>reejecutar no escribe filas idénticas
+    Svc->>NovSvc: saveAll(nuevas + actualizadas)
+    Svc-->>Ctrl: NovedadesTransferencia (nuevas, actualizadas, sinCambios, total)
+    Ctrl-->>Usuario: 200 con los contadores
+    Note over Usuario,Ctrl: GET legacy /transfer responde 204 (cliente VB6)
