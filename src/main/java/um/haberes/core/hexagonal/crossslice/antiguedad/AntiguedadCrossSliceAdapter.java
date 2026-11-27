@@ -13,7 +13,7 @@ import um.haberes.core.service.AntiguedadService;
 import um.haberes.core.service.facade.DesignacionToolService;
 
 /**
- * Adaptador cross-slice de antigüedad: meses del registro y los dos índices del período.
+ * Adaptador cross-slice de antigüedad: meses de los tres orígenes y los dos índices del período.
  *
  * <p>Es una lectura: si no hay registro del período devuelve la vista vacía en lugar de disparar
  * el cálculo (el legacy calculaba al abrir el formulario, un efecto de escritura en una lectura
@@ -33,7 +33,7 @@ public class AntiguedadCrossSliceAdapter implements AntiguedadCrossSlice {
         try {
             antiguedad = antiguedadService.findByUnique(legajoId, anho, mes);
         } catch (AntiguedadException e) {
-            return new AntiguedadView(null, null, null, null);
+            return new AntiguedadView(null, null, null, null, null);
         }
         BigDecimal indiceDocente = null;
         BigDecimal indiceAdministrativo = null;
@@ -45,6 +45,6 @@ public class AntiguedadCrossSliceAdapter implements AntiguedadCrossSlice {
             indiceAdministrativo = indices.get(1);
         }
         return new AntiguedadView(antiguedad.getMesesDocentes(), antiguedad.getMesesAdministrativos(),
-                indiceDocente, indiceAdministrativo);
+                antiguedad.getMesesEtec(), indiceDocente, indiceAdministrativo);
     }
 }
