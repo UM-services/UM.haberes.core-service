@@ -19,7 +19,7 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**3.3.1** (2026-11-25)
+**3.4.0** (2026-11-27)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
@@ -306,9 +306,12 @@ docker run -d \
 - `GET /api/haberes/core/makeLiquidacionGeneral/general/{anho}/{mes}/{force}` - Liquidación general masiva
 
 En la liquidación individual, la jubilación secundaria ETEC (código `70`, 2% sobre los haberes con
-aportes) sólo se emite cuando el legajo tiene al menos un cargo ETEC acumulado y sus horas semanales
-de `curso_cargo` en la facultad ETEC (15) superan a las del resto de las facultades; el empate no
-aplica y se ignoran los cursos sin curso o sin facultad.
+aportes) sólo se emite cuando el legajo tiene al menos un cargo ETEC acumulado y acumula más horas
+semanales en la facultad ETEC (15) que en el resto de las facultades; el empate no aplica y se
+ignoran los cursos sin curso o sin facultad. A las horas de `curso_cargo` se suman las horas fijas
+del cargo ETEC por puntos (`etec_asignacion_cargo.horas_cargo`), que no tienen curso asociado, de
+modo que los cargos por puntos de la ETEC —preceptores, secretarios y directivos— también cuentan
+para la comparación.
 
 Cada liquidación elimina antes las novedades duplicadas del período. Aplicar
 `sql/026_novedad_periodo_duplicado_index.sql` antes de desplegar: la consulta filtra por `anho`/`mes`
@@ -321,6 +324,10 @@ con el índice en lugar de recorrer toda la tabla `novedad`.
 - `DELETE /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/{forzar}` - Eliminar la liquidación del legajo/período
 - `POST /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/novedad` - Alta o actualización de una novedad
 - `DELETE /api/haberes/core/liquidacion-individual/{legajoId}/{anho}/{mes}/novedad/{novedadId}/{forzar}` - Eliminar una novedad del legajo/período
+
+La ficha devuelve `antiguedad` con `mesesDocentes`, `mesesAdministrativos`, `mesesEtec`,
+`indiceDocente` e `indiceAdministrativo`; los meses pueden ser `null` cuando el período todavía no
+tiene registro de antigüedad.
 
 ### Liquidación general (slice hexagonal)
 - `GET /api/haberes/core/liquidacion-general/{anho}/{mes}` - Padrón agregado del período: acciones, resumen (docentes, no docentes, novedades, liquidados, bloqueados, neto negativo/cero y total neto) y filas por legajo

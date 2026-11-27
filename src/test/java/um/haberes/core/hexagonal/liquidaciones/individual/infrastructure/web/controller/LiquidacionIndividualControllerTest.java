@@ -69,6 +69,7 @@ class LiquidacionIndividualControllerTest {
                 .andExpect(jsonPath("$.persona.apellido").value("PEREZ"))
                 .andExpect(jsonPath("$.acciones.puedeLiquidar").value(true))
                 .andExpect(jsonPath("$.acciones.bloqueado").value(false))
+                .andExpect(jsonPath("$.antiguedad.mesesEtec").value(6))
                 .andExpect(jsonPath("$.novedades[0].codigoNombre").value("PRESENTISMO"));
     }
 
@@ -151,7 +152,7 @@ class LiquidacionIndividualControllerTest {
                 new PersonaView(LEGAJO, BigDecimal.TEN, "PEREZ", "ANA", 1, "S", 7, "B"),
                 new ControlView(88L, ANHO, MES, 1),
                 null,
-                new AntiguedadView(192, 0, new BigDecimal("1.85"), BigDecimal.ONE),
+                new AntiguedadView(192, 0, 6, new BigDecimal("1.85"), BigDecimal.ONE),
                 List.of(), List.of(), List.of(),
                 List.of(new NovedadView(77L, 16, "PRESENTISMO", BigDecimal.ZERO, "N", null, null)),
                 List.of(),

@@ -36,8 +36,8 @@ public record FichaLiquidacionIndividualResponse(Long legajoId, Integer anho, In
                                       timezone = "UTC") OffsetDateTime fechaAcreditacion) {
     }
 
-    public record Antiguedad(Integer mesesDocentes, Integer mesesAdministrativos, BigDecimal indiceDocente,
-                             BigDecimal indiceAdministrativo) {
+    public record Antiguedad(Integer mesesDocentes, Integer mesesAdministrativos, Integer mesesEtec,
+                             BigDecimal indiceDocente, BigDecimal indiceAdministrativo) {
     }
 
     public record Cargo(Long cargoLiquidacionId, Integer dependenciaId, String dependenciaAcronimo,
