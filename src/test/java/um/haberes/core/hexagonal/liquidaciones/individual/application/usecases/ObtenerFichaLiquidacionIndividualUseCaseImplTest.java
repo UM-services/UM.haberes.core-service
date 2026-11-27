@@ -92,7 +92,7 @@ class ObtenerFichaLiquidacionIndividualUseCaseImplTest {
                 new ControlView(88L, ANHO, MES, 1)));
         when(liquidacionCrossSlice.porClaveUnica(LEGAJO, ANHO, MES)).thenReturn(Optional.empty());
         when(antiguedadCrossSlice.porLegajo(LEGAJO, ANHO, MES))
-                .thenReturn(new AntiguedadView(192, 0, new BigDecimal("1.85"), BigDecimal.ONE));
+                .thenReturn(new AntiguedadView(192, 0, 6, new BigDecimal("1.85"), BigDecimal.ONE));
         when(cargoLiquidacionCrossSlice.porLegajo(LEGAJO, ANHO, MES))
                 .thenReturn(List.of(cargo(true), cargo(false)));
         when(cargoClaseCrossSlice.porLegajo(LEGAJO, ANHO, MES))

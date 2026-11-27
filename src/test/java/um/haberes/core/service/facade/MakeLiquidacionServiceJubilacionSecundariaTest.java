@@ -11,8 +11,9 @@ import um.haberes.core.hexagonal.cursos.curso.domain.model.Curso;
 import um.haberes.core.hexagonal.cursos.curso_cargo.domain.model.CursoCargo;
 
 /**
- * Regla de la jubilación secundaria ETEC: 2% adicional cuando el legajo dicta más horas semanales
- * en la ETEC (facultad 15) que en el resto de las facultades, comparando sólo {@code curso_cargo}.
+ * Regla de la jubilación secundaria ETEC: 2% adicional cuando el legajo acumula más horas
+ * semanales en la ETEC (facultad 15) que en el resto de las facultades, sumando las horas de
+ * {@code curso_cargo} y las horas fijas del cargo ETEC por puntos.
  */
 class MakeLiquidacionServiceJubilacionSecundariaTest {
 
@@ -84,5 +85,36 @@ class MakeLiquidacionServiceJubilacionSecundariaTest {
                 curso(1, "4.00"), curso(4, "3.00"));
 
         assertThat(MakeLiquidacionService.tieneMasHorasEtecQueOtras(cursos)).isTrue();
+    }
+
+    @Test
+    void aplicaConSoloCargoEtecPorPuntosSinCursos() {
+        // Legajo 2736: PRECEPTOR ETEC por puntos, 6 horas de cargo y ningún curso_cargo.
+        assertThat(MakeLiquidacionService.tieneMasHorasEtecQueOtras(List.of(), new BigDecimal("6.00")))
+                .isTrue();
+    }
+
+    @Test
+    void sumaHorasDelCargoPorPuntosALasDeLosCursosEtec() {
+        List<CursoCargo> cursos = List.of(curso(15, "4.00"), curso(2, "8.00"));
+
+        assertThat(MakeLiquidacionService.tieneMasHorasEtecQueOtras(cursos, new BigDecimal("6.00")))
+                .isTrue();
+    }
+
+    @Test
+    void noAplicaSiElRestoSuperaLaSumaDeHorasEtec() {
+        List<CursoCargo> cursos = List.of(curso(15, "4.00"), curso(2, "12.00"));
+
+        assertThat(MakeLiquidacionService.tieneMasHorasEtecQueOtras(cursos, new BigDecimal("6.00")))
+                .isFalse();
+    }
+
+    @Test
+    void noAplicaConCargoPorPuntosEnCeroYSinCursosEtec() {
+        assertThat(MakeLiquidacionService.tieneMasHorasEtecQueOtras(List.of(), BigDecimal.ZERO))
+                .isFalse();
+        assertThat(MakeLiquidacionService.tieneMasHorasEtecQueOtras(List.of(), null))
+                .isFalse();
     }
 }

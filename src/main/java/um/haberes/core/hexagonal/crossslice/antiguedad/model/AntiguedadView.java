@@ -5,9 +5,10 @@ import java.math.BigDecimal;
 /**
  * Vista de antigüedad de un legajo en un período.
  *
- * <p>{@code mesesDocentes}/{@code mesesAdministrativos} pueden ser {@code null} cuando todavía no
- * existe el registro del período; los índices pueden venir vacíos.
+ * <p>{@code mesesDocentes}/{@code mesesAdministrativos}/{@code mesesEtec} pueden ser {@code null}
+ * cuando todavía no existe el registro del período; los índices pueden venir vacíos.
  */
 public record AntiguedadView(Integer mesesDocentes, Integer mesesAdministrativos,
-                             BigDecimal indiceDocente, BigDecimal indiceAdministrativo) {
+                             Integer mesesEtec, BigDecimal indiceDocente,
+                             BigDecimal indiceAdministrativo) {
 }

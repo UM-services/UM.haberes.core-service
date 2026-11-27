@@ -919,19 +919,30 @@ public class MakeLiquidacionService {
     }
 
     /**
-     * Jubilación secundaria ETEC: corresponde el 2% adicional cuando el legajo dicta más horas
-     * semanales en la ETEC (facultad 15) que en el resto de las facultades. Se comparan las horas
-     * de {@code curso_cargo} del período; no se suman cargos con clase ni las horas fijas del
-     * cargo por puntos. Exige que el legajo tenga al menos un cargo ETEC liquidado.
+     * Jubilación secundaria ETEC: corresponde el 2% adicional cuando el legajo acumula más horas
+     * semanales en la ETEC (facultad 15) que en el resto de las facultades. A las horas de
+     * {@code curso_cargo} del período se suman las horas fijas del cargo ETEC por puntos
+     * ({@code etec_asignacion_cargo.horas_cargo}), que no tienen curso asociado: preceptores,
+     * secretarios y directivos de la ETEC se liquidan por puntos. Exige que el legajo tenga al
+     * menos un cargo ETEC liquidado.
      */
     private boolean evaluarJubilacionSecundaria(Long legajoId, Integer anho, Integer mes,
                                                 LiquidacionState state) {
         return state.getEtecAcumulado().hayCargos()
-                && tieneMasHorasEtecQueOtras(cursoCargoService.findAllByLegajo(legajoId, anho, mes));
+                && tieneMasHorasEtecQueOtras(cursoCargoService.findAllByLegajo(legajoId, anho, mes),
+                        state.getEtecAcumulado().getHorasCargoPuntos());
     }
 
     static boolean tieneMasHorasEtecQueOtras(List<CursoCargo> cursos) {
-        BigDecimal horasEtec = BigDecimal.ZERO;
+        return tieneMasHorasEtecQueOtras(cursos, BigDecimal.ZERO);
+    }
+
+    /**
+     * @param horasEtecPuntos horas semanales del cargo ETEC por puntos vigente en el período; se
+     *                        suman a las horas de los cursos de la facultad 15.
+     */
+    static boolean tieneMasHorasEtecQueOtras(List<CursoCargo> cursos, BigDecimal horasEtecPuntos) {
+        BigDecimal horasEtec = horasEtecPuntos == null ? BigDecimal.ZERO : horasEtecPuntos;
         BigDecimal horasOtras = BigDecimal.ZERO;
         for (CursoCargo cursoCargo : cursos) {
             Curso curso = cursoCargo.getCurso();
