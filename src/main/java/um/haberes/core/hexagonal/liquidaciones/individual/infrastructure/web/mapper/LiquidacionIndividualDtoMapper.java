@@ -115,7 +115,7 @@ public class LiquidacionIndividualDtoMapper {
             return null;
         }
         return new FichaLiquidacionIndividualResponse.Antiguedad(antiguedad.mesesDocentes(),
-                antiguedad.mesesAdministrativos(), antiguedad.indiceDocente(),
+                antiguedad.mesesAdministrativos(), antiguedad.mesesEtec(), antiguedad.indiceDocente(),
                 antiguedad.indiceAdministrativo());
     }
 
