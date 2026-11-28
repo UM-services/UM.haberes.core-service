@@ -1,5 +1,5 @@
 ---
-title: "Liquidación ETEC: Conceptos 984 a 990 (Puntos y Horas)"
+title: "Liquidación ETEC: Conceptos 984 a 989 + adicional directivo configurado (Puntos y Horas)"
 ---
 sequenceDiagram
     autonumber
@@ -28,7 +28,7 @@ sequenceDiagram
     Make->>Escala: porcentajeParaAnios(mesesEtec / 12)
     Escala-->>Make: porcentaje de arraigo (0 si no alcanza el tramo de 2 años)
     Make->>State: setPorcentajeArraigoEtec(porcentaje)
-    Make->>Make: valida catálogo ETEC (984 a 990) si el legajo tiene cargos ETEC
+    Make->>Make: valida catálogo ETEC (984 a 989 + código configurado del adicional directivo) si el legajo tiene cargos ETEC
     alt Falta un código ETEC
         Make-->>Usuario: IllegalStateException (conserva la liquidación previa)
     end
@@ -53,11 +53,11 @@ sequenceDiagram
     alt Sin cargos ETEC acumulados
         Calc-->>Make: mapa vacío (no genera ítems ETEC)
     else Con cargos acumulados
-        Calc-->>Make: 984 (sólo con pérdida), 985, 986, 987, 988, 989 y 990 con importe distinto de cero
+        Calc-->>Make: 984 (sólo con pérdida), 985, 986, 987, 988, 989 y el código configurado del adicional directivo, con importe distinto de cero
     end
     Make->>Make: ConceptosEtecValidator.validar (todo importe distinto de cero exige código)
     Make->>DB: agrega los ítems con importe distinto de cero, antes de los totales
 
-    Note over Calc,DB: 984 descuento = -presentismo bruto de los cargos que perdieron presentismo.<br/>985 presentismo = cargo x %presentismo (bruto, para el recibo).<br/>986 adicional carrera = (cargo + antigüedad) x %adicional.<br/>988 carga horaria = horas adicionales fijas + horas de clase, ambas x valor hora.<br/>989 arraigo = cargo x porcentaje de la escala ETEC.<br/>990 adicional directivo = básico del maestro de grado x veces del cargo.<br/>Todo con HALF_UP a 2 decimales.
+    Note over Calc,DB: 984 descuento = -presentismo bruto de los cargos que perdieron presentismo.<br/>985 presentismo = cargo x %presentismo (bruto, para el recibo).<br/>986 adicional carrera = (cargo + antigüedad) x %adicional.<br/>988 carga horaria = horas adicionales fijas + horas de clase, ambas x valor hora.<br/>989 arraigo = cargo x porcentaje de la escala ETEC.<br/>Adicional directivo = básico del maestro de grado x veces del cargo, con el código configurado en control_etec.codigo_adicional_directivo.<br/>Todo con HALF_UP a 2 decimales.
     Note over Calc,DB: 987 garantía tiene dos pisos: puntos contra max(0, garantía x horasCargo / horasReferencia - base de puntos)<br/>y horas contra max(0, garantía / 18 x horas - base de horas), con piso completo desde 18 horas.
     Note over Acum: Puntos y horas se acumulan por separado y se suman por código,<br/>y la garantía de cada origen sólo descuenta su propia base.

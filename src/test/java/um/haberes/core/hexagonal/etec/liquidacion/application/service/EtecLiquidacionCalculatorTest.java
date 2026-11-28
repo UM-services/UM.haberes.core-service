@@ -1,6 +1,7 @@
 package um.haberes.core.hexagonal.etec.liquidacion.application.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -180,6 +181,7 @@ class EtecLiquidacionCalculatorTest {
                 .garantia(new BigDecimal("887116.98"))
                 .horasAdicionalCargaHoraria(new BigDecimal("15.00"))
                 .valorHoraAdicionalCargaHoraria(new BigDecimal("8412.81"))
+                .codigoAdicionalDirectivo(1234)
                 .build();
 
         Map<Integer, BigDecimal> conceptos = calculator.calcular(acumulador, control);
@@ -189,7 +191,19 @@ class EtecLiquidacionCalculatorTest {
         assertThat(conceptos).doesNotContainKey(987);
         assertThat(conceptos).containsEntry(988, new BigDecimal("126192.15"));
         assertThat(conceptos).containsEntry(989, new BigDecimal("866552.34"));
-        assertThat(conceptos).containsEntry(990, new BigDecimal("712710.00"));
+        assertThat(conceptos).containsEntry(1234, new BigDecimal("712710.00"));
+    }
+
+    @Test
+    void fallaSiElAdicionalDirectivoTieneImporteYSinCodigoConfigurado() {
+        AcumuladorEtec acumulador = new AcumuladorEtec();
+        acumulador.acumularPuntos(new BigDecimal("500000.00"), BigDecimal.ZERO,
+                new BigDecimal("20.00"), new BigDecimal("10.00"), BigDecimal.ZERO);
+        acumulador.acumularAdicionalDirectivo(new BigDecimal("100000.00"));
+
+        assertThatThrownBy(() -> calculator.calcular(acumulador, control("0.00", "0.00", "0.00")))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("codigo_adicional_directivo");
     }
 
     @Test

@@ -23,7 +23,7 @@ class EtecCatalogoValidatorTest {
 
     @Test
     void noFallaConCatalogoCompleto() {
-        when(codigoService.findAll()).thenReturn(codigos(984, 985, 986, 987, 988, 989, 990));
+        when(codigoService.findAll()).thenReturn(codigos(984, 985, 986, 987, 988, 989));
 
         assertThatCode(() -> new EtecCatalogoValidator(codigoService, true).run(null))
                 .doesNotThrowAnyException();
@@ -37,7 +37,7 @@ class EtecCatalogoValidatorTest {
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("986")
                 .hasMessageContaining("989")
-                .hasMessageContaining("990");
+                .hasMessageContaining("codigo_adicional_directivo");
     }
 
     @Test

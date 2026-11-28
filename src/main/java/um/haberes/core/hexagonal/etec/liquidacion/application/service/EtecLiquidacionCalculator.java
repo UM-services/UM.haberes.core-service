@@ -42,7 +42,9 @@ import um.haberes.core.hexagonal.etec.liquidacion.domain.model.AcumuladorEtecCar
  *       dos se calculan con el mismo valor hora y se suman en un único ítem.</li>
  *   <li>989 ARRAIGO ETEC: suma de {@code cargo × porcentaje} por cargo, con el porcentaje que
  *       corresponde a la antigüedad ETEC según la escala global ({@code etec_arraigo_escala}).</li>
- *   <li>990 ADICIONAL DIRECTIVO ETEC: {@code básico del maestro de grado × veces} del cargo.</li>
+ *   <li>ADICIONAL DIRECTIVO ETEC: {@code básico del maestro de grado × veces} del cargo. El
+ *       código de liquidación no está fijo en el código: lo define el período en
+ *       {@code control_etec.codigo_adicional_directivo}.</li>
  * </ul>
  */
 @Component
@@ -60,20 +62,21 @@ public class EtecLiquidacionCalculator {
 
     public static final int CODIGO_ARRAIGO_ETEC = 989;
 
-    public static final int CODIGO_ADICIONAL_DIRECTIVO_ETEC = 990;
-
     /** Horas de clase que corresponden a la garantía completa del período. */
     public static final BigDecimal HORAS_GARANTIA_COMPLETA_ETEC = new BigDecimal("18");
 
-    /** Códigos que el catálogo global debe tener para liquidar cualquier legajo ETEC. */
+    /**
+     * Códigos base que el catálogo global debe tener para liquidar cualquier legajo ETEC. El
+     * adicional directivo no está acá: su código lo configura el período en
+     * {@code control_etec.codigo_adicional_directivo} y se valida al liquidar.
+     */
     public static final List<Integer> CODIGOS_ETEC = List.of(
             CODIGO_DESCUENTO_PRESENTISMO_ETEC,
             CODIGO_PRESENTISMO_ETEC,
             CODIGO_ADICIONAL_CARRERA_ETEC,
             CODIGO_GARANTIA_ETEC,
             CODIGO_ADICIONAL_CARGA_HORARIA_ETEC,
-            CODIGO_ARRAIGO_ETEC,
-            CODIGO_ADICIONAL_DIRECTIVO_ETEC);
+            CODIGO_ARRAIGO_ETEC);
 
     public Map<Integer, BigDecimal> calcular(AcumuladorEtec acumulado, ControlEtec control) {
         if (control == null || acumulado == null || !acumulado.hayCargos()) {
@@ -104,7 +107,15 @@ public class EtecLiquidacionCalculator {
 
         agregar(conceptos, CODIGO_ARRAIGO_ETEC, acumulado.getArraigo());
 
-        agregar(conceptos, CODIGO_ADICIONAL_DIRECTIVO_ETEC, acumulado.getAdicionalDirectivo());
+        if (acumulado.getAdicionalDirectivo().signum() > 0) {
+            Integer codigoAdicionalDirectivo = control.getCodigoAdicionalDirectivo();
+            if (codigoAdicionalDirectivo == null || codigoAdicionalDirectivo <= 0) {
+                throw new IllegalStateException(
+                        "El adicional directivo ETEC tiene importe pero el período no configuró "
+                                + "control_etec.codigo_adicional_directivo");
+            }
+            agregar(conceptos, codigoAdicionalDirectivo, acumulado.getAdicionalDirectivo());
+        }
 
         return conceptos;
     }

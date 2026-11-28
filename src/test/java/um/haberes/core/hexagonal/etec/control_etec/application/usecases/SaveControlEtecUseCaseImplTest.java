@@ -48,6 +48,7 @@ class SaveControlEtecUseCaseImplTest {
         assertThat(control.getMontoFijoCargo()).isEqualByComparingTo("50000.00");
         assertThat(control.getHorasReferenciaCargo()).isEqualByComparingTo("18.00");
         assertThat(control.getBasicoMaestroGrado()).isEqualByComparingTo("750000.00");
+        assertThat(control.getCodigoAdicionalDirectivo()).isNull();
         assertThat(control.getPorcentajePresentismo()).isEqualByComparingTo("20.00");
         assertThat(control.getPorcentajeAdicionalCarrera()).isEqualByComparingTo("10.00");
         assertThat(control.getGarantia()).isEqualByComparingTo("0.00");
@@ -63,6 +64,7 @@ class SaveControlEtecUseCaseImplTest {
                 .montoFijoCargo(new BigDecimal("10000.00"))
                 .horasReferenciaCargo(new BigDecimal("18.00"))
                 .basicoMaestroGrado(new BigDecimal("700000.00"))
+                .codigoAdicionalDirectivo(990)
                 .porcentajePresentismo(new BigDecimal("25.00"))
                 .porcentajeAdicionalCarrera(new BigDecimal("12.00"))
                 .garantia(new BigDecimal("844872.78"))
@@ -81,6 +83,7 @@ class SaveControlEtecUseCaseImplTest {
         assertThat(control.getMontoFijoCargo()).isEqualByComparingTo("10000.00");
         assertThat(control.getHorasReferenciaCargo()).isEqualByComparingTo("18.00");
         assertThat(control.getBasicoMaestroGrado()).isEqualByComparingTo("700000.00");
+        assertThat(control.getCodigoAdicionalDirectivo()).isEqualTo(990);
         assertThat(control.getPorcentajePresentismo()).isEqualByComparingTo("25.00");
         assertThat(control.getGarantia()).isEqualByComparingTo("844872.78");
         assertThat(control.getHorasAdicionalCargaHoraria()).isEqualByComparingTo("15.00");
