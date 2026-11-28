@@ -27,6 +27,8 @@ public class ControlEtecResponse {
 
     private BigDecimal basicoMaestroGrado;
 
+    private Integer codigoAdicionalDirectivo;
+
     private BigDecimal porcentajePresentismo;
 
     private BigDecimal porcentajeAdicionalCarrera;

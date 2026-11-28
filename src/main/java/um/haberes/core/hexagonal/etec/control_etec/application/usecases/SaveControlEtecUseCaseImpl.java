@@ -35,6 +35,7 @@ public class SaveControlEtecUseCaseImpl implements SaveControlEtecUseCase {
                         ControlEtec::getHorasReferenciaCargo, BigDecimal.ZERO))
                 .basicoMaestroGrado(valor(datos.getBasicoMaestroGrado(), existente,
                         ControlEtec::getBasicoMaestroGrado, BigDecimal.ZERO))
+                .codigoAdicionalDirectivo(codigo(datos.getCodigoAdicionalDirectivo(), existente))
                 .porcentajePresentismo(valor(datos.getPorcentajePresentismo(), existente,
                         ControlEtec::getPorcentajePresentismo, ControlEtec.PORCENTAJE_PRESENTISMO_DEFAULT))
                 .porcentajeAdicionalCarrera(valor(datos.getPorcentajeAdicionalCarrera(), existente,
@@ -48,6 +49,20 @@ public class SaveControlEtecUseCaseImpl implements SaveControlEtecUseCase {
 
         validarNoNegativo(control);
         return repository.save(control);
+    }
+
+    /**
+     * Código del adicional directivo ETEC. {@code null} conserva el del período existente y
+     * {@code 0} lo limpia; un código negativo es inválido.
+     */
+    private Integer codigo(Integer nuevo, ControlEtec existente) {
+        if (nuevo == null) {
+            return existente == null ? null : existente.getCodigoAdicionalDirectivo();
+        }
+        if (nuevo < 0) {
+            throw new ControlEtecException("El código del adicional directivo no puede ser negativo");
+        }
+        return nuevo == 0 ? null : nuevo;
     }
 
     private BigDecimal valor(BigDecimal nuevo, ControlEtec existente,

@@ -30,7 +30,7 @@ class ConceptosEtecValidatorTest {
         assertThatThrownBy(() -> ConceptosEtecValidator.validar(conceptos, Set.of(985)))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("989")
-                .hasMessageContaining("sql/016_codigo_arraigo_etec.sql");
+                .hasMessageContaining("control_etec.codigo_adicional_directivo");
     }
 
     @Test

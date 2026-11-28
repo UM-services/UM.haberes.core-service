@@ -40,6 +40,13 @@ public class ControlEtec {
     /** Básico del maestro de grado del período, base de {@code vecesBasicoMaestroGrado}. */
     private BigDecimal basicoMaestroGrado;
 
+    /**
+     * Código de liquidación del adicional directivo ETEC. Es un dato del período: el código se
+     * crea o elige en el catálogo y acá sólo se referencia. Nulo o cero significa que el período
+     * no liquida el concepto.
+     */
+    private Integer codigoAdicionalDirectivo;
+
     /** Porcentaje de presentismo ETEC sobre el valor del cargo. */
     private BigDecimal porcentajePresentismo;
 
