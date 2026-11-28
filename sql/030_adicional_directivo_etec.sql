@@ -1,19 +1,9 @@
 -- Adicional Directivo ETEC.
 --
--- Concepto propio de los cargos ETEC por puntos que tienen informado
--- `etec_asignacion_cargo.veces_basico_maestro_grado`:
+-- El concepto ya no se crea con un `codigo_id` fijo. El código se crea o se elige en la
+-- pantalla de Códigos y el período lo referencia en `control_etec.codigo_adicional_directivo`
+-- (ver `sql/031_control_etec_codigo_adicional_directivo.sql`).
 --
---   importe = control_etec.basico_maestro_grado × veces_basico_maestro_grado
---
--- Es remunerativo, docente e incluido en ETEC, igual que el resto de los conceptos del circuito.
--- Idempotente: sólo inserta si el código no existe.
+-- Este script se conserva como marcador histórico: no inserta ningún código.
 
-INSERT INTO codigo (codigo_id, nombre, docente, no_docente, transferible, incluido_etec,
-                    afip_concepto_sueldo_id_primer_semestre, afip_concepto_sueldo_id_segundo_semestre,
-                    created)
-SELECT 990, 'ADICIONAL DIRECTIVO ETEC', 1, 0, 0, 1, 110000, 110000, NOW() FROM DUAL
-WHERE NOT EXISTS (SELECT 1 FROM codigo WHERE codigo_id = 990);
-
-INSERT INTO codigo_grupo (codigo_id, remunerativo, no_remunerativo, deduccion, total, created)
-SELECT 990, 1, 0, 0, 0, NOW() FROM DUAL
-WHERE NOT EXISTS (SELECT 1 FROM codigo_grupo WHERE codigo_id = 990);
+SELECT 'Adicional Directivo ETEC: el código se configura en control_etec.codigo_adicional_directivo' AS resultado;

@@ -19,7 +19,7 @@ Servicio central de liquidaciones de haberes de la Universidad de Mendoza. Permi
 
 ## Versión
 
-**3.4.0** (2026-11-27)
+**3.4.1** (2026-11-28)
 _La versión se corresponde con la declarada en `pom.xml`._
 
 ## Tecnologías y dependencias principales
@@ -167,8 +167,10 @@ haberes:
 proceso masivo de liquidación general procesa los legajos del período.
 
 `haberes.etec.catalogo-estricto` (default `false`) hace que `EtecCatalogoValidator` impida el
-arranque si el catálogo no tiene los códigos ETEC (`984` a `990`); con `false` el faltante se
-registra como error en el log con los scripts `sql/` que hay que aplicar.
+arranque si el catálogo no tiene los seis códigos ETEC base (`984` a `989`); el código del adicional
+directivo es un dato del período (`control_etec.codigo_adicional_directivo`) y se valida al
+liquidar. Con `false` el faltante se registra como error en el log con los scripts `sql/` que hay
+que aplicar.
 
 
 ## Auditoría de operaciones
@@ -431,7 +433,7 @@ versionados en el período.
 - `DELETE /api/haberes/core/etec/asignacion-cargo/{asignacionCargoId}` - Baja
 - `GET /api/haberes/core/etec/control/{anho}/{mes}` - Parámetros ETEC del período (`404` si no está configurado)
 - `GET /api/haberes/core/etec/control/{anho}/{mes}/opcional` - Ídem, con `200` y cuerpo vacío si no existe
-- `POST /api/haberes/core/etec/control/{anho}/{mes}` - Alta o actualización (upsert) de los parámetros ETEC del período: valor del punto, monto fijo, `horasReferenciaCargo`, `basicoMaestroGrado`, porcentajes de presentismo y adicional carrera, garantía y horas adicionales de carga horaria
+- `POST /api/haberes/core/etec/control/{anho}/{mes}` - Alta o actualización (upsert) de los parámetros ETEC del período: valor del punto, monto fijo, `horasReferenciaCargo`, `basicoMaestroGrado`, `codigoAdicionalDirectivo` (código del catálogo; nulo conserva, `0` lo limpia y negativo se rechaza), porcentajes de presentismo y adicional carrera, garantía y horas adicionales de carga horaria
 - `POST /api/haberes/core/etec/control/copiar/{anho}/{mes}` - Copia los parámetros ETEC y la escala de horas del mes anterior (`409` si el destino existe, `404` si no hay origen)
 - `GET /api/haberes/core/etec/hora/escala/{anho}/{mes}` - Escala de horas de clase ETEC del período (lista vacía si el período no tiene control ETEC); cada tramo incluye `categoriaId`
 - `PUT /api/haberes/core/etec/hora/escala/{anho}/{mes}` - Reemplazo completo de la escala de horas (valida rangos, solapamientos, importes y que cada tramo indique una categoría marcada como `etec_horas`; la lista vacía borra la escala; `404` si el período no tiene control ETEC)
@@ -456,7 +458,8 @@ La pérdida de presentismo hace que la liquidación ETEC emita el `985 PRESENTIS
 `sql/020_codigo_descuento_presentismo_etec.sql`, `sql/021_etec_presentismo.sql`,
 `sql/022_etec_presentismo_horas.sql`, `sql/023_etec_hora_categoria.sql`,
 `sql/024_categoria_periodo_etec.sql`, `sql/028_etec_config_horas_basico.sql`,
-`sql/029_antiguedad_etec.sql` y `sql/030_adicional_directivo_etec.sql` antes de usar los endpoints.
+`sql/029_antiguedad_etec.sql` y `sql/031_control_etec_codigo_adicional_directivo.sql` antes de usar
+los endpoints.
 `sql/023_etec_hora_categoria.sql` agrega `categoria.etec_horas` y `etec_hora_escala.categoria_id`
 (con backfill a `2002`), de modo que cada tramo de horas ETEC liquida con la categoría configurada
 y ya no con un id fijo en el código. `sql/024_categoria_periodo_etec.sql` agrega
@@ -464,7 +467,8 @@ y ya no con un id fijo en el código. `sql/024_categoria_periodo_etec.sql` agreg
 y debe aplicarse antes de desplegar la generación ETEC por período.
 
 Antes de borrar la liquidación anterior, un legajo con cargos ETEC verifica que el catálogo tenga
-los siete códigos ETEC (`984` a `990`); si falta alguno, la liquidación falla y conserva la previa.
+los seis códigos base (`984` a `989`) y, si el período configuró el adicional directivo, también ese
+código; si falta alguno, la liquidación falla y conserva la previa.
 En el cálculo, `ConceptosEtecValidator` corta la liquidación cuando un concepto con importe
 distinto de cero no tiene código en el catálogo, en lugar de omitirlo en silencio. El catálogo se
 valida además al arrancar (`EtecCatalogoValidator`, ver `haberes.etec.catalogo-estricto`).
@@ -480,16 +484,22 @@ valida además al arrancar (`EtecCatalogoValidator`, ver `haberes.etec.catalogo-
   tiene menos horas que las de referencia;
 - la garantía `987 GARANTIA ETEC` de los cargos por puntos se prorratea por
   `horasCargo / horasReferenciaCargo`, y sin esos valores se conserva la garantía completa;
-- el `990 ADICIONAL DIRECTIVO ETEC` es `basicoMaestroGrado × vecesBasicoMaestroGrado` del cargo y
-  sólo se emite cuando `vecesBasicoMaestroGrado` es mayor a cero.
+- el adicional directivo ETEC es `basicoMaestroGrado × vecesBasicoMaestroGrado` del cargo y sólo se
+  emite cuando `vecesBasicoMaestroGrado` es mayor a cero. Su código de liquidación no está fijo en
+  el código: lo define el período en `control_etec.codigo_adicional_directivo`; si hay importe y el
+  período no configuró el código, la liquidación falla en lugar de omitirlo.
 
 `sql/029_antiguedad_etec.sql` agrega `antiguedad.meses_etec` con backfill desde `persona.alta_etec`
 y recrea `vw_antiguedad_periodo`. El arraigo ETEC y el `989 ARRAIGO ETEC` usan esa antigüedad ETEC en
 lugar de la docente; un legajo sin `alta_etec` queda con cero meses ETEC y sin arraigo. El cálculo
 también corrige la antigüedad administrativa, que tomaba `alta_docente` como fecha de ingreso.
 
-`sql/030_adicional_directivo_etec.sql` inserta el código `990 ADICIONAL DIRECTIVO ETEC`
-(remunerativo, docente, incluido en ETEC y con concepto AFIP `110000` en ambos semestres).
+`sql/031_control_etec_codigo_adicional_directivo.sql` agrega
+`control_etec.codigo_adicional_directivo` y enlaza por nombre el código `ADICIONAL DIRECTIVO ETEC`
+si ya existe; no fija ningún número. El código se crea o elige en la pantalla de Códigos
+(remunerativo, docente, incluido en ETEC y con concepto AFIP `110000` en ambos semestres) y después
+se selecciona en Control ETEC. `sql/030_adicional_directivo_etec.sql` se conserva como marcador
+histórico y ya no inserta el código.
 
 Las cachés `codigos` y `codigos_grupos` usan como clave la versión del catálogo (cantidad de filas,
 último `updated` y último id), de modo que una carga por SQL directo invalida la entrada sin
