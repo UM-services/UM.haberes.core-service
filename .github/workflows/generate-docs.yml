@@ -150,7 +150,7 @@ jobs:
                   { file: 'diagrams/flujo-anotacion-aprobacion.mmd', title: '✍️ Secuencia: Anotación y Aprobación Docente' },
                   { file: 'diagrams/flujo-etec-antiguedad.mmd', title: '🎒 Secuencia: ETEC, Antigüedad y Bonos' },
                   { file: 'diagrams/flujo-etec-cargo-puntos.mmd', title: '🎯 Secuencia: Cargos ETEC por Puntos y Reemplazo de Cargos' },
-                  { file: 'diagrams/flujo-etec-liquidacion-puntos.mmd', title: '🧮 Secuencia: Liquidación ETEC por Puntos (Conceptos 984 a 990)' },
+                  { file: 'diagrams/flujo-etec-liquidacion-puntos.mmd', title: '🧮 Secuencia: Liquidación ETEC por Puntos (Conceptos 984 a 989 + adicional directivo configurado)' },
                   { file: 'diagrams/flujo-etec-presentismo.mmd', title: '🚫 Secuencia: Pérdida de Presentismo ETEC y Concepto 984' },
                   { file: 'diagrams/flujo-legajobanco-filtro-codigo.mmd', title: '🏦 Secuencia: LegajoBanco con Filtro por Código' },
                   { file: 'diagrams/flujo-vistas-reporte.mmd', title: '📊 Secuencia: Vistas de Reporte' },

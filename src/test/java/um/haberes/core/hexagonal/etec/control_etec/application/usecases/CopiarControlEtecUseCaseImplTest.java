@@ -45,6 +45,7 @@ class CopiarControlEtecUseCaseImplTest {
                 .montoFijoCargo(new BigDecimal("50000.00"))
                 .horasReferenciaCargo(new BigDecimal("18.00"))
                 .basicoMaestroGrado(new BigDecimal("750000.00"))
+                .codigoAdicionalDirectivo(990)
                 .porcentajePresentismo(new BigDecimal("20.00"))
                 .porcentajeAdicionalCarrera(new BigDecimal("10.00"))
                 .garantia(new BigDecimal("844872.78"))
@@ -67,6 +68,7 @@ class CopiarControlEtecUseCaseImplTest {
         assertThat(copia.getMontoFijoCargo()).isEqualByComparingTo("50000.00");
         assertThat(copia.getHorasReferenciaCargo()).isEqualByComparingTo("18.00");
         assertThat(copia.getBasicoMaestroGrado()).isEqualByComparingTo("750000.00");
+        assertThat(copia.getCodigoAdicionalDirectivo()).isEqualTo(990);
         assertThat(copia.getGarantia()).isEqualByComparingTo("844872.78");
         assertThat(copia.getHorasAdicionalCargaHoraria()).isEqualByComparingTo("15.00");
         assertThat(copia.getValorHoraAdicionalCargaHoraria()).isEqualByComparingTo("8012.19");

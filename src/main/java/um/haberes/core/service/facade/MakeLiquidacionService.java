@@ -737,9 +737,10 @@ public class MakeLiquidacionService {
     }
 
     /**
-     * Agrega los conceptos propios de la ETEC por puntos (984 a 990) calculados sobre los cargos
-     * con {@code categoria.puntos > 0}. Corre después del básico y la antigüedad y antes de los
-     * totales parciales, para que entren en los grupos remunerativos.
+     * Agrega los conceptos propios de la ETEC por puntos (984 a 989 y el código configurado del
+     * adicional directivo) calculados sobre los cargos con {@code categoria.puntos > 0}. Corre
+     * después del básico y la antigüedad y antes de los totales parciales, para que entren en los
+     * grupos remunerativos.
      */
     private void calcularConceptosEtec(Long legajoId, Integer anho, Integer mes, LiquidacionState state) {
         Map<Integer, BigDecimal> conceptos = etecLiquidacionCalculator.calcular(state.getEtecAcumulado(),
@@ -768,13 +769,22 @@ public class MakeLiquidacionService {
         if (!tieneCargoEtec) {
             return;
         }
-        List<Integer> faltantes = EtecLiquidacionCalculator.CODIGOS_ETEC.stream()
+        Set<Integer> requeridos = new HashSet<>(EtecLiquidacionCalculator.CODIGOS_ETEC);
+        if (state.getControlEtec() != null
+                && state.getControlEtec().getCodigoAdicionalDirectivo() != null
+                && state.getControlEtec().getCodigoAdicionalDirectivo() > 0) {
+            requeridos.add(state.getControlEtec().getCodigoAdicionalDirectivo());
+        }
+        List<Integer> faltantes = requeridos.stream()
                 .filter(codigoId -> !state.getCodigos().containsKey(codigoId))
+                .sorted()
                 .toList();
         if (!faltantes.isEmpty()) {
             throw new IllegalStateException("Faltan códigos ETEC en el catálogo: " + faltantes
                     + ". Aplicar sql/010_codigos_etec.sql, sql/016_codigo_arraigo_etec.sql y "
-                    + "sql/020_codigo_descuento_presentismo_etec.sql, y refrescar la caché de códigos.");
+                    + "sql/020_codigo_descuento_presentismo_etec.sql, y configurar "
+                    + "control_etec.codigo_adicional_directivo con un código existente; "
+                    + "después refrescar la caché de códigos.");
         }
     }
 

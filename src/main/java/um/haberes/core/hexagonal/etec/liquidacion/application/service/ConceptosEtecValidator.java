@@ -25,8 +25,9 @@ public final class ConceptosEtecValidator {
                 .toList();
         if (!faltantes.isEmpty()) {
             throw new IllegalStateException("Faltan códigos ETEC en el catálogo: " + faltantes
-                    + ". Aplicar sql/010_codigos_etec.sql, sql/016_codigo_arraigo_etec.sql y "
-                    + "sql/020_codigo_descuento_presentismo_etec.sql, y refrescar la caché de códigos.");
+                    + ". Revisar el catálogo de códigos y la configuración ETEC del período "
+                    + "(incluido control_etec.codigo_adicional_directivo), y refrescar la caché "
+                    + "de códigos.");
         }
     }
 }
